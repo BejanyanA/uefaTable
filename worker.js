@@ -45,7 +45,7 @@ export async function onRequest(context) {
 
           response = jsonResponse({ success: true, message: "User registered" }, 201);
         } catch {
-          response = jsonResponse({ success: false, message: "Registration failed" }, 500);
+          response = jsonResponse({ success: false, message: "Registration failedddd" }, 500);
         }
       }
     }
