@@ -1,4 +1,4 @@
-name = "uefa-app-production"
+name = "uefa-app"
 compatibility_date = "2025-07-11"
 main = "worker.js"                 
 type = "javascript"        
