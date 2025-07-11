@@ -73,7 +73,7 @@ function isValidPassword(password) {
 
 
 // 🔹 2. Constants
-const API_BASE = "https://uefaresults.com";
+const API_BASE = "https://api.uefaresults.com";
 
 
 // 🔹 3. Form submit event listeners (Register + Login)

@@ -1,4 +1,4 @@
-name = "uefa-table-app"
+name = "uefa-app"
 compatibility_date = "2025-07-11"
 main = "worker.js"                 
 type = "javascript"        
@@ -7,7 +7,7 @@ type = "javascript"
 upload.format = "modules"
 
 [[routes]]
-pattern = "uefaresults.com"
+pattern = "api.uefaresults.com"
 zone_id = "fd4555f4b7101c5d8895f808418eef29"
 custom_domain = true
 
