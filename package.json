@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "@tsndr/cloudflare-worker-jwt": "^3.2.0"
+  },
+  "name": "uefa",
+  "version": "1.0.0",
+  "main": "worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
