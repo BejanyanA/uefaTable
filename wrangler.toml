@@ -1,4 +1,4 @@
-name = "uefa-app"
+name = "uefa-app-production"
 compatibility_date = "2025-07-11"
 main = "worker.js"                 
 type = "javascript"        
@@ -11,10 +11,7 @@ pattern = "api.uefaresults.com"
 zone_id = "fd4555f4b7101c5d8895f808418eef29"
 custom_domain = true
 
-[env.production]
-compatibility_date = "2025-07-11"
-
-[[env.production.d1_databases]]
+[[d1_databases]]
 binding = "core_data"
 database_name = "users-db"
 database_id = "09b42559-8b10-4ee0-b3b0-af0d5a5f3609"
