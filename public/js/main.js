@@ -37,6 +37,7 @@ function closeModal(id) {
   // Re-enable background
   document.body.classList.remove("modal-open");
 }
+window.closeModal = closeModal;
 
 function togglePassword(inputId, icon) {
   const input = document.getElementById(inputId);
@@ -44,6 +45,7 @@ function togglePassword(inputId, icon) {
   input.type = isPassword ? "text" : "password";
   icon.src = isPassword ? "assets/eye-off.svg" : "assets/eye.svg"; // Replace with your hidden eye icon path
 }
+window.togglePassword = togglePassword;
 
 // Validations
 function setError(id, message) {
@@ -221,7 +223,7 @@ function setLanguage(lang) {
     changeLang(lang);
   }
 }
-
+window.setLanguage = setLanguage;
 
 // 🔹 5. JWT check on load
 async function checkLoggedIn() {
