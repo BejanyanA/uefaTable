@@ -1,3 +1,5 @@
+import { showToast } from './toast.js';
+
 // 🔹 1. Utility + UI functions first (openModal, closeModal, setError, etc.)
 function openModal(id) {
   // Close all other modals
@@ -127,7 +129,8 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
       password: regPassword.value
     })
   });
-  alert(await res.text());
+  const message = await res.text();
+  showToast(message, res.ok ? "success" : "error");
   closeModal('registerModal');
 });
 
@@ -185,10 +188,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       closeModal("loginModal");
     } else {
-      alert(data.message || "Login failed.");
+      showToast(data.message || "Login failed.", "error");
     }
   } catch (err) {
-    alert("Something went wrong.");
+    showToast("Something went wrong.", "error");
     console.error(err);
   }
 });
