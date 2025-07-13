@@ -28,12 +28,15 @@ function createToastContainer() {
   const container = document.createElement("div");
   container.id = "toast-container";
   container.style.position = "fixed";
-  container.style.bottom = "20px";
+  container.style.top = "20px";
   container.style.left = "50%";
+  container.style.right = "auto";
+  container.style.bottom = "";
   container.style.transform = "translateX(-50%)";
   container.style.zIndex = "9999";
   container.style.display = "flex";
   container.style.flexDirection = "column";
+  container.style.alignItems = "center";
   container.style.gap = "10px";
   document.body.appendChild(container);
   return container;
