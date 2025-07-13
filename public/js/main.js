@@ -21,6 +21,8 @@ function openModal(id) {
   // Disable background interactions
   document.body.classList.add("modal-open");
 }
+window.openModal = openModal;
+
 
 function closeModal(id) {
   const modal = document.getElementById(id);
@@ -202,6 +204,7 @@ function toggleDropdown() {
   const dropdown = document.getElementById("langDropdown");
   dropdown.classList.toggle("show");
 }
+window.toggleDropdown = toggleDropdown;
 
 function setLanguage(lang) {
   const flag = document.getElementById("langTrigger");
