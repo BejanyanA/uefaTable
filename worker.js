@@ -102,15 +102,31 @@ export async function onRequest(context) {
   // Route: /me
   else if (request.method === "GET" && url.pathname === "/me") {
     const authHeader = request.headers.get("Authorization");
+
     if (!authHeader?.startsWith("Bearer ")) {
       response = jsonResponse({ success: false, message: "Unauthorized" }, 401);
     } else {
       const token = authHeader.split(" ")[1];
+
       try {
-        const payload = await jwt.verify(token, env.JWT_SECRET); // ⏱️ This will throw if expired
-        response = jsonResponse({ success: true, user: payload });
+        const isValid = await jwt.verify(token, env.JWT_SECRET);
+
+        if (!isValid) {
+          response = jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+        } else {
+          const payload = jwt.decode(token).payload;
+
+          // Manually check expiration
+          const now = Math.floor(Date.now() / 1000);
+          if (payload.exp && payload.exp < now) {
+            response = jsonResponse({ success: false, message: "Token expired" }, 401);
+          } else {
+            response = jsonResponse({ success: true, user: payload }, 200);
+          }
+        }
       } catch (err) {
-        response = jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+        console.error("Token verification failed:", err);
+        response = jsonResponse({ success: false, message: "Invalid token" }, 401);
       }
     }
   }
