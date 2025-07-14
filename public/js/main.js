@@ -113,8 +113,14 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   if (!regPassword.value.trim()) {
     setError("regPasswordError", translation.required);
     hasError = true;
+  } else if (regPassword.value === regUsername.value) {
+    setError("regPasswordError", translation.passMatchUsername);
+    hasError = true;
   } else if (!isValidPassword(regPassword.value.trim())) {
     setError("regPasswordError", translation.invalidPassword);
+    hasError = true;
+  } else if (regPassword.value.trim().length > 30) {
+    setError("regPasswordError", translation.longPassword);
     hasError = true;
   }
 
@@ -123,6 +129,9 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     hasError = true;
   } else if (regPassword.value !== regConfirmPassword.value) {
     setError("regConfirmPasswordError", translation.mismatch);
+    hasError = true;
+  } else if (regConfirmPassword.value.trim().length > 30) {
+    setError("regConfirmPasswordError", translation.longPassword);
     hasError = true;
   }
 
