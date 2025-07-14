@@ -14,7 +14,8 @@ const langMap = {
     invalidPassword: "Password must be at least 8 characters, include uppercase, lowercase, number, and special character",
     mismatch: "Passwords do not match",
     shortUsername: "Username must be at least 3 characters",
-    longUsername: "Username must not exceed 20 characters",
+    longUsername: "Username must not exceed 20 characters", 
+    welcome: "Welcome", 
 
     //BackEnd Errors
     username_exists: "Username already exists",
@@ -42,6 +43,7 @@ const langMap = {
     mismatch: "Գաղտնաբառերը չեն համընկնում",
     shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ",
     longUsername: "Օգտանունը չպետք է գերազանցի 20 նիշը",
+    welcome: "Բարի Գալուստ", 
 
     //BackEnd Errors
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -69,6 +71,7 @@ const langMap = {
     mismatch: "Mots de passe non identiques",
     shortUsername: "Le nom d'utilisateur doit contenir au moins 3 caractères",
     longUsername: "Le nom d'utilisateur ne doit pas dépasser 20 caractères",
+    welcome: "Bienvenue", 
 
     //BackEnd Errors
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -104,6 +107,7 @@ function changeLang(lang) {
   document.getElementById("loginBtn").innerText = t.login;
   document.getElementById("logoutBtn").innerText = t.logout;
   document.getElementById("registerBtn").innerText = t.registerBtn;
+  // document.getElementById("welcomeUser").innerText = t.welcome;
   document.getElementById("loginTitle").innerText = t.login;
   document.getElementById("registerTitle").innerText = t.register;
   document.getElementById("loginEmail").placeholder = t.email;
