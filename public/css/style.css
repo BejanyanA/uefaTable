@@ -119,6 +119,36 @@ header {
   transform: scale(0.96);
 }
 
+.logout-button {
+  display: block;
+  gap: 15px;
+}
+
+.logout-button button {
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4%;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 100px;
+  /* ✅ Force fixed width */
+  text-align: center;
+  box-sizing: content-box;
+}
+
+.logout-button button:hover {
+  background-color: white;
+  color: rgb(245, 2, 2);
+}
+
+.logout-button button:active {
+  transform: scale(0.96);
+}
+
 /* Modal */
 .modal {
   display: none;
@@ -134,9 +164,11 @@ header {
   box-sizing: border-box;
 }
 
-body.modal-open > *:not(.modal) {
-  pointer-events: none;   /* disable all interaction */
-  user-select: none;      /* prevent selection */
+body.modal-open>*:not(.modal) {
+  pointer-events: none;
+  /* disable all interaction */
+  user-select: none;
+  /* prevent selection */
 }
 
 .modal-content {
@@ -204,7 +236,8 @@ body.modal-open > *:not(.modal) {
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 35px; /* space for icon */
+  padding-right: 35px;
+  /* space for icon */
 }
 
 .toggle-password {
@@ -283,6 +316,19 @@ footer {
   }
 
   .auth-buttons button {
+    width: auto;
+    /* let buttons adjust naturally on mobile */
+    min-width: 70px;
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+
+  .logOut-button {
+    gap: 10px;
+    order: 1;
+  }
+
+  .logOut-button button {
     width: auto;
     /* let buttons adjust naturally on mobile */
     min-width: 70px;

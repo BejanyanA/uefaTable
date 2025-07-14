@@ -83,7 +83,7 @@ const API_BASE = "https://api.uefaresults.com";
 
 
 // 🔹 3. Form submit event listeners (Register + Login)
-// Registr Form
+// Registration
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const translation = langMap[currentLang];
@@ -167,7 +167,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   }
 });
 
-// Login Form
+// Login
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const translation = langMap[currentLang];
@@ -195,8 +195,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   if (hasError) return;
 
   // Clear all error messages before sending request
-  regEmailError.textContent = "";
-  regPasswordError.textContent = "";
+  loginEmailError.textContent = "";
+  loginPassword.textContent = "";
 
   try {
     const res = await fetch(`${API_BASE}/login`, {
@@ -223,6 +223,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       if (me.success) {
         document.getElementById("welcomeUser").innerText = `Welcome, ${me.user.username}!`;
         document.getElementById("home").style.display = "block";
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("registerBtn").style.display = "none";
       }
 
       closeModal("loginModal");
@@ -235,6 +237,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     showToast(translation.something_went_wrong, "error");
     console.error(err);
   }
+
 });
 
 
@@ -262,28 +265,60 @@ function setLanguage(lang) {
 }
 window.setLanguage = setLanguage;
 
+
 // 🔹 5. JWT check on load
 async function checkLoggedIn() {
   const token = localStorage.getItem("jwt");
-  if (!token) return;
+  const authButtons = document.getElementById("authButtons");
+
+  if (!token) {
+    // No token = show buttons
+    if (authButtons) authButtons.style.display = "flex";
+    return;
+  }
 
   try {
     const res = await fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
     const data = await res.json();
 
     if (data.success && data.user) {
       document.getElementById("welcomeUser").innerText = `Welcome, ${data.user.username}!`;
       document.getElementById("home").style.display = "block";
+      // Keep buttons hidden
     } else {
       localStorage.removeItem("jwt");
+      if (authButtons) authButtons.style.display = "flex"; // Show buttons only if not logged in
     }
   } catch (err) {
     console.error("Token check failed", err);
     localStorage.removeItem("jwt");
+    if (authButtons) authButtons.style.display = "flex";
   }
 }
+
+// Logout 
+window.logout = function () {
+  localStorage.removeItem("jwt");
+  location.reload()
+
+  // Hide the welcome section
+  document.getElementById("home").style.display = "none";
+
+  // Reset welcome message
+  document.getElementById("welcomeUser").innerText = "";
+
+  // Optionally: show login/signup buttons again
+  document.getElementById("loginBtn").style.display = "inline-block";
+  document.getElementById("registerBtn").style.display = "inline-block";
+
+  // Optionally: show a toast confirmation
+  showToast("Logged out successfully", "info");
+};
+
+checkLoggedIn();
 
 
 // 🔹 6. Outside click: hide language dropdown
@@ -301,6 +336,3 @@ document.addEventListener("click", function (e) {
     dropdown.classList.remove("show");
   }
 });
-
-// ✅ Run check
-checkLoggedIn();

@@ -1,6 +1,7 @@
 const langMap = {
   en: {
     login: "Login",
+    logout: "Logout",
     register: "Registration",
     registerBtn: "Sign Up",
     registerSubmit: "Submit",
@@ -26,6 +27,7 @@ const langMap = {
 
   am: {
     login: "Մուտք",
+    logout: "Դուրս գալ",
     register: "Գրանցվել",
     registerBtn: "Գրանցվել",
     registerSubmit: "Հաստատել",
@@ -51,6 +53,7 @@ const langMap = {
 
   fr: {
     login: "Connexion",
+    logout: "Se déconnecter",
     register: "Inscription",
     registerBtn: "S’inscrire",
     registerSubmit: "Envoyer",
@@ -96,6 +99,7 @@ function changeLang(lang) {
   const t = langMap[lang];
 
   document.getElementById("loginBtn").innerText = t.login;
+  document.getElementById("logoutBtn").innerText = t.logout;
   document.getElementById("registerBtn").innerText = t.registerBtn;
   document.getElementById("loginTitle").innerText = t.login;
   document.getElementById("registerTitle").innerText = t.register;

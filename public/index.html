@@ -12,11 +12,6 @@
 <body>
   <div id="overlay" class="overlay"></div>
 
-  <section id="home" style="display: none; text-align:center; margin-top: 50px;">
-    <h2 id="welcomeUser">Welcome!</h2>
-    <button onclick="logout()" style="margin-top: 20px;">Logout</button>
-  </section>
-
   <!-- Header  -->
   <header>
     <div class="language-auth-group">
@@ -37,12 +32,19 @@
           </div>
         </div>
       </div>
-      <div class="auth-buttons">
+      <div class="auth-buttons" style="display: none;" id="authButtons">
         <button onclick="openModal('loginModal')" id="loginBtn">Login</button>
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
     </div>
   </header>
+
+  <section id="home" style="display: none; text-align:center; margin-top: 50px;">
+    <h2 id="welcomeUser">Welcome!</h2>
+    <div class="logout-button">
+      <button onclick="logout()" id="logoutBtn">Logout</button>
+    </div>
+  </section>
 
   <!-- Login Modal  -->
   <div class="modal" id="loginModal">
@@ -98,8 +100,8 @@
   </footer>
 
   <!-- Load language system, validations, then main logic -->
-<script src="js/lang.js" defer></script>
-<script type="module" src="js/main.js"></script>
+  <script src="js/lang.js" defer></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 
 </html>
