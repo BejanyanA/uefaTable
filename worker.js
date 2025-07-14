@@ -92,7 +92,7 @@ export async function onRequest(context) {
       if (!user || (await hashWithSalt(password, user.salt)) !== user.password_hash) {
         response = jsonResponse({ success: false, message: "invalid_email_or_password" }, 400);
       } else {
-        const expiration = Math.floor(Date.now() / 1000) + (2 * 60); // 2 hours - 60 * 60 * 2 
+        const expiration = Math.floor(Date.now() / 1000) + (60 * 60 * 2);
         const token = await jwt.sign({ email: user.email, username: user.username, exp: expiration }, env.JWT_SECRET);
         response = jsonResponse({ success: true, message: "Login successful", token }, 200);
       }
