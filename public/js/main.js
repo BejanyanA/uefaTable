@@ -66,7 +66,7 @@ function isValidPassword(password) {
   const upper = /[A-Z]/;
   const lower = /[a-z]/;
   const number = /[0-9]/;
-  const special = /[!@#$%^&*(),.?":{}|<>]/;
+  const special = /[!@#$%^&*(),.?":{}|<>]-_/;
 
   return (
     minLength.test(password) &&
