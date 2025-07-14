@@ -79,7 +79,7 @@ export async function onRequest(context) {
   // Route: /login
   else if (request.method === "POST" && url.pathname === "/login") {
     const { email, password } = await parseBody(request);
-    
+
     const errors = {};
     if (!email) errors.email = "Email is required";
     if (!password) errors.password = "Password is required";
@@ -92,7 +92,8 @@ export async function onRequest(context) {
       if (!user || (await hashWithSalt(password, user.salt)) !== user.password_hash) {
         response = jsonResponse({ success: false, message: "invalid_email_or_password" }, 400);
       } else {
-        const token = await jwt.sign({ email: user.email, username: user.username }, env.JWT_SECRET, { exp: '2h' });
+        const expiration = Math.floor(Date.now() / 1000) + (2 * 60); // 2 hours - 60 * 60 * 2 
+        const token = await jwt.sign({ email: user.email, username: user.username, exp: expiration }, env.JWT_SECRET);
         response = jsonResponse({ success: true, message: "Login successful", token }, 200);
       }
     }
@@ -105,10 +106,12 @@ export async function onRequest(context) {
       response = jsonResponse({ success: false, message: "Unauthorized" }, 401);
     } else {
       const token = authHeader.split(" ")[1];
-      const valid = await jwt.verify(token, env.JWT_SECRET);
-      response = valid
-        ? jsonResponse({ success: true, user: jwt.decode(token).payload })
-        : jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+      try {
+        const payload = await jwt.verify(token, env.JWT_SECRET); // ⏱️ This will throw if expired
+        response = jsonResponse({ success: true, user: payload });
+      } catch (err) {
+        response = jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+      }
     }
   }
 
