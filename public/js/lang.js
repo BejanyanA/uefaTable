@@ -8,11 +8,11 @@ const langMap = {
     password: "Password",
     confirmPassword: "Confirm Password",
     username: "Username",
-    required: "This field is required.",
-    invalidEmail: "Invalid email format.",
-    invalidPassword: "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.",
-    mismatch: "Passwords do not match.",
-    shortUsername: "Username must be at least 3 characters."
+    required: "This field is required",
+    invalidEmail: "Invalid email format",
+    invalidPassword: "Password must be at least 8 characters, include uppercase, lowercase, number, and special character",
+    mismatch: "Passwords do not match",
+    shortUsername: "Username must be at least 3 characters"
   },
   am: {
     login: "Մուտք",
@@ -23,11 +23,11 @@ const langMap = {
     password: "Գաղտնաբառ",
     confirmPassword: "Հաստատել գաղտնաբառը",
     username: "Օգտանուն",
-    required: "Այս դաշտը պարտադիր է։",
-    invalidEmail: "Սխալ էլ․ հասցե։",
-    invalidPassword: "Գաղտնաբառը պետք է լինի առնվազն 8 նիշ, պարունակի մեծատառ, փոքրատառ, թիվ և հատուկ նիշ։",
-    mismatch: "Գաղտնաբառերը չեն համընկնում։",
-    shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ։"
+    required: "Այս դաշտը պարտադիր է",
+    invalidEmail: "Սխալ էլ․ հասցե",
+    invalidPassword: "Գաղտնաբառը պետք է լինի առնվազն 8 նիշ, պարունակի մեծատառ, փոքրատառ, թիվ և հատուկ նիշ",
+    mismatch: "Գաղտնաբառերը չեն համընկնում",
+    shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ"
   }
 };
 
