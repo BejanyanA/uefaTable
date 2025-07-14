@@ -326,9 +326,6 @@ window.logout = function () {
   // Optionally: show login/signup buttons again
   document.getElementById("loginBtn").style.display = "inline-block";
   document.getElementById("registerBtn").style.display = "inline-block";
-
-  // Optionally: show a toast confirmation
-  showToast("Logged out successfully", "info");
 };
 
 checkLoggedIn();

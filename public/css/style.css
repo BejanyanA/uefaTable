@@ -210,21 +210,22 @@ body.modal-open>*:not(.modal) {
 }
 
 .modal form button {
-  padding: 8px 16px;
-  background: #444;
+  border: 1px solid white;
   color: white;
-  border: none;
+  background: #666;
+  padding: 8px 16px;
   cursor: pointer;
   font-size: 14px;
   border-radius: 4px;
-  width: 100px;
-  text-align: center;
-  margin-top: 10px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 80px;
+  text-align: center;
+  box-sizing: content-box;
 }
 
 .modal form button:hover {
-  background: #666;
+  background: #1d1d1d;
 }
 
 .modal form button:active {
@@ -291,6 +292,7 @@ footer {
   font-size: x-small;
 }
 
+
 /* Mobile */
 @media (max-width: 480px) {
   .dropdown-menu {
@@ -298,6 +300,73 @@ footer {
     top: 30px;
     min-width: 100px;
     padding: 5px 0;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .modal h2 {
+    margin-top: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+  }
+
+  .modal form button {
+    border: 1px solid white;
+    color: white;
+    background: #1d1d1d;
+    padding: 8px 3px;
+    cursor: pointer;
+    font-size: 11px;
+    border-radius: 4px;
+    transition: background 0.3s, color 0.3s, transform 0.1s;
+    white-space: nowrap;
+    width: 80px;
+    text-align: center;
+    box-sizing: content-box;
+  }
+
+  .modal input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+  }
+
+  .modal-content {
+    background: white;
+    color: black;
+    padding: 15px 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 350px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 30px;
   }
 
   .language-auth-group {
