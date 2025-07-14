@@ -22,49 +22,57 @@ export async function onRequest(context) {
 
   let response;
 
-  // Route: /register
-  if (request.method === "POST" && url.pathname === "/register") {
-    const { username, email, password } = await parseBody(request);
+// Route: /register
+if (request.method === "POST" && url.pathname === "/register") {
+  const { username, email, password } = await parseBody(request);
 
-    const errors = {};
-    if (!username) errors.username = "Username is required";
-    if (!email) errors.email = "Email is required";
-    if (!password) errors.password = "Password is required";
+  const errors = {};
+  if (!username) errors.username = "Username is required";
+  if (!email) errors.email = "Email is required";
+  if (!password) errors.password = "Password is required";
 
-    if (Object.keys(errors).length > 0) {
-      response = jsonResponse({ success: false, errors }, 400);
+  if (Object.keys(errors).length > 0) {
+    response = jsonResponse({ success: false, errors }, 400);
+  } else {
+    const existingEmail = await env.core_data
+      .prepare(`SELECT * FROM users WHERE email = ?`)
+      .bind(email)
+      .first();
+
+    const existingUsername = await env.core_data
+      .prepare(`SELECT * FROM users WHERE username = ?`)
+      .bind(username)
+      .first();
+
+    if (existingEmail || existingUsername) {
+      if (existingUsername) errors.username = "Username already exists";
+      if (existingEmail) errors.email = "Email already exists";
+
+      response = jsonResponse({ success: false, errors }, 409);
     } else {
-      const existing = await env.core_data
-        .prepare(`SELECT * FROM users WHERE email = ?`)
-        .bind(email)
-        .first();
+      const saltArray = crypto.getRandomValues(new Uint8Array(16));
+      const salt = Array.from(saltArray)
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
 
-      if (existing) {
-        response = jsonResponse({ success: false, errors: { email: "Email already exists" } }, 409);
-      } else {
-        const saltArray = crypto.getRandomValues(new Uint8Array(16));
-        const salt = Array.from(saltArray)
-          .map(b => b.toString(16).padStart(2, "0"))
-          .join("");
+      const password_hash = await hashWithSalt(password, salt);
 
-        const password_hash = await hashWithSalt(password, salt);
-
-        try {
-          await env.core_data
-            .prepare(
-              `INSERT INTO users (username, email, password_hash, salt, created_at)
+      try {
+        await env.core_data
+          .prepare(
+            `INSERT INTO users (username, email, password_hash, salt, created_at)
              VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-            )
-            .bind(username, email, password_hash, salt)
-            .run();
+          )
+          .bind(username, email, password_hash, salt)
+          .run();
 
-          response = jsonResponse({ success: true, message: "User registered Successfully" }, 201);
-        } catch {
-          response = jsonResponse({ success: false, message: "Registration failed" }, 500);
-        }
+        response = jsonResponse({ success: true, message: "User registered Successfully" }, 201);
+      } catch {
+        response = jsonResponse({ success: false, message: "Registration failed" }, 500);
       }
     }
   }
+}
 
   // Route: /login
   else if (request.method === "POST" && url.pathname === "/login") {

@@ -123,6 +123,12 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     hasError = true;
   }
 
+  // Registration: BackEnd error handling
+  // Clear all error messages before sending request
+  regUsernameError.textContent = "";
+  regEmailError.textContent = "";
+  regPasswordError.textContent = "";
+
   if (hasError) return;
 
   try {
@@ -140,24 +146,16 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
     if (registrData.success) {
       closeModal("registerModal");
-
     } else {
+      // Check for structured field-level errors
       const errors = registrData.errors;
 
-      if (errors) {
-        if (errors.username) {
-          document.getElementById("regUsernameError").textContent = errors.username;
-        }
-
-        if (errors.email) {
-          document.getElementById("regEmailError").textContent = errors.email;
-        }
-
-        if (errors.password) {
-          document.getElementById("regPasswordError").textContent = errors.password;
-        }
-
+      if (errors && typeof errors === "object") {
+        if (errors.username) regUsernameError.textContent = errors.username;
+        if (errors.email) regEmailError.textContent = errors.email;
+        if (errors.password) regPasswordError.textContent = errors.password;
       } else {
+        // Fallback to toast if no field-specific error structure
         showToast(registrData.message || "Registration failed", "error");
       }
     }
@@ -191,6 +189,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     hasError = true;
   }
 
+  // Login: BackEnd Error handling
+  // Clear all error messages before sending request
+  regEmailError.textContent = "";
+  regPasswordError.textContent = "";
+  
   if (hasError) return;
 
   try {
