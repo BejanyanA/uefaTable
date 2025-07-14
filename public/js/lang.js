@@ -119,3 +119,5 @@ function changeLang(lang) {
 window.changeLang = changeLang;
 window.langMap = langMap;
 window.currentLang = currentLang;
+
+changeLang(currentLang);
