@@ -88,7 +88,7 @@ export async function onRequest(context) {
       const user = await env.core_data.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
 
       if (!user || (await hashWithSalt(password, user.salt)) !== user.password_hash) {
-        response = jsonResponse({ success: false, message: "invalid_credentials" }, 400);
+        response = jsonResponse({ success: false, message: "invalid_email_or_password" }, 400);
       } else {
         const token = await jwt.sign({ email: user.email, username: user.username }, env.JWT_SECRET, { exp: '2h' });
         response = jsonResponse({ success: true, message: "Login successful", token }, 200);

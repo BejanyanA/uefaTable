@@ -229,7 +229,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       // Error handling
     } else {
-      showToast(translation.invalid_credentials || "Login failed", "error");
+      showToast(translation.invalid_email_or_password || "Login failed", "error");
     }
   } catch (err) {
     showToast(translation.something_went_wrong, "error");

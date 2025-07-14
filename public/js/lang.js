@@ -21,7 +21,7 @@ const langMap = {
     registration_failed: "Registration failed",
     registration_success: "Successfully Registered",
     something_went_wrong: "Something went wrong",
-    invalid_credentials: "Invalid credentials",
+    invalid_email_or_password: "Email or Password is incorrect",
   },
 
   am: {
@@ -46,7 +46,32 @@ const langMap = {
     registration_failed: "Գրանցումը ձախողվեց",
     registration_success: "Գրանցումը հաջողվեց",
     something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
-    invalid_credentials: "Մուտքի տվյալները սխալ են",
+    invalid_email_or_password: "Մուտքի տվյալները սխալ են",
+  },
+
+  fr: {
+    login: "Connexion",
+    register: "Inscription",
+    registerBtn: "S’inscrire",
+    registerSubmit: "Envoyer",
+    email: "Adresse e-mail",
+    password: "Mot de passe",
+    confirmPassword: "Confirmer le mot de passe",
+    username: "Nom d'utilisateur",
+    required: "Ce champ est requis",
+    invalidEmail: "Format d'e-mail invalide",
+    invalidPassword: "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial",
+    mismatch: "Mots de passe non identiques",
+    shortUsername: "Le nom d'utilisateur doit contenir au moins 3 caractères",
+
+    //BackEnd Errors
+    username_exists: "Le nom d'utilisateur existe déjà",
+    email_exists: "L’adresse e-mail existe déjà",
+    password_error: "Erreur de mot de passe",
+    registration_failed: "Échec de l'inscription",
+    registration_success: "Inscription réussie",
+    something_went_wrong: "Une erreur s'est produite",
+    invalid_email_or_password: "E-mail ou mot de passe incorrect",
   }
 };
 
