@@ -86,40 +86,40 @@ const API_BASE = "https://api.uefaresults.com";
 // Registr Form
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const t = langMap[currentLang];
+  const translation = langMap[currentLang];
   clearErrors(["regUsernameError", "regEmailError", "regPasswordError", "regConfirmPasswordError"]);
 
   let hasError = false;
 
   if (!regUsername.value.trim()) {
-    setError("regUsernameError", t.required);
+    setError("regUsernameError", translation.required);
     hasError = true;
   } else if (regUsername.value.trim().length < 3) {
-    setError("regUsernameError", t.shortUsername);
+    setError("regUsernameError", translation.shortUsername);
     hasError = true;
   }
 
   if (!regEmail.value.trim()) {
-    setError("regEmailError", t.required);
+    setError("regEmailError", translation.required);
     hasError = true;
   } else if (!isValidEmail(regEmail.value)) {
-    setError("regEmailError", t.invalidEmail);
+    setError("regEmailError", translation.invalidEmail);
     hasError = true;
   }
 
   if (!regPassword.value.trim()) {
-    setError("regPasswordError", t.required);
+    setError("regPasswordError", translation.required);
     hasError = true;
   } else if (!isValidPassword(regPassword.value.trim())) {
-    setError("regPasswordError", t.invalidPassword);
+    setError("regPasswordError", translation.invalidPassword);
     hasError = true;
   }
 
   if (!regConfirmPassword.value.trim()) {
-    setError("regConfirmPasswordError", t.required);
+    setError("regConfirmPasswordError", translation.required);
     hasError = true;
   } else if (regPassword.value !== regConfirmPassword.value) {
-    setError("regConfirmPasswordError", t.mismatch);
+    setError("regConfirmPasswordError", translation.mismatch);
     hasError = true;
   }
 
@@ -146,21 +146,23 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
     if (registrData.success) {
       closeModal("registerModal");
+      showToast(translation.registration_success || "Successfully Registered", "success");
     } else {
-      // Check for structured field-level errors
+
+      // Error handling
       const errors = registrData.errors;
 
       if (errors && typeof errors === "object") {
-        if (errors.username) regUsernameError.textContent = errors.username;
-        if (errors.email) regEmailError.textContent = errors.email;
-        if (errors.password) regPasswordError.textContent = errors.password;
+        if (errors.username) regUsernameError.textContent = translation.username_exists;
+        if (errors.email) regEmailError.textContent = translation.email_exists;
+        if (errors.password) regPasswordError.textContent = translation.password_error;
       } else {
         // Fallback to toast if no field-specific error structure
-        showToast(registrData.message || "Registration failed", "error");
+        showToast(translation.registration_failed || "Registration failed", "error");
       }
     }
   } catch (err) {
-    showToast("Something went wrong", "error");
+    showToast(translation.something_went_wrong, "error");
     console.error(err);
   }
 });
@@ -168,30 +170,30 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // Login Form
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const t = langMap[currentLang];
+  const translation = langMap[currentLang];
   clearErrors(["loginEmailError", "loginPasswordError"]);
 
   let hasError = false;
 
   if (!loginEmail.value.trim()) {
-    setError("loginEmailError", t.required);
+    setError("loginEmailError", translation.required);
     hasError = true;
   } else if (!isValidEmail(loginEmail.value)) {
-    setError("loginEmailError", t.invalidEmail);
+    setError("loginEmailError", translation.invalidEmail);
     hasError = true;
   }
 
   if (!loginPassword.value.trim()) {
-    setError("loginPasswordError", t.required);
+    setError("loginPasswordError", translation.required);
     hasError = true;
   } else if (!isValidPassword(loginPassword.value.trim())) {
-    setError("loginPasswordError", t.invalidPassword);
+    setError("loginPasswordError", translation.invalidPassword);
     hasError = true;
   }
 
   // Login: BackEnd Error handling
   if (hasError) return;
-  
+
   // Clear all error messages before sending request
   regEmailError.textContent = "";
   regPasswordError.textContent = "";
@@ -224,11 +226,13 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       }
 
       closeModal("loginModal");
+
+      // Error handling
     } else {
-      showToast(loginData.message || "Login failed", "error");
+      showToast(translation.invalid_credentials || "Login failed", "error");
     }
   } catch (err) {
-    showToast("Something went wrong", "error");
+    showToast(translation.something_went_wrong, "error");
     console.error(err);
   }
 });

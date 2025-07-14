@@ -12,8 +12,18 @@ const langMap = {
     invalidEmail: "Invalid email format",
     invalidPassword: "Password must be at least 8 characters, include uppercase, lowercase, number, and special character",
     mismatch: "Passwords do not match",
-    shortUsername: "Username must be at least 3 characters"
+    shortUsername: "Username must be at least 3 characters",
+
+    //BackEnd Errors
+    username_exists: "Username already exists",
+    email_exists: "Email already exists",
+    password_error: "Password Error",
+    registration_failed: "Registration failed",
+    registration_success: "Successfully Registered",
+    something_went_wrong: "Something went wrong",
+    invalid_credentials: "Invalid credentials",
   },
+
   am: {
     login: "Մուտք",
     register: "Գրանցվել",
@@ -27,7 +37,16 @@ const langMap = {
     invalidEmail: "Սխալ էլ․ հասցե",
     invalidPassword: "Գաղտնաբառը պետք է լինի առնվազն 8 նիշ, պարունակի մեծատառ, փոքրատառ, թիվ և հատուկ նիշ",
     mismatch: "Գաղտնաբառերը չեն համընկնում",
-    shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ"
+    shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ",
+
+    //BackEnd Errors
+    username_exists: "Գրանցման անունը արդեն գոյություն ունի",
+    email_exists: "Էլ. հասցեն արդեն գոյություն ունի",
+    password_error: "Գաղտնաբառի սխալ",
+    registration_failed: "Գրանցումը ձախողվեց",
+    registration_success: "Գրանցումը հաջողվեց",
+    something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
+    invalid_credentials: "Մուտքի տվյալները սխալ են",
   }
 };
 
