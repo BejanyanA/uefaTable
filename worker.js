@@ -88,7 +88,7 @@ export async function onRequest(context) {
       const user = await env.core_data.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
 
       if (!user || (await hashWithSalt(password, user.salt)) !== user.password_hash) {
-        response = jsonResponse({ success: false, message: "invalid_credentials" }, 401);
+        response = jsonResponse({ success: false, message: "invalid_credentials" }, 400);
       } else {
         const token = await jwt.sign({ email: user.email, username: user.username }, env.JWT_SECRET, { exp: '2h' });
         response = jsonResponse({ success: true, message: "Login successful", token }, 200);
@@ -100,13 +100,13 @@ export async function onRequest(context) {
   else if (request.method === "GET" && url.pathname === "/me") {
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      response = jsonResponse({ success: false, message: "Unauthorized" }, 403);
+      response = jsonResponse({ success: false, message: "Unauthorized" }, 401);
     } else {
       const token = authHeader.split(" ")[1];
       const valid = await jwt.verify(token, env.JWT_SECRET);
       response = valid
         ? jsonResponse({ success: true, user: jwt.decode(token).payload })
-        : jsonResponse({ success: false, message: "Invalid or expired token" }, 403);
+        : jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
   }
 
