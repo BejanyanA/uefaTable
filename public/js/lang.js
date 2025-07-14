@@ -14,6 +14,7 @@ const langMap = {
     invalidPassword: "Password must be at least 8 characters, include uppercase, lowercase, number, and special character",
     mismatch: "Passwords do not match",
     shortUsername: "Username must be at least 3 characters",
+    longUsername: "Username must not exceed 20 characters",
 
     //BackEnd Errors
     username_exists: "Username already exists",
@@ -40,6 +41,7 @@ const langMap = {
     invalidPassword: "Գաղտնաբառը պետք է լինի առնվազն 8 նիշ, պարունակի մեծատառ, փոքրատառ, թիվ և հատուկ նիշ",
     mismatch: "Գաղտնաբառերը չեն համընկնում",
     shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ",
+    longUsername: "Օգտանունը չպետք է գերազանցի 20 նիշը",
 
     //BackEnd Errors
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -66,6 +68,7 @@ const langMap = {
     invalidPassword: "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial",
     mismatch: "Mots de passe non identiques",
     shortUsername: "Le nom d'utilisateur doit contenir au moins 3 caractères",
+    longUsername: "Le nom d'utilisateur ne doit pas dépasser 20 caractères",
 
     //BackEnd Errors
     username_exists: "Le nom d'utilisateur existe déjà",

@@ -43,7 +43,7 @@ function togglePassword(inputId, icon) {
   const input = document.getElementById(inputId);
   const isPassword = input.type === "password";
   input.type = isPassword ? "text" : "password";
-  icon.src = isPassword ? "assets/eye-off.svg" : "assets/eye.svg"; 
+  icon.src = isPassword ? "assets/eye-off.svg" : "assets/eye.svg";
 }
 window.togglePassword = togglePassword;
 
@@ -96,6 +96,9 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     hasError = true;
   } else if (regUsername.value.trim().length < 3) {
     setError("regUsernameError", translation.shortUsername);
+    hasError = true;
+  } else if (regUsername.value.trim().length > 20) {
+    setError("regUsernameError", translation.longUsername);
     hasError = true;
   }
 
