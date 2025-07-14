@@ -83,6 +83,7 @@ const API_BASE = "https://api.uefaresults.com";
 
 
 // 🔹 3. Form submit event listeners (Register + Login)
+// Registr Form
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const t = langMap[currentLang];
@@ -124,20 +125,49 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
   if (hasError) return;
 
-  const res = await fetch(`${API_BASE}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: regUsername.value,
-      email: regEmail.value,
-      password: regPassword.value
-    })
-  });
-  const message = await res.text();
-  showToast(message, res.ok ? "success" : "error");
-  closeModal('registerModal');
+  try {
+    const res = await fetch(`${API_BASE}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: regUsername.value,
+        email: regEmail.value,
+        password: regPassword.value
+      })
+    });
+
+    const registrData = await res.json();
+
+    if (registrData.success) {
+      closeModal("registerModal");
+
+    } else {
+      const errors = registrData.errors;
+
+      if (errors) {
+        if (errors.username) {
+          document.getElementById("regUsernameError").textContent = errors.username;
+        }
+
+        if (errors.email) {
+          document.getElementById("regEmailError").textContent = errors.email;
+        }
+
+        if (errors.password) {
+          document.getElementById("regPasswordError").textContent = errors.password;
+        }
+
+      } else {
+        showToast(registrData.message || "Registration failed", "error");
+      }
+    }
+  } catch (err) {
+    showToast("Something went wrong", "error");
+    console.error(err);
+  }
 });
 
+// Login Form
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const t = langMap[currentLang];
@@ -173,14 +203,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       })
     });
 
-    const data = await res.json();
+    const loginData = await res.json();
 
-    if (data.success && data.token) {
-      localStorage.setItem("jwt", data.token);  // Save token
+    if (loginData.success && loginData.token) {
+      localStorage.setItem("jwt", loginData.token);  // Save token
 
       const meRes = await fetch(`${API_BASE}/me`, {
         headers: {
-          Authorization: `Bearer ${data.token}`
+          Authorization: `Bearer ${loginData.token}`
         }
       });
 
@@ -192,10 +222,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       closeModal("loginModal");
     } else {
-      showToast(data.message || "Login failed.", "error");
+      showToast(loginData.message || "Login failed", "error");
     }
   } catch (err) {
-    showToast("Something went wrong.", "error");
+    showToast("Something went wrong", "error");
     console.error(err);
   }
 });

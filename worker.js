@@ -2,7 +2,7 @@ import jwt from '@tsndr/cloudflare-worker-jwt';
 
 function handleCorsHeaders(origin = "*") {
   return {
-    "Access-Control-Allow-Origin": origin, // Or set to a fixed domain like 'https://uefaresults.com'
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
@@ -25,27 +25,42 @@ export async function onRequest(context) {
   // Route: /register
   if (request.method === "POST" && url.pathname === "/register") {
     const { username, email, password } = await parseBody(request);
-    if (!username || !email || !password) {
-      response = jsonResponse({ success: false, message: "Missing fields" }, 400);
+
+    const errors = {};
+    if (!username) errors.username = "Username is required";
+    if (!email) errors.email = "Email is required";
+    if (!password) errors.password = "Password is required";
+
+    if (Object.keys(errors).length > 0) {
+      response = jsonResponse({ success: false, errors }, 400);
     } else {
-      const existing = await env.core_data.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
+      const existing = await env.core_data
+        .prepare(`SELECT * FROM users WHERE email = ?`)
+        .bind(email)
+        .first();
 
       if (existing) {
-        response = jsonResponse({ success: false, message: "Email already exists" }, 409);
+        response = jsonResponse({ success: false, errors: { email: "Email already exists" } }, 409);
       } else {
         const saltArray = crypto.getRandomValues(new Uint8Array(16));
-        const salt = Array.from(saltArray).map(b => b.toString(16).padStart(2, '0')).join('');
+        const salt = Array.from(saltArray)
+          .map(b => b.toString(16).padStart(2, "0"))
+          .join("");
+
         const password_hash = await hashWithSalt(password, salt);
 
         try {
-          await env.core_data.prepare(
-            `INSERT INTO users (username, email, password_hash, salt, created_at)
+          await env.core_data
+            .prepare(
+              `INSERT INTO users (username, email, password_hash, salt, created_at)
              VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-          ).bind(username, email, password_hash, salt).run();
+            )
+            .bind(username, email, password_hash, salt)
+            .run();
 
-          response = jsonResponse({ success: true, message: "User registered" }, 201);
+          response = jsonResponse({ success: true, message: "User registered Successfully" }, 201);
         } catch {
-          response = jsonResponse({ success: false, message: "Registration failedddd" }, 500);
+          response = jsonResponse({ success: false, message: "Registration failed" }, 500);
         }
       }
     }
