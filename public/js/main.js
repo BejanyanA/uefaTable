@@ -124,12 +124,12 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   }
 
   // Registration: BackEnd error handling
+  if (hasError) return;
+
   // Clear all error messages before sending request
   regUsernameError.textContent = "";
   regEmailError.textContent = "";
   regPasswordError.textContent = "";
-
-  if (hasError) return;
 
   try {
     const res = await fetch(`${API_BASE}/register`, {
@@ -190,11 +190,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   // Login: BackEnd Error handling
+  if (hasError) return;
+  
   // Clear all error messages before sending request
   regEmailError.textContent = "";
   regPasswordError.textContent = "";
-  
-  if (hasError) return;
 
   try {
     const res = await fetch(`${API_BASE}/login`, {
