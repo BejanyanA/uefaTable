@@ -43,7 +43,7 @@ function togglePassword(inputId, icon) {
   const input = document.getElementById(inputId);
   const isPassword = input.type === "password";
   input.type = isPassword ? "text" : "password";
-  icon.src = isPassword ? "assets/eye-off.svg" : "assets/eye.svg"; // Replace with your hidden eye icon path
+  icon.src = isPassword ? "assets/eye-off.svg" : "assets/eye.svg"; 
 }
 window.togglePassword = togglePassword;
 
@@ -147,6 +147,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     if (registrData.success) {
       closeModal("registerModal");
       showToast(translation.registration_success || "Successfully Registered", "success");
+      openModal("loginModal");
     } else {
 
       // Error handling
