@@ -296,7 +296,6 @@ footer {
 /* Mobile */
 @media (max-width: 480px) {
 
-  html,
   body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -307,13 +306,6 @@ footer {
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
-    overscroll-behavior: none;
-  }
-
-  body.modal-open {
-    height: 100vh;
-    overflow: hidden;
-    /* ✅ Prevent background scroll when modal open */
   }
 
   header {
@@ -406,8 +398,6 @@ footer {
     flex-direction: column;
     align-items: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    word-wrap: break-word;
   }
 
   .close {
