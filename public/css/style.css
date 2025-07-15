@@ -310,7 +310,7 @@ footer {
 
   header {
     color: transparent;
-    position: fixed;    /*sticky or fixed if you want it always visible */
+    position: sticky;    /*sticky or fixed if you want it always visible */
     top: 0;
     padding: 25px 25px;
     display: flex;
@@ -375,8 +375,7 @@ footer {
   .modal button,
   .modal select,
   .modal textarea {
-    font-size: 16px !important;
-    ;
+    font-size: 16px;
   }
 
   .modal input {
@@ -428,10 +427,9 @@ footer {
   }
 
   .auth-buttons button {
-    width: auto;
-    /* let buttons adjust naturally on mobile */
-    min-width: 70px;
-    font-size: 11px;
+    width: auto;    /* let buttons adjust naturally on mobile */
+    min-width: 80px;
+    font-size: 13px;
     padding: 4px 6px;
   }
 
