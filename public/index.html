@@ -52,11 +52,17 @@
       <span class="close" onclick="closeModal('loginModal')">&times;</span>
       <h2 id="loginTitle">Login</h2>
       <form id="loginForm">
-        <input type="text" id="loginEmail" placeholder="Email">
+        <div class="input-group">
+          <input type="text" id="loginEmail" />
+          <label for="loginEmail" id="loginEmailLabel"></label>
+        </div>
         <div class="error" id="loginEmailError"></div>
 
         <div class="password-wrapper">
-          <input type="password" id="loginPassword" placeholder="Password">
+          <div class="input-group">
+            <input type="password" id="loginPassword" />
+            <label for="password" id="loginPasswordLabel"></label>
+          </div>
           <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('loginPassword', this)" />
         </div>
         <div class="error" id="loginPasswordError"></div>
@@ -72,20 +78,32 @@
       <span class="close" onclick="closeModal('registerModal')">&times;</span>
       <h2 id="registerTitle">Register</h2>
       <form id="registerForm">
-        <input type="text" id="regUsername" placeholder="Username">
+        <div class="input-group">
+          <input type="text" id="regUsername" />
+          <label for="regUsername" id="regUsernameLabel"></label>
+        </div>
         <div class="error" id="regUsernameError"></div>
 
-        <input type="text" id="regEmail" placeholder="Email">
+        <div class="input-group">
+          <input type="text" id="regEmail" />
+          <label for="regEmail" id="regEmailLabel"></label>
+        </div>
         <div class="error" id="regEmailError"></div>
 
         <div class="password-wrapper">
-          <input type="password" id="regPassword" placeholder="Password">
+          <div class="input-group">
+            <input type="password" id="regPassword" />
+            <label for="password" id="regPasswordLabel"></label>
+          </div>
           <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('regPassword', this)" />
         </div>
         <div class="error" id="regPasswordError"></div>
 
         <div class="password-wrapper">
-          <input type="password" id="regConfirmPassword" placeholder="Confirm Password">
+          <div class="input-group">
+            <input type="password" id="regConfirmPassword" />
+            <label for="password" id="regConfirmPasswordLabel"></label>
+          </div>
           <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('regConfirmPassword', this)" />
         </div>
         <div class="error" id="regConfirmPasswordError"></div>

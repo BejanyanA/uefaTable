@@ -246,7 +246,7 @@ body.modal-open>*:not(.modal) {
 .toggle-password {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 55%;
   width: 20px;
   height: 20px;
   transform: translateY(-50%);
@@ -258,12 +258,52 @@ body.modal-open>*:not(.modal) {
   opacity: 1;
 }
 
+.input-group {
+  position: relative;
+  margin-bottom: -8px;
+  width: 100%;
+}
+
+.input-group input {
+  /* width: 100%; */
+  /* padding: 10px; */
+  /* font-size: 16px; */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  background: white;
+}
+
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  background: white;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown):valid + label,
+.input-group input:not(:focus):not(:placeholder-shown):not(:invalid) + label {
+  top: -10px;            /* ⬅️ Move label closer to input */
+  left: 4px;
+  font-size: 13px;      /* ⬅️ Slightly smaller label text */
+  color: #333;
+}
+
 .error {
   color: red;
   font-size: 12px;
-  margin-bottom: 6px;
+  margin-top: 8px;        /* 👈 Add this for spacing above */
+  margin-bottom: 16px;    /* 👈 Reduce bottom if needed */
   align-self: flex-start;
-  min-height: 26px;
+  min-height: 18px;       /* 👈 Optional: keep consistent height */
 }
 
 .close {
@@ -291,6 +331,7 @@ footer {
   margin-top: auto;
   font-size: x-small;
 }
+
 
 
 /* Mobile */
@@ -380,8 +421,8 @@ footer {
 
   .modal input {
     width: 100%;
-    padding: 6px;
-    margin-bottom: 4px;
+    padding: 4px;
+    margin-bottom: 3px;
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -391,7 +432,7 @@ footer {
   .modal-content {
     background: white;
     color: black;
-    padding: 15px 30px;
+    padding: 16px 30px;
     border-radius: 8px;
     width: 100%;
     max-width: 300px;

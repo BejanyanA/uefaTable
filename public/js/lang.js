@@ -16,8 +16,8 @@ const langMap = {
     passMatchUsername: "Password must not contain the username",
     mismatch: "Passwords do not match",
     shortUsername: "Username must be at least 3 characters",
-    longUsername: "Username must not exceed 20 characters", 
-    welcome: "Welcome", 
+    longUsername: "Username must not exceed 20 characters",
+    welcome: "Welcome",
 
     //BackEnd Errors
     username_exists: "Username already exists",
@@ -47,7 +47,7 @@ const langMap = {
     mismatch: "Գաղտնաբառերը չեն համընկնում",
     shortUsername: "Օգտանունը պետք է պարունակի առնվազն 3 նիշ",
     longUsername: "Օգտանունը չպետք է գերազանցի 20 նիշը",
-    welcome: "Բարի Գալուստ", 
+    welcome: "Բարի Գալուստ",
 
     //BackEnd Errors
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -77,7 +77,7 @@ const langMap = {
     mismatch: "Mots de passe non identiques",
     shortUsername: "Le nom d'utilisateur doit contenir au moins 3 caractères",
     longUsername: "Le nom d'utilisateur ne doit pas dépasser 20 caractères",
-    welcome: "Bienvenue", 
+    welcome: "Bienvenue",
 
     //BackEnd Errors
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -124,6 +124,14 @@ function changeLang(lang) {
   document.getElementById("regPassword").placeholder = t.password;
   document.getElementById("regConfirmPassword").placeholder = t.confirmPassword;
   document.getElementById("registerSubmit").innerText = t.registerSubmit;
+
+  // Labels
+  document.getElementById("regUsernameLabel").textContent = t.username;
+  document.getElementById("regEmailLabel").textContent = t.email;
+  document.getElementById("regPasswordLabel").textContent = t.password;
+  document.getElementById("regConfirmPasswordLabel").textContent = t.confirmPassword;
+  document.getElementById("loginEmailLabel").textContent = t.email;
+  document.getElementById("loginPasswordLabel").textContent = t.password;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/${lang}.svg`;
