@@ -302,7 +302,7 @@ footer {
     background: url('../assets/bgImage.jpg') no-repeat center center fixed;
     background-size: cover;
     color: transparent;
-    /* display: flex; */
+    display: flex;
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
@@ -310,6 +310,8 @@ footer {
 
   header {
     color: transparent;
+    position: fixed;    /*sticky or fixed if you want it always visible */
+    top: 0;
     padding: 25px 25px;
     display: flex;
     justify-content: flex-end;
@@ -373,7 +375,8 @@ footer {
   .modal button,
   .modal select,
   .modal textarea {
-    font-size: 16px !important;;
+    font-size: 16px !important;
+    ;
   }
 
   .modal input {
