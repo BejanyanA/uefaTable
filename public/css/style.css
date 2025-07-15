@@ -368,6 +368,13 @@ footer {
     box-sizing: content-box;
   }
 
+  .modal input,
+  .modal button,
+  .modal select,
+  .modal textarea {
+    font-size: 16px;
+  }
+
   .modal input {
     width: 100%;
     padding: 6px;
@@ -375,7 +382,7 @@ footer {
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 16px;
+
   }
 
   .modal-content {
@@ -385,7 +392,7 @@ footer {
     border-radius: 8px;
     width: 100%;
     max-width: 300px;
-    position: fixed;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
