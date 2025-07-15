@@ -350,7 +350,7 @@ footer {
     margin-top: 0;
     text-align: center;
     width: 100%;
-    font-size: 20px;
+    font-size: 25px;
   }
 
   .modal form button {
@@ -375,7 +375,7 @@ footer {
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
-
+    font-size: 16px;
   }
 
   .modal-content {
