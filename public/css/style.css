@@ -23,8 +23,7 @@ header {
 .language-auth-group {
   flex-direction: row;
   justify-content: space-between;
-  display: flex;
-  /* justify-content: flex-end; */
+  display: flex;  /* justify-content: flex-end; */
   flex-wrap: nowrap;
   align-items: center;
   gap: 15px;
@@ -106,8 +105,7 @@ header {
   border-radius: 4px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 100px;
-  /* ✅ Force fixed width */
+  width: 100px;  /* ✅ Force fixed width */
   text-align: center;
   box-sizing: border-box;
 }
@@ -136,8 +134,7 @@ header {
   border-radius: 4%;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 100px;
-  /* ✅ Force fixed width */
+  width: 100px;  /* ✅ Force fixed width */
   text-align: center;
   box-sizing: content-box;
 }
@@ -167,10 +164,10 @@ header {
 }
 
 body.modal-open>*:not(.modal) {
-  pointer-events: none;
-  /* disable all interaction */
-  user-select: none;
-  /* prevent selection */
+  pointer-events: none;  /* disable all interaction */
+  user-select: none;  /* prevent selection */
+  filter: blur(3px);
+  transition: filter 0.3s ease;
 }
 
 .modal-content {
@@ -239,8 +236,7 @@ body.modal-open>*:not(.modal) {
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 35px;
-  /* space for icon */
+  padding-right: 35px;  /* space for icon */
 }
 
 .toggle-password {
@@ -265,9 +261,6 @@ body.modal-open>*:not(.modal) {
 }
 
 .input-group input {
-  /* width: 100%; */
-  /* padding: 10px; */
-  /* font-size: 16px; */
   border: 1px solid #ccc;
   border-radius: 4px;
   outline: none;
@@ -452,8 +445,7 @@ footer {
 
   .language-auth-group {
     flex-direction: row;
-    justify-content: space-between;
-    /* ⬅️ Language left, buttons right */
+    justify-content: space-between;    /* ⬅️ Language left, buttons right */
     width: 100%;
   }
 
@@ -480,8 +472,7 @@ footer {
   }
 
   .logOut-button button {
-    width: auto;
-    /* let buttons adjust naturally on mobile */
+    width: auto;    /* let buttons adjust naturally on mobile */
     min-width: 70px;
     font-size: 11px;
     padding: 4px 6px;
