@@ -23,7 +23,8 @@ header {
 .language-auth-group {
   flex-direction: row;
   justify-content: space-between;
-  display: flex;  /* justify-content: flex-end; */
+  display: flex;
+  /* justify-content: flex-end; */
   flex-wrap: nowrap;
   align-items: center;
   gap: 15px;
@@ -105,7 +106,8 @@ header {
   border-radius: 4px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 100px;  /* ✅ Force fixed width */
+  width: 100px;
+  /* ✅ Force fixed width */
   text-align: center;
   box-sizing: border-box;
 }
@@ -120,8 +122,13 @@ header {
 }
 
 .logout-button {
-  display: block;
-  gap: 15px;
+  flex-direction: row;
+  justify-content:  flex-end;
+  display: flex;  /* justify-content: flex-end; */
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
 .logout-button button {
@@ -134,7 +141,8 @@ header {
   border-radius: 4%;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 100px;  /* ✅ Force fixed width */
+  width: 100px;
+  /* ✅ Force fixed width */
   text-align: center;
   box-sizing: content-box;
 }
@@ -163,9 +171,11 @@ header {
   box-sizing: border-box;
 }
 
-body.modal-open>*:not(.modal) {
-  pointer-events: none;  /* disable all interaction */
-  user-select: none;  /* prevent selection */
+body.modal-open>*:not(.modal):not(.homePage):not(#toast-container) {
+  pointer-events: none;
+  /* disable all interaction */
+  user-select: none;
+  /* prevent selection */
   filter: blur(3px);
   transition: filter 0.3s ease;
 }
@@ -236,7 +246,8 @@ body.modal-open>*:not(.modal) {
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 35px;  /* space for icon */
+  padding-right: 35px;
+  /* space for icon */
 }
 
 .toggle-password {
@@ -281,22 +292,27 @@ body.modal-open>*:not(.modal) {
   line-height: 1;
 }
 
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown):valid + label,
-.input-group input:not(:focus):not(:placeholder-shown):not(:invalid) + label {
-  top: -10px;            /* ⬅️ Move label closer to input */
+.input-group input:focus+label,
+.input-group input:not(:placeholder-shown):valid+label,
+.input-group input:not(:focus):not(:placeholder-shown):not(:invalid)+label {
+  top: -10px;
+  /* ⬅️ Move label closer to input */
   left: 4px;
-  font-size: 13px;      /* ⬅️ Slightly smaller label text */
+  font-size: 13px;
+  /* ⬅️ Slightly smaller label text */
   color: #333;
 }
 
 .error {
   color: red;
   font-size: 12px;
-  margin-top: 8px;        /* 👈 Add this for spacing above */
-  margin-bottom: 16px;    /* 👈 Reduce bottom if needed */
+  margin-top: 8px;
+  /* 👈 Add this for spacing above */
+  margin-bottom: 16px;
+  /* 👈 Reduce bottom if needed */
   align-self: flex-start;
-  min-height: 18px;       /* 👈 Optional: keep consistent height */
+  min-height: 18px;
+  /* 👈 Optional: keep consistent height */
 }
 
 .close {
@@ -344,7 +360,8 @@ footer {
 
   header {
     color: transparent;
-    position: sticky;    /*sticky or fixed if you want it always visible */
+    position: sticky;
+    /*sticky or fixed if you want it always visible */
     top: 0;
     padding: 25px 25px;
     display: flex;
@@ -445,7 +462,8 @@ footer {
 
   .language-auth-group {
     flex-direction: row;
-    justify-content: space-between;    /* ⬅️ Language left, buttons right */
+    justify-content: space-between;
+    /* ⬅️ Language left, buttons right */
     width: 100%;
   }
 
@@ -460,7 +478,8 @@ footer {
   }
 
   .auth-buttons button {
-    width: auto;    /* let buttons adjust naturally on mobile */
+    width: auto;
+    /* let buttons adjust naturally on mobile */
     min-width: 80px;
     font-size: 13px;
     padding: 4px 6px;
@@ -472,7 +491,8 @@ footer {
   }
 
   .logOut-button button {
-    width: auto;    /* let buttons adjust naturally on mobile */
+    width: auto;
+    /* let buttons adjust naturally on mobile */
     min-width: 70px;
     font-size: 11px;
     padding: 4px 6px;

@@ -1,6 +1,7 @@
 import { API_BASE } from './config.js';
 import './login.js';
 import './registration.js';
+import './homepage.js';
 import './config.js';
 
 // 🔹 1. Utility + UI functions first (openModal, closeModal, setError, etc.)
@@ -105,10 +106,11 @@ function setLanguage(lang) {
 window.setLanguage = setLanguage;
 
 
-// 🔹 5. JWT check on load
+// 🔹 5. JWT and Logged in check on load
 async function checkLoggedIn() {
   const token = localStorage.getItem("jwt");
   const authButtons = document.getElementById("authButtons");
+  const bannerSection = document.querySelector(".banner-container");
 
   if (!token) {
     // No token = show buttons
@@ -124,17 +126,19 @@ async function checkLoggedIn() {
     const data = await res.json();
 
     if (data.success && data.user) {
-      document.getElementById("welcomeUser").innerText = `Welcome, ${data.user.username}!`;
-      document.getElementById("home").style.display = "block";
+      document.getElementById("logoutButtn").style.display = "block";
+      document.getElementById("homePage").style.display = "block";
       // Keep buttons hidden
     } else {
       localStorage.removeItem("jwt");
       if (authButtons) authButtons.style.display = "flex"; // Show buttons only if not logged in
+
     }
   } catch (err) {
     console.error("Token check failed", err);
     localStorage.removeItem("jwt");
     if (authButtons) authButtons.style.display = "flex";
+    if (bannerSection) bannerSection.style.display = "none";
   }
 }
 

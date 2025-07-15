@@ -37,14 +37,14 @@
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
     </div>
+    <section id="logoutButtn" style="display: none;">
+      <div class="logout-button">
+        <button onclick="logout()" id="logoutBtn">Logout</button>
+      </div>
+    </section>
   </header>
 
-  <section id="home" style="display: none; text-align:center; margin-top: 50px;">
-    <h2 id="welcomeUser">Welcome!</h2>
-    <div class="logout-button">
-      <button onclick="logout()" id="logoutBtn">Logout</button>
-    </div>
-  </section>
+  <h2 id="welcomeUser">Welcome!</h2>
 
   <!-- Login Modal  -->
   <div class="modal" id="loginModal">
@@ -113,6 +113,36 @@
     </div>
   </div>
 
+  <div class="homePage" id="homePage" style="display: none;">
+    <!-- 🔹 Banners -->
+    <div class="banner-container">
+      <img src="assets/banner1.jpg" class="banner" data-table-id="table1" onclick="openModal('tableModal', this)" />
+    </div>
+
+    <!-- 🔹 Modal -->
+    <div class="modal" id="tableModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('tableModal')">&times;</span>
+        <h2 id="actionTitle">Table Actions</h2>
+        <form id="actionForm">
+          <button id="createBtn">Create</button>
+          <button id="openBtn">Open</button>
+
+          <div id="openTableSection" style="display: none;">
+            <input type="text" id="tablePassword"/>
+            <div class="error" id="tablePasswordError"></div>
+            <button id="confirmOpenBtn">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 Game Table Section -->
+  <div id="gameTableSection" style="display: none;">
+    <!-- Populated dynamically -->
+  </div>
+  </div>
+
   <footer>
     Powered by And Bejanyan © 2025 All rights reserved
   </footer>
@@ -120,10 +150,12 @@
   <!-- Load language system, validations, then main logic -->
   <script src="js/lang.js" defer></script>
   <script type="module" src="js/config.js"></script>
+  <script type="module" src="js/main.js"></script>
   <script type="module" src="js/login.js"></script>
   <script type="module" src="js/register.js"></script>
   <script type="module" src="js/logout.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/homepage.js"></script>
+
 </body>
 
 </html>

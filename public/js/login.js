@@ -1,5 +1,6 @@
 import { showToast } from './toast.js';
 import { API_BASE } from './config.js';
+import './homepage.js';
 
 function setError(id, message) {
   document.getElementById(id).textContent = message;
@@ -84,8 +85,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       const me = await meRes.json();
       if (me.success) {
-        document.getElementById("welcomeUser").innerText = `Welcome, ${me.user.username}!`;
-        document.getElementById("home").style.display = "block";
+        document.getElementById("logoutButtn").style.display = "block";
+        document.getElementById("homePage").style.display = "block";
         document.getElementById("loginBtn").style.display = "none";
         document.getElementById("registerBtn").style.display = "none";
       }

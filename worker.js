@@ -99,6 +99,28 @@ export async function onRequest(context) {
     }
   }
 
+  // Route: /open-table
+  else if (request.method === "POST" && url.pathname === "/open-table") {
+    const { tableId, password } = await request.json();
+
+    if (!tableId || !password) {
+      return jsonResponse({ success: false, message: "Missing credentials" }, 400);
+    }
+
+    const table = await env.core_data.prepare(`
+    SELECT * FROM tables WHERE id = ? AND password = ?
+  `).bind(tableId, password).first();
+
+    if (!table) {
+      return jsonResponse({ success: false, message: "Invalid credentials" }, 401);
+    }
+
+    // Example HTML generation — replace with real data rendering
+    const tableHtml = `<h3>${table.name}</h3><p>Match list coming soon...</p>`;
+
+    return jsonResponse({ success: true, tableHtml }, 200);
+  }
+
   // Route: /me
   else if (request.method === "GET" && url.pathname === "/me") {
     const authHeader = request.headers.get("Authorization");
