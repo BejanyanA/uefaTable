@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Auth</title>
+  <title>Table UEFA</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/toast.css" />
 </head>
@@ -37,14 +37,14 @@
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
     </div>
+    <div class="logoutButtn">
     <section id="logoutButtn" style="display: none;">
       <div class="logout-button">
         <button onclick="logout()" id="logoutBtn">Logout</button>
       </div>
     </section>
+    </div>
   </header>
-
-  <h2 id="welcomeUser">Welcome!</h2>
 
   <!-- Login Modal  -->
   <div class="modal" id="loginModal">
@@ -113,34 +113,43 @@
     </div>
   </div>
 
-  <div class="homePage" id="homePage" style="display: none;">
-    <!-- 🔹 Banners -->
+  <!-- 🔹 Banners -->
+  <div class="homePage" id="homePage" style="display: none; ">
     <div class="banner-container">
-      <img src="assets/banner1.jpg" class="banner" data-table-id="table1" onclick="openModal('tableModal', this)" />
-    </div>
-
-    <!-- 🔹 Modal -->
-    <div class="modal" id="tableModal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal('tableModal')">&times;</span>
-        <h2 id="actionTitle">Table Actions</h2>
-        <form id="actionForm">
-          <button id="createBtn">Create</button>
-          <button id="openBtn">Open</button>
-
-          <div id="openTableSection" style="display: none;">
-            <input type="text" id="tablePassword"/>
-            <div class="error" id="tablePasswordError"></div>
-            <button id="confirmOpenBtn">Submit</button>
-        </form>
-      </div>
+      <img src="assets/banner1.jpg" class="banner" data-table-id="table1" onclick="handleBannerClick(this)" />
     </div>
   </div>
+
+  <!-- Modal -->
+<div class="modal" id="tableModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('tableModal')">&times;</span>
+    <h2 id="actionTitle">Table Actions</h2>
+
+    <form id="actionForm" onsubmit="return false;">
+      <div class="auth-buttons" id="actionButtons">
+        <button type="button" id="createBtn">Create</button>
+        <button type="button" id="openBtn">Open</button>
+      </div>
+      
+        <div class="password-wrapper" id="openTableSection" style="display: none;">
+          <div class="input-group">
+            <input type="password" id="tablePassword" />
+            <label for="tablePassword" id="tablePasswordLabel"></label>
+          </div>
+          <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
+        </div>
+        <div class="error" id="tablePasswordError"></div>
+
+        <button type="submit" id="confirmOpenBtn" class="modal-content" class="modal form button">Submit</button>
+      
+    </form>
+  </div>
+</div>
 
   <!-- 🔹 Game Table Section -->
   <div id="gameTableSection" style="display: none;">
     <!-- Populated dynamically -->
-  </div>
   </div>
 
   <footer>

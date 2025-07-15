@@ -4,14 +4,12 @@ import './registration.js';
 import './homepage.js';
 import './config.js';
 
-// 🔹 1. Utility + UI functions first (openModal, closeModal, setError, etc.)
+// Open Modal
 function openModal(id) {
-  // Close all other modals
   document.querySelectorAll(".modal").forEach(modal => {
     modal.style.display = "none";
   });
 
-  // Reset form in this modal (if any)
   const modal = document.getElementById(id);
   const form = modal.querySelector("form");
   if (form) {
@@ -27,10 +25,16 @@ function openModal(id) {
 }
 window.openModal = openModal;
 
-
+// Close Modal
 function closeModal(id) {
   const modal = document.getElementById(id);
   modal.style.display = "none";
+  document.getElementById("actionButtons").style.display = "flex";
+  document.getElementById("openTableSection").style.display = "none";
+  document.getElementById("tablePassword").value = "";
+  document.getElementById("tablePasswordError").textContent = "";
+  document.getElementsByClassName("toggle-password").textContent = "";
+
 
   const form = modal.querySelector("form");
   if (form) {
@@ -43,6 +47,7 @@ function closeModal(id) {
 }
 window.closeModal = closeModal;
 
+// Password eye icon
 function togglePassword(inputId, icon) {
   const input = document.getElementById(inputId);
   const isPassword = input.type === "password";
@@ -51,37 +56,7 @@ function togglePassword(inputId, icon) {
 }
 window.togglePassword = togglePassword;
 
-// Validations
-function setError(id, message) {
-  document.getElementById(id).textContent = message;
-}
-
-function clearErrors(ids) {
-  ids.forEach(id => document.getElementById(id).textContent = "");
-}
-
-function isValidEmail(email) {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
-}
-
-function isValidPassword(password) {
-  const minLength = /.{8,}/;
-  const upper = /[A-Z]/;
-  const lower = /[a-z]/;
-  const number = /[0-9]/;
-  const special = /[!@#$%^&*(),.?":{}|<>-_]/;
-
-  return (
-    minLength.test(password) &&
-    upper.test(password) &&
-    lower.test(password) &&
-    number.test(password) &&
-    special.test(password)
-  );
-}
-
-// 🔹 4. Language dropdown functions
+// Language dropdown functions
 function toggleDropdown() {
   const dropdown = document.getElementById("langDropdown");
   dropdown.classList.toggle("show");
@@ -104,6 +79,20 @@ function setLanguage(lang) {
   }
 }
 window.setLanguage = setLanguage;
+
+// Banner click Handler
+function handleBannerClick(element) {
+  const tableId = element.getAttribute("data-table-id");
+  document.getElementById("tableModal").dataset.tableId = tableId;
+
+  window.openModal("tableModal");
+
+  // Reset section
+  document.getElementById("openTableSection").style.display = "none";
+  document.getElementById("tablePassword").value = "";
+  document.getElementById("tablePasswordError").textContent = "";
+}
+window.handleBannerClick = handleBannerClick;
 
 
 // 🔹 5. JWT and Logged in check on load
