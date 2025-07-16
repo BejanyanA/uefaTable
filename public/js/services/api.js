@@ -5,17 +5,22 @@ async function handleResponse(response) {
   const contentType = response.headers.get("content-type");
   const isJson = contentType && contentType.includes("application/json");
 
-  const data = isJson ? await response.json() : {};
-
-  if (!response.ok) {
-    const error = {
-      status: response.status,
-      statusText: response.statusText,
-      body: data,
-    };
-    throw error;
+  let data = {};
+  try {
+    data = isJson ? await response.json() : {};
+  } catch (jsonErr) {
+    console.warn("❗ Failed to parse JSON", jsonErr);
   }
 
+  // ✅ Network/server error (like 500, 404), no usable response
+  if (!response.ok && typeof data !== "object") {
+    throw {
+      status: response.status,
+      body: { message: "something_went_wrong" },
+    };
+  }
+
+  // ✅ Let your code handle data.success === false
   return data;
 }
 
@@ -32,7 +37,6 @@ export async function apiPost(endpoint, body = {}, token = null) {
 
     return await handleResponse(response);
   } catch (err) {
-    console.error(`[apiPost] ${endpoint} failed:`, err);
     throw err;
   }
 }
@@ -49,7 +53,6 @@ export async function apiGet(endpoint, token = null) {
 
     return await handleResponse(response);
   } catch (err) {
-    console.error(`[apiGet] ${endpoint} failed:`, err);
     throw err;
   }
 }
