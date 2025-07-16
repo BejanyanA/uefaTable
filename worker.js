@@ -149,17 +149,35 @@ export async function onRequest(context) {
     }
 
     // Get match data and join team names
-    const matches = await env.core_data.prepare(`
-    SELECT 
-      lm.*,
-      t1.name AS team1_name,
-      t2.name AS team2_name
-    FROM league_matches lm
-    LEFT JOIN team_data.teams t1 ON lm.team1 = t1.id
-    LEFT JOIN team_data.teams t2 ON lm.team2 = t2.id
-    WHERE lm.league_id = ?
-    ORDER BY lm.match_date ASC
-  `).bind(tableId).all();
+    const leagueMatches = await env.core_data.prepare(`
+  SELECT * FROM league_matches
+  WHERE league_id = ?
+  ORDER BY match_date ASC
+`).bind(tableId).all();
+
+    // Get unique team IDs
+    const teamIds = new Set();
+    leagueMatches.results.forEach(match => {
+      if (match.team1) teamIds.add(match.team1);
+      if (match.team2) teamIds.add(match.team2);
+    });
+
+    // Fetch team names from team_data
+    const placeholders = [...teamIds].map(() => '?').join(', ');
+    const teamQuery = `SELECT id, name FROM teams WHERE id IN (${placeholders})`;
+    const teamResults = await env.team_data.prepare(teamQuery).bind(...teamIds).all();
+
+    const teamsMap = {};
+    teamResults.results.forEach(team => {
+      teamsMap[team.id] = team.name;
+    });
+
+    // Attach team names to match results
+    const enrichedMatches = leagueMatches.results.map(match => ({
+      ...match,
+      team1_name: teamsMap[match.team1] || 'Unknown',
+      team2_name: teamsMap[match.team2] || 'Unknown'
+    }));
 
     return jsonResponse({
       success: true,
@@ -169,7 +187,7 @@ export async function onRequest(context) {
           name: league.name,
           created_at: league.league_created_at
         },
-        matches: matches.results
+        matches: enrichedMatches
       }
     }, 200);
   }
