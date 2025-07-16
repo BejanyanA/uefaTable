@@ -1,0 +1,104 @@
+import { AuthManager } from './modules/AuthManager.js';
+import { TableManager } from './modules/TableManager.js';
+import { changeLang, currentLang } from './modules/LanguageManager.js';
+import { ModalManager } from './modules/ModalManager.js';
+import { apiGet } from './services/api.js'; 
+
+// ✅ Register modal methods globally
+window.openModal = ModalManager.open;
+window.closeModal = ModalManager.close;
+window.togglePassword = ModalManager.togglePassword;
+
+// ✅ Init App
+document.addEventListener('DOMContentLoaded', () => {
+   AuthManager.initLogin();
+   AuthManager.initRegister();
+   TableManager.init();
+   changeLang(currentLang);
+   checkLoggedIn();
+});
+
+// 🔹 Language Dropdown
+window.toggleDropdown = function () {
+   const dropdown = document.getElementById("langDropdown");
+   dropdown.classList.toggle("show");
+};
+
+window.setLanguage = function (lang) {
+   const flag = document.getElementById("langTrigger");
+   flag.src = `assets/flags/${lang}.svg`;
+
+   const dropdown = document.getElementById("langDropdown");
+   if (dropdown) dropdown.classList.remove("show");
+
+   if (typeof changeLang === "function") {
+      changeLang(lang);
+   }
+};
+
+// 🔹 Handle Banner Click (optional, if not already handled inside TableManager)
+window.handleBannerClick = function (element) {
+   const tableId = element.getAttribute("data-table-id");
+   document.getElementById("tableModal").dataset.tableId = tableId;
+
+   window.openModal("tableModal");
+
+   document.getElementById("openTableSection").style.display = "none";
+   document.getElementById("tablePassword").value = "";
+   document.getElementById("tablePasswordError").textContent = "";
+};
+
+// 🔹 JWT Check on Load
+async function checkLoggedIn() {
+   const token = localStorage.getItem("jwt");
+   const authButtons = document.getElementById("authButtons");
+   const bannerSection = document.querySelector(".banner-container");
+
+   if (!token) {
+      if (authButtons) authButtons.style.display = "flex";
+      return;
+   }
+
+   try {
+      const data = await apiGet("/me", token); // ✅ Cleaner
+      if (data.success && data.user) {
+         document.getElementById("logoutButtn").style.display = "block";
+         document.getElementById("homePage").style.display = "block";
+      } else {
+         localStorage.removeItem("jwt");
+         if (authButtons) authButtons.style.display = "flex";
+      }
+   } catch (err) {
+      console.error("Token check failed", err);
+      localStorage.removeItem("jwt");
+      if (authButtons) authButtons.style.display = "flex";
+      if (bannerSection) bannerSection.style.display = "none";
+   }
+}
+
+// 🔹 Logout
+window.logout = function () {
+   localStorage.removeItem("jwt");
+   location.reload();
+
+   document.getElementById("homePage").style.display = "none";
+   document.getElementById("welcomeUser").innerText = "";
+
+   document.getElementById("loginBtn").style.display = "inline-block";
+   document.getElementById("registerBtn").style.display = "inline-block";
+};
+
+// 🔹 Close lang dropdown on outside click
+document.addEventListener("click", function (e) {
+   const dropdown = document.getElementById("langDropdown");
+   const trigger = document.getElementById("langTrigger");
+
+   if (
+      dropdown && trigger &&
+      !dropdown.contains(e.target) &&
+      !trigger.contains(e.target) &&
+      !e.target.closest(".language-option")
+   ) {
+      dropdown.classList.remove("show");
+   }
+});

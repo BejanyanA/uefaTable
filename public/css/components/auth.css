@@ -1,0 +1,99 @@
+/* Buttons */
+.auth-buttons {
+   display: flex;
+   gap: 12px;
+}
+
+.auth-buttons button {
+   background-color: transparent;
+   border: 1px solid white;
+   color: white;
+   padding: 6px 12px;
+   cursor: pointer;
+   font-size: 14px;
+   border-radius: 4px;
+   transition: background 0.3s, color 0.3s, transform 0.1s;
+   white-space: nowrap;
+   width: 100px;
+   /* ✅ Force fixed width */
+   text-align: center;
+   box-sizing: border-box;
+}
+
+.auth-buttons button:hover {
+   background-color: rgb(0, 0, 0);
+   color: rgb(255, 255, 255);
+}
+
+.auth-buttons button:active {
+   transform: scale(0.96);
+}
+
+.logout-button {
+   flex-direction: row;
+   justify-content: flex-end;
+   display: flex;
+   /* justify-content: flex-end; */
+   flex-wrap: nowrap;
+   align-items: center;
+   gap: 20px;
+   width: 100%;
+}
+
+.logout-button button {
+   background-color: transparent;
+   border: 1px solid white;
+   color: white;
+   padding: 6px 12px;
+   cursor: pointer;
+   font-size: 14px;
+   border-radius: 4%;
+   transition: background 0.3s, color 0.3s, transform 0.1s;
+   white-space: nowrap;
+   width: 100px;
+   /* ✅ Force fixed width */
+   text-align: center;
+   box-sizing: content-box;
+}
+
+.logout-button button:hover {
+   background-color: white;
+   color: rgb(245, 2, 2);
+}
+
+.logout-button button:active {
+   transform: scale(0.96);
+}
+
+
+
+/* Mobile */
+@media (max-width: 480px) {
+
+   .auth-buttons {
+      gap: 10px;
+      order: 1;
+   }
+
+   .auth-buttons button {
+      width: auto;
+      /* let buttons adjust naturally on mobile */
+      min-width: 80px;
+      font-size: 13px;
+      padding: 4px 6px;
+   }
+
+   .logOut-button {
+      gap: 10px;
+      order: 1;
+   }
+
+   .logOut-button button {
+      width: auto;
+      /* let buttons adjust naturally on mobile */
+      min-width: 70px;
+      font-size: 11px;
+      padding: 4px 6px;
+   }
+
+}

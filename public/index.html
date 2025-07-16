@@ -5,8 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Table UEFA</title>
+  <link rel="stylesheet" href="css/layout/header.css">
+  <link rel="stylesheet" href="css/layout/footer.css">
+  <link rel="stylesheet" href="css/components/auth.css">
+  <link rel="stylesheet" href="css/components/modal.css">
+  <link rel="stylesheet" href="css/components/language-switcher.css">
+  <link rel="stylesheet" href="css/components/toast.css" />
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/toast.css" />
 </head>
 
 <body>
@@ -16,18 +21,18 @@
   <header>
     <div class="language-auth-group">
       <div class="language-switcher">
-        <img src="assets/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
+        <img src="assets/flags/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
         <div id="langDropdown" class="dropdown-menu">
           <div class="language-option" onclick="setLanguage('en')">
-            <img src="assets/en.svg" />
+            <img src="assets/flags/en.svg" />
             <span>English</span>
           </div>
           <div class="language-option" onclick="setLanguage('am')">
-            <img src="assets/am.svg" />
+            <img src="assets/flags/am.svg" />
             <span>Հայերեն</span>
           </div>
           <div class="language-option" onclick="setLanguage('fr')">
-            <img src="assets/fr.svg" />
+            <img src="assets/flags/fr.svg" />
             <span>Français</span>
           </div>
         </div>
@@ -38,11 +43,11 @@
       </div>
     </div>
     <div class="logoutButtn">
-    <section id="logoutButtn" style="display: none;">
-      <div class="logout-button">
-        <button onclick="logout()" id="logoutBtn">Logout</button>
-      </div>
-    </section>
+      <section id="logoutButtn" style="display: none;">
+        <div class="logout-button">
+          <button onclick="logout()" id="logoutBtn">Logout</button>
+        </div>
+      </section>
     </div>
   </header>
 
@@ -61,9 +66,9 @@
         <div class="password-wrapper">
           <div class="input-group">
             <input type="password" id="loginPassword" />
-            <label for="password" id="loginPasswordLabel"></label>
+            <label for="loginPassword" id="loginPasswordLabel"></label>
           </div>
-          <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('loginPassword', this)" />
+          <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('loginPassword', this)" />
         </div>
         <div class="error" id="loginPasswordError"></div>
 
@@ -93,18 +98,18 @@
         <div class="password-wrapper">
           <div class="input-group">
             <input type="password" id="regPassword" />
-            <label for="password" id="regPasswordLabel"></label>
+            <label for="regPassword" id="regPasswordLabel"></label>
           </div>
-          <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('regPassword', this)" />
+          <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('regPassword', this)" />
         </div>
         <div class="error" id="regPasswordError"></div>
 
         <div class="password-wrapper">
           <div class="input-group">
             <input type="password" id="regConfirmPassword" />
-            <label for="password" id="regConfirmPasswordLabel"></label>
+            <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
           </div>
-          <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('regConfirmPassword', this)" />
+          <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('regConfirmPassword', this)" />
         </div>
         <div class="error" id="regConfirmPasswordError"></div>
 
@@ -116,36 +121,36 @@
   <!-- 🔹 Banners -->
   <div class="homePage" id="homePage" style="display: none; ">
     <div class="banner-container">
-      <img src="assets/banner1.jpg" class="banner" data-table-id="table1" onclick="handleBannerClick(this)" />
+      <img src="assets/images/banner1.jpg" class="banner" data-table-id="table1" />
     </div>
   </div>
 
   <!-- Modal -->
-<div class="modal" id="tableModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('tableModal')">&times;</span>
-    <h2 id="actionTitle">Table Actions</h2>
+  <div class="modal" id="tableModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('tableModal')">&times;</span>
+      <h2 id="actionTitle">Table Actions</h2>
 
-    <form id="actionForm" onsubmit="return false;">
-      <div class="auth-buttons" id="actionButtons">
-        <button type="button" id="createBtn">Create</button>
-        <button type="button" id="openBtn">Open</button>
-      </div>
-      
+      <form id="actionForm" onsubmit="return false;">
+        <div class="auth-buttons" id="actionButtons">
+          <button type="button" id="createBtn">Create</button>
+          <button type="button" id="openBtn">Open</button>
+        </div>
+
         <div class="password-wrapper" id="openTableSection" style="display: none;">
           <div class="input-group">
             <input type="password" id="tablePassword" />
             <label for="tablePassword" id="tablePasswordLabel"></label>
           </div>
-          <img src="assets/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
+          <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
         </div>
         <div class="error" id="tablePasswordError"></div>
 
         <button type="submit" id="confirmOpenBtn" class="modal-content" class="modal form button">Submit</button>
-      
-    </form>
+
+      </form>
+    </div>
   </div>
-</div>
 
   <!-- 🔹 Game Table Section -->
   <div id="gameTableSection" style="display: none;">
@@ -157,14 +162,7 @@
   </footer>
 
   <!-- Load language system, validations, then main logic -->
-  <script src="js/lang.js" defer></script>
-  <script type="module" src="js/config.js"></script>
-  <script type="module" src="js/main.js"></script>
-  <script type="module" src="js/login.js"></script>
-  <script type="module" src="js/register.js"></script>
-  <script type="module" src="js/logout.js"></script>
-  <script type="module" src="js/homepage.js"></script>
-
+  <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

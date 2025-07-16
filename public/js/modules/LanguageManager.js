@@ -1,4 +1,4 @@
-const langMap = {
+export const langMap = {
   en: {
     login: "Login",
     logout: "Logout",
@@ -21,8 +21,6 @@ const langMap = {
     create: "Create",
     open: "Open",
     tableActions: "Table Actions",
-
-    //BackEnd Errors
     username_exists: "Username already exists",
     email_exists: "Email already exists",
     password_error: "Password Error",
@@ -31,7 +29,6 @@ const langMap = {
     something_went_wrong: "Something went wrong",
     invalid_email_or_password: "Email or Password is incorrect",
   },
-
   am: {
     login: "Մուտք",
     logout: "Դուրս գալ",
@@ -54,8 +51,6 @@ const langMap = {
     create: "Ստեղծել",
     open: "Բացել",
     tableActions: "Աղյուսակի գործողություն",
-
-    //BackEnd Errors
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
     email_exists: "Էլ. հասցեն արդեն գոյություն ունի",
     password_error: "Գաղտնաբառի սխալ",
@@ -64,7 +59,6 @@ const langMap = {
     something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
   },
-
   fr: {
     login: "Connexion",
     logout: "Se déconnecter",
@@ -87,8 +81,6 @@ const langMap = {
     create: "Créer",
     open: "Ouvrir",
     tableActions: "Actions de table",
-
-    //BackEnd Errors
     username_exists: "Le nom d'utilisateur existe déjà",
     email_exists: "L’adresse e-mail existe déjà",
     password_error: "Erreur de mot de passe",
@@ -122,7 +114,6 @@ function changeLang(lang) {
   document.getElementById("loginBtn").innerText = t.login;
   document.getElementById("logoutBtn").innerText = t.logout;
   document.getElementById("registerBtn").innerText = t.registerBtn;
-  // document.getElementById("welcomeUser").innerText = t.welcome;
   document.getElementById("loginTitle").innerText = t.login;
   document.getElementById("registerTitle").innerText = t.register;
   document.getElementById("loginEmail").placeholder = t.email;
@@ -138,7 +129,6 @@ function changeLang(lang) {
   document.getElementById("actionTitle").innerText = t.tableActions;
   document.getElementById("confirmOpenBtn").innerText = t.registerSubmit;
   document.getElementById("tablePassword").placeholder = t.password;
-  
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
@@ -150,11 +140,14 @@ function changeLang(lang) {
   document.getElementById("tablePasswordLabel").textContent = t.password;
 
   const flag = document.getElementById("langTrigger");
-  if (flag) flag.src = `assets/${lang}.svg`;
+  if (flag) flag.src = `assets/flags/${lang}.svg`;
 }
 
+// Export + global registration
+export { changeLang, currentLang };
 window.changeLang = changeLang;
 window.langMap = langMap;
 window.currentLang = currentLang;
 
+// Immediately apply
 changeLang(currentLang);

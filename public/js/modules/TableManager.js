@@ -1,0 +1,71 @@
+import { isValidPassword } from '../utils/validators.js';
+import { setError, clearErrors } from '../utils/helper.js';
+import { langMap, currentLang } from '../modules/LanguageManager.js';
+import { apiPost } from '../services/api.js';
+
+export const TableManager = {
+  init: function () {
+
+    // 🔹 Banner click logic
+    document.querySelectorAll(".banner").forEach(banner => {
+      banner.addEventListener("click", () => {
+        const tableId = banner.getAttribute("data-table-id");
+        document.getElementById("tableModal").dataset.tableId = tableId;
+
+        window.openModal("tableModal");
+
+        // Reset view
+        document.getElementById("actionButtons").style.display = "flex";
+        document.getElementById("openTableSection").style.display = "none";
+        document.getElementById("confirmOpenBtn").style.display = "none";
+        document.getElementById("tablePassword").value = "";
+        document.getElementById("tablePasswordError").textContent = "";
+      });
+    });
+
+    // 🔹 "Open" button: hide options, show password
+    document.getElementById("openBtn").addEventListener("click", () => {
+      document.getElementById("actionButtons").style.display = "none";
+      document.getElementById("confirmOpenBtn").style.display = "flex";
+      document.getElementById("openTableSection").style.display = "block";
+    });
+
+    // 🔹 Submit password
+    document.getElementById("confirmOpenBtn").addEventListener("click", async () => {
+      const translation = langMap[currentLang];
+      clearErrors(["tablePasswordError"]);
+
+      const tableId = document.getElementById("tableModal").dataset.tableId;
+      const password = document.getElementById("tablePassword").value.trim();
+      const errorField = document.getElementById("tablePasswordError");
+
+      let hasError = false;
+
+      if (!password) {
+        setError("tablePasswordError", translation.required);
+        hasError = true;
+      } else if (!isValidPassword(password)) {
+        setError("tablePasswordError", translation.invalidPassword);
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      try {
+        const data = await apiPost("/open-table", { tableId, password });
+
+        if (data.success && data.tableHtml) {
+          window.closeModal("tableModal");
+          const section = document.getElementById("gameTableSection");
+          section.style.display = "block";
+          section.innerHTML = data.tableHtml;
+        } else {
+          errorField.textContent = translation.incorrectPassword || "Incorrect password or table not found.";
+        }
+      } catch (err) {
+        errorField.textContent = translation.something_went_wrong || "Something went wrong.";
+        console.error("Error opening table:", err);
+      }
+    });
+  }
+};

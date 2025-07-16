@@ -1,0 +1,29 @@
+header {
+  color: white;
+  padding: 25px 25px;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+  z-index: 2;
+}
+
+
+/* Mobile */
+@media (max-width: 480px) {
+
+  header {
+    color: transparent;
+    position: sticky;
+    /*sticky or fixed if you want it always visible */
+    top: 0;
+    padding: 25px 25px;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+    z-index: 2;
+  }
+}
