@@ -21,6 +21,8 @@ export const langMap = {
     create: "Create",
     open: "Open",
     tableActions: "Table Actions",
+
+    //BE translations
     username_exists: "Username already exists",
     email_exists: "Email already exists",
     password_error: "Password Error",
@@ -28,6 +30,7 @@ export const langMap = {
     registration_success: "Successfully Registered",
     something_went_wrong: "Something went wrong",
     invalid_email_or_password: "Email or Password is incorrect",
+    invalid_table_password: "Incorrect password or table not found",
   },
   am: {
     login: "Մուտք",
@@ -51,6 +54,8 @@ export const langMap = {
     create: "Ստեղծել",
     open: "Բացել",
     tableActions: "Աղյուսակի գործողություն",
+
+    //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
     email_exists: "Էլ. հասցեն արդեն գոյություն ունի",
     password_error: "Գաղտնաբառի սխալ",
@@ -58,6 +63,7 @@ export const langMap = {
     registration_success: "Գրանցումը հաջողվեց",
     something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
+    invalid_table_password: "Գաղտնաբառը սխալ է կամ աղյուսակը չի գտնվել",
   },
   fr: {
     login: "Connexion",
@@ -81,6 +87,8 @@ export const langMap = {
     create: "Créer",
     open: "Ouvrir",
     tableActions: "Actions de table",
+
+    //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
     email_exists: "L’adresse e-mail existe déjà",
     password_error: "Erreur de mot de passe",
@@ -88,6 +96,7 @@ export const langMap = {
     registration_success: "Inscription réussie",
     something_went_wrong: "Une erreur s'est produite",
     invalid_email_or_password: "E-mail ou mot de passe incorrect",
+    invalid_table_password: "Mot de passe incorrect ou table introuvable",
   }
 };
 

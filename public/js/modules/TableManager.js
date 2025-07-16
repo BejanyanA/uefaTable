@@ -60,7 +60,7 @@ export const TableManager = {
           section.style.display = "block";
           section.innerHTML = data.tableHtml;
         } else {
-          errorField.textContent = translation.incorrectPassword || "Incorrect password or table not found.";
+          errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
         }
       } catch (err) {
         errorField.textContent = translation.something_went_wrong || "Something went wrong.";
