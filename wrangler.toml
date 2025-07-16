@@ -13,5 +13,10 @@ custom_domain = true
 
 [[d1_databases]]
 binding = "core_data"
-database_name = "users-db"
+database_name = "core-db"
 database_id = "09b42559-8b10-4ee0-b3b0-af0d5a5f3609"
+
+[[d1_databases]]
+binding = "team_data"
+database_name = "teams_db"
+database_id = "0e68a4b5-e8c0-4632-8c85-9e4ee97e8310"

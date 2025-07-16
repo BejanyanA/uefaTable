@@ -128,38 +128,36 @@
     <div class="banner-container">
       <img src="assets/images/banner1.jpg" class="banner" data-table-id="table1" />
     </div>
-  </div>
+    <!-- Modal -->
+    <div class="modal" id="tableModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('tableModal')">&times;</span>
+        <h2 id="actionTitle">Table Actions</h2>
 
-  <!-- Modal -->
-  <div class="modal" id="tableModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('tableModal')">&times;</span>
-      <h2 id="actionTitle">Table Actions</h2>
-
-      <form id="actionForm" onsubmit="return false;">
-        <div class="auth-buttons" id="actionButtons">
-          <button type="button" id="createBtn">Create</button>
-          <button type="button" id="openBtn">Open</button>
-        </div>
-
-        <div class="password-wrapper" id="openTableSection" style="display: none;">
-          <div class="input-group">
-            <input type="password" id="tablePassword" />
-            <label for="tablePassword" id="tablePasswordLabel"></label>
+        <form id="actionForm" onsubmit="return false;">
+          <div class="auth-buttons" id="actionButtons">
+            <button type="button" id="createBtn">Create</button>
+            <button type="button" id="openBtn">Open</button>
           </div>
-          <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
-        </div>
-        <div class="error" id="tablePasswordError"></div>
 
-        <button type="submit" id="confirmOpenBtn" class="modal-content modal form button">Submit</button>
+          <div class="password-wrapper" id="openTableSection" style="display: none;">
+            <div class="input-group">
+              <input type="password" id="tablePassword" />
+              <label for="tablePassword" id="tablePasswordLabel"></label>
+            </div>
+            <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
+          </div>
+          <div class="error" id="tablePasswordError"></div>
 
-      </form>
+          <button type="submit" id="confirmOpenBtn" class="modal-content modal form button">Submit</button>
+
+        </form>
+      </div>
     </div>
-  </div>
-
-  <!-- 🔹 Game Table Section -->
-  <div id="gameTableSection" style="display: none;">
-    <!-- Populated dynamically -->
+    <!-- 🔹 Game Table Section -->
+    <div id="gameTableSection" style="display: none;">
+      <!-- Populated dynamically -->
+    </div>
   </div>
 
   <footer>

@@ -93,32 +93,10 @@ export async function onRequest(context) {
         response = jsonResponse({ success: false, message: "invalid_email_or_password" }, 400);
       } else {
         const expiration = Math.floor(Date.now() / 1000) + (60 * 60 * 2);
-        const token = await jwt.sign({ email: user.email, username: user.username, exp: expiration }, env.JWT_SECRET);
-        response = jsonResponse({ success: true, message: "Login successful", token }, 200);
+        const token = await jwt.sign({ id: user.id, email: user.email, username: user.username, exp: expiration }, env.JWT_SECRET);
+        response = jsonResponse({ success: true, message: "Login successful", id: user.id, token }, 200);
       }
     }
-  }
-
-  // Route: /open-table
-  else if (request.method === "POST" && url.pathname === "/open-table") {
-    const { tableId, password } = await request.json();
-
-    if (!tableId || !password) {
-      return jsonResponse({ success: false, message: "Missing credentials" }, 400);
-    }
-
-    const table = await env.core_data.prepare(`
-    SELECT * FROM tables WHERE id = ? AND password = ?
-  `).bind(tableId, password).first();
-
-    if (!table) {
-      return jsonResponse({ success: false, message: "Invalid credentials" }, 401);
-    }
-
-    // Example HTML generation — replace with real data rendering
-    const tableHtml = `<h3>${table.name}</h3><p>Match list coming soon...</p>`;
-
-    return jsonResponse({ success: true, tableHtml }, 200);
   }
 
   // Route: /me
@@ -151,6 +129,49 @@ export async function onRequest(context) {
         response = jsonResponse({ success: false, message: "Invalid token" }, 401);
       }
     }
+  }
+
+  // open-table route
+  else if (request.method === "POST" && url.pathname === "/open-table") {
+    const { tableId, password } = await request.json();
+
+    if (!tableId || !password) {
+      return jsonResponse({ success: false, message: "Missing credentials" }, 400);
+    }
+
+    // Validate league with password
+    const league = await env.core_data.prepare(`
+    SELECT * FROM leagues WHERE league_name = ? AND league_password = ?
+  `).bind(tableId, password).first();
+
+    if (!league) {
+      return jsonResponse({ success: false, message: "Invalid credentials" }, 401);
+    }
+
+    // Get match data and join team names
+    const matches = await env.core_data.prepare(`
+    SELECT 
+      lm.*,
+      t1.name AS team1_name,
+      t2.name AS team2_name
+    FROM league_matches lm
+    LEFT JOIN team_data.teams t1 ON lm.team1 = t1.id
+    LEFT JOIN team_data.teams t2 ON lm.team2 = t2.id
+    WHERE lm.league_id = ?
+    ORDER BY lm.match_date ASC
+  `).bind(tableId).all();
+
+    return jsonResponse({
+      success: true,
+      data: {
+        league: {
+          id: league.id,
+          name: league.name,
+          created_at: league.league_created_at
+        },
+        matches: matches.results
+      }
+    }, 200);
   }
 
   // Route not found

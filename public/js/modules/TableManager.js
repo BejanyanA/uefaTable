@@ -1,6 +1,8 @@
+import { showToast } from '../utils/toast.js';
 import { isValidPassword } from '../utils/validators.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
+import { renderLeagueTable } from './components/renderTable.js';
 import { apiPost } from '../services/api.js';
 
 export const TableManager = {
@@ -31,41 +33,42 @@ export const TableManager = {
     });
 
     // 🔹 Submit password
-    document.getElementById("confirmOpenBtn").addEventListener("click", async () => {
-      const translation = langMap[currentLang];
-      clearErrors(["tablePasswordError"]);
+    const openBtn = document.getElementById("confirmOpenBtn");
+    if (openBtn) {
+      openBtn.addEventListener("click", async () => {
+        const translation = langMap[currentLang];
+        clearErrors(["tablePasswordError"]);
 
-      const tableId = document.getElementById("tableModal").dataset.tableId;
-      const password = document.getElementById("tablePassword").value.trim();
-      const errorField = document.getElementById("tablePasswordError");
+        const tableId = document.getElementById("tableModal").dataset.tableId;
+        const password = document.getElementById("tablePassword").value.trim();
+        const errorField = document.getElementById("tablePasswordError");
 
-      let hasError = false;
+        let hasError = false;
 
-      if (!password) {
-        setError("tablePasswordError", translation.required);
-        hasError = true;
-      } else if (!isValidPassword(password)) {
-        setError("tablePasswordError", translation.invalidPassword);
-        hasError = true;
-      }
-
-      if (hasError) return;
-
-      try {
-        const data = await apiPost("/open-table", { tableId, password });
-
-        if (data.success && data.tableHtml) {
-          window.closeModal("tableModal");
-          const section = document.getElementById("gameTableSection");
-          section.style.display = "block";
-          section.innerHTML = data.tableHtml;
-        } else {
-          errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+        if (!password) {
+          setError("tablePasswordError", translation.required);
+          hasError = true;
+        } else if (!isValidPassword(password)) {
+          setError("tablePasswordError", translation.invalidPassword);
+          hasError = true;
         }
-      } catch (err) {
-        errorField.textContent = translation.something_went_wrong || "Something went wrong.";
-        console.error("Error opening table:", err);
-      }
-    });
+
+        if (hasError) return;
+
+        try {
+          const data = await apiPost("/open-table", { tableId, password });
+
+          if (data.success && data.data) {
+            window.closeModal("tableModal");
+            renderLeagueTable(data.data); // 💡 Your custom function to render match data
+          } else {
+            errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+          }
+        } catch (err) {
+          showToast(translation.something_went_wrong || "Something went wrong.", "error");
+          console.error("Error opening table:", err);
+        }
+      });
+    }
   }
 };
