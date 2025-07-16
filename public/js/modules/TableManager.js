@@ -60,6 +60,8 @@ export const TableManager = {
 
           if (data.success && data.data) {
             window.closeModal("tableModal");
+            document.getElementById("bannerContainer").style.display = "none";
+            
             renderLeagueTable(data.data); // 💡 Your custom function to render match data
           } else {
             errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
