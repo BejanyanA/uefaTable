@@ -36,18 +36,6 @@ window.setLanguage = function (lang) {
    }
 };
 
-// 🔹 Handle Banner Click (optional, if not already handled inside TableManager)
-window.handleBannerClick = function (element) {
-   const tableId = element.getAttribute("data-table-id");
-   document.getElementById("tableModal").dataset.tableId = tableId;
-
-   window.openModal("tableModal");
-
-   document.getElementById("openTableSection").style.display = "none";
-   document.getElementById("tablePassword").value = "";
-   document.getElementById("tablePasswordError").textContent = "";
-};
-
 // 🔹 JWT Check on Load
 async function checkLoggedIn() {
    const token = localStorage.getItem("jwt");
