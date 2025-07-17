@@ -155,7 +155,7 @@ export async function onRequest(context) {
   `).bind(tableId, password).first();
 
     if (!league) {
-      return jsonResponse({ success: false, message: "Invalid credentials" }, 401);
+      return jsonResponse({ success: false, message: "invalid_table_password" }, 400);
     }
 
     // Get match data and join team names
