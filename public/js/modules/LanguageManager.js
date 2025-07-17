@@ -30,7 +30,7 @@ export const langMap = {
     registration_success: "Successfully Registered",
     something_went_wrong: "Something went wrong",
     invalid_email_or_password: "Email or Password is incorrect",
-    invalid_table_password: "Incorrect Table Password",
+    invalid_table_password: "Table Password is incorrect",
   },
   am: {
     login: "Մուտք",
