@@ -143,10 +143,14 @@ export async function onRequest(context) {
 
   // open-table route
   else if (request.method === "POST" && url.pathname === "/open-table") {
-    const { tableId, password } = await request.json();
+    const { tableId, password } = await parseBody(request);
 
-    if (!tableId || !password) {
-      return jsonResponse({ success: false, message: "Missing credentials" }, 400);
+    const errors = {};
+    if (!tableId) errors.username = "TableId is required";
+    if (!password) errors.password = "Password is required"
+
+    if (Object.keys(errors).length > 0) {
+      return jsonResponse({ success: false, errors }, 400);
     }
 
     // Validate league with password
