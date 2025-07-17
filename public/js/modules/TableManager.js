@@ -11,8 +11,8 @@ export const TableManager = {
     // 🔹 Banner click logic
     document.querySelectorAll(".banner").forEach(banner => {
       banner.addEventListener("click", () => {
-        const tableId = banner.getAttribute("data-table-id");
-        document.getElementById("tableModal").dataset.tableId = tableId;
+        const id = banner.getAttribute("banner-id");
+        document.getElementById("tableModal").dataset.bannerId = id;
 
         window.openModal("tableModal");
 
@@ -39,7 +39,7 @@ export const TableManager = {
         const translation = langMap[currentLang];
         clearErrors(["tablePasswordError"]);
 
-        const tableId = document.getElementById("tableModal").dataset.tableId;
+        const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
         const password = document.getElementById("tablePassword").value.trim();
         const errorField = document.getElementById("tablePasswordError");
 
@@ -56,7 +56,7 @@ export const TableManager = {
         if (hasError) return;
 
         try {
-          const data = await apiPost("/open-table", { tableId, password });
+          const data = await apiPost("/open-table", { bannerId, password });
 
           if (data.success && data.data) {
             window.closeModal("tableModal");

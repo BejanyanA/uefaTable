@@ -143,10 +143,10 @@ export async function onRequest(context) {
 
   // open-table route
   else if (request.method === "POST" && url.pathname === "/open-table") {
-    const { tableId, password } = await parseBody(request);
+    const { bannerId, password } = await parseBody(request);
 
     const errors = {};
-    if (!tableId) errors.username = "TableId is required";
+    if (!bannerId) errors.username = "BannerId is required";
     if (!password) errors.password = "Password is required"
 
     if (Object.keys(errors).length > 0) {
@@ -155,8 +155,8 @@ export async function onRequest(context) {
 
     // Validate league with password
     const league = await env.core_data.prepare(`
-    SELECT * FROM leagues WHERE league_id = ? AND access_password = ?
-  `).bind(tableId, password).first();
+    SELECT * FROM leagues WHERE banner_id = ? AND access_password = ?
+  `).bind(bannerId, password).first();
 
     if (!league) {
       return jsonResponse({ success: false, message: "invalid_table_password" }, 400);
@@ -167,7 +167,7 @@ export async function onRequest(context) {
   SELECT * FROM league_matches
   WHERE league_id = ?
   ORDER BY match_date ASC
-`).bind(tableId).all();
+`).bind(bannerId).all();
 
     // Get unique team IDs
     const teamIds = new Set();
