@@ -30,7 +30,7 @@ export const langMap = {
     registration_success: "Successfully Registered",
     something_went_wrong: "Something went wrong",
     invalid_email_or_password: "Email or Password is incorrect",
-    invalid_table_password: "Incorrect password or table not found",
+    invalid_table_password: "Incorrect Table Password",
   },
   am: {
     login: "Մուտք",
@@ -63,7 +63,7 @@ export const langMap = {
     registration_success: "Գրանցումը հաջողվեց",
     something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
-    invalid_table_password: "Գաղտնաբառը սխալ է կամ աղյուսակը չի գտնվել",
+    invalid_table_password: "Աղյուսակի Գաղտնաբառը սխալ է",
   },
   fr: {
     login: "Connexion",
@@ -96,7 +96,7 @@ export const langMap = {
     registration_success: "Inscription réussie",
     something_went_wrong: "Une erreur s'est produite",
     invalid_email_or_password: "E-mail ou mot de passe incorrect",
-    invalid_table_password: "Mot de passe incorrect ou table introuvable",
+    invalid_table_password: "Mot de passe de table incorrect",
   }
 };
 
