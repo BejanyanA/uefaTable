@@ -52,6 +52,7 @@ export const AuthManager = {
 
         if (loginData.success && loginData.token) {
           localStorage.setItem("jwt", loginData.token);
+          localStorage.setItem("loggedInuserId", loginData.id);
 
           const me = await apiGet("/me", loginData.token);
           if (me.success) {
