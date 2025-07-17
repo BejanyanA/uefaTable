@@ -178,7 +178,7 @@ export async function onRequest(context) {
 
     // Fetch team names from team_data
     const placeholders = [...teamIds].map(() => '?').join(', ');
-    const teamQuery = `SELECT id, name FROM teams WHERE id IN (${placeholders})`;
+    const teamQuery = `SELECT id, name FROM all_clubs WHERE id IN (${placeholders})`;
     const teamResults = await env.team_data.prepare(teamQuery).bind(...teamIds).all();
 
     const teamsMap = {};
