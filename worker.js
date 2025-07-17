@@ -155,7 +155,7 @@ export async function onRequest(context) {
 
     // Validate league with password
     const league = await env.core_data.prepare(`
-    SELECT * FROM leagues WHERE league_name = ? AND league_password = ?
+    SELECT * FROM leagues WHERE league_id = ? AND access_password = ?
   `).bind(tableId, password).first();
 
     if (!league) {
@@ -176,14 +176,14 @@ export async function onRequest(context) {
       if (match.team2) teamIds.add(match.team2);
     });
 
-    // Fetch team names from team_data
+    // Fetch team names from all_clubs
     const placeholders = [...teamIds].map(() => '?').join(', ');
-    const teamQuery = `SELECT id, name FROM all_clubs WHERE id IN (${placeholders})`;
-    const teamResults = await env.team_data.prepare(teamQuery).bind(...teamIds).all();
+    const teamQuery = `SELECT id, club_name FROM all_clubs WHERE id IN (${placeholders})`;
+    const teamResults = await env.core_data.prepare(teamQuery).bind(...teamIds).all();
 
     const teamsMap = {};
     teamResults.results.forEach(team => {
-      teamsMap[team.id] = team.name;
+      teamsMap[team.id] = team.club_name;
     });
 
     // Attach team names to match results
