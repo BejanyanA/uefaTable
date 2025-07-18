@@ -22,7 +22,7 @@ export async function handleLogin(request, env) {
     return jsonResponse({ success: false, message: "invalid_email_or_password" }, 400);
   }
 
-  const expiration = Math.floor(Date.now() / 1000) + (60 * 2);   //60 * 60 * 2
+  const expiration = Math.floor(Date.now() / 1000) + (60 * 60 * 2);
   const token = await jwt.sign(
     { id: user.id, email: user.email, username: user.username, exp: expiration },
     env.JWT_SECRET

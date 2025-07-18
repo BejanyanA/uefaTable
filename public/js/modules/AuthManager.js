@@ -54,7 +54,7 @@ export const AuthManager = {
           localStorage.setItem("jwt", loginData.token);
           localStorage.setItem("loggedInuserId", loginData.id);
 
-          const me = await apiGet("/me", loginData.token);
+          const me = await apiGet("/me");
           if (me.success) {
             document.getElementById("logoutButtn").style.display = "block";
             document.getElementById("homePage").style.display = "block";

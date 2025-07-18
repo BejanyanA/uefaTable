@@ -13,7 +13,7 @@ export function renderLeagueTable(data) {
         </tr>
       </thead>
       <tbody>
-        ${data.matches.map(match => `
+        ${data.leagueInstances.map(match => `
           <tr>
             <td>${match.match_date || "-"}</td>
             <td>${match.round || "-"}</td>

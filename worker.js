@@ -5,11 +5,12 @@ import { handleMe } from './routes/me.js';
 import { handleLeagues } from './routes/leagues.js';
 // import additional route handlers as needed
 
-const routes = {
-  "POST /register": handleRegister,
-  "POST /leagues": handleLeagues,
-  "POST /login": handleLogin,
-  "GET /me": handleMe,
+// Route registry with path as key and allowed methods as subkeys
+const routeRegistry = {
+  "/register": { POST: handleRegister },
+  "/login": { POST: handleLogin },
+  "/me": { GET: handleMe },
+  "/leagues": { POST: handleLeagues },
   // Add more routes here
 };
 
@@ -17,7 +18,7 @@ export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const method = request.method;
-  const pathname = url.pathname;
+  const path = url.pathname;
 
   // Handle CORS preflight
   if (method === "OPTIONS") {
@@ -27,18 +28,31 @@ export async function onRequest(context) {
     });
   }
 
-  // Route dispatch using route key
-  const routeKey = `${method} ${pathname}`;
-  const handler = routes[routeKey];
-
+  const route = routeRegistry[path];
   let response;
 
-  if (handler) {
-    try {
-      response = await handler(request, env);
-    } catch (err) {
-      console.error("❗ Unexpected error:", err);
-      response = jsonResponse({ success: false, message: "something_went_wrong" }, 500);
+  if (route) {
+    const handler = route[method];
+    if (handler) {
+      try {
+        response = await handler(request, env);
+      } catch (err) {
+        console.error("❗ Unexpected error:", err);
+        response = jsonResponse({ success: false, message: "something_went_wrong" }, 500);
+      }
+    } else {
+      const allowedMethods = Object.keys(route).join(", ");
+      response = new Response(JSON.stringify({
+        success: false,
+        message: "Method Not Allowed"
+      }), {
+        status: 405,
+        headers: {
+          "Content-Type": "application/json",
+          "Allow": allowedMethods,
+          ...handleCorsHeaders(request.headers.get("Origin")),
+        }
+      });
     }
   } else {
     response = jsonResponse({ success: false, message: "Not Found" }, 404);

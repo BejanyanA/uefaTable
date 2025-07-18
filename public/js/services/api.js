@@ -24,8 +24,9 @@ async function handleResponse(response) {
   return data;
 }
 
-export async function apiPost(endpoint, body = {}, token = null) {
+export async function apiPost(endpoint, body = {}) {
   try {
+    const token = localStorage.getItem("jwt")
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -41,8 +42,9 @@ export async function apiPost(endpoint, body = {}, token = null) {
   }
 }
 
-export async function apiGet(endpoint, token = null) {
+export async function apiGet(endpoint) {
   try {
+    const token = localStorage.getItem("jwt")
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
