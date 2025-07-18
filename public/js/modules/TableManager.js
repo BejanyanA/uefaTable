@@ -56,8 +56,7 @@ export const TableManager = {
         if (hasError) return;
 
         try {
-          const userId = parseInt(localStorage.getItem("loggedInuserId"));
-          const data = await apiPost("/open-table", { userId, bannerId, password });
+          const data = await apiPost("/leagues", { bannerId, password });
 
           if (data.success && data.data) {
             window.closeModal("tableModal");

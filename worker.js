@@ -141,57 +141,60 @@ export async function onRequest(context) {
     }
   }
 
-  // open-table route
-  else if (request.method === "POST" && url.pathname === "/open-table") {
-    const { bannerId, password } = await parseBody(request);
+  // leagues route
+  else if (request.method === "POST" && url.pathname === "/leagues") {
+    const authHeader = request.headers.get("Authorization");
 
+    if (!authHeader?.startsWith("Bearer ")) {
+      return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+    }
+
+    const token = authHeader.split(" ")[1];
+    let userId;
+
+    try {
+      const isValid = await jwt.verify(token, env.JWT_SECRET);
+      if (!isValid) throw new Error("Invalid");
+
+      const payload = jwt.decode(token).payload;
+
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) {
+        return jsonResponse({ success: false, message: "Token expired" }, 401);
+      }
+
+      userId = payload.id; // 🟢 Extract userId from token payload
+
+    } catch (err) {
+      console.error("Token verification failed:", err);
+      return jsonResponse({ success: false, message: "Invalid token" }, 401);
+    }
+
+    // ✅ Continue with your existing logic
+    const { bannerId, password } = await parseBody(request);
     const errors = {};
-    if (!bannerId) errors.username = "BannerId is required";
-    if (!password) errors.password = "Password is required"
+    if (!bannerId) errors.bannerId = "BannerId is required";
+    if (!password) errors.password = "Password is required";
 
     if (Object.keys(errors).length > 0) {
       return jsonResponse({ success: false, errors }, 400);
     }
 
-    // Validate league with password
     const league = await env.core_data.prepare(`
-    SELECT * FROM leagues WHERE banner_id = ? AND access_password = ?
-  `).bind(bannerId, password).first();
+    SELECT * FROM leagues
+    WHERE banner_id = ? AND access_password = ? AND created_by_user_id = ?
+  `).bind(bannerId, password, userId).first();
 
     if (!league) {
-      return jsonResponse({ success: false, message: "invalid_table_password" }, 400);
+      return jsonResponse({ success: false, message: "invalid_table_password_or_owner" }, 403);
     }
 
-    // Get match data and join team names
-    const leagueMatches = await env.core_data.prepare(`
-  SELECT * FROM league_matches
-  WHERE league_id = ?
-  ORDER BY match_date ASC
-`).bind(bannerId).all();
-
-    // Get unique team IDs
-    const teamIds = new Set();
-    leagueMatches.results.forEach(match => {
-      if (match.team1) teamIds.add(match.team1);
-      if (match.team2) teamIds.add(match.team2);
-    });
-
-    // Fetch team names from all_clubs
-    const placeholders = [...teamIds].map(() => '?').join(', ');
-    const teamQuery = `SELECT id, club_name FROM all_clubs WHERE id IN (${placeholders})`;
-    const teamResults = await env.core_data.prepare(teamQuery).bind(...teamIds).all();
-
-    const teamsMap = {};
-    teamResults.results.forEach(team => {
-      teamsMap[team.id] = team.club_name;
-    });
-
-    // Attach team names to match results
-    const enrichedMatches = leagueMatches.results.map(match => ({
-      ...match,
-      team1_name: teamsMap[match.team1] || 'Unknown',
-      team2_name: teamsMap[match.team2] || 'Unknown'
-    }));
+    const leagueInstances = await env.core_data.prepare(`
+    SELECT li.*, l.name AS league_type
+    FROM league_instances li
+    JOIN leagues l ON li.league_id = l.id
+    WHERE li.created_by_user_id = ?
+  `).bind(userId).all();
 
     return jsonResponse({
       success: true,
@@ -201,7 +204,7 @@ export async function onRequest(context) {
           name: league.name,
           created_at: league.league_created_at
         },
-        matches: enrichedMatches
+        leagueInstances: leagueInstances.results
       }
     }, 200);
   }
