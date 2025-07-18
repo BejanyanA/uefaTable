@@ -1,29 +1,23 @@
 export function renderLeagueTable(data) {
   const section = document.getElementById("gameTableSection");
+  const leagues = data.leagues || [];
+
+  if (!leagues.length) {
+    section.innerHTML = `<p>No leagues found.</p>`;
+    section.style.display = "block";
+    return;
+  }
+
+  // Render league names side by side
   section.innerHTML = `
-    <h2>${data.league.name}</h2>
-    <table class="league-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Round</th>
-          <th>Team 1</th>
-          <th>Score</th>
-          <th>Team 2</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.leagueInstances.map(match => `
-          <tr>
-            <td>${match.match_date || "-"}</td>
-            <td>${match.round || "-"}</td>
-            <td>${match.team1_name || "?"}</td>
-            <td>${match.score1 ?? "?"} : ${match.score2 ?? "?"}</td>
-            <td>${match.team2_name || "?"}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="league-names-row">
+      ${leagues.map(league => `
+        <div class="league-name-box">
+          ${league.name}
+        </div>
+      `).join("")}
+    </div>
   `;
+
   section.style.display = "block";
 }

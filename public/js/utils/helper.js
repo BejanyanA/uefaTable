@@ -9,3 +9,12 @@ export function clearErrors(ids = []) {
     if (el) el.textContent = "";
   });
 }
+
+// Loader
+export function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+
+export function hideLoader() {
+  document.getElementById("loader").style.display = "none";
+}

@@ -21,6 +21,7 @@ export const langMap = {
     create: "Create",
     open: "Open",
     tableActions: "Table Actions",
+    leagueName: "League Name",
 
     //BE translations
     username_exists: "Username already exists",
@@ -54,6 +55,7 @@ export const langMap = {
     create: "Ստեղծել",
     open: "Բացել",
     tableActions: "Աղյուսակի գործողություն",
+    leagueName: "Լիգայի անվանում",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -87,6 +89,7 @@ export const langMap = {
     create: "Créer",
     open: "Ouvrir",
     tableActions: "Actions de table",
+    leagueName: "Nom de la ligue",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -136,8 +139,8 @@ function changeLang(lang) {
   document.getElementById("createBtn").innerText = t.create;
   document.getElementById("openBtn").innerText = t.open;
   document.getElementById("actionTitle").innerText = t.tableActions;
-  document.getElementById("confirmOpenBtn").innerText = t.registerSubmit;
-  document.getElementById("tablePassword").placeholder = t.password;
+  document.getElementById("confirmCreareBtn").innerText = t.registerSubmit;
+  document.getElementById("leagueName").placeholder = t.leagueName;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
@@ -146,7 +149,7 @@ function changeLang(lang) {
   document.getElementById("regConfirmPasswordLabel").textContent = t.confirmPassword;
   document.getElementById("loginEmailLabel").textContent = t.email;
   document.getElementById("loginPasswordLabel").textContent = t.password;
-  document.getElementById("tablePasswordLabel").textContent = t.password;
+  document.getElementById("leagueNameLabel").textContent = t.leagueName;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;

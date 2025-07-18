@@ -30,9 +30,9 @@ export const ModalManager = {
     }
 
     document.getElementById("actionButtons").style.display = "flex";
-    document.getElementById("openTableSection").style.display = "none";
-    document.getElementById("tablePassword").value = "";
-    document.getElementById("tablePasswordError").textContent = "";
+    document.getElementById("openCreateSection").style.display = "none";
+    document.getElementById("leagueName").value = "";
+    document.getElementById("leagueNameError").textContent = "";
 
     document.body.classList.remove("modal-open");
   },

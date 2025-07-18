@@ -16,11 +16,13 @@
   <link rel="stylesheet" href="css/components/modal.css">
   <link rel="stylesheet" href="css/components/language-switcher.css">
   <link rel="stylesheet" href="css/components/toast.css" />
+  <link rel="stylesheet" href="css/components/leagues.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
   <div id="overlay" class="overlay"></div>
+  <div id="loader" class="spinner"></div>
 
   <!-- Header  -->
   <header>
@@ -141,16 +143,15 @@
             <button type="button" id="openBtn">Open</button>
           </div>
 
-          <div class="password-wrapper" id="openTableSection" style="display: none;">
+          <div class="password-wrapper" id="openCreateSection" style="display: none;">
             <div class="input-group">
-              <input type="password" id="tablePassword" />
-              <label for="tablePassword" id="tablePasswordLabel"></label>
+              <input type="text" id="leagueName" />
+              <label for="leagueName" id="leagueNameLabel"></label>
             </div>
-            <img src="assets/icons/eye.svg" class="toggle-password" onclick="togglePassword('tablePassword', this)" />
           </div>
-          <div class="error" id="tablePasswordError"></div>
+          <div class="error" id="leagueNameError"></div>
 
-          <button type="submit" id="confirmOpenBtn" class="modal-content modal form button">Submit</button>
+          <button type="submit" id="confirmCreareBtn" class="modal-content modal form button">Submit</button>
 
         </form>
       </div>

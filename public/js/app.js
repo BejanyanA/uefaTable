@@ -1,5 +1,5 @@
 import { AuthManager } from './modules/AuthManager.js';
-import { TableManager } from './modules/TableManager.js';
+import { LeagueManager } from './modules/LeagueManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { apiGet } from './services/api.js'; 
@@ -13,7 +13,8 @@ window.togglePassword = ModalManager.togglePassword;
 document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initLogin();
    AuthManager.initRegister();
-   TableManager.init();
+   LeagueManager.initCreate();
+   LeagueManager.initOpen();
    changeLang(currentLang);
    checkLoggedIn();
 });
