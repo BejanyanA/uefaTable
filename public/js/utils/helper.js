@@ -13,8 +13,10 @@ export function clearErrors(ids = []) {
 // Loader
 export function showLoader() {
   document.getElementById("loader").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
 }
 
 export function hideLoader() {
   document.getElementById("loader").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
 }

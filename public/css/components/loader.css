@@ -1,0 +1,154 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+main-loader {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+#loader,
+#overlay {
+  display: none;
+}
+
+.main-fader {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.8);
+
+  .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    svg {
+      height: 300px;
+      display: block;
+      margin: 0 auto;
+
+      path {
+        animation-duration: 1s;
+        animation-name: pulse;
+        animation-iteration-count: infinite;
+        color: #26a380;
+
+        &.path-7 {
+          animation-delay: -1s
+        }
+
+        &.path-6 {
+          animation-delay: -.875s
+        }
+
+        &.path-5 {
+          animation-delay: -.75s
+        }
+
+        &.path-4 {
+          animation-delay: -.625s
+        }
+
+        &.path-3 {
+          animation-delay: -.5s
+        }
+
+        &.path-2 {
+          animation-delay: -.375s
+        }
+
+        &.path-1 {
+          animation-delay: -.25s
+        }
+
+        &.path-0 {
+          animation-delay: -.125s
+        }
+      }
+    }
+  }
+}
+
+
+@keyframes pulse {
+  0% {
+    opacity: .1;
+  }
+
+  30% {
+    opacity: .8;
+  }
+
+  100% {
+    opacity: .1;
+  }
+}
+
+/* .loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+#loader,
+#overlay {
+  display: none;
+}
+
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+  display: none;
+}
+
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Mobile */
+/* @media (max-width: 480px) {
+
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('../assets/images/bgImage.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: transparent;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+} */

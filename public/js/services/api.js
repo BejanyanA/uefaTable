@@ -1,4 +1,5 @@
 import { API_BASE } from './config.js';
+import { showLoader, hideLoader } from '../utils/helper.js';
 
 
 async function handleResponse(response) {
@@ -25,8 +26,10 @@ async function handleResponse(response) {
 }
 
 export async function apiPost(endpoint, body = {}) {
+  showLoader();
+
   try {
-    const token = localStorage.getItem("authToken")
+    const token = localStorage.getItem("authToken");
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -38,13 +41,19 @@ export async function apiPost(endpoint, body = {}) {
 
     return await handleResponse(response);
   } catch (err) {
+    console.error(`❌ POST ${endpoint} failed:`, err);
     throw err;
+  } finally {
+    hideLoader();
   }
 }
 
+
 export async function apiGet(endpoint) {
+  showLoader();
+
   try {
-    const token = localStorage.getItem("authToken")
+    const token = localStorage.getItem("authToken");
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -55,6 +64,9 @@ export async function apiGet(endpoint) {
 
     return await handleResponse(response);
   } catch (err) {
+    console.error(`❌ GET ${endpoint} failed:`, err);
     throw err;
+  } finally {
+    hideLoader();
   }
 }

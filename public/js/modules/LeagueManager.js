@@ -1,6 +1,6 @@
 import { showToast } from '../utils/toast.js';
 import { isValidPassword } from '../utils/validators.js';
-import { setError, clearErrors, showLoader, hideLoader } from '../utils/helper.js';
+import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
 import { apiPost } from '../services/api.js';
@@ -103,11 +103,7 @@ initOpen: async function () {
    
 
     try {
-      showLoader();
-
       const data = await apiPost("/leagues", { bannerId });
-
-      hideLoader();
 
       if (data.success && data.data) {
         window.closeModal("tableModal");
@@ -117,8 +113,6 @@ initOpen: async function () {
         errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
       }
     } catch (err) {
-      hideLoader();
-      
       showToast(translation.something_went_wrong || "Something went wrong.", "error");
       console.error("Error opening table:", err);
     }
