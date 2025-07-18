@@ -3,6 +3,8 @@ import { handleRegister } from './routes/register.js';
 import { handleLogin } from './routes/login.js';
 import { handleMe } from './routes/me.js';
 import { handleLeagues } from './routes/leagues.js';
+import { handleLeagueInstances } from './routes/league_instances.js';
+
 // import additional route handlers as needed
 
 // Route registry with path as key and allowed methods as subkeys
@@ -11,7 +13,8 @@ const routeRegistry = {
   "/login": { POST: handleLogin },
   "/me": { GET: handleMe },
   "/leagues": { POST: handleLeagues },
-  // Add more routes here
+  "/league-instances": { POST: handleLeagueInstances },
+  // Add more routes here  league_instances
 };
 
 export async function onRequest(context) {
