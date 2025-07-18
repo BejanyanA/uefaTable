@@ -71,8 +71,8 @@
 @media (max-width: 480px) {
 
    .auth-buttons {
+      display: flex;
       gap: 10px;
-      order: 1;
    }
 
    .auth-buttons button {

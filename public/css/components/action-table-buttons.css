@@ -1,0 +1,48 @@
+/* Buttons */
+.action-table-buttons {
+   display: flex;
+   gap: 30px;
+}
+
+.action-table-buttons button {
+   background-color: transparent;
+   border: 1px solid white;
+   color: white;
+   padding: 6px 12px;
+   cursor: pointer;
+   font-size: 14px;
+   border-radius: 4px;
+   transition: background 0.3s, color 0.3s, transform 0.1s;
+   white-space: nowrap;
+   width: 100px;
+   /* ✅ Force fixed width */
+   text-align: center;
+   box-sizing: border-box;
+}
+
+.action-table-buttons button:hover {
+   background-color: rgb(0, 0, 0);
+   color: rgb(255, 255, 255);
+}
+
+.action-table-buttons button:active {
+   transform: scale(0.96);
+}
+
+
+/* Mobile */
+@media (max-width: 480px) {
+
+   .action-table-buttons {
+      display: flex;
+      gap: 30px;
+   }
+
+   .action-table-buttons button {
+      width: auto;
+      /* let buttons adjust naturally on mobile */
+      min-width: 80px;
+      font-size: 13px;
+      padding: 4px 6px;
+   }
+}

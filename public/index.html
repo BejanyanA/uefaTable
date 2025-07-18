@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/components/language-switcher.css">
   <link rel="stylesheet" href="css/components/toast.css" />
   <link rel="stylesheet" href="css/components/leagues.css">
+    <link rel="stylesheet" href="css/components/action-table-buttons.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -71,7 +72,7 @@
         <div class="error" id="loginEmailError"></div>
 
         <div class="password-wrapper">
-          <div class="input-group">
+          <div class="input-group submit-button">
             <input type="password" id="loginPassword" />
             <label for="loginPassword" id="loginPasswordLabel"></label>
           </div>
@@ -79,7 +80,7 @@
         </div>
         <div class="error" id="loginPasswordError"></div>
 
-        <button type="submit" id="loginSubmit">Login</button>
+        <button type="submit" class="submit-button" id="loginSubmit">Login</button>
       </form>
     </div>
   </div>
@@ -138,7 +139,7 @@
         <h2 id="actionTitle">Table Actions</h2>
 
         <form id="actionForm" onsubmit="return false;">
-          <div class="auth-buttons" id="actionButtons">
+          <div class="action-table-buttons" id="actionButtons">
             <button type="button" id="createBtn">Create</button>
             <button type="button" id="openBtn">Open</button>
           </div>
