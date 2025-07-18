@@ -26,7 +26,7 @@ async function handleResponse(response) {
 
 export async function apiPost(endpoint, body = {}) {
   try {
-    const token = localStorage.getItem("jwt")
+    const token = localStorage.getItem("authToken")
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -44,7 +44,7 @@ export async function apiPost(endpoint, body = {}) {
 
 export async function apiGet(endpoint) {
   try {
-    const token = localStorage.getItem("jwt")
+    const token = localStorage.getItem("authToken")
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 

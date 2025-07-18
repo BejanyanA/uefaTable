@@ -38,7 +38,7 @@ window.setLanguage = function (lang) {
 
 // 🔹 JWT Check on Load
 async function checkLoggedIn() {
-   const token = localStorage.getItem("jwt");
+   const token = localStorage.getItem("authToken");
    const authButtons = document.getElementById("authButtons");
    const bannerSection = document.querySelector(".banner-container");
 
@@ -53,12 +53,12 @@ async function checkLoggedIn() {
          document.getElementById("logoutButtn").style.display = "block";
          document.getElementById("homePage").style.display = "block";
       } else {
-         localStorage.removeItem("jwt");
+         localStorage.removeItem("authToken");
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
       console.error("Token check failed", err);
-      localStorage.removeItem("jwt");
+      localStorage.removeItem("authToken");
       if (authButtons) authButtons.style.display = "flex";
       if (bannerSection) bannerSection.style.display = "none";
    }
@@ -66,7 +66,7 @@ async function checkLoggedIn() {
 
 // 🔹 Logout
 window.logout = function () {
-   localStorage.removeItem("jwt");
+   localStorage.removeItem("authToken");
    location.reload();
 
    document.getElementById("homePage").style.display = "none";
