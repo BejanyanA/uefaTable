@@ -113,6 +113,9 @@
         justify-content: flex-start;
         /* left alignment */
         align-items: flex-end;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     #banner-wrap {
