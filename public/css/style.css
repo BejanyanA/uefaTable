@@ -18,12 +18,12 @@ body.modal-open>*:not(.modal):not(.homePage):not(#toast-container):not(#loader) 
   transition: filter 0.3s ease;
 }
 
-.password-wrapper {
+.input-league-name {
   position: relative;
   width: 100%;
 }
 
-.password-wrapper input {
+.input-league-name input {
   width: 100%;
   padding-right: 35px;
   /* space for icon */

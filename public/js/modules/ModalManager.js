@@ -33,6 +33,8 @@ export const ModalManager = {
     document.getElementById("openCreateSection").style.display = "none";
     document.getElementById("leagueName").value = "";
     document.getElementById("leagueNameError").textContent = "";
+    document.getElementById("createCompetition").style.display = "none";
+    document.getElementById("confirmCreareBtn").style.display = "none";
 
     document.body.classList.remove("modal-open");
   },

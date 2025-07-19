@@ -106,7 +106,7 @@
         </div>
         <div class="error" id="loginEmailError"></div>
 
-        <div class="password-wrapper">
+        <div class="input-league-name">
           <div class="input-group submit-button">
             <input type="password" id="loginPassword" />
             <label for="loginPassword" id="loginPasswordLabel"></label>
@@ -138,7 +138,7 @@
         </div>
         <div class="error" id="regEmailError"></div>
 
-        <div class="password-wrapper">
+        <div class="input-league-name">
           <div class="input-group">
             <input type="password" id="regPassword" />
             <label for="regPassword" id="regPasswordLabel"></label>
@@ -147,7 +147,7 @@
         </div>
         <div class="error" id="regPasswordError"></div>
 
-        <div class="password-wrapper">
+        <div class="input-league-name">
           <div class="input-group">
             <input type="password" id="regConfirmPassword" />
             <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
@@ -185,17 +185,23 @@
     </div>
     <!-- Modal -->
     <div class="modal" id="tableModal">
-      <div class="modal-content">
+      <div class="modal-content" id="modal-content">
+        <div class="actionTitle">
+          <h2 id="actionTitle">Table Actions</h2>
+        </div>
+        <div class="createCompetition">
+              <h2 id="createCompetition">Create Competition</h2>
+            </div>
         <span class="close" onclick="closeModal('tableModal')">&times;</span>
-        <h2 id="actionTitle">Table Actions</h2>
 
         <form id="actionForm" onsubmit="return false;">
+
           <div class="action-table-buttons" id="actionButtons">
             <button type="button" id="createBtn">Create</button>
             <button type="button" id="openBtn">Open</button>
           </div>
 
-          <div class="password-wrapper" id="openCreateSection" style="display: none;">
+          <div class="input-league-name" id="openCreateSection">
             <div class="input-group">
               <input type="text" id="leagueName" />
               <label for="leagueName" id="leagueNameLabel"></label>

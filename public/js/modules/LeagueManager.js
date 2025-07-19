@@ -20,13 +20,16 @@ export const LeagueManager = {
         document.getElementById("actionButtons").style.display = "flex";
         document.getElementById("openCreateSection").style.display = "none";
         document.getElementById("confirmCreareBtn").style.display = "none";
+        document.getElementById("createCompetition").style.display = "none";
         document.getElementById("leagueName").value = "";
         document.getElementById("leagueNameError").textContent = "";
       });
     });
 
-    // 🔹 "Open" button: hide options, show password
+    // 🔹 "Create" button: hide options, show password
     document.getElementById("createBtn").addEventListener("click", () => {
+      document.getElementById("actionTitle").style.display = "none";
+      document.getElementById("createCompetition").style.display = "block";
       document.getElementById("actionButtons").style.display = "none";
       document.getElementById("confirmCreareBtn").style.display = "flex";
       document.getElementById("openCreateSection").style.display = "block";
@@ -74,48 +77,48 @@ export const LeagueManager = {
       });
     };
   },
-initOpen: async function () {
+  initOpen: async function () {
 
-  // 🔹 Banner click logic
-  document.querySelectorAll(".banner").forEach(banner => {
-    banner.addEventListener("click", () => {
-      const id = banner.getAttribute("banner-id");
-      
-      document.getElementById("tableModal").dataset.bannerId = id;
+    // 🔹 Banner click logic
+    document.querySelectorAll(".banner").forEach(banner => {
+      banner.addEventListener("click", () => {
+        const id = banner.getAttribute("banner-id");
 
-      window.openModal("tableModal");
+        document.getElementById("tableModal").dataset.bannerId = id;
 
-      // Reset view
-      document.getElementById("actionButtons").style.display = "flex";
-      document.getElementById("openCreateSection").style.display = "none";
-      document.getElementById("confirmCreareBtn").style.display = "none";
-      document.getElementById("leagueName").value = "";
-      document.getElementById("leagueNameError").textContent = "";
+        window.openModal("tableModal");
+
+        // Reset view
+        document.getElementById("actionButtons").style.display = "flex";
+        document.getElementById("openCreateSection").style.display = "none";
+        document.getElementById("confirmCreareBtn").style.display = "none";
+        document.getElementById("leagueName").value = "";
+        document.getElementById("leagueNameError").textContent = "";
+      });
     });
-  });
 
-  // 🔹 "Open" button: hide options, show password
-  document.getElementById("openBtn").addEventListener("click", async () => {
-    document.getElementById("tableModal").style.display = "none";
+    // 🔹 "Open" button: hide options, show password
+    document.getElementById("openBtn").addEventListener("click", async () => {
+      document.getElementById("tableModal").style.display = "none";
 
-    const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
-    const translation = langMap[currentLang];
-   
+      const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+      const translation = langMap[currentLang];
 
-    try {
-      const data = await apiPost("/leagues", { bannerId });
 
-      if (data.success && data.data) {
-        window.closeModal("tableModal");
-        document.getElementById("bannerContainer").style.display = "none";
-        renderLeagueTable(data.data);
-      } else {
-        errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+      try {
+        const data = await apiPost("/leagues", { bannerId });
+
+        if (data.success && data.data) {
+          window.closeModal("tableModal");
+          document.getElementById("bannerContainer").style.display = "none";
+          renderLeagueTable(data.data);
+        } else {
+          errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+        }
+      } catch (err) {
+        showToast(translation.something_went_wrong || "Something went wrong.", "error");
+        console.error("Error opening table:", err);
       }
-    } catch (err) {
-      showToast(translation.something_went_wrong || "Something went wrong.", "error");
-      console.error("Error opening table:", err);
-    }
-  });
-}
+    });
+  }
 };
