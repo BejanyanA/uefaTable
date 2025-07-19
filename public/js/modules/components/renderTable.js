@@ -3,8 +3,10 @@ export function renderLeagueTable(data) {
   const leagues = data.leagues || [];
 
   if (!leagues.length) {
-    section.innerHTML = `<p>No leagues found.</p>`;
-    section.style.display = "block";
+    section.innerHTML = `<div id="bannerContainerWrapper ">
+        <h2 id="competition-types">No leagues found</h2>
+      </div>`;
+    section.style.display = "block"; 
     return;
   }
 
