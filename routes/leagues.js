@@ -17,41 +17,48 @@ export async function handleLeagues(request, env) {
     return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
   }
 
-  const userId = payload.id;
+const userId = payload.id;
+const { bannerId } = await parseBody(request);
 
-  const { bannerId, password } = await parseBody(request);
-  // const errors = {};
-  // if (!bannerId) errors.bannerId = "BannerId is required";
-  // if (!password) errors.password = "Password is required";
+// Step 1: Get created leagues
+const created = await env.core_data.prepare(`
+  SELECT * FROM leagues WHERE banner_id = ? AND created_by_user_id = ?
+`).bind(bannerId, userId).all();
 
-  // if (Object.keys(errors).length > 0) {
-  //   return jsonResponse({ success: false, errors }, 400);
-  // }
+// Step 2: Get granted_by_user_ids from league_access
+const access = await env.core_data.prepare(`
+  SELECT DISTINCT granted_by_user_id FROM league_access WHERE user_id = ?
+`).bind(userId).all();
 
-  // const league = await env.core_data.prepare(`
-  //   SELECT * FROM leagues
-  //   WHERE banner_id = ? AND access_password = ? AND created_by_user_id = ?
-  // `).bind(bannerId, password, userId).first();
+// Step 3: Fetch shared leagues
+let sharedLeagues = [];
+for (const row of access.results) {
+  const shared = await env.core_data.prepare(`
+    SELECT * FROM leagues WHERE banner_id = ? AND created_by_user_id = ?
+  `).bind(bannerId, row.granted_by_user_id).all();
 
-  // if (!league || (await hashWithSalt(password, league.salt)) !== league.password_hash) {
-  //   return jsonResponse({ success: false, message: "invalid_leauge_password" }, 400);
-  // }
+  sharedLeagues.push(...shared.results);
+}
 
-  const leagues = await env.core_data.prepare(`
-    SELECT * FROM leagues
-    WHERE created_by_user_id = ? AND banner_id = ?;
-  `).bind(userId, bannerId).all();
+// Step 4: Combine and deduplicate
+const leagueMap = new Map();
+for (const league of [...created.results, ...sharedLeagues]) {
+  leagueMap.set(league.id, league); // avoids duplicates by league ID
+}
 
-  return jsonResponse({
-    success: true,
-    data: {
-      leagues: leagues.results.map(({ id, name, banner_id, created_by_user_id, created_at }) => ({
-        id,
-        name,
-        banner_id,
-        created_by_user_id,
-        created_at
-      }))
-    }
-  }, 200);
+// Step 5: Respond with combined data
+return jsonResponse({
+  success: true,
+  data: {
+    leagues: Array.from(leagueMap.values())
+      .sort((a, b) => b.id - a.id)
+      .map(({ id, name, banner_id, created_by_user_id, created_at }) => ({
+      id,
+      name,
+      banner_id,
+      created_by_user_id,
+      created_at
+    }))
+  }
+}, 200);
 }
