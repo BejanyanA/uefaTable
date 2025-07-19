@@ -145,7 +145,7 @@ function changeLang(lang) {
   document.getElementById("createBtn").innerText = t.create;
   document.getElementById("openBtn").innerText = t.open;
   document.getElementById("actionTitle").innerText = t.tableActions;
-  document.getElementById("confirmCreareBtn").innerText = t.registerSubmit;
+  document.getElementById("confirmCreateBtn").innerText = t.registerSubmit;
   document.getElementById("leagueName").placeholder = t.leagueName;
   document.getElementById("competition-types").innerText = t.competitionTypes;
   document.getElementById("createCompetition").innerText = t.createCompetition;

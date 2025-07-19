@@ -19,7 +19,7 @@ export const LeagueManager = {
         // Reset view
         document.getElementById("actionButtons").style.display = "flex";
         document.getElementById("openCreateSection").style.display = "none";
-        document.getElementById("confirmCreareBtn").style.display = "none";
+        document.getElementById("confirmCreateBtn").style.display = "none";
         document.getElementById("createCompetition").style.display = "none";
         document.getElementById("leagueName").value = "";
         document.getElementById("leagueNameError").textContent = "";
@@ -31,12 +31,12 @@ export const LeagueManager = {
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
       document.getElementById("actionButtons").style.display = "none";
-      document.getElementById("confirmCreareBtn").style.display = "flex";
+      document.getElementById("confirmCreateBtn").style.display = "flex";
       document.getElementById("openCreateSection").style.display = "block";
     });
 
     // 🔹 Submit password
-    const createBtn = document.getElementById("confirmCreareBtn");
+    const createBtn = document.getElementById("confirmCreateBtn");
     if (createBtn) {
       createBtn.addEventListener("click", async () => {
         const translation = langMap[currentLang];
@@ -91,7 +91,7 @@ export const LeagueManager = {
         // Reset view
         document.getElementById("actionButtons").style.display = "flex";
         document.getElementById("openCreateSection").style.display = "none";
-        document.getElementById("confirmCreareBtn").style.display = "none";
+        document.getElementById("confirmCreateBtn").style.display = "none";
         document.getElementById("leagueName").value = "";
         document.getElementById("leagueNameError").textContent = "";
       });

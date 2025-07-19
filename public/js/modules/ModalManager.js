@@ -29,14 +29,17 @@ export const ModalManager = {
       form.querySelectorAll(".error").forEach(el => (el.textContent = ""));
     }
 
-    document.getElementById("actionButtons").style.display = "flex";
-    document.getElementById("openCreateSection").style.display = "none";
-    document.getElementById("leagueName").value = "";
-    document.getElementById("leagueNameError").textContent = "";
-    document.getElementById("createCompetition").style.display = "none";
-    document.getElementById("confirmCreareBtn").style.display = "none";
 
-    document.body.classList.remove("modal-open");
+  document.getElementById("actionButtons").style.display = "flex";
+  document.getElementById("openCreateSection").style.display = "none";
+  document.getElementById("leagueName").value = "";
+  document.getElementById("leagueNameError").textContent = "";
+  document.getElementById("createCompetition").style.display = "none";
+  document.getElementById("confirmCreateBtn").style.display = "none";
+
+  document.getElementById("actionTitle").style.display = "block";
+
+  document.body.classList.remove("modal-open");
   },
 
   togglePassword(inputId, iconElement) {
