@@ -129,21 +129,21 @@
 
     #banner1 {
 
-        background-image: url('../../assets/images/champLMob.png');
+        background-image: url('../../assets/images/champLMob.png') !important;
     }
 
     #banner2 {
 
-        background-image: url('../../assets/images/europaLMob.png');
+        background-image: url('../../assets/images/europaLMob.png') !important;
     }
 
     #banner3 {
 
-        background-image: url('../../assets/images/euroMob.png');
+        background-image: url('../../assets/images/euroMob.png') !important;
     }
 
     #banner4 {
 
-        background-image: url('../../assets/images/worldMob.png');
+        background-image: url('../../assets/images/worldMob.png') !important;
     }
 }
