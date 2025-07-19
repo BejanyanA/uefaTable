@@ -22,6 +22,7 @@ export const langMap = {
     open: "Open",
     tableActions: "Table Actions",
     leagueName: "League Name",
+    competitionTypes: "Competition Types",
 
     //BE translations
     username_exists: "Username already exists",
@@ -56,6 +57,7 @@ export const langMap = {
     open: "Բացել",
     tableActions: "Աղյուսակի գործողություն",
     leagueName: "Լիգայի անվանում",
+    competitionTypes: "Մրցույթի տեսակներ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -90,6 +92,7 @@ export const langMap = {
     open: "Ouvrir",
     tableActions: "Actions de table",
     leagueName: "Nom de la ligue",
+    competitionTypes: "Type de compétition",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -141,6 +144,7 @@ function changeLang(lang) {
   document.getElementById("actionTitle").innerText = t.tableActions;
   document.getElementById("confirmCreareBtn").innerText = t.registerSubmit;
   document.getElementById("leagueName").placeholder = t.leagueName;
+  document.getElementById("competition-types").innerText = t.competitionTypes;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
