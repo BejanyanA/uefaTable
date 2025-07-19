@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: url('../assets/images/bgImage.jpg') no-repeat center center fixed;
+  background: url('../assets/images/desktopBack.png') no-repeat center center fixed;
   background-size: cover;
   color: rgb(95, 95, 95);
   display: flex;
@@ -36,7 +36,7 @@ body.modal-open>*:not(.modal):not(.homePage):not(#toast-container):not(#loader) 
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: url('../assets/images/bgImage.jpg') no-repeat center center fixed;
+    background: url('../assets/images/mobileBack.png') no-repeat center center fixed;
     background-size: cover;
     color: transparent;
     display: flex;
