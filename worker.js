@@ -1,9 +1,10 @@
 import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
-import { handleRegister } from './routes/register.js';
-import { handleLogin } from './routes/login.js';
-import { handleMe } from './routes/me.js';
-import { handleLeagues } from './routes/leagues.js';
-import { handleLeagueInstances } from './routes/league_instances.js';
+import { handleRegister } from './routes_endpoints/register.js';
+import { handleLogin } from './routes_endpoints/login.js';
+import { handleMe } from './routes_endpoints/me.js';
+import { handleLeagues } from './routes_endpoints/leagues.js';
+import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
+import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 
 // import additional route handlers as needed
 
@@ -14,6 +15,7 @@ const routeRegistry = {
   "/me": { GET: handleMe },
   "/leagues": { POST: handleLeagues },
   "/league-instances": { POST: handleLeagueInstances },
+  "/friends": { GET: handleGetApprovedFriends },
   // Add more routes here  league_instances
 };
 

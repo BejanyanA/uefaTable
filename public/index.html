@@ -10,6 +10,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
 
+
   <link rel="stylesheet" href="css/layout/header.css">
   <link rel="stylesheet" href="css/layout/footer.css">
   <link rel="stylesheet" href="css/components/auth.css">
@@ -20,6 +21,8 @@
   <link rel="stylesheet" href="css/components/action-table-buttons.css">
   <link rel="stylesheet" href="css/components/loader.css">
   <link rel="stylesheet" href="css/components/competitions.css">
+  <link rel="stylesheet" href="css/components/dropdown.css">
+  <link rel="stylesheet" href="css/components/checkboslist.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -190,8 +193,8 @@
           <h2 id="actionTitle">Table Actions</h2>
         </div>
         <div class="createCompetition">
-              <h2 id="createCompetition">Create Competition</h2>
-            </div>
+          <h2 id="createCompetition">Create Competition</h2>
+        </div>
         <span class="close" onclick="closeModal('tableModal')">&times;</span>
 
         <form id="actionForm" onsubmit="return false;">
@@ -208,6 +211,19 @@
             </div>
           </div>
           <div class="error" id="leagueNameError"></div>
+
+          <!-- Friends list -->
+          <div id="user-select" class="checkbox-list"></div>
+<!-- 
+          <div id="friendError" class="error-message" style="display: none;"></div> -->
+
+          <!-- Single Select Dropdown -->
+          <select id="count-select" class="modal-dropdown">
+            <option class="teamCount" id="count-text">Select Team Count</option>
+            <option class="teamCount" value="24">24</option>
+            <option class="teamCount" value="32">32</option>
+            <option class="teamCount" value="48">48</option>
+          </select>
 
           <button type="submit" id="confirmCreateBtn" class="modal-content modal form button">Submit</button>
 

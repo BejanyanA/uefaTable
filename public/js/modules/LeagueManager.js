@@ -1,8 +1,8 @@
 import { showToast } from '../utils/toast.js';
-import { isValidPassword } from '../utils/validators.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
+import { getFriends } from './GetFriends.js';
 import { apiPost } from '../services/api.js';
 
 export const LeagueManager = {
@@ -11,8 +11,6 @@ export const LeagueManager = {
     // 🔹 Banner click logic
     document.querySelectorAll(".banner").forEach(banner => {
       banner.addEventListener("click", () => {
-        const id = banner.getAttribute("banner-id");
-        document.getElementById("tableModal").dataset.bannerId = id;
 
         window.openModal("tableModal");
 
@@ -23,16 +21,22 @@ export const LeagueManager = {
         document.getElementById("createCompetition").style.display = "none";
         document.getElementById("leagueName").value = "";
         document.getElementById("leagueNameError").textContent = "";
+        document.getElementById("count-select").style.display = "none";
+        document.getElementById("user-select").style.display = "none";
       });
     });
 
     // 🔹 "Create" button: hide options, show password
     document.getElementById("createBtn").addEventListener("click", () => {
+      getFriends.initGetAllFriends();
+      
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
       document.getElementById("actionButtons").style.display = "none";
       document.getElementById("confirmCreateBtn").style.display = "flex";
       document.getElementById("openCreateSection").style.display = "block";
+      document.getElementById("count-select").style.display = "block";
+      document.getElementById("user-select").style.display = "block";
     });
 
     // 🔹 Submit password
@@ -42,25 +46,33 @@ export const LeagueManager = {
         const translation = langMap[currentLang];
         clearErrors(["leagueNameError"]);
 
-        const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
-        const password = document.getElementById("leagueName").value.trim();
-        const errorField = document.getElementById("leagueNameError");
-
         let hasError = false;
 
-        if (!password) {
+        const modal = document.getElementById("tableModal");
+        const bannerId = modal.dataset.bannerId;
+        const leagueNameInput = document.getElementById("leagueName").value.trim()
+        const teamCount = document.getElementById("count-select").value;
+
+        const leagueNameError = document.getElementById("leagueNameError");
+
+        if (!leagueNameInput) {
           setError("leagueNameError", translation.required);
           hasError = true;
-        } else if (!isValidPassword(password)) {
-          setError("leagueNameError", translation.invalidPassword);
+        } else if (leagueNameInput.length < 3) {
+          setError("leagueNameError", translation.shortLeagueName);
+          hasError = true;
+        } else if (leagueNameInput.length > 30) {
+          setError("leagueNameError", translation.longLeagueName);
           hasError = true;
         }
 
         if (hasError) return;
 
+        leagueNameError.textContent = "";
+
         try {
-          const userId = parseInt(localStorage.getItem("loggedInuserId"));
-          const data = await apiPost("/open-table", { userId, bannerId, password });
+          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount });
+          console.log(leagueNameInput)
 
           if (data.success && data.data) {
             window.closeModal("tableModal");
@@ -77,6 +89,13 @@ export const LeagueManager = {
       });
     };
   },
+
+
+
+
+
+
+
   initOpen: async function () {
 
     // 🔹 Banner click logic

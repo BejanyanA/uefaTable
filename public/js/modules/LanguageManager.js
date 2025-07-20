@@ -24,6 +24,9 @@ export const langMap = {
     leagueName: "League Name",
     competitionTypes: "Competition Types",
     createCompetition: "Create Competition",
+    shortLeagueName: "League Name must be at least 3 characters",
+    longLeagueName: "League Name must not exceed 30 characters",
+    selectTeamCount: "Select Team Count",
 
     //BE translations
     username_exists: "Username already exists",
@@ -60,6 +63,9 @@ export const langMap = {
     leagueName: "Լիգայի անվանում",
     competitionTypes: "Մրցույթի տեսակներ",
     createCompetition: "Ստեղծել մրցույթ",
+    shortLeagueName: "Լիգայի անվանում պետք է պարունակի առնվազն 3 նիշ",
+    longLeagueName: "Լիգայի անվանում չպետք է գերազանցի 30 նիշը",
+    selectTeamCount: "Ընտրեք թմերի քանակը",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -96,6 +102,9 @@ export const langMap = {
     leagueName: "Nom de la ligue",
     competitionTypes: "Type de compétition",
     createCompetition: "Créer une compétition",
+    shortLeagueName: "Nom de la ligue doit contenir au moins 3 caractères",
+    longLeagueName: "Nom de la ligue ne doit pas dépasser 30 caractères",
+    selectTeamCount: "Nombre d’équipes",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -149,6 +158,7 @@ function changeLang(lang) {
   document.getElementById("leagueName").placeholder = t.leagueName;
   document.getElementById("competition-types").innerText = t.competitionTypes;
   document.getElementById("createCompetition").innerText = t.createCompetition;
+  document.getElementById("count-text").innerText = t.selectTeamCount;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;

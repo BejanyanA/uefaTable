@@ -31,13 +31,15 @@ export const ModalManager = {
 
 
   document.getElementById("actionButtons").style.display = "flex";
+  document.getElementById("actionTitle").style.display = "block";
   document.getElementById("openCreateSection").style.display = "none";
   document.getElementById("leagueName").value = "";
   document.getElementById("leagueNameError").textContent = "";
   document.getElementById("createCompetition").style.display = "none";
   document.getElementById("confirmCreateBtn").style.display = "none";
-
-  document.getElementById("actionTitle").style.display = "block";
+  document.getElementById("count-select").style.display = "none";
+  document.getElementById("user-select").style.display = "none";
+  
 
   document.body.classList.remove("modal-open");
   },
