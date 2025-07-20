@@ -27,6 +27,7 @@ export const LeagueManager = {
         document.getElementById("teamCountError").style.display = "none";
         document.getElementById("clubList").style.display = "none";
         document.getElementById("clubsError").style.display = "none";
+        document.getElementById("clubCount").innerHTML = "";
       });
     });
 
@@ -52,7 +53,7 @@ export const LeagueManager = {
     if (createBtn) {
       createBtn.addEventListener("click", async () => {
         const translation = langMap[currentLang];
-        clearErrors(["leagueNameError"]);
+        clearErrors([ "leagueNameError", "teamCountError", "clubsError" ]);
 
         let hasError = false;
 

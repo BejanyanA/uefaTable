@@ -29,6 +29,7 @@ export const langMap = {
     selectTeamCount: "Select Team Count",
     lessClubCount: "The number of selected teams is less than the required maximum",
     largeClubCount: "The number of selected teams is greater than the required maximum",
+    selectedCount: "Selected",
 
     //BE translations
     username_exists: "Username already exists",
@@ -72,6 +73,7 @@ export const langMap = {
     selectTeamCount: "Ընտրեք թմերի քանակը",
     lessClubCount: "Ընտրված թիմերի քանակը պակաս է պահանջվող առավելագույնից",
     largeClubCount: "Ընտրված թիմերի քանակը գերազանցում է պահանջվող առավելագույնը",
+    selectedCount: "Ընտրված է",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -115,6 +117,7 @@ export const langMap = {
     selectTeamCount: "Nombre d’équipes",
     lessClubCount: "Le nombre d’équipes sélectionnées est inférieur au maximum requis",
     largeClubCount: "Le nombre d’équipes sélectionnées dépasse le maximum requis",
+    selectedCount: "Sélectionné",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -171,6 +174,7 @@ function changeLang(lang) {
   document.getElementById("competition-types").innerText = t.competitionTypes;
   document.getElementById("createCompetition").innerText = t.createCompetition;
   document.getElementById("count-text").innerText = t.selectTeamCount;
+  document.getElementById("clubCount").innerText = t.selectedCount;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;

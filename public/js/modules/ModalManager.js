@@ -44,6 +44,7 @@ export const ModalManager = {
     document.getElementById("clubsError").textContent = "";
     document.getElementById("user-select").innerHTML = "";
     document.getElementById("clubList").innerHTML = "";
+    document.getElementById("clubCount").innerHTML = "";
 
 
     document.body.classList.remove("modal-open");
