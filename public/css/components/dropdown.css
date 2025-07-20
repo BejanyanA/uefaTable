@@ -1,9 +1,22 @@
 .modal-dropdown {
   width: 100%;
-  padding: 6px;
+  padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  border-radius: 6px;
+  margin-bottom: -8px;
   font-size: 14px;
   box-sizing: border-box;
+  position: relative;
+}
+
+.modal-dropdown-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 12px;
+  /* 👈 Add this for spacing above */
+  margin-bottom: 20px;
+  /* 👈 Reduce bottom if needed */
+  align-self: flex-start;
+  min-height: 18px;
+  /* 👈 Optional: keep consistent height */
 }

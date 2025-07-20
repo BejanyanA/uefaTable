@@ -23,13 +23,14 @@ export const LeagueManager = {
         document.getElementById("leagueNameError").textContent = "";
         document.getElementById("count-select").style.display = "none";
         document.getElementById("user-select").style.display = "none";
+        document.getElementById("teamCountError").style.display = "none";
       });
     });
 
     // 🔹 "Create" button: hide options, show password
     document.getElementById("createBtn").addEventListener("click", () => {
       getFriends.initGetAllFriends();
-      
+
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
       document.getElementById("actionButtons").style.display = "none";
@@ -37,6 +38,7 @@ export const LeagueManager = {
       document.getElementById("openCreateSection").style.display = "block";
       document.getElementById("count-select").style.display = "block";
       document.getElementById("user-select").style.display = "block";
+      document.getElementById("teamCountError").style.display = "block";
     });
 
     // 🔹 Submit password
@@ -49,11 +51,12 @@ export const LeagueManager = {
         let hasError = false;
 
         const modal = document.getElementById("tableModal");
-        const bannerId = modal.dataset.bannerId;
+        const bannerId = parseInt(modal.dataset.bannerId);
         const leagueNameInput = document.getElementById("leagueName").value.trim()
-        const teamCount = document.getElementById("count-select").value;
+        const teamCount = parseInt(document.getElementById("count-select").value);
 
         const leagueNameError = document.getElementById("leagueNameError");
+        const teamCountError = document.getElementById("teamCountError");
 
         if (!leagueNameInput) {
           setError("leagueNameError", translation.required);
@@ -66,12 +69,26 @@ export const LeagueManager = {
           hasError = true;
         }
 
+        
+        if (!teamCount) {
+          setError("teamCountError", translation.required);
+          hasError = true;
+        }
+
+        // Selected Friends
+        const selectedIds = Array.from(document.querySelectorAll('#user-select input[type="checkbox"]:checked'))
+          .map(cb => cb.value);
+
+        const friendIds = selectedIds.map(id => parseInt(id, 10));
+
+
         if (hasError) return;
 
         leagueNameError.textContent = "";
+        teamCountError.textContent = "";
 
         try {
-          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount });
+          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount, friendIds });
           console.log(leagueNameInput)
 
           if (data.success && data.data) {

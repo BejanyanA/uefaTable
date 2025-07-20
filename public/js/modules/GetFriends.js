@@ -16,9 +16,10 @@ export const getFriends = {
             if (response.success && response.data?.friends?.length) {
                 response.data.friends.forEach(friend => {
                     const label = document.createElement("label");
+                    label.className = "checkbox-checkbox";
                     label.innerHTML = `
-            <input type="checkbox" value="${friend.id}"> ${friend.username}
-          `;
+                    <input type="checkbox" value="${friend.id}" />
+                    <span class="checkbox-name">${friend.username}</span> `;
                     container.appendChild(label);
                 });
                 friendError.textContent = ""; // ✅ optional cleanup
