@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/components/loader.css">
   <link rel="stylesheet" href="css/components/competitions.css">
   <link rel="stylesheet" href="css/components/dropdown.css">
-  <link rel="stylesheet" href="css/components/checkboslist.css">
+  <link rel="stylesheet" href="css/components/checkbox-lists.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -103,7 +103,7 @@
       <span class="close" onclick="closeModal('loginModal')">&times;</span>
       <h2 id="loginTitle">Login</h2>
       <form id="loginForm">
-        <div class="input-group">
+        <div class="input-group input-league-name">
           <input type="text" id="loginEmail" />
           <label for="loginEmail" id="loginEmailLabel"></label>
         </div>
@@ -129,13 +129,13 @@
       <span class="close" onclick="closeModal('registerModal')">&times;</span>
       <h2 id="registerTitle">Register</h2>
       <form id="registerForm">
-        <div class="input-group">
+        <div class="input-group input-league-name">
           <input type="text" id="regUsername" />
           <label for="regUsername" id="regUsernameLabel"></label>
         </div>
         <div class="error" id="regUsernameError"></div>
 
-        <div class="input-group">
+        <div class="input-group input-league-name">
           <input type="text" id="regEmail" />
           <label for="regEmail" id="regEmailLabel"></label>
         </div>
@@ -213,9 +213,9 @@
           <div class="error" id="leagueNameError"></div>
 
           <!-- Friends list -->
-          <div id="user-select" class="checkbox-list"></div>
+          <div id="user-select" class="friend-checkbox-list"></div>
 
-          <div id="friendError" class="error-message" style="display: none;"></div>
+          <div id="friendError" class="friend-list-error" style="display: none;"></div>
 
           <!-- Single Select Dropdown -->
           <select id="count-select" class="modal-dropdown">
@@ -225,6 +225,11 @@
             <option class="teamCount" value="48">48</option>
           </select>
           <div id="teamCountError" class="modal-dropdown-error"></div>
+
+          <!-- Clubs list -->
+          <div id="clubList" class="club-checkbox-list">
+          </div>
+          <div id="clubsError" class="clubs-list-error"></div>
 
           <button type="submit" id="confirmCreateBtn" class="modal-content modal form button">Submit</button>
 

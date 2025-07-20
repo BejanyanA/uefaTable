@@ -3,6 +3,7 @@ import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
 import { getFriends } from './GetFriends.js';
+import { getClubs } from './GetClubs.js';
 import { apiPost } from '../services/api.js';
 
 export const LeagueManager = {
@@ -24,12 +25,15 @@ export const LeagueManager = {
         document.getElementById("count-select").style.display = "none";
         document.getElementById("user-select").style.display = "none";
         document.getElementById("teamCountError").style.display = "none";
+        document.getElementById("clubList").style.display = "none";
+        document.getElementById("clubsError").style.display = "none";
       });
     });
 
     // 🔹 "Create" button: hide options, show password
     document.getElementById("createBtn").addEventListener("click", () => {
       getFriends.initGetAllFriends();
+      getClubs.initGetAllClubs();
 
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
@@ -39,6 +43,8 @@ export const LeagueManager = {
       document.getElementById("count-select").style.display = "block";
       document.getElementById("user-select").style.display = "block";
       document.getElementById("teamCountError").style.display = "block";
+      document.getElementById("clubList").style.display = "block";
+      document.getElementById("clubsError").style.display = "block";
     });
 
     // 🔹 Submit password
@@ -54,9 +60,13 @@ export const LeagueManager = {
         const bannerId = parseInt(modal.dataset.bannerId);
         const leagueNameInput = document.getElementById("leagueName").value.trim()
         const teamCount = parseInt(document.getElementById("count-select").value);
+        const selectedClubIds = Array.from(document.querySelectorAll('#clubList input[type="checkbox"]:checked'))
+          .map(cb => parseInt(cb.value));
+        const clubIds = selectedClubIds;
 
         const leagueNameError = document.getElementById("leagueNameError");
         const teamCountError = document.getElementById("teamCountError");
+        const clubsError = document.getElementById("clubsError");
 
         if (!leagueNameInput) {
           setError("leagueNameError", translation.required);
@@ -69,27 +79,41 @@ export const LeagueManager = {
           hasError = true;
         }
 
-        
         if (!teamCount) {
           setError("teamCountError", translation.required);
           hasError = true;
         }
 
+        if (!clubIds.length) {
+          setError("clubsError", translation.required);
+          hasError = true;
+        } else if (clubIds.length < teamCount) {
+          setError("clubsError", translation.lessClubCount);
+          hasError = true;
+        } else if (clubIds.length > teamCount) {
+          setError("clubsError", translation.largeClubCount);
+          hasError = true;
+        }
+
         // Selected Friends
-        const selectedIds = Array.from(document.querySelectorAll('#user-select input[type="checkbox"]:checked'))
+        const selectedFriendIds = Array.from(document.querySelectorAll('#user-select input[type="checkbox"]:checked'))
           .map(cb => cb.value);
 
-        const friendIds = selectedIds.map(id => parseInt(id, 10));
+        let friendIds = selectedFriendIds.map(id => parseInt(id));
+        if (!friendIds.length) {
+          friendIds = null
+        }
 
 
         if (hasError) return;
 
         leagueNameError.textContent = "";
         teamCountError.textContent = "";
+        clubsError.textContent = "";
 
         try {
-          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount, friendIds });
-          console.log(leagueNameInput)
+          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount, friendIds, clubIds });
+
 
           if (data.success && data.data) {
             window.closeModal("tableModal");

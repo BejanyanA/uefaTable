@@ -16,10 +16,10 @@ export const getFriends = {
             if (response.success && response.data?.friends?.length) {
                 response.data.friends.forEach(friend => {
                     const label = document.createElement("label");
-                    label.className = "checkbox-checkbox";
+                    label.className = "friend-checkbox-checkbox";
                     label.innerHTML = `
                     <input type="checkbox" value="${friend.id}" />
-                    <span class="checkbox-name">${friend.username}</span> `;
+                    <span class="friend-checkbox-name">${friend.username}</span> `;
                     container.appendChild(label);
                 });
                 friendError.textContent = ""; // ✅ optional cleanup
@@ -29,13 +29,13 @@ export const getFriends = {
                 friendError.textContent = message;
 
                 const error = document.createElement("div");
-                error.className = "error-message";
+                error.className = "friend-list-error";
                 error.textContent = message;
                 container.appendChild(error);
             }
         } catch (err) {
             const container = document.getElementById("user-select");
-            container.innerHTML = `<div class="error-message">Something went wrong while loading friends.</div>`;
+            container.innerHTML = `<div class="friend-list-error">Something went wrong while loading friends.</div>`;
             console.error("Error fetching friends:", err);
         }
     }

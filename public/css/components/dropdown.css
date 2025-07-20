@@ -4,10 +4,12 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-bottom: -8px;
+  margin-top: 24px;
   font-size: 14px;
   box-sizing: border-box;
   position: relative;
 }
+
 
 .modal-dropdown-error {
   color: red;

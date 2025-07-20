@@ -27,6 +27,8 @@ export const langMap = {
     shortLeagueName: "League Name must be at least 3 characters",
     longLeagueName: "League Name must not exceed 30 characters",
     selectTeamCount: "Select Team Count",
+    lessClubCount: "The number of selected teams is less than the required maximum",
+    largeClubCount: "The number of selected teams is greater than the required maximum",
 
     //BE translations
     username_exists: "Username already exists",
@@ -38,6 +40,7 @@ export const langMap = {
     invalid_email_or_password: "Email or Password is incorrect",
     invalid_leauge_password: "Table Password is incorrect",
     no_friends_found: "No friends found",
+    no_clubs_found: "No clubs found",
   },
   am: {
     login: "Մուտք",
@@ -67,6 +70,8 @@ export const langMap = {
     shortLeagueName: "Լիգայի անվանում պետք է պարունակի առնվազն 3 նիշ",
     longLeagueName: "Լիգայի անվանում չպետք է գերազանցի 30 նիշը",
     selectTeamCount: "Ընտրեք թմերի քանակը",
+    lessClubCount: "Ընտրված թիմերի քանակը պակաս է պահանջվող առավելագույնից",
+    largeClubCount: "Ընտրված թիմերի քանակը գերազանցում է պահանջվող առավելագույնը",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -78,6 +83,7 @@ export const langMap = {
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
     invalid_leauge_password: "Աղյուսակի Գաղտնաբառը սխալ է",
     no_friends_found: "Ընկերներ չեն գտնվել",
+    no_clubs_found: "Ակումբներ չեն գտնվել",
   },
   fr: {
     login: "Connexion",
@@ -107,6 +113,8 @@ export const langMap = {
     shortLeagueName: "Nom de la ligue doit contenir au moins 3 caractères",
     longLeagueName: "Nom de la ligue ne doit pas dépasser 30 caractères",
     selectTeamCount: "Nombre d’équipes",
+    lessClubCount: "Le nombre d’équipes sélectionnées est inférieur au maximum requis",
+    largeClubCount: "Le nombre d’équipes sélectionnées dépasse le maximum requis",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -118,6 +126,7 @@ export const langMap = {
     invalid_email_or_password: "E-mail ou mot de passe incorrect",
     invalid_leauge_password: "Mot de passe de table incorrect",
     no_friends_found: "Pas d’amis trouvés",
+    no_clubs_found: "Aucun club trouvé",
   }
 };
 

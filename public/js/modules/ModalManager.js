@@ -39,7 +39,11 @@ export const ModalManager = {
     document.getElementById("confirmCreateBtn").style.display = "none";
     document.getElementById("count-select").style.display = "none";
     document.getElementById("user-select").style.display = "none";
-    document.getElementById("teamCountError").style.display = "none";
+    document.getElementById("teamCountError").textContent = "";
+    document.getElementById("clubList").style.display = "none";
+    document.getElementById("clubsError").textContent = "";
+    document.getElementById("user-select").innerHTML = "";
+    document.getElementById("clubList").innerHTML = "";
 
 
     document.body.classList.remove("modal-open");
