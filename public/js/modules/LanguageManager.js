@@ -37,6 +37,7 @@ export const langMap = {
     something_went_wrong: "Something went wrong",
     invalid_email_or_password: "Email or Password is incorrect",
     invalid_leauge_password: "Table Password is incorrect",
+    no_friends_found: "No friends found",
   },
   am: {
     login: "Մուտք",
@@ -76,6 +77,7 @@ export const langMap = {
     something_went_wrong: "Տեղի է ունեցել անսպասելի սխալ",
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
     invalid_leauge_password: "Աղյուսակի Գաղտնաբառը սխալ է",
+    no_friends_found: "Ընկերներ չեն գտնվել",
   },
   fr: {
     login: "Connexion",
@@ -115,6 +117,7 @@ export const langMap = {
     something_went_wrong: "Une erreur s'est produite",
     invalid_email_or_password: "E-mail ou mot de passe incorrect",
     invalid_leauge_password: "Mot de passe de table incorrect",
+    no_friends_found: "Pas d’amis trouvés",
   }
 };
 
