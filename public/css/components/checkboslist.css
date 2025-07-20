@@ -43,7 +43,7 @@
 }
 
 .checkbox-list .error-message {
-  color: red;
+  color: rgb(63, 59, 59);
   font-size: 14px;
   text-align: center;
   padding: 20px;
