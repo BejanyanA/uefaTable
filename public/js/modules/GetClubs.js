@@ -19,6 +19,7 @@ export const getClubs = {
             container.innerHTML = "";
             clubError.textContent = "";
             clubCount.textContent = "";
+            clubCount.textContent = `${translation.selectedCount} (0)`;
 
             const response = await apiGet("/clubs");
 

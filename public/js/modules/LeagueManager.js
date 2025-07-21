@@ -46,6 +46,7 @@ export const LeagueManager = {
       document.getElementById("teamCountError").style.display = "block";
       document.getElementById("clubList").style.display = "block";
       document.getElementById("clubsError").style.display = "block";
+      document.getElementById("clubCount").style.display = "block";
     });
 
     // 🔹 Submit password
