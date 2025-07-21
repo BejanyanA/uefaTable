@@ -18,3 +18,8 @@ export function isValidPassword(password) {
     special.test(password)
   );
 }
+
+export function detectSpace(username) {
+  const regex = /\s/;
+  return regex.test(username);
+}

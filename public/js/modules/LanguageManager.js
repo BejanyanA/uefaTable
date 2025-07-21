@@ -30,6 +30,7 @@ export const langMap = {
     lessClubCount: "The number of selected teams is less than the required maximum",
     largeClubCount: "The number of selected teams is greater than the required maximum",
     selectedCount: "Selected",
+    no_spaces_allowed: "Spaces are not allowed",
 
     //BE translations
     username_exists: "Username already exists",
@@ -74,6 +75,7 @@ export const langMap = {
     lessClubCount: "Ընտրված թիմերի քանակը պակաս է պահանջվող առավելագույնից",
     largeClubCount: "Ընտրված թիմերի քանակը գերազանցում է պահանջվող առավելագույնը",
     selectedCount: "Ընտրված է",
+    no_spaces_allowed: "Բացատները թույլատրելի չեն",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -118,6 +120,7 @@ export const langMap = {
     lessClubCount: "Le nombre d’équipes sélectionnées est inférieur au maximum requis",
     largeClubCount: "Le nombre d’équipes sélectionnées dépasse le maximum requis",
     selectedCount: "Sélectionné",
+    no_spaces_allowed: "Les espaces ne sont pas autorisés",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",

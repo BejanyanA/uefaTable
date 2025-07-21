@@ -1,5 +1,5 @@
 import { showToast } from '../utils/toast.js';
-import { isValidEmail, isValidPassword } from '../utils/validators.js';
+import { isValidEmail, isValidPassword, detectSpace } from '../utils/validators.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { apiPost, apiGet } from '../services/api.js';
@@ -29,13 +29,16 @@ export const AuthManager = {
       } else if (!isValidEmail(emailInput.value)) {
         setError("loginEmailError", translation.invalidEmail);
         hasError = true;
-      }
+      }       
 
       if (!passwordInput.value.trim()) {
         setError("loginPasswordError", translation.required);
         hasError = true;
       } else if (!isValidPassword(passwordInput.value.trim())) {
         setError("loginPasswordError", translation.invalidPassword);
+        hasError = true;
+      } else if (detectSpace(passwordInput.value.trim())) {
+        setError("loginPasswordError", translation.no_spaces_allowed);
         hasError = true;
       }
 
@@ -103,7 +106,11 @@ export const AuthManager = {
       } else if (regUsernameInput.value.trim().length > 20) {
         setError("regUsernameError", translation.longUsername);
         hasError = true;
+      } else if (detectSpace(regUsernameInput.value.trim())) {
+        setError("regUsernameError", translation.no_spaces_allowed);
+        hasError = true;
       }
+
 
       if (!regEmailInput.value.trim()) {
         setError("regEmailError", translation.required);
@@ -125,6 +132,9 @@ export const AuthManager = {
       } else if (regPasswordInput.value.trim().length > 30) {
         setError("regPasswordError", translation.longPassword);
         hasError = true;
+      } else if (detectSpace(regPasswordInput.value.trim())) {
+        setError("regPasswordError", translation.no_spaces_allowed);
+        hasError = true;
       }
 
       if (!regConfPasswordInput.value.trim()) {
@@ -135,6 +145,9 @@ export const AuthManager = {
         hasError = true;
       } else if (regConfPasswordInput.value.trim().length > 30) {
         setError("regConfirmPasswordError", translation.longPassword);
+        hasError = true;
+      } else if (detectSpace(regConfPasswordInput.value.trim())) {
+        setError("regConfirmPasswordError", translation.no_spaces_allowed);
         hasError = true;
       }
 
