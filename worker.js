@@ -5,7 +5,7 @@ import { handleMe } from './routes_endpoints/me.js';
 import { handleLeagues } from './routes_endpoints/leagues.js';
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
-import { handleGetAllClubs } from './routes_endpoints/get_clubs.js';
+import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
 
 // import additional route handlers as needed
 
@@ -18,6 +18,7 @@ const routeRegistry = {
   "/league-instances": { POST: handleLeagueInstances },
   "/friends": { GET: handleGetApprovedFriends },
   "/clubs": { GET: handleGetAllClubs },
+  "/search-clubs": { POST: handleSearchClubs },
   // Add more routes here  league_instances
 };
 

@@ -1,4 +1,4 @@
-// routes/leagues.js
+// routes/league_instances.js
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
