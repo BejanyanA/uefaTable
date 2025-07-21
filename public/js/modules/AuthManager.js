@@ -23,6 +23,7 @@ export const AuthManager = {
       const loginEmailError = document.getElementById("loginEmailError");
       const loginPasswordError = document.getElementById("loginPasswordError");
 
+      // Email Validations
       if (!emailInput.value.trim()) {
         setError("loginEmailError", translation.required);
         hasError = true;
@@ -31,6 +32,7 @@ export const AuthManager = {
         hasError = true;
       }       
 
+      // Password Validations
       if (!passwordInput.value.trim()) {
         setError("loginPasswordError", translation.required);
         hasError = true;
@@ -97,6 +99,7 @@ export const AuthManager = {
       const regPasswordError = document.getElementById("regPasswordError");
       const regConfPasswordError = document.getElementById("regConfirmPasswordError");
 
+      // Username Validations
       if (!regUsernameInput.value.trim()) {
         setError("regUsernameError", translation.required);
         hasError = true;
@@ -111,7 +114,7 @@ export const AuthManager = {
         hasError = true;
       }
 
-
+      // Email Validations
       if (!regEmailInput.value.trim()) {
         setError("regEmailError", translation.required);
         hasError = true;
@@ -120,6 +123,7 @@ export const AuthManager = {
         hasError = true;
       }
 
+      // Password Validations
       if (!regPasswordInput.value.trim()) {
         setError("regPasswordError", translation.required);
         hasError = true;
@@ -137,6 +141,7 @@ export const AuthManager = {
         hasError = true;
       }
 
+      // Confirm Password Validations
       if (!regConfPasswordInput.value.trim()) {
         setError("regConfirmPasswordError", translation.required);
         hasError = true;
