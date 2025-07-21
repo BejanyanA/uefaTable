@@ -44,7 +44,7 @@ export const getClubs = {
 
             } else {
                 const message = translation.no_clubs_found || "No clubs found.";
-                clubError.textContent = message;
+                // clubError.textContent = message;
 
                 const error = document.createElement("div");
                 error.className = "clubs-list-error";
