@@ -206,7 +206,7 @@
   .club-search label {
     position: absolute;
     top: 50%;
-    left: 5px;
+    left: 4px;
     transform: translateY(-50%);
     color: #aaa;
     font-size: 14px;
@@ -219,9 +219,9 @@
 
   .club input,
   .club-search,
-  .club button,
-  .club select,
-  .club textarea {
+  .club-search button,
+  .club-search select,
+  .club-search textarea {
     font-size: 16px;
   }
 }
