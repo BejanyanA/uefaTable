@@ -63,7 +63,7 @@
   margin-bottom: 2px;
 }
 
-.clubs-list-error {
+.clubs-error {
   color: red;
   font-size: 12px;
   margin-top: 4px;
@@ -73,6 +73,16 @@
   align-self: flex-start;
   min-height: 18px;
   /* 👈 Optional: keep consistent height */
+}
+
+.clubs-list-error {
+  color: rgb(122, 116, 116);
+  font-size: 16px;
+  margin-top: 4px;
+  min-height: 18px;
+  font-weight: bold;
+  text-align: center;
+  padding: 50px 10px;
 }
 
 
@@ -94,6 +104,7 @@
   max-width: 480px;
   /* ✅ Optional fixed width */
   box-sizing: border-box;
+  margin-bottom: 16px;
 }
 
 /* 🔘 Each row (label + checkbox + name) */
