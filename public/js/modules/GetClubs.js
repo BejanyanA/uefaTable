@@ -80,6 +80,18 @@ export const getClubs = {
             clearTimeout(timeout);
             timeout = setTimeout(async () => {
                 try {
+                    // ✅ Step 1: Save current selections BEFORE clearing the DOM
+                    const checkboxes = container.querySelectorAll(".club-checkbox");
+                    checkboxes.forEach(cb => {
+                        const id = parseInt(cb.value);
+                        if (cb.checked) {
+                            selectedClubIds.add(id);
+                        } else {
+                            selectedClubIds.delete(id);
+                        }
+                    });
+
+                    // ✅ Step 2: Proceed with search and rendering
                     container.innerHTML = "";
                     clubError.textContent = "";
                     clubCount.textContent = `${translation.selectedCount} (${selectedClubIds.size})`;
