@@ -60,7 +60,7 @@
   color: #424040;
   font-weight: bold;
   font-size: 14px;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .clubs-error {
@@ -85,6 +85,43 @@
   padding: 50px 10px;
 }
 
+.club-search {
+  position: relative;
+  margin-bottom: -18px;
+  width: 100%;
+}
+
+.club-search input {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  background: white;
+}
+
+.club-search label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  background: white;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+.club-search input:focus+label,
+.club-search input:not(:placeholder-shown):valid+label,
+.club-search input:not(:focus):not(:placeholder-shown):not(:invalid)+label {
+  top: -10px;
+  /* ⬅️ Move label closer to input */
+  left: 4px;
+  font-size: 13px;
+  /* ⬅️ Slightly smaller label text */
+  color: #333;
+}
 
 
 .friend-checkbox-list {
@@ -146,4 +183,45 @@
   left: 50%;
   margin-right: -50%;
   transform: translate(-50%, -50%)
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+
+  .club-search {
+    position: relative;
+    margin-bottom: -18px;
+    
+    width: 100%;
+  }
+
+  .modal input {
+    padding: 4px;
+    margin-bottom: 3px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .club-search label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 14px;
+    pointer-events: none;
+    transition: 0.2s ease all;
+    background: white;
+    padding: 0 3px;
+    line-height: 1;
+  }
+
+  .club input,
+  .club button,
+  .club select,
+  .club textarea {
+    font-size: 16px;
+  }
 }

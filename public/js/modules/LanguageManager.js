@@ -31,6 +31,7 @@ export const langMap = {
     largeClubCount: "The number of selected teams is greater than the required maximum",
     selectedCount: "Selected",
     no_spaces_allowed: "Spaces are not allowed",
+    clubSearch: "Search Clubs...",
 
     //BE translations
     username_exists: "Username already exists",
@@ -76,6 +77,7 @@ export const langMap = {
     largeClubCount: "Ընտրված թիմերի քանակը գերազանցում է պահանջվող առավելագույնը",
     selectedCount: "Ընտրված է",
     no_spaces_allowed: "Բացատները թույլատրելի չեն",
+    clubSearch: "Որոնել ակումբներ...",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -121,6 +123,7 @@ export const langMap = {
     largeClubCount: "Le nombre d’équipes sélectionnées dépasse le maximum requis",
     selectedCount: "Sélectionné",
     no_spaces_allowed: "Les espaces ne sont pas autorisés",
+    clubSearch: "Rechercher des clubs...",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -178,6 +181,7 @@ function changeLang(lang) {
   document.getElementById("createCompetition").innerText = t.createCompetition;
   document.getElementById("count-text").innerText = t.selectTeamCount;
   document.getElementById("clubCount").innerText = t.selectedCount;
+  document.getElementById("clubSearch").placeholder = t.clubSearch;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
@@ -187,6 +191,7 @@ function changeLang(lang) {
   document.getElementById("loginEmailLabel").textContent = t.email;
   document.getElementById("loginPasswordLabel").textContent = t.password;
   document.getElementById("leagueNameLabel").textContent = t.leagueName;
+  document.getElementById("clubSearchLabel").textContent = t.clubSearch;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;

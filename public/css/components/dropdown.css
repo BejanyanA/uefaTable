@@ -22,3 +22,49 @@
   min-height: 18px;
   /* 👈 Optional: keep consistent height */
 }
+
+/* Mobile */
+@media (max-width: 480px) {
+
+  .modal-dropdown {
+    position: relative;
+    margin-bottom: -10px;
+    padding: 0 4px;
+    width: 100%;
+  }
+
+  #count-select {
+    padding: 4px;
+    font-size: 14px;
+  }
+
+  .modal-dropdown input {
+    padding: 4px;
+    margin-bottom: 3px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .modal-dropdown option {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 12px;
+    pointer-events: none;
+    transition: 0.2s ease all;
+    background: white;
+    padding: 0 3px;
+    line-height: 1;
+  }
+
+  .modal-dropdown input,
+  .modal-dropdown button,
+  .modal-dropdown select,
+  .modal-dropdown textarea {
+    font-size: 16px;
+  }
+}

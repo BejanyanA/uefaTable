@@ -45,6 +45,8 @@ export const ModalManager = {
     document.getElementById("user-select").innerHTML = "";
     document.getElementById("clubList").innerHTML = "";
     document.getElementById("clubCount").innerHTML = "";
+    document.getElementById("clubSearch").style.display = "none";
+    document.getElementById("clubSearchLabel").style.display = "none";
 
 
     document.body.classList.remove("modal-open");

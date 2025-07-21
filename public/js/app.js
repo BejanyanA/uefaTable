@@ -1,5 +1,7 @@
 import { AuthManager } from './modules/AuthManager.js';
 import { LeagueManager } from './modules/LeagueManager.js';
+import { getFriends } from './modules/GetFriends.js';
+import { getClubs } from './modules/GetClubs.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { apiGet } from './services/api.js'; 
@@ -15,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initRegister();
    LeagueManager.initCreate();
    LeagueManager.initOpen();
+   getFriends.initGetAllFriends();
+   getClubs.initGetAllClubs();
+   getClubs.initSearchClubs()
    changeLang(currentLang);
    checkLoggedIn();
 });

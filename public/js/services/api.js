@@ -25,8 +25,10 @@ async function handleResponse(response) {
   return data;
 }
 
-export async function apiPost(endpoint, body = {}) {
-  showLoader();
+export async function apiPost(endpoint, body = {}, options = {}) {
+  const { showLoading = true } = options;
+
+  if (showLoading) showLoader();
 
   try {
     const token = localStorage.getItem("authToken");
@@ -44,13 +46,15 @@ export async function apiPost(endpoint, body = {}) {
     console.error(`❌ POST ${endpoint} failed:`, err);
     throw err;
   } finally {
-    hideLoader();
+    if (showLoading) hideLoader();
   }
 }
 
 
-export async function apiGet(endpoint) {
-  showLoader();
+export async function apiGet(endpoint, options = {}) {
+  const { showLoading = true } = options;
+
+  if (showLoading) showLoader();
 
   try {
     const token = localStorage.getItem("authToken");
@@ -67,6 +71,6 @@ export async function apiGet(endpoint) {
     console.error(`❌ GET ${endpoint} failed:`, err);
     throw err;
   } finally {
-    hideLoader();
+    if (showLoading) hideLoader();
   }
 }

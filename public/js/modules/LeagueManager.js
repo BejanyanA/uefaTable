@@ -28,6 +28,8 @@ export const LeagueManager = {
         document.getElementById("clubList").style.display = "none";
         document.getElementById("clubsError").style.display = "none";
         document.getElementById("clubCount").innerHTML = "";
+        document.getElementById("clubSearch").style.display = "none";
+        document.getElementById("clubSearchLabel").style.display = "none";
       });
     });
 
@@ -47,6 +49,8 @@ export const LeagueManager = {
       document.getElementById("clubList").style.display = "block";
       document.getElementById("clubsError").style.display = "block";
       document.getElementById("clubCount").style.display = "block";
+      document.getElementById("clubSearch").style.display = "block";
+      document.getElementById("clubSearchLabel").style.display = "block";
     });
 
     // 🔹 Submit password
