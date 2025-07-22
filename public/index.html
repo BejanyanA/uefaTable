@@ -165,7 +165,7 @@
     </div>
   </div>
 
-  <!-- 🔹 Banners -->
+  <!-- 🔹 Home Page Banners -->
   <div class="homePage" id="homePage" style="display: none; ">
     <div class="banner-container" id="bannerContainer">
       <div id="bannerContainerWrapper ">
@@ -186,66 +186,68 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
-    <div class="modal" id="tableModal">
-      <div class="modal-content" id="modal-content">
-        <div class="actionTitle">
-          <h2 id="actionTitle">Table Actions</h2>
-        </div>
-        <div class="createCompetition">
-          <h2 id="createCompetition">Create Competition</h2>
-        </div>
-        <span class="close" onclick="closeModal('tableModal')">&times;</span>
+  </div>
 
-        <form id="actionForm" onsubmit="return false;">
-
-          <div class="action-table-buttons" id="actionButtons">
-            <button type="button" id="createBtn">Create</button>
-            <button type="button" id="openBtn">Open</button>
-          </div>
-
-          <div class="input-league-name" id="openCreateSection">
-            <div class="input-group">
-              <input type="text" id="leagueName" />
-              <label for="leagueName" id="leagueNameLabel"></label>
-            </div>
-          </div>
-          <div class="error" id="leagueNameError"></div>
-
-          <!-- Friends list -->
-          <div id="user-select" class="friend-checkbox-list"></div>
-
-          <div id="friendError" class="friend-list-error" style="display: none;"></div>
-
-          <!-- Single Select Dropdown -->
-          <select id="count-select" class="modal-dropdown">
-            <option class="teamCount" id="count-text">Select Team Count</option>
-            <option class="teamCount" value="24">24</option>
-            <option class="teamCount" value="32">32</option>
-            <option class="teamCount" value="48">48</option>
-          </select>
-          <div id="teamCountError" class="modal-dropdown-error"></div>
-
-          <!-- Clubs list -->
-          <div class="club-search">
-            <input type="text" id="clubSearch" />
-            <label for="clubSearch" id="clubSearchLabel"></label>
-          </div>
-          <div id="clubCount" class="club-count">Selected</div>
-          <div id="clubList" class="club-checkbox-list club-list-scroll">
-            <div class="clubs-list-error"></div>
-          </div>
-          <div id="clubsError" class="clubs-error"></div>
-
-          <button type="submit" id="confirmCreateBtn" class="modal-content modal form button">Submit</button>
-
-        </form>
+  <!-- Modal -->
+  <div class="modal" id="tableModal">
+    <div class="modal-content" id="modal-content">
+      <div class="actionTitle">
+        <h2 id="actionTitle">Table Actions</h2>
       </div>
+      <div class="createCompetition">
+        <h2 id="createCompetition">Create Competition</h2>
+      </div>
+      <span class="close" onclick="closeModal('tableModal')">&times;</span>
+
+      <form id="actionForm" onsubmit="return false;">
+
+        <div class="action-table-buttons" id="actionButtons">
+          <button type="button" id="createBtn">Create</button>
+          <button type="button" id="openBtn">Open</button>
+        </div>
+
+        <div class="input-league-name" id="openCreateSection">
+          <div class="input-group">
+            <input type="text" id="leagueName" />
+            <label for="leagueName" id="leagueNameLabel"></label>
+          </div>
+        </div>
+        <div class="error" id="leagueNameError"></div>
+
+        <!-- Friends list -->
+        <div id="user-select" class="friend-checkbox-list"></div>
+
+        <div id="friendError" class="friend-list-error" style="display: none;"></div>
+
+        <!-- Single Select Dropdown -->
+        <select id="count-select" class="modal-dropdown">
+          <option class="teamCount" id="count-text">Select Team Count</option>
+          <option class="teamCount" value="24">24</option>
+          <option class="teamCount" value="32">32</option>
+          <option class="teamCount" value="48">48</option>
+        </select>
+        <div id="teamCountError" class="modal-dropdown-error"></div>
+
+        <!-- Clubs list -->
+        <div class="club-search">
+          <input type="text" id="clubSearch" />
+          <label for="clubSearch" id="clubSearchLabel"></label>
+        </div>
+        <div id="clubCount" class="club-count">Selected</div>
+        <div id="clubList" class="club-checkbox-list club-list-scroll">
+          <div class="clubs-list-error"></div>
+        </div>
+        <div id="clubsError" class="clubs-error"></div>
+
+        <button type="submit" id="confirmCreateBtn" class="modal-content modal form button">Submit</button>
+
+      </form>
     </div>
-    <!-- 🔹 Game Table Section -->
-    <div id="gameTableSection" style="display: none;">
-      <!-- Populated dynamically -->
-    </div>
+  </div>
+
+  <!-- 🔹 Leagues -->
+  <div id="leagueType1" style="display: none;">
+    <!-- Populated dynamically -->
   </div>
 
   <footer>

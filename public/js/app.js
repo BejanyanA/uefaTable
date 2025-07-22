@@ -17,9 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initRegister();
    LeagueManager.initCreate();
    LeagueManager.initOpen();
-   getFriends.initGetAllFriends();
-   getClubs.initGetAllClubs();
-   getClubs.initSearchClubs()
    changeLang(currentLang);
    checkLoggedIn();
 });

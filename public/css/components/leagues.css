@@ -1,6 +1,7 @@
 /* Outer section or container */
-#gameTableSection {
-  padding: 24px; /* ✅ Add spacing inside the section */
+#leagueType1 {
+  padding: 24px; 
+  z-index: 5;/* ✅ Add spacing inside the section */
 }
 
 /* League name row (horizontal layout) */
@@ -34,7 +35,7 @@
 /* Mobile */
 @media (max-width: 480px) {
 /* Outer section or container */
-#gameTableSection {
+#leagueType1 {
   padding: 24px; /* ✅ Add spacing inside the section */
 }
 
