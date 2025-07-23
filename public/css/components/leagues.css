@@ -1,7 +1,6 @@
 /* Outer section or container */
 #leagueType1 {
   padding: 24px; 
-  z-index: 5;/* ✅ Add spacing inside the section */
 }
 
 /* League name row (horizontal layout) */
