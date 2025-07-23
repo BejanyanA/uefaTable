@@ -147,15 +147,8 @@ function getLangFromURL() {
 
 let currentLang = getLangFromURL();
 
-function updateURLWithLang(lang) {
-  const url = new URL(window.location);
-  url.searchParams.set("lang", lang);
-  window.history.replaceState(null, "", url);
-}
-
 function changeLang(lang) {
   currentLang = lang;
-  updateURLWithLang(lang);
 
   const t = langMap[lang];
 

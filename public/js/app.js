@@ -2,6 +2,7 @@ import { AuthManager } from './modules/AuthManager.js';
 import { LeagueManager } from './modules/LeagueManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
+import { getClubs } from './modules/GetClubs.js';
 import { apiGet } from './services/api.js'; 
 
 // ✅ Register modal methods globally
@@ -15,7 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initRegister();
    LeagueManager.initCreate();
    LeagueManager.initOpen();
+   getClubs.initSearchClubs()
    changeLang(currentLang);
+   
    checkLoggedIn();
 });
 
