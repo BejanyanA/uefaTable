@@ -1,5 +1,5 @@
 export function renderLeagueTable(data) {
-  const section = document.getElementById("gameTableSection");
+  const section = document.getElementById("leagueType1");
   const leagues = data.leagues || [];
 
   if (!leagues.length) {
