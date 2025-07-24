@@ -1,9 +1,9 @@
+import { checkLoggedIn, logout } from './modules/MeHomepage.js';
 import { AuthManager } from './modules/AuthManager.js';
 import { LeagueManager } from './modules/LeagueManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { getClubs } from './modules/GetClubs.js';
-import { apiGet } from './services/api.js'; 
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
    changeLang(currentLang);
    
    checkLoggedIn();
+   window.logout = logout;
 });
 
 // 🔹 Language Dropdown
@@ -38,46 +39,6 @@ window.setLanguage = function (lang) {
    if (typeof changeLang === "function") {
       changeLang(lang);
    }
-};
-
-// 🔹 JWT Check on Load
-async function checkLoggedIn() {
-   const token = localStorage.getItem("authToken");
-   const authButtons = document.getElementById("authButtons");
-   const bannerSection = document.querySelector(".banner-container");
-
-   if (!token) {
-      if (authButtons) authButtons.style.display = "flex";
-      return;
-   }
-
-   try {
-      const data = await apiGet("/me", token); // ✅ Cleaner
-      if (data.success && data.user) {
-         document.getElementById("logoutButtn").style.display = "block";
-         document.getElementById("homePage").style.display = "block";
-      } else {
-         localStorage.removeItem("authToken");
-         if (authButtons) authButtons.style.display = "flex";
-      }
-   } catch (err) {
-      console.error("Token check failed", err);
-      localStorage.removeItem("authToken");
-      if (authButtons) authButtons.style.display = "flex";
-      if (bannerSection) bannerSection.style.display = "none";
-   }
-}
-
-// 🔹 Logout
-window.logout = function () {
-   localStorage.removeItem("authToken");
-   location.reload();
-
-   document.getElementById("homePage").style.display = "none";
-   document.getElementById("welcomeUser").innerText = "";
-
-   document.getElementById("loginBtn").style.display = "inline-block";
-   document.getElementById("registerBtn").style.display = "inline-block";
 };
 
 // 🔹 Close lang dropdown on outside click
