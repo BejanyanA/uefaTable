@@ -1,10 +1,6 @@
 name = "uefa-app-production"
 compatibility_date = "2025-07-11"
 main = "worker.js"                 
-type = "javascript"        
-
-[build]
-upload.format = "modules"
 
 [[routes]]
 pattern = "api.uefaresults.com"
