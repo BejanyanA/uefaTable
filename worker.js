@@ -2,10 +2,11 @@ import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
-import { handleLeagues, handleLeaguesCreate } from './routes_endpoints/leagues.js';
-import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
+import { handleLeagues, handleLeaguesCreate } from './routes_endpoints/leagues.js';
+import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
+import { handleLeagueStandings } from './routes_endpoints/standings.js';
 
 // import additional route handlers as needed
 
@@ -14,13 +15,13 @@ const routeRegistry = {
   "/register": { POST: handleRegister },
   "/login": { POST: handleLogin },
   "/me": { GET: handleMe },
-  "/leagues": { POST: handleLeagues },
-  "/league-instances": { POST: handleLeagueInstances },
   "/friends": { GET: handleGetApprovedFriends },
   "/clubs": { GET: handleGetAllClubs },
   "/search-clubs": { POST: handleSearchClubs },
+  "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
-  
+  "/league-instances": { POST: handleLeagueInstances },
+  "/standings": { POST: handleLeagueStandings },
   // Add more routes here  league_instances
 };
 
