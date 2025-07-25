@@ -17,24 +17,81 @@ export async function handleLeagueInstances(request, env) {
     return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
   }
 
-  const userId = payload.id;
+const userId = payload.id;
+const { leagueId } = await parseBody(request);
 
-  const leagueInstances = await env.core_data.prepare(`
-    SELECT li.*, l.name AS league_type
-    FROM league_instances li
-    JOIN leagues l ON li.league_id = l.id
-    WHERE li.created_by_user_id = ?
-  `).bind(userId).all();
+// Step 1: Check access
+const owned = await env.core_data.prepare(`
+  SELECT id, name, created_at AS league_created_at
+  FROM leagues
+  WHERE id = ? AND created_by_user_id = ?
+`).bind(leagueId, userId).first();
 
-  return jsonResponse({
-    success: true,
-    data: {
-      league: {
-        id: league.id,
-        name: league.name,
-        created_at: league.league_created_at
-      },
-      leagueInstances: leagueInstances.results
+let accessType = "owner";
+let leagueInfo = owned;
+
+if (!owned) {
+  const access = await env.core_data.prepare(`
+    SELECT 1 FROM league_access
+    WHERE league_id = ? AND user_id = ?
+  `).bind(leagueId, userId).first();
+  if (!access) {
+    return jsonResponse({ success: false, error: "access_denied" }, 403);
+  }
+  accessType = "granted";
+  leagueInfo = await env.core_data.prepare(`
+    SELECT id, name, created_at AS league_created_at
+    FROM leagues
+    WHERE id = ?
+  `).bind(leagueId).first();
+}
+
+// Step 2: Get league instances
+const instances = await env.core_data.prepare(`
+  SELECT id AS instanceId, name, created_at
+  FROM league_instances
+  WHERE league_id = ?
+`).bind(leagueId).all();
+
+const instanceIds = instances.results.map(r => r.instanceId);
+let groupData = {};
+
+if (instanceIds.length > 0) {
+  const placeholders = instanceIds.map(() => '?').join(', ');
+  const groupRows = await env.core_data.prepare(`
+    SELECT lg.league_instance_id, lg.group_name, gs.team_id
+    FROM league_groups lg
+    JOIN group_standings gs ON gs.group_id = lg.id
+    WHERE lg.league_instance_id IN (${placeholders})
+    ORDER BY lg.group_name ASC
+  `).bind(...instanceIds).all();
+
+  groupRows.results.forEach(row => {
+    if (!groupData[row.league_instance_id]) {
+      groupData[row.league_instance_id] = {};
     }
-  }, 200);
+    if (!groupData[row.league_instance_id][row.group_name]) {
+      groupData[row.league_instance_id][row.group_name] = [];
+    }
+    groupData[row.league_instance_id][row.group_name].push(row.team_id);
+  });
+}
+
+return jsonResponse({
+  success: true,
+  data: {
+    accessType,
+    league: {
+      id: leagueInfo.id,
+      name: leagueInfo.name,
+      created_at: leagueInfo.league_created_at
+    },
+    leagueInstances: instances.results.map(inst => ({
+      id: inst.instanceId,
+      name: inst.name,
+      created_at: inst.created_at,
+      groups: groupData[inst.instanceId] || {}
+    }))
+  }
+}, 200);
 }
