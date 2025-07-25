@@ -2,7 +2,7 @@ import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
-import { handleLeagues } from './routes_endpoints/leagues.js';
+import { handleLeagues, handleLeaguesCreate } from './routes_endpoints/leagues.js';
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
@@ -19,6 +19,8 @@ const routeRegistry = {
   "/friends": { GET: handleGetApprovedFriends },
   "/clubs": { GET: handleGetAllClubs },
   "/search-clubs": { POST: handleSearchClubs },
+  "/create-leagues": { POST: handleLeaguesCreate },
+  
   // Add more routes here  league_instances
 };
 

@@ -44,7 +44,11 @@ export const langMap = {
     invalid_leauge_password: "Table Password is incorrect",
     no_friends_found: "No friends found",
     no_clubs_found: "No clubs found",
+    table_not_found: "Leagues not found",
+    league_create_success: "League Successfully Created",
+    league_creation_failed: "League Creation failed",
   },
+
   am: {
     login: "Մուտք",
     logout: "Դուրս գալ",
@@ -90,7 +94,11 @@ export const langMap = {
     invalid_leauge_password: "Աղյուսակի Գաղտնաբառը սխալ է",
     no_friends_found: "Ընկերներ չեն գտնվել",
     no_clubs_found: "Ակումբներ չեն գտնվել",
+    table_not_found: "Լիգաներ չեն գտնվել",
+    league_create_success: "Լիգան հաջողությամբ ստեղծվեց",
+    league_creation_failed: "Լիգայի ստեղծումը ձախողվեց",
   },
+
   fr: {
     login: "Connexion",
     logout: "Se déconnecter",
@@ -136,6 +144,9 @@ export const langMap = {
     invalid_leauge_password: "Mot de passe de table incorrect",
     no_friends_found: "Pas d’amis trouvés",
     no_clubs_found: "Aucun club trouvé",
+    table_not_found: "Ligues introuvables",
+    league_create_success: "Ligue créée avec succès",
+    league_creation_failed: "Échec de la création de la ligue",
   }
 };
 

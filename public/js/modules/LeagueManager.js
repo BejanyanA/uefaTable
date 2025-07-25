@@ -58,13 +58,13 @@ export const LeagueManager = {
     if (createBtn) {
       createBtn.addEventListener("click", async () => {
         const translation = langMap[currentLang];
-        clearErrors([ "leagueNameError", "teamCountError", "clubsError" ]);
+        clearErrors(["leagueNameError", "teamCountError", "clubsError"]);
 
         let hasError = false;
 
         const modal = document.getElementById("tableModal");
         const bannerId = parseInt(modal.dataset.bannerId);
-        const leagueNameInput = document.getElementById("leagueName").value.trim()
+        const name = document.getElementById("leagueName").value.trim()
         const teamCount = parseInt(document.getElementById("count-select").value);
         const selectedClubIds = Array.from(document.querySelectorAll('#clubList input[type="checkbox"]:checked'))
           .map(cb => parseInt(cb.value));
@@ -74,13 +74,13 @@ export const LeagueManager = {
         const teamCountError = document.getElementById("teamCountError");
         const clubsError = document.getElementById("clubsError");
 
-        if (!leagueNameInput) {
+        if (!name) {
           setError("leagueNameError", translation.required);
           hasError = true;
-        } else if (leagueNameInput.length < 3) {
+        } else if (name.length < 3) {
           setError("leagueNameError", translation.shortLeagueName);
           hasError = true;
-        } else if (leagueNameInput.length > 30) {
+        } else if (name.length > 30) {
           setError("leagueNameError", translation.longLeagueName);
           hasError = true;
         }
@@ -118,29 +118,39 @@ export const LeagueManager = {
         clubsError.textContent = "";
 
         try {
-          const data = await apiPost("/create-leagues", { bannerId, leagueNameInput, teamCount, friendIds, clubIds });
+          const createLeague = await apiPost("/create-leagues", { bannerId, name, teamCount, friendIds, clubIds });
 
 
-          if (data.success && data.data) {
-            window.closeModal("tableModal");
-            document.getElementById("bannerContainer").style.display = "none";
+          if (createLeague.success && createLeague.data) {
+            try {
+              const data = await apiPost("/leagues", { bannerId });
 
-            renderLeagueTable(data.data); // 💡 Your custom function to render match data
+              if (data.success && data.data) {
+                window.closeModal("tableModal");
+                showToast(translation.league_create_success || "League Successfully Created", "success");
+                document.getElementById("bannerContainer").style.display = "none";
+                renderLeagueTable(data.data);
+              } else {
+                showToast(translation.table_not_found || "Table not found.");
+              }
+            } catch (err) {
+              showToast(translation.something_went_wrong || "Something went wrong.", "error");
+              console.error("Error opening table:", err);
+            }
           } else {
-            errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+
+            const error = createLeague.error;
+            if (error === "creation_failed") {
+              showToast(translation.league_creation_failed || "League Creation failed", "error");
+            }
           }
         } catch (err) {
-          showToast(translation.something_went_wrong || "Something went wrong.", "error");
-          console.error("Error opening table:", err);
+          showToast(translation.something_went_wrong, "error");
+          console.error(err);
         }
       });
     };
   },
-
-
-
-
-
 
 
   initOpen: async function () {
@@ -179,7 +189,7 @@ export const LeagueManager = {
           document.getElementById("bannerContainer").style.display = "none";
           renderLeagueTable(data.data);
         } else {
-          errorField.textContent = translation.invalid_table_password || "Incorrect password or table not found.";
+          showToast(translation.table_not_found || "Table not found.");
         }
       } catch (err) {
         showToast(translation.something_went_wrong || "Something went wrong.", "error");
