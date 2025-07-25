@@ -151,50 +151,34 @@ export async function handleLeaguesCreate(request, env) {
       `).bind(instanceId, groupName).first();
       const groupId = groupRes.id;
 
-      for (const teamId of groups[i]) {
-        await db.prepare(`
-          INSERT INTO group_standings (
-            group_id, team_id, user_id,
-            played, wins, wins_vs_computer, wins_vs_player, draws,
-            losses, goals_for, goals_against, goal_difference, points
-          ) VALUES (?, ?, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        `).bind(groupId, teamId).run();
-      }
+      const standingValues = groups[i].map(teamId => `(${groupId}, ${teamId}, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)`).join(', ');
+      await db.exec(`INSERT INTO group_standings (group_id, team_id, user_id, played, wins, wins_vs_computer, wins_vs_player, draws, losses, goals_for, goals_against, goal_difference, points) VALUES ${standingValues}`);
 
+      const matchInserts = [];
       const pairs = generateAllPairs(groups[i]);
       for (const [team1, team2] of pairs) {
         for (const matchType of ['home', 'away']) {
           const [t1, t2] = matchType === 'home' ? [team1, team2] : [team2, team1];
-          await db.prepare(`
-            INSERT INTO league_matches (
-              group_id, team1_id, team2_id,
-              team1_user_id, team2_user_id,
-              is_vs_computer, computer_team,
-              team1_score, team2_score, winner_team_id,
-              updated_user_id, match_type
-            ) VALUES (?, ?, ?, NULL, NULL, 0, NULL, 0, 0, NULL, NULL, ?)
-          `).bind(groupId, t1, t2, matchType).run();
+          matchInserts.push(`(${groupId}, ${t1}, ${t2}, null, null, 0, null, 0, 0, null, null, '${matchType}')`);
         }
+      }
+      if (matchInserts.length > 0) {
+        await db.exec(`INSERT INTO league_matches (group_id, team1_id, team2_id, team1_user_id, team2_user_id, is_vs_computer, computer_team, team1_score, team2_score, winner_team_id, updated_user_id, match_type) VALUES ${matchInserts.join(', ')}`);
       }
     }
 
-    if (Array.isArray(friendIds)) {
-      for (const friendId of friendIds) {
-        await db.prepare(`
-          INSERT INTO league_access (league_id, user_id, granted_by_user_id)
-          VALUES (?, ?, ?)
-          ON CONFLICT DO NOTHING
-        `).bind(leagueId, friendId, userId).run();
-      }
+    if (Array.isArray(friendIds) && friendIds.length > 0) {
+      const accessValues = friendIds.map(id => `(${leagueId}, ${id}, ${userId})`).join(', ');
+      await db.exec(`INSERT INTO league_access (league_id, user_id, granted_by_user_id) VALUES ${accessValues} ON CONFLICT DO NOTHING`);
     }
 
     return jsonResponse({
       success: true,
       data: {
+        friendIds: Array.isArray(friendIds) ? friendIds : [],
         leagueId,
         instanceId,
-        groupCount: groups.length,
-        friendIds: Array.isArray(friendIds) ? friendIds : [],
+        groupCount: groups.length
       }
     }, 201);
   } catch (err) {
