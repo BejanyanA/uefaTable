@@ -57,6 +57,7 @@ export function renderLeagueTable(data) {
       try {
         const response = await apiPost("/league-instances", { leagueId: league.id });
         if (response.success) {
+          localStorage.setItem("leagueId", league.id);
           renderLeagueInstances(response.data);
         } else {
           section.innerHTML = `<p>Error loading instances</p>`;

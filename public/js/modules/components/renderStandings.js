@@ -23,14 +23,14 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       if (response.success) {
         renderLeagueInstances(response.data);
       } else {
-        section.innerHTML = `<p>Error loading instances</p>`;
+        wrapper.innerHTML = `<p>Error loading instances</p>`;
       }
     } catch (err) {
       console.error("Failed to fetch league instances", err);
     }
   });
 
-  // Initial load: Standings
+  // Initial tab
   loadTabContent("standings");
 
   // Tab click logic
@@ -42,6 +42,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     });
   });
 
+  // Tab content loader
   async function loadTabContent(tab) {
     const contentDiv = document.getElementById("tabContent");
     contentDiv.innerHTML = "Loading...";
@@ -55,9 +56,10 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           contentDiv.innerHTML = "Failed to load standings.";
         }
       } else if (tab === "matches") {
-        const response = await apiPost("/matches", { leagueId, groupId }); // <-- replace with your real endpoint
+        const response = await apiPost("/matches", { leagueId, groupId });
         if (response.success) {
-          contentDiv.innerHTML = renderMatchesTable(response.data.matches); // implement this
+          contentDiv.innerHTML = ""; // Clear before rendering
+          await renderMatchesTable(response.data, contentDiv, leagueId);
         } else {
           contentDiv.innerHTML = "Failed to load matches.";
         }
@@ -67,14 +69,22 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     }
   }
 
-
-  function renderStandingsTable(standings) {
-    return `
+  // Render Standings
+function renderStandingsTable(standings) {
+  return `
+    <div class="standings-wrapper">
       <table class="standings-table">
         <thead>
           <tr>
-            <th>Club</th><th>MP</th><th>W</th><th>D</th><th>L</th>
-            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+            <th>Club</th>
+            <th>MP</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
           </tr>
         </thead>
         <tbody>
@@ -93,15 +103,85 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           `).join("")}
         </tbody>
       </table>
-    `;
-  }
+    </div>
+  `;
+}
 
-  function renderMatchesTable(matches) {
-    if (!matches || matches.length === 0) return `<p>No matches available.</p>`;
-    return `
-      <ul class="match-list">
-        ${matches.map(match => `<li>${match.team1} vs ${match.team2} - ${match.status}</li>`).join("")}
-      </ul>
-    `;
+  // Render Matches Table
+  async function renderMatchesTable(matchesData, leagueId, groupId) {
+    const section = document.getElementById("tabContent");
+    section.innerHTML = "";
+
+    const { matches, accessType } = matchesData;
+    const editable = accessType === "owner";
+
+    // Create table
+    const table = document.createElement("table");
+    table.className = "matches-table";
+
+    table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Team</th>
+        <th></th>
+        <th></th>
+        <th>Team</th>
+        <th>Player</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${matches.map(match => `
+        <tr data-match-id="${match.id}">
+          <td>
+            <select class="user-dropdown" name="team1_user" ${editable ? "" : "disabled"}>
+              <option value="">Select</option>
+            </select>
+          </td>
+          <td>${match.team1_name}</td>
+          <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
+          <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
+          <td>${match.team2_name}</td>
+          <td>
+            <select class="user-dropdown" name="team2_user" ${editable ? "" : "disabled"}>
+              <option value="">Select</option>
+            </select>
+          </td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+
+    section.appendChild(table);
+    section.style.display = "block";
+
+    // Fetch league players and populate dropdowns
+    try {
+      const response = await apiPost("/league-players", { leagueId });
+      if (response.success) {
+        const players = response.data.players || [];
+
+        // Create options list
+        const optionsHtml = ['<option value="">Select user</option>']
+          .concat(players.map(p => `<option value="${p.user_id}">${p.username}</option>`))
+          .join("");
+
+        // Apply to each row
+        matches.forEach(match => {
+          const row = section.querySelector(`tr[data-match-id="${match.id}"]`);
+          if (!row) return;
+
+          const team1Select = row.querySelector(`select[name="team1_user"]`);
+          const team2Select = row.querySelector(`select[name="team2_user"]`);
+
+          team1Select.innerHTML = optionsHtml;
+          team2Select.innerHTML = optionsHtml;
+
+          // ❌ Don't preselect users (intentionally left out)
+        });
+      }
+    } catch (err) {
+      console.error("Error loading league players", err);
+    }
   }
 }
