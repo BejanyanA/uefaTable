@@ -70,8 +70,8 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   }
 
   // Render Standings
-function renderStandingsTable(standings) {
-  return `
+  function renderStandingsTable(standings) {
+    return `
     <div class="standings-wrapper">
       <table class="standings-table">
         <thead>
@@ -105,7 +105,7 @@ function renderStandingsTable(standings) {
       </table>
     </div>
   `;
-}
+  }
 
   // Render Matches Table
   async function renderMatchesTable(matchesData, leagueId, groupId) {
@@ -157,16 +157,14 @@ function renderStandingsTable(standings) {
 
     // Fetch league players and populate dropdowns
     try {
-      const response = await apiPost("/league-players", { leagueId });
+      const response = await apiPost("/league-players", { leagueId }, { showLoading: false });
       if (response.success) {
         const players = response.data.players || [];
 
-        // Create options list
         const optionsHtml = ['<option value="">Select user</option>']
           .concat(players.map(p => `<option value="${p.user_id}">${p.username}</option>`))
           .join("");
 
-        // Apply to each row
         matches.forEach(match => {
           const row = section.querySelector(`tr[data-match-id="${match.id}"]`);
           if (!row) return;
@@ -176,12 +174,42 @@ function renderStandingsTable(standings) {
 
           team1Select.innerHTML = optionsHtml;
           team2Select.innerHTML = optionsHtml;
-
-          // ❌ Don't preselect users (intentionally left out)
         });
       }
     } catch (err) {
       console.error("Error loading league players", err);
+    }
+
+    // ✅ Auto-save on blur
+    if (editable) {
+      section.querySelectorAll(".score-input").forEach(input => {
+        input.addEventListener("blur", async () => {
+          const row = input.closest("tr");
+          const matchId = parseInt(row.dataset.matchId);
+          const team1Input = row.querySelector(`input[name="team1"]`);
+          const team2Input = row.querySelector(`input[name="team2"]`);
+
+          const team1_score = team1Input.value;
+          const team2_score = team2Input.value;
+
+          // If either field is empty, skip
+          if (team1_score === "" || team2_score === "") return;
+
+          try {
+            const updateResponse = await apiPost("/update-score", {
+              matchId,
+              team1_score: parseInt(team1_score),
+              team2_score: parseInt(team2_score)
+            }, { showLoading: false });
+
+            if (!updateResponse.success) {
+              console.warn("⚠️ Score update failed for match", matchId);
+            }
+          } catch (err) {
+            console.error("⚠️ Error updating match score:", err);
+          }
+        });
+      });
     }
   }
 }

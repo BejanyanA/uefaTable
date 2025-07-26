@@ -25,7 +25,7 @@ const routeRegistry = {
   "/league-instances": { POST: handleLeagueInstances },
   "/standings": { POST: handleLeagueStandings },
   "/matches": { POST: handleLeagueMatches },
-  "/update-matches": { POST: handleUpdateMatches },
+  "/update-score": { POST: handleUpdateMatches },
 
   // Add more routes here  league_instances
 };
