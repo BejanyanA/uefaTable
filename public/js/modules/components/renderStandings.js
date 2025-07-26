@@ -186,27 +186,27 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         input.addEventListener("blur", async () => {
           const row = input.closest("tr");
           const matchId = parseInt(row.dataset.matchId);
-          const team1Input = row.querySelector(`input[name="team1"]`);
-          const team2Input = row.querySelector(`input[name="team2"]`);
+          const scoreValue = input.value;
 
-          const team1_score = team1Input.value;
-          const team2_score = team2Input.value;
+          // Skip empty or invalid values
+          if (scoreValue === "" || isNaN(scoreValue)) return;
 
-          // If either field is empty, skip
-          if (team1_score === "" || team2_score === "") return;
+          const payload = { matchId };
+
+          if (input.name === "team1") {
+            payload.team1_score = parseInt(scoreValue);
+          } else if (input.name === "team2") {
+            payload.team2_score = parseInt(scoreValue);
+          }
 
           try {
-            const updateResponse = await apiPost("/update-score", {
-              matchId,
-              team1_score: parseInt(team1_score),
-              team2_score: parseInt(team2_score)
-            }, { showLoading: false });
+            const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
 
             if (!updateResponse.success) {
-              console.warn("⚠️ Score update failed for match", matchId);
+              console.warn(`⚠️ Failed to update score for match ${matchId}`);
             }
           } catch (err) {
-            console.error("⚠️ Error updating match score:", err);
+            console.error("⚠️ Error while updating score:", err);
           }
         });
       });
