@@ -7,6 +7,7 @@ import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clu
 import { handleLeagues, handleLeaguesCreate } from './routes_endpoints/leagues.js';
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleLeagueStandings } from './routes_endpoints/standings.js';
+import { handleLeagueMatches } from './routes_endpoints/matches.js';
 
 // import additional route handlers as needed
 
@@ -22,6 +23,8 @@ const routeRegistry = {
   "/create-leagues": { POST: handleLeaguesCreate },
   "/league-instances": { POST: handleLeagueInstances },
   "/standings": { POST: handleLeagueStandings },
+  "/matches": { POST: handleLeagueMatches },
+
   // Add more routes here  league_instances
 };
 

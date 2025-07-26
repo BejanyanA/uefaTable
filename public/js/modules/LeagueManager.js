@@ -7,7 +7,7 @@ import { getClubs } from './GetClubs.js';
 import { apiPost } from '../services/api.js';
 
 export const LeagueManager = {
-  initCreate: function () { //TO DO
+  initCreate: function () {
 
     // 🔹 Banner click logic
     document.querySelectorAll(".banner").forEach(banner => {
@@ -35,8 +35,13 @@ export const LeagueManager = {
 
     // 🔹 "Create" button: hide options, show password
     document.getElementById("createBtn").addEventListener("click", () => {
-      getFriends.initGetAllFriends();
-      getClubs.initGetAllClubs();
+      const modal = document.getElementById("tableModal");
+      const bannerId = parseInt(modal.dataset.bannerId);
+
+      if (bannerId === 1 || bannerId === 2) {
+        getFriends.initGetAllFriends();
+        getClubs.initGetAllClubs();
+      } // TO DO EUROPE AND WORLD 
 
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
