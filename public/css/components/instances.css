@@ -4,8 +4,8 @@
     background-color: rgba(0, 0, 0, 0.5);
     /* Dark semi-transparent background */
     border-radius: 12px;
+    box-sizing: border-box;
 }
-
 
 /* League title */
 .league-instance h2 {
@@ -74,6 +74,11 @@
 
 @media (max-width: 480px) {
 
+    .league-instance {
+        padding: 20px 10px;
+        margin: 20px 10px;
+    }
+
     .league-instance h2 {
         font-size: 20px;
     }
@@ -87,18 +92,13 @@
     .group-block {
         width: 90%;
         max-width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         text-align: left;
         margin-left: -10px;
     }
 
     .group-block h3 {
         font-size: 14px;
-    }
-
-    .league-instance {
-        padding: 20px 10px;
-        margin: 20px 10px;
     }
 
     .club-list li {
