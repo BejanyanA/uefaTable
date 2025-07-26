@@ -31,7 +31,7 @@ export const langMap = {
     largeClubCount: "The number of selected teams is greater than the required maximum",
     selectedCount: "Selected",
     no_spaces_allowed: "Spaces are not allowed",
-    clubSearch: "Search Clubs...",
+    clubSearch: "Search Teams...",
 
     //BE translations
     username_exists: "Username already exists",
@@ -43,7 +43,7 @@ export const langMap = {
     invalid_email_or_password: "Email or Password is incorrect",
     invalid_leauge_password: "Table Password is incorrect",
     no_friends_found: "No friends found",
-    no_clubs_found: "No clubs found",
+    no_clubs_found: "No teams found",
     table_not_found: "Leagues not found",
     league_create_success: "League Successfully Created",
     league_creation_failed: "League Creation failed",
@@ -77,11 +77,11 @@ export const langMap = {
     shortLeagueName: "Լիգայի անվանում պետք է պարունակի առնվազն 3 նիշ",
     longLeagueName: "Լիգայի անվանում չպետք է գերազանցի 30 նիշը",
     selectTeamCount: "Ընտրեք թմերի քանակը",
-    lessClubCount: "Ընտրված թիմերի քանակը պակաս է պահանջվող առավելագույնից",
-    largeClubCount: "Ընտրված թիմերի քանակը գերազանցում է պահանջվող առավելագույնը",
+    lessClubCount: "Ընտրված թմերի քանակը պակաս է պահանջվող առավելագույնից",
+    largeClubCount: "Ընտրված թմերի քանակը գերազանցում է պահանջվող առավելագույնը",
     selectedCount: "Ընտրված է",
     no_spaces_allowed: "Բացատները թույլատրելի չեն",
-    clubSearch: "Որոնել ակումբներ...",
+    clubSearch: "Թմերի Որոնում...",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -93,7 +93,7 @@ export const langMap = {
     invalid_email_or_password: "Մուտքի տվյալները սխալ են",
     invalid_leauge_password: "Աղյուսակի Գաղտնաբառը սխալ է",
     no_friends_found: "Ընկերներ չեն գտնվել",
-    no_clubs_found: "Ակումբներ չեն գտնվել",
+    no_clubs_found: "Թմեր չեն գտնվել",
     table_not_found: "Լիգաներ չեն գտնվել",
     league_create_success: "Լիգան հաջողությամբ ստեղծվեց",
     league_creation_failed: "Լիգայի ստեղծումը ձախողվեց",
@@ -131,7 +131,7 @@ export const langMap = {
     largeClubCount: "Le nombre d’équipes sélectionnées dépasse le maximum requis",
     selectedCount: "Sélectionné",
     no_spaces_allowed: "Les espaces ne sont pas autorisés",
-    clubSearch: "Rechercher des clubs...",
+    clubSearch: "Recherche d’équipes...",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -143,7 +143,7 @@ export const langMap = {
     invalid_email_or_password: "E-mail ou mot de passe incorrect",
     invalid_leauge_password: "Mot de passe de table incorrect",
     no_friends_found: "Pas d’amis trouvés",
-    no_clubs_found: "Aucun club trouvé",
+    no_clubs_found: "Aucune équipe trouvée",
     table_not_found: "Ligues introuvables",
     league_create_success: "Ligue créée avec succès",
     league_creation_failed: "Échec de la création de la ligue",
