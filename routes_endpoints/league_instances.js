@@ -63,9 +63,10 @@ export async function handleLeagueInstances(request, env) {
   if (instanceIds.length > 0) {
     const placeholders = instanceIds.map(() => '?').join(', ');
     const groupRows = await env.core_data.prepare(`
-    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id
+    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id, ac.club_name
     FROM league_groups lg
     JOIN group_standings gs ON gs.group_id = lg.id
+    JOIN all_clubs ac ON ac.id = gs.team_id
     WHERE lg.league_instance_id IN (${placeholders})
     ORDER BY lg.group_name ASC
   `).bind(...instanceIds).all();
@@ -77,22 +78,22 @@ export async function handleLeagueInstances(request, env) {
       if (!groupData[row.league_instance_id][row.group_name]) {
         groupData[row.league_instance_id][row.group_name] = {
           groupId: row.group_id,
-          clubIds: []
+          clubs: []
         };
       }
-      groupData[row.league_instance_id][row.group_name].clubIds.push(row.team_id);
+      groupData[row.league_instance_id][row.group_name].clubs.push({ id: row.team_id, name: row.club_name });
     });
   }
 
   return jsonResponse({
     success: true,
     data: {
-      accessType,
       league: {
         id: leagueInfo.id,
         name: leagueInfo.name,
         created_at: leagueInfo.league_created_at
       },
+      accessType,
       leagueInstances: instances.results.map(inst => ({
         id: inst.instanceId,
         name: inst.name,

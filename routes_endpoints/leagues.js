@@ -26,28 +26,21 @@ export async function handleLeagues(request, env) {
   SELECT * FROM leagues WHERE banner_id = ? AND created_by_user_id = ?
 `).bind(bannerId, userId).all();
 
-  // Step 2: Get granted_by_user_ids from league_access
-  const access = await env.core_data.prepare(`
-  SELECT DISTINCT granted_by_user_id FROM league_access WHERE user_id = ?
-`).bind(userId).all();
+  // Step 2: Get granted leagues
+  const granted = await env.core_data.prepare(`
+  SELECT l.*
+  FROM league_access la
+  JOIN leagues l ON la.league_id = l.id
+  WHERE la.user_id = ? AND l.banner_id = ?
+`).bind(userId, bannerId).all();
 
-  // Step 3: Fetch shared leagues
-  let sharedLeagues = [];
-  for (const row of access.results) {
-    const shared = await env.core_data.prepare(`
-    SELECT * FROM leagues WHERE banner_id = ? AND created_by_user_id = ?
-  `).bind(bannerId, row.granted_by_user_id).all();
-
-    sharedLeagues.push(...shared.results);
-  }
-
-  // Step 4: Combine and deduplicate
+  // Step 3: Combine and deduplicate
   const leagueMap = new Map();
-  for (const league of [...created.results, ...sharedLeagues]) {
-    leagueMap.set(league.id, league); // avoids duplicates by league ID
+  for (const league of [...created.results, ...granted.results]) {
+    leagueMap.set(league.id, league);
   }
 
-  // Step 5: Respond with combined data
+  // Step 4: Respond with combined data
   return jsonResponse({
     success: true,
     data: {
