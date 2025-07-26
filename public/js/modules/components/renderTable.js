@@ -1,4 +1,5 @@
 import { apiPost } from '../../services/api.js';
+import { renderGroupStandingsPage } from './renderStandings.js'
 
 export function renderLeagueTable(data) {
   const section = document.getElementById("leagueType1");
@@ -43,7 +44,6 @@ export function renderLeagueInstances(instanceData) {
   wrapper.innerHTML = "";
 
   const instances = instanceData.leagueInstances || [];
-
   const hasVisibleGroups = instances.some(i => i.groups && Object.keys(i.groups).length);
 
   if (!hasVisibleGroups) {
@@ -74,12 +74,25 @@ export function renderLeagueInstances(instanceData) {
       const groupDiv = document.createElement("div");
       groupDiv.className = "group-block";
 
+      // 🔹 Set data attributes for click handler
+      groupDiv.dataset.leagueId = instance.id;
+      groupDiv.dataset.groupId = groupData.groupId;
+      groupDiv.dataset.groupName = groupName;
+
       groupDiv.innerHTML = `
         <h3>${groupName}</h3>
         <ul class="club-list">
           ${groupData.clubs.map(club => `<li>${club.name}</li>`).join("")}
         </ul>
       `;
+
+      // ✅ CLICK HANDLER
+      groupDiv.addEventListener("click", () => {
+        const leagueId = groupDiv.dataset.leagueId;
+        const groupId = groupDiv.dataset.groupId;
+        const groupName = groupDiv.dataset.groupName;
+        renderGroupStandingsPage(leagueId, groupId, groupName);
+      });
 
       groupsRow.appendChild(groupDiv);
     }

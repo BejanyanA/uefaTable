@@ -1,0 +1,41 @@
+.tabs {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.tab-btn {
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  color: white;
+}
+
+.tab-btn.active {
+  background: white;
+  color: black;
+  font-weight: bold;
+}
+
+.tab-content {
+  margin-top: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.standings-table th,
+.standings-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+  color: white;
+}

@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/components/dropdown.css">
   <link rel="stylesheet" href="css/components/checkbox-lists.css">
   <link rel="stylesheet" href="css/components/instances.css">
+  <link rel="stylesheet" href="css/components/standings.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -247,10 +248,18 @@
   </div>
 
   <!-- 🔹 Leagues -->
-  <div id="leagueType1" style="display: none;">
+  <section id="leagueType1" style="display: none;">
     <!-- Populated dynamically -->
     <div id="leagueGroupsWrapper" class="league-background-wrapper" style="display: none;"></div>
-  </div>
+    <div class="group-tabs">
+      <button class="tab-btn active" data-tab="standings">Standings</button>
+      <button class="tab-btn" data-tab="matches">Matches</button>
+    </div>
+    <div class="tab-content" data-content="standings"></div>
+    <div class="tab-content hidden" data-content="matches"></div>
+  </section>
+
+
 
 
   <footer>

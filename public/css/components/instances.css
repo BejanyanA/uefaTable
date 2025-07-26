@@ -17,7 +17,7 @@
 
 /* Centered inner wrapper */
 .groups-center-wrapper {
-    max-width: 1300px;
+    max-width: 1700px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -33,7 +33,7 @@
 }
 
 .group-block {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(29, 28, 28, 0.7);
     border-radius: 12px;
     margin-bottom: 10px;
     margin-right: 10px;
@@ -46,6 +46,10 @@
     color: white;
     flex: 0 1 auto;
     cursor: pointer;
+}
+
+.group-block:hover {
+  transform: scale(1.03);
 }
 
 /* Club list inside group */
