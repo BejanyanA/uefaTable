@@ -5,15 +5,23 @@
 }
 
 .tab-btn {
-  padding: 5px 10px;
-  background: transparent;
-  border: 1px solid #ccc;
-  cursor: pointer;
+  border: 1px solid white;
   color: white;
+  background: transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 3px;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 80px;
+  text-align: center;
+  box-sizing: content-box;
 }
 
 .tab-btn.active {
-  background: white;
+  background: rgb(255, 255, 255);
   color: black;
   font-weight: bold;
 }
