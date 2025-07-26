@@ -9,6 +9,7 @@ import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleLeagueStandings } from './routes_endpoints/standings.js';
 import { handleLeagueMatches } from './routes_endpoints/matches.js';
 import { handleUpdateMatches } from './routes_endpoints/update_matches.js';
+import { handleGetLeaguePlayers } from './routes_endpoints/league-player.js';
 
 // import additional route handlers as needed
 
@@ -26,6 +27,7 @@ const routeRegistry = {
   "/standings": { POST: handleLeagueStandings },
   "/matches": { POST: handleLeagueMatches },
   "/update-score": { POST: handleUpdateMatches },
+  "/league-players": { POST: handleGetLeaguePlayers },
 
   // Add more routes here  league_instances
 };

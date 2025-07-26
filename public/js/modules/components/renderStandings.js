@@ -157,6 +157,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
     // Fetch league players and populate dropdowns
     try {
+      const leagueId = parseInt(localStorage.getItem("leagueId"));
       const response = await apiPost("/league-players", { leagueId }, { showLoading: false });
       if (response.success) {
         const players = response.data.players || [];
