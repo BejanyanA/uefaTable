@@ -39,18 +39,38 @@ export function renderLeagueTable(data) {
 
 
 export function renderLeagueInstances(instanceData) {
-  const section = document.getElementById("leagueType1");
-  section.innerHTML = "";
+  const wrapper = document.getElementById("leagueType1");
+  wrapper.innerHTML = "";
 
-  instanceData.leagueInstances.forEach(instance => {
+  const instances = instanceData.leagueInstances || [];
+
+  const hasVisibleGroups = instances.some(i => i.groups && Object.keys(i.groups).length);
+
+  if (!hasVisibleGroups) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  wrapper.style.display = "block";
+
+  instances.forEach(instance => {
+    const groups = instance.groups || {};
+    if (!Object.keys(groups).length) return;
+
     const instanceDiv = document.createElement("div");
     instanceDiv.className = "league-instance";
 
-    const leagueTitle = `<h2>${instance.name}</h2>`;
-    const groupsWrapper = document.createElement("div");
-    groupsWrapper.className = "groups-row"; // Flex wrapper
+    const leagueTitle = document.createElement("h2");
+    leagueTitle.textContent = instance.name;
+    instanceDiv.appendChild(leagueTitle);
 
-    for (const [groupName, groupData] of Object.entries(instance.groups)) {
+    const centeredWrapper = document.createElement("div");
+    centeredWrapper.className = "groups-center-wrapper";
+
+    const groupsRow = document.createElement("div");
+    groupsRow.className = "groups-row";
+
+    for (const [groupName, groupData] of Object.entries(groups)) {
       const groupDiv = document.createElement("div");
       groupDiv.className = "group-block";
 
@@ -61,13 +81,11 @@ export function renderLeagueInstances(instanceData) {
         </ul>
       `;
 
-      groupsWrapper.appendChild(groupDiv);
+      groupsRow.appendChild(groupDiv);
     }
 
-    instanceDiv.innerHTML = leagueTitle;
-    instanceDiv.appendChild(groupsWrapper);
-    section.appendChild(instanceDiv);
+    centeredWrapper.appendChild(groupsRow);
+    instanceDiv.appendChild(centeredWrapper);
+    wrapper.appendChild(instanceDiv);
   });
-
-  section.style.display = "block";
 }
