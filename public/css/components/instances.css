@@ -9,49 +9,54 @@
 
 /* League title */
 .league-instance h2 {
-  color: white;
-  padding: 0 20px 20px;
-  font-size: 26px;
-  text-align: center;
+    color: white;
+    padding: 0 20px 20px;
+    font-size: 26px;
+    text-align: center;
 }
 
 /* Centered inner wrapper */
 .groups-center-wrapper {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 0 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 /* Group boxes container (desktop) */
 .groups-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 40px; /* increased spacing */
-  padding: 30px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    /* increased spacing */
+    padding: 30px 40px;
 }
 
 .group-block {
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 12px;
-  padding: 20px 25px;
-  min-width: 250px;
-  max-width: 280px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
-  color: white;
-  flex: 0 1 auto;
-  cursor: pointer;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding: 20px 25px;
+    min-width: 250px;
+    max-width: 280px;
+    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.2);
+    /* ✅ white shadow */
+    transition: transform 0.3s ease;
+    color: white;
+    flex: 0 1 auto;
+    cursor: pointer;
 }
 
 /* Club list inside group */
 .group-block ul {
-  padding-left: 20px;
-  margin-top: 8px;
+    padding-left: 20px;
+    margin-top: 8px;
 }
 
 .group-block h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
+    font-size: 18px;
+    margin-bottom: 6px;
 }
 
 .club-list {
@@ -67,21 +72,21 @@
 
 
 @media (max-width: 480px) {
-  .groups-row {
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-  }
+    .groups-row {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
 
-  .group-block {
-    width: 90%;
-    max-width: 100%;
-    margin-bottom: 15px;
-    text-align: left;
-  }
+    .group-block {
+        width: 90%;
+        max-width: 100%;
+        margin-bottom: 10px;
+        text-align: left;
+    }
 
-  .league-instance {
-    padding: 20px 10px;
-    margin: 20px 10px;
-  }
+    .league-instance {
+        padding: 20px 10px;
+        margin: 20px 10px;
+    }
 }
