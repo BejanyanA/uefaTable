@@ -59,16 +59,20 @@ export async function handleLeagueMatches(request, env) {
         return jsonResponse({ success: false, error: "invalid_group" }, 404);
     }
 
-    // Step 3: Fetch matches for the group
+    // Step 3: Fetch matches for the group with user names
     const matches = await env.core_data.prepare(`
   SELECT lm.*, 
          ac1.club_name AS team1_name, 
          ac2.club_name AS team2_name, 
          ac1.logo_url AS team1_logo, 
-         ac2.logo_url AS team2_logo
+         ac2.logo_url AS team2_logo,
+         u1.username AS team1_username,
+         u2.username AS team2_username
   FROM league_matches lm
   JOIN all_clubs ac1 ON ac1.id = lm.team1_id
   JOIN all_clubs ac2 ON ac2.id = lm.team2_id
+  LEFT JOIN users u1 ON u1.id = lm.team1_user_id
+  LEFT JOIN users u2 ON u2.id = lm.team2_user_id
   WHERE lm.group_id = ?
   ORDER BY lm.id ASC
 `).bind(groupId).all();
@@ -78,7 +82,7 @@ export async function handleLeagueMatches(request, env) {
         data: {
             groupId,
             accessType,
-            userId,
+            userId: userId,
             matches: matches.results
         }
     }, 200);
