@@ -55,7 +55,7 @@
 }
 
 .group-block h3 {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 6px;
 }
 
@@ -65,13 +65,19 @@
 
 .club-list li {
     list-style-type: disc;
-    margin: 4px 0;
+    margin: 10px 0;
     color: #eee;
+    font-size: 16px;
 }
 
 
 
 @media (max-width: 480px) {
+
+    .league-instance h2 {
+        font-size: 20px;
+    }
+
     .groups-row {
         flex-direction: column;
         align-items: center;
@@ -83,10 +89,19 @@
         max-width: 100%;
         margin-bottom: 10px;
         text-align: left;
+        margin-left: -10px;
+    }
+
+    .group-block h3 {
+        font-size: 14px;
     }
 
     .league-instance {
         padding: 20px 10px;
         margin: 20px 10px;
+    }
+
+    .club-list li {
+        font-size: 14px;
     }
 }
