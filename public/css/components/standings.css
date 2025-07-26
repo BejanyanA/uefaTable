@@ -30,7 +30,18 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  background: rgba(29, 28, 28, 0.7);
 }
+
+.group-standings-header h2 {
+  color: white;
+  padding: 0 20px 20px;
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 5px;
+  padding: 50px;
+}
+
 
 .standings-table th,
 .standings-table td {
@@ -38,4 +49,65 @@
   padding: 6px;
   text-align: center;
   color: white;
+  font-size: 14px;
+}
+
+
+#backBtn {
+  border: 1px solid white;
+  color: white;
+  background: #666;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 50px;
+  text-align: center;
+  box-sizing: content-box;
+}
+
+#backBtn:hover {
+  background: #1d1d1d;
+}
+
+#backBtn:active {
+  transform: scale(0.96);
+}
+
+
+@media (max-width: 480px) {
+
+  #backBtn {
+    border: 1px solid white;
+    color: white;
+    background: #666;
+    padding: 4px 6px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background 0.3s, color 0.3s, transform 0.1s;
+    white-space: nowrap;
+    width: 50px;
+    text-align: center;
+    box-sizing: content-box;
+  }
+
+  .group-standings-header h2 {
+    font-size: 20px;
+    color: white;
+    padding: 0 20px 20px;
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 30px;
+  }
+
+  .standings-table td {
+    font-size: 12px;
+  }
+
+  .standings-table th {
+    font-size: 14px;
+  }
 }

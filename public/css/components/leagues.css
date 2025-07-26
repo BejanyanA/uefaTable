@@ -8,7 +8,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;               /* ✅ Space between items */
-  margin: 0 auto;          /* Center if needed */
+  margin: 30px auto;          /* Center if needed */
   padding-left: 0px;  
   padding-right: 0px;    /* ✅ Prevent from sticking to left */
 }
@@ -43,7 +43,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;               /* ✅ Space between items */
-  margin: 0 auto;          /* Center if needed */
+  margin: 30 auto;          /* Center if needed */
   padding-left: 0px;   
   padding-right: 0px;   /* ✅ Prevent from sticking to left */
 }

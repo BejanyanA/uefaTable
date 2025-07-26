@@ -1,90 +1,107 @@
 import { apiPost } from '../../services/api.js';
+import { renderLeagueInstances } from './renderTable.js';
 
 export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   const wrapper = document.getElementById("leagueType1");
-  wrapper.innerHTML = "";
-
-  const title = document.createElement("h2");
-  title.textContent = `${groupName} - Standings`;
-
-  const tabs = document.createElement("div");
-  tabs.className = "tabs";
-
-  const standingsBtn = document.createElement("button");
-  standingsBtn.textContent = "Standings";
-  standingsBtn.className = "tab-btn active";
-
-  const matchesBtn = document.createElement("button");
-  matchesBtn.textContent = "Matches";
-  matchesBtn.className = "tab-btn";
-
-  const standingsTab = document.createElement("div");
-  standingsTab.className = "tab-content standings-tab";
-  standingsTab.textContent = "Loading standings...";
-
-  const matchesTab = document.createElement("div");
-  matchesTab.className = "tab-content matches-tab hidden";
-  matchesTab.textContent = "Matches coming soon...";
-
-  tabs.appendChild(standingsBtn);
-  tabs.appendChild(matchesBtn);
-  wrapper.appendChild(title);
-  wrapper.appendChild(tabs);
-  wrapper.appendChild(standingsTab);
-  wrapper.appendChild(matchesTab);
-
-  // Tab switching
-  standingsBtn.addEventListener("click", () => {
-    standingsBtn.classList.add("active");
-    matchesBtn.classList.remove("active");
-    standingsTab.classList.remove("hidden");
-    matchesTab.classList.add("hidden");
-  });
-
-  matchesBtn.addEventListener("click", () => {
-    matchesBtn.classList.add("active");
-    standingsBtn.classList.remove("active");
-    standingsTab.classList.add("hidden");
-    matchesTab.classList.remove("hidden");
-  });
-
-  // Fetch standings
-  try {
-    const res = await apiPost("/standings", { leagueId, groupId });
-    if (res.success) {
-      standingsTab.innerHTML = renderStandingsTable(res.data.standings);
-    } else {
-      standingsTab.textContent = "Failed to load standings.";
-    }
-  } catch (err) {
-    standingsTab.textContent = "Error fetching standings.";
-  }
-}
-
-function renderStandingsTable(standings) {
-  return `
-    <table class="standings-table">
-      <thead>
-        <tr>
-          <th>Club</th><th>MP</th><th>W</th><th>D</th><th>L</th>
-          <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${standings.map(team => `
-          <tr>
-            <td>${team.club_name}</td>
-            <td>${team.played}</td>
-            <td>${team.wins}</td>
-            <td>${team.draws}</td>
-            <td>${team.losses}</td>
-            <td>${team.goals_for}</td>
-            <td>${team.goals_against}</td>
-            <td>${team.goal_difference}</td>
-            <td>${team.points}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
+  wrapper.innerHTML = `
+    <div class="group-standings-header">
+      <button id="backBtn">⬅ Back</button>
+      <h2>${groupName}</h2>
+    </div>
+    <div class="group-tabs">
+      <button class="tab-btn active" data-tab="standings">Standings</button>
+      <button class="tab-btn" data-tab="matches">Matches</button>
+    </div>
+    <div class="tab-content" id="tabContent">Loading...</div>
   `;
+
+  // Back button logic
+  document.getElementById("backBtn").addEventListener("click", async () => {
+    try {
+      const leagueId = parseInt(localStorage.getItem("leagueId"));
+      const response = await apiPost("/league-instances", { leagueId });
+      if (response.success) {
+        renderLeagueInstances(response.data);
+      } else {
+        section.innerHTML = `<p>Error loading instances</p>`;
+      }
+    } catch (err) {
+      console.error("Failed to fetch league instances", err);
+    }
+  });
+
+  // Initial load: Standings
+  loadTabContent("standings");
+
+  // Tab click logic
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadTabContent(btn.dataset.tab);
+    });
+  });
+
+  async function loadTabContent(tab) {
+    const contentDiv = document.getElementById("tabContent");
+    contentDiv.innerHTML = "Loading...";
+
+    try {
+      if (tab === "standings") {
+        const response = await apiPost("/standings", { leagueId, groupId });
+        if (response.success) {
+          contentDiv.innerHTML = renderStandingsTable(response.data.standings);
+        } else {
+          contentDiv.innerHTML = "Failed to load standings.";
+        }
+      } else if (tab === "matches") {
+        const response = await apiPost("/matches", { leagueId, groupId }); // <-- replace with your real endpoint
+        if (response.success) {
+          contentDiv.innerHTML = renderMatchesTable(response.data.matches); // implement this
+        } else {
+          contentDiv.innerHTML = "Failed to load matches.";
+        }
+      }
+    } catch (err) {
+      contentDiv.innerHTML = "Error fetching data.";
+    }
+  }
+
+
+  function renderStandingsTable(standings) {
+    return `
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>Club</th><th>MP</th><th>W</th><th>D</th><th>L</th>
+            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${standings.map(team => `
+            <tr>
+              <td>${team.club_name}</td>
+              <td>${team.played}</td>
+              <td>${team.wins}</td>
+              <td>${team.draws}</td>
+              <td>${team.losses}</td>
+              <td>${team.goals_for}</td>
+              <td>${team.goals_against}</td>
+              <td>${team.goal_difference}</td>
+              <td>${team.points}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderMatchesTable(matches) {
+    if (!matches || matches.length === 0) return `<p>No matches available.</p>`;
+    return `
+      <ul class="match-list">
+        ${matches.map(match => `<li>${match.team1} vs ${match.team2} - ${match.status}</li>`).join("")}
+      </ul>
+    `;
+  }
 }

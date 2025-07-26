@@ -1,18 +1,52 @@
-import { apiPost } from '../../services/api.js';
+import { apiGet, apiPost } from '../../services/api.js';
 import { renderGroupStandingsPage } from './renderStandings.js'
 
 export function renderLeagueTable(data) {
   const section = document.getElementById("leagueType1");
   const leagues = data.leagues || [];
 
+  section.innerHTML = ""; // Clear previous content
+  section.style.display = "block";
+
+  // ✅ Add Back Button to /me
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "⬅ Back";
+  backBtn.id = "backBtn";
+
+  backBtn.addEventListener("click", async () => {
+    const token = localStorage.getItem("authToken");
+
+    try {
+      const response = await apiGet("/me", token);
+      if (response.success && response.user) {
+         document.getElementById("logoutButtn").style.display = "block";
+         document.getElementById("bannerContainer").style.display = "block";
+         document.getElementById("leagueType1").style.display = "none";
+      } else {
+        localStorage.removeItem("authToken");
+        if (authButtons) authButtons.style.display = "flex";
+      }
+    } catch (err) {
+      console.error("🔴 Error in Back button to /me:", err);
+      localStorage.removeItem("authToken");
+      if (authButtons) authButtons.style.display = "flex";
+    }
+  });
+
+  section.appendChild(backBtn); // Add Back button
+
+  // ✅ If no leagues
   if (!leagues.length) {
-    section.innerHTML = `<div><h2>No leagues found</h2></div>`;
-    section.style.display = "block";
+    const noDataMsg = document.createElement("div");
+    noDataMsg.innerHTML = `<h2>No leagues found</h2>`;
+    section.appendChild(noDataMsg);
     return;
   }
 
-  section.innerHTML = `<div class="league-names-row"></div>`;
-  const rowContainer = section.querySelector(".league-names-row");
+  // ✅ Container for league boxes
+  const rowContainer = document.createElement("div");
+  rowContainer.className = "league-names-row";
+  section.appendChild(rowContainer);
 
   leagues.forEach(league => {
     const leagueBox = document.createElement("div");
@@ -34,8 +68,6 @@ export function renderLeagueTable(data) {
 
     rowContainer.appendChild(leagueBox);
   });
-
-  section.style.display = "block";
 }
 
 
@@ -50,6 +82,32 @@ export function renderLeagueInstances(instanceData) {
     wrapper.style.display = "none";
     return;
   }
+
+  // ✅ Back button to return to /leagues
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "⬅ Back";
+  backBtn.id = "backBtn";
+  const bannerId = parseInt(localStorage.getItem("currentBannerId"))
+  backBtn.addEventListener("click", async () => {
+
+    try {
+      const data = await apiPost("/leagues", { bannerId });
+      if (data.success && data.data) {
+        wrapper.style.display = "none";
+        document.getElementById("bannerContainer").style.display = "none"; // Optional if modal used
+        renderLeagueTable(data.data);
+      } else {
+        showToast("Table not found.");
+      }
+    } catch (err) {
+      console.error("Error loading leagues", err);
+      showToast("Something went wrong", "error");
+    }
+  });
+
+  wrapper.appendChild(backBtn); // ✅ Add back button to wrapper
+
 
   wrapper.style.display = "block";
 

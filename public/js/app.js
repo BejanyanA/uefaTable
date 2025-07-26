@@ -4,6 +4,7 @@ import { LeagueManager } from './modules/LeagueManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { getClubs } from './modules/GetClubs.js';
+// import { renderLeagueTable } from './modules/components/renderTable.js';
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -16,8 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initRegister();
    LeagueManager.initCreate();
    LeagueManager.initOpen();
-   getClubs.initSearchClubs()
+   getClubs.initSearchClubs();
    changeLang(currentLang);
+   // renderLeagueTable();
    
    checkLoggedIn();
    window.logout = logout;

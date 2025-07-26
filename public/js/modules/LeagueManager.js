@@ -184,6 +184,7 @@ export const LeagueManager = {
 
       const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
       const translation = langMap[currentLang];
+      localStorage.setItem("currentBannerId", bannerId);
 
 
       try {
