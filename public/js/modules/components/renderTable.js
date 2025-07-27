@@ -147,8 +147,8 @@ export function renderLeagueInstances(instanceData) {
 
       // ✅ CLICK HANDLER
       groupDiv.addEventListener("click", () => {
-        const leagueId = groupDiv.dataset.leagueId;
-        const groupId = groupDiv.dataset.groupId;
+        const leagueId = parseInt(groupDiv.dataset.leagueId);
+        const groupId = parseInt(groupDiv.dataset.groupId);
         const groupName = groupDiv.dataset.groupName;
         renderGroupStandingsPage(leagueId, groupId, groupName);
       });

@@ -1,8 +1,7 @@
 import { apiPost } from '../../services/api.js';
 import { renderLeagueInstances } from './renderTable.js';
 
-export async function renderGroupStandingsPage( groupId, groupName) {
-  const leagueId = parseInt(localStorage.getItem("leagueId"));
+export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   const wrapper = document.getElementById("leagueType1");
   wrapper.innerHTML = `
     <div class="group-standings-header">
@@ -18,7 +17,6 @@ export async function renderGroupStandingsPage( groupId, groupName) {
 
   document.getElementById("backBtn").addEventListener("click", async () => {
     try {
-      
       const response = await apiPost("/league-instances", { leagueId });
       if (response.success) {
         renderLeagueInstances(response.data);

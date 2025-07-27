@@ -151,7 +151,7 @@ export async function handleLeaguesCreate(request, env) {
       for (const [team1, team2] of pairs) {
         for (const matchType of ['home', 'away']) {
           const [t1, t2] = matchType === 'home' ? [team1, team2] : [team2, team1];
-          matchValues.push(`(${groupId}, ${t1}, ${t2}, null, null, 0, null, 0, 0, null, null, '${matchType}')`);
+          matchValues.push(`(${groupId}, ${t1}, ${t2}, null, null, 0, null, null, null, null, null, '${matchType}')`);
         }
       }
     });
