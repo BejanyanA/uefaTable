@@ -115,7 +115,6 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     const { matches, accessType } = matchesData;
     const editable = accessType === "owner";
 
-    // Create table
     const table = document.createElement("table");
     table.className = "matches-table";
 
@@ -134,8 +133,12 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       ${matches.map(match => `
         <tr data-match-id="${match.id}">
           <td>
-            <select class="user-dropdown" name="team1_user" ${editable ? "" : "disabled"}>
-              <option value="">Select</option>
+            <select class="user-dropdown" 
+                    name="team1_user"
+                    data-team-id="${match.team1_id}" 
+                    data-initial-username="${match.team1_username || ''}" 
+                    ${editable ? "" : "disabled"}>
+              <option value="">${match.team1_username || "Select user"}</option>
             </select>
           </td>
           <td>${match.team1_name}</td>
@@ -143,8 +146,12 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
           <td>${match.team2_name}</td>
           <td>
-            <select class="user-dropdown" name="team2_user" ${editable ? "" : "disabled"}>
-              <option value="">Select</option>
+            <select class="user-dropdown" 
+                    name="team2_user" 
+                    data-team-id="${match.team2_id}" 
+                    data-initial-username="${match.team2_username || ''}" 
+                    ${editable ? "" : "disabled"}>
+              <option value="">${match.team2_username || "Select user"}</option>
             </select>
           </td>
         </tr>
@@ -155,59 +162,83 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     section.appendChild(table);
     section.style.display = "block";
 
-    // Fetch league players and populate dropdowns
-    try {
-      const leagueId = parseInt(localStorage.getItem("leagueId"));
-      const response = await apiPost("/league-players", { leagueId }, { showLoading: false });
-      if (response.success) {
-        const players = response.data.players || [];
-
-        const optionsHtml = ['<option value="">Select user</option>']
-          .concat(players.map(p => `<option value="${p.user_id}">${p.username}</option>`))
-          .join("");
-
-        matches.forEach(match => {
-          const row = section.querySelector(`tr[data-match-id="${match.id}"]`);
-          if (!row) return;
-
-          const team1Select = row.querySelector(`select[name="team1_user"]`);
-          const team2Select = row.querySelector(`select[name="team2_user"]`);
-
-          team1Select.innerHTML = optionsHtml;
-          team2Select.innerHTML = optionsHtml;
-        });
-      }
-    } catch (err) {
-      console.error("Error loading league players", err);
-    }
-
-    // ✅ Auto-save on blur
     if (editable) {
+      // ✅ Score auto-save on blur
       section.querySelectorAll(".score-input").forEach(input => {
         input.addEventListener("blur", async () => {
           const row = input.closest("tr");
           const matchId = parseInt(row.dataset.matchId);
           const scoreValue = input.value;
 
-          // Skip empty or invalid values
           if (scoreValue === "" || isNaN(scoreValue)) return;
 
           const payload = { matchId };
-
-          if (input.name === "team1") {
-            payload.team1_score = parseInt(scoreValue);
-          } else if (input.name === "team2") {
-            payload.team2_score = parseInt(scoreValue);
-          }
+          if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
+          if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
 
           try {
             const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
-
             if (!updateResponse.success) {
               console.warn(`⚠️ Failed to update score for match ${matchId}`);
             }
           } catch (err) {
             console.error("⚠️ Error while updating score:", err);
+          }
+        });
+      });
+
+      // ✅ User dropdown dynamic loading + attach
+      section.querySelectorAll(".user-dropdown").forEach(dropdown => {
+        let loaded = false;
+
+        dropdown.addEventListener("focus", async () => {
+          if (loaded) return;
+          loaded = true;
+
+          const leagueId = parseInt(localStorage.getItem("leagueId"));
+          const response = await apiPost("/league-players", { leagueId }, { showLoading: false });
+          const players = response?.data?.players || [];
+
+          const defaultOption = `<option value="">Select user</option>`;
+          const options = players.map(p =>
+            `<option value="${p.id}">${p.username}</option>`
+          ).join("");
+
+          dropdown.innerHTML = defaultOption + options;
+
+          // Preselect based on username match
+          const currentUsername = dropdown.dataset.initialUsername?.trim();
+          if (currentUsername) {
+            const foundOption = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
+            if (foundOption) dropdown.value = foundOption.value;
+          }
+        });
+
+        dropdown.addEventListener("change", async () => {
+          const row = dropdown.closest("tr");
+          const matchId = parseInt(row.dataset.matchId);
+          const teamId = parseInt(dropdown.dataset.teamId);
+          const userId = parseInt(dropdown.value);
+          const leagueId = parseInt(localStorage.getItem("leagueId"));
+
+          if (!matchId || !teamId || !userId || !leagueId) {
+            console.warn("⚠️ Missing values, cannot attach player");
+            return;
+          }
+
+          try {
+            const res = await apiPost("/attach-players", {
+              matchId,
+              teamId,
+              userId,
+              leagueId
+            });
+
+            if (!res.success) {
+              console.error("❌ Failed to attach user");
+            }
+          } catch (err) {
+            console.error("⚠️ Error while attaching user:", err);
           }
         });
       });
