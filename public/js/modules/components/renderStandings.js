@@ -1,7 +1,8 @@
 import { apiPost } from '../../services/api.js';
 import { renderLeagueInstances } from './renderTable.js';
 
-export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
+export async function renderGroupStandingsPage( groupId, groupName) {
+  const leagueId = parseInt(localStorage.getItem("leagueId"));
   const wrapper = document.getElementById("leagueType1");
   wrapper.innerHTML = `
     <div class="group-standings-header">
@@ -15,10 +16,9 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
 
-  // Back button logic
   document.getElementById("backBtn").addEventListener("click", async () => {
     try {
-      const leagueId = parseInt(localStorage.getItem("leagueId"));
+      
       const response = await apiPost("/league-instances", { leagueId });
       if (response.success) {
         renderLeagueInstances(response.data);
@@ -30,10 +30,8 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     }
   });
 
-  // Initial tab
   loadTabContent("standings");
 
-  // Tab click logic
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -42,7 +40,6 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     });
   });
 
-  // Tab content loader
   async function loadTabContent(tab) {
     const contentDiv = document.getElementById("tabContent");
     contentDiv.innerHTML = "Loading...";
@@ -56,10 +53,14 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           contentDiv.innerHTML = "Failed to load standings.";
         }
       } else if (tab === "matches") {
-        const response = await apiPost("/matches", { leagueId, groupId });
-        if (response.success) {
-          contentDiv.innerHTML = ""; // Clear before rendering
-          await renderMatchesTable(response.data, contentDiv, leagueId);
+        const [matchesResponse, playersResponse] = await Promise.all([
+          apiPost("/matches", { leagueId, groupId }),
+          apiPost("/league-players", { leagueId }, { showLoading: false })
+        ]);
+
+        if (matchesResponse.success && playersResponse.success) {
+          contentDiv.innerHTML = "";
+          await renderMatchesTable(matchesResponse.data, contentDiv, leagueId, playersResponse.data.players);
         } else {
           contentDiv.innerHTML = "Failed to load matches.";
         }
@@ -69,7 +70,6 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     }
   }
 
-  // Render Standings
   function renderStandingsTable(standings) {
     return `
     <div class="standings-wrapper">
@@ -107,9 +107,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   `;
   }
 
-  // Render Matches Table
-  async function renderMatchesTable(matchesData, leagueId, groupId) {
-    const section = document.getElementById("tabContent");
+  async function renderMatchesTable(matchesData, section, leagueId, players = []) {
     section.innerHTML = "";
 
     const { matches, accessType } = matchesData;
@@ -133,11 +131,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       ${matches.map(match => `
         <tr data-match-id="${match.id}">
           <td>
-            <select class="user-dropdown" 
-                    name="team1_user"
-                    data-team-id="${match.team1_id}" 
-                    data-initial-username="${match.team1_username || ''}" 
-                    ${editable ? "" : "disabled"}>
+            <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
               <option value="">${match.team1_username || "Select user"}</option>
             </select>
           </td>
@@ -146,11 +140,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
           <td>${match.team2_name}</td>
           <td>
-            <select class="user-dropdown" 
-                    name="team2_user" 
-                    data-team-id="${match.team2_id}" 
-                    data-initial-username="${match.team2_username || ''}" 
-                    ${editable ? "" : "disabled"}>
+            <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
               <option value="">${match.team2_username || "Select user"}</option>
             </select>
           </td>
@@ -163,7 +153,6 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     section.style.display = "block";
 
     if (editable) {
-      // ✅ Score auto-save on blur
       section.querySelectorAll(".score-input").forEach(input => {
         input.addEventListener("blur", async () => {
           const row = input.closest("tr");
@@ -187,39 +176,22 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         });
       });
 
-      // ✅ User dropdown dynamic loading + attach
       section.querySelectorAll(".user-dropdown").forEach(dropdown => {
-        let loaded = false;
+        const defaultOption = `<option value="">Select user</option>`;
+        const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
+        dropdown.innerHTML = defaultOption + options;
 
-        dropdown.addEventListener("focus", async () => {
-          if (loaded) return;
-          loaded = true;
-
-          const leagueId = parseInt(localStorage.getItem("leagueId"));
-          const response = await apiPost("/league-players", { leagueId }, { showLoading: false });
-          const players = response?.data?.players || [];
-
-          const defaultOption = `<option value="">Select user</option>`;
-          const options = players.map(p =>
-            `<option value="${p.id}">${p.username}</option>`
-          ).join("");
-
-          dropdown.innerHTML = defaultOption + options;
-
-          // Preselect based on username match
-          const currentUsername = dropdown.dataset.initialUsername?.trim();
-          if (currentUsername) {
-            const foundOption = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
-            if (foundOption) dropdown.value = foundOption.value;
-          }
-        });
+        const currentUsername = dropdown.dataset.initialUsername?.trim();
+        if (currentUsername) {
+          const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
+          if (found) dropdown.value = found.value;
+        }
 
         dropdown.addEventListener("change", async () => {
           const row = dropdown.closest("tr");
           const matchId = parseInt(row.dataset.matchId);
           const teamId = parseInt(dropdown.dataset.teamId);
           const userId = parseInt(dropdown.value);
-          const leagueId = parseInt(localStorage.getItem("leagueId"));
 
           if (!matchId || !teamId || !userId || !leagueId) {
             console.warn("⚠️ Missing values, cannot attach player");
@@ -232,7 +204,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
               teamId,
               userId,
               leagueId
-            });
+            }, { showLoading: false });
 
             if (!res.success) {
               console.error("❌ Failed to attach user");
