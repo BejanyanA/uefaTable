@@ -59,6 +59,10 @@
   color: white;
 }
 
+.standings-table td:first-child {
+  text-align: left;
+}
+
 .standings-table tr th {
   font-size: 18px;
 }

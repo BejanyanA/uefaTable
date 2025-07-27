@@ -86,19 +86,19 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           </tr>
         </thead>
         <tbody>
-          ${standings.map(team => `
+          ${standings.map((team, index) => `
             <tr>
-              <td>${team.club_name}</td>
-              <td>${team.played}</td>
-              <td>${team.wins}</td>
-              <td>${team.draws}</td>
-              <td>${team.losses}</td>
-              <td>${team.goals_for}</td>
-              <td>${team.goals_against}</td>
-              <td>${team.goal_difference}</td>
-              <td>${team.points}</td>
+              <td>${index + 1}. ${team.club_name}</td>
+              <td>${team.played ?? 0}</td>
+              <td>${team.wins ?? 0}</td>
+              <td>${team.draws ?? 0}</td>
+              <td>${team.losses ?? 0}</td>
+              <td>${team.goals_for ?? 0}</td>
+              <td>${team.goals_against ?? 0}</td>
+              <td>${team.goal_difference ?? 0}</td>
+              <td>${team.points ?? 0}</td>
             </tr>
-          `).join("")}
+            `).join("")}
         </tbody>
       </table>
     </div>
