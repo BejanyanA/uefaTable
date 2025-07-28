@@ -5,25 +5,27 @@
 }
 
 .tab-btn {
-  border: 1px solid white;
+  /* border: 1px solid white; */
   color: white;
   background: transparent;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 14px;
   margin: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
   width: 80px;
   text-align: center;
   box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .tab-btn.active {
   background: rgb(255, 255, 255);
   color: black;
   font-weight: bold;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .tab-content {
@@ -97,22 +99,22 @@
 }
 
 #backBtn {
-  border: 1px solid white;
   color: white;
-  background: #666;
-  padding: 4px 6px;
+  background: #1d1d1d;
+  padding: 6px 3px;
   cursor: pointer;
   font-size: 14px;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 50px;
+  width: 80px;
   text-align: center;
   box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 #backBtn:hover {
-  background: #1d1d1d;
+  background: black;
 }
 
 #backBtn:active {
@@ -123,18 +125,18 @@
 @media (max-width: 480px) {
 
   #backBtn {
-    border: 1px solid white;
     color: white;
-    background: #666;
-    padding: 4px 6px;
+    background: #1d1d1d;
+    padding: 6px 3px;
     cursor: pointer;
-    font-size: 14px;
-    border-radius: 4px;
+    font-size: 12px;
+    border-radius: 6px;
     transition: background 0.3s, color 0.3s, transform 0.1s;
     white-space: nowrap;
-    width: 50px;
+    width: 60px;
     text-align: center;
     box-sizing: content-box;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
 
   .group-standings-header h2 {
@@ -153,4 +155,22 @@
   .standings-table td {
     font-size: 12px;
   }
+
+  .tab-btn {
+  /* border: 1px solid white; */
+  color: white;
+  background: transparent;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin: 3px;
+  border-radius: 6px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 60px;
+  text-align: center;
+  box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
 }

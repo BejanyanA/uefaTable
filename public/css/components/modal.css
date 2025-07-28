@@ -6,7 +6,7 @@
    left: 0;
    width: 100%;
    height: 100%;
-   background-color: rgba(0, 0, 0, 0.6);
+   background-color: rgba(0, 0, 0, 0.9);
    justify-content: center;
    align-items: center;
    padding: 10px;
@@ -15,7 +15,7 @@
 }
 
 .modal-content {
-   background: white;
+   background-color: rgba(0, 0, 0, 0.5);
    color: black;
    padding: 20px 30px;
    border-radius: 8px;
@@ -25,13 +25,14 @@
    display: flex;
    flex-direction: column;
    align-items: center;
-   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+   box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .modal h2 {
    margin-top: 0;
    text-align: center;
    width: 100%;
+   color: white;
 }
 
 .modal input {
@@ -51,18 +52,19 @@
 }
 
 .modal form button {
-   border: 1px solid white;
+   /* border: 1px solid white; */
    color: white;
    background: #666;
    padding: 8px 16px;
    cursor: pointer;
    font-size: 14px;
-   border-radius: 4px;
+   border-radius: 6px;
    transition: background 0.3s, color 0.3s, transform 0.1s;
    white-space: nowrap;
    width: 80px;
    text-align: center;
    box-sizing: content-box;
+   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .modal form button:hover {
@@ -74,85 +76,87 @@
 }
 
 .close {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  font-size: 25px;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+   position: absolute;
+   top: 10px;
+   right: 14px;
+   font-size: 25px;
+   cursor: pointer;
+   transition: transform 0.2s ease-in-out;
+   color: white;
 }
 
 .close:hover {
-  transform: scale(1.5);
+   transform: scale(1.5);
 }
 
 .close:active {
-  transform: scale(1.2);
+   transform: scale(1.2);
 }
 
 .toggle-password {
-  position: absolute;
-  right: 10px;
-  top: 55%;
-  width: 20px;
-  height: 20px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  opacity: 0.7;
+   position: absolute;
+   right: 10px;
+   top: 55%;
+   width: 20px;
+   height: 20px;
+   transform: translateY(-50%);
+   cursor: pointer;
+   opacity: 0.7;
 }
 
 .toggle-password:hover {
-  opacity: 1;
+   opacity: 1;
 }
 
 .input-group {
-  position: relative;
-  margin-bottom: -8px;
-  width: 100%;
+   position: relative;
+   margin-bottom: -8px;
+   width: 100%;
 }
 
 .input-group input {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  background: white;
+   border: 1px solid #ccc;
+   border-radius: 8px;
+   outline: none;
+   background: white;
 }
 
 .input-group label {
-  position: absolute;
-  top: 50%;
-  left: 5px;
-  transform: translateY(-50%);
-  color: #aaa;
-  font-size: 16px;
-  pointer-events: none;
-  transition: 0.2s ease all;
-  background: white;
-  padding: 0 3px;
-  line-height: 1;
+   position: absolute;
+   top: 45%;
+   left: 5px;
+   transform: translateY(-50%);
+   color: #aaa;
+   font-size: 16px;
+   pointer-events: none;
+   transition: 0.2s ease all;
+   background: white;
+   padding: 0 3px;
+   line-height: 1;
 }
 
 .input-group input:focus+label,
 .input-group input:not(:placeholder-shown):valid+label,
 .input-group input:not(:focus):not(:placeholder-shown):not(:invalid)+label {
-  top: -10px;
-  /* ⬅️ Move label closer to input */
-  left: 4px;
-  font-size: 13px;
-  /* ⬅️ Slightly smaller label text */
-  color: #333;
+   top: -10px;
+   /* ⬅️ Move label closer to input */
+   left: 4px;
+   font-size: 13px;
+   /* ⬅️ Slightly smaller label text */
+   color: white;
+   background: rgba(0, 0, 0, 0.9);
 }
 
 .error {
-  color: red;
-  font-size: 12px;
-  margin-top: 8px;
-  /* 👈 Add this for spacing above */
-  margin-bottom: 16px;
-  /* 👈 Reduce bottom if needed */
-  align-self: flex-start;
-  min-height: 18px;
-  /* 👈 Optional: keep consistent height */
+   color: red;
+   font-size: 12px;
+   margin-top: 8px;
+   /* 👈 Add this for spacing above */
+   margin-bottom: 16px;
+   /* 👈 Reduce bottom if needed */
+   align-self: flex-start;
+   min-height: 18px;
+   /* 👈 Optional: keep consistent height */
 }
 
 
@@ -166,7 +170,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.9);
       justify-content: center;
       align-items: center;
       padding: 8px;
@@ -188,18 +192,19 @@
    }
 
    .modal form button {
-      border: 1px solid white;
+      /* border: 1px solid white; */
       color: white;
       background: #1d1d1d;
       padding: 8px 3px;
       cursor: pointer;
       font-size: 11px;
-      border-radius: 4px;
+      border-radius: 6px;
       transition: background 0.3s, color 0.3s, transform 0.1s;
       white-space: nowrap;
       width: 80px;
       text-align: center;
       box-sizing: content-box;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
    }
 
    .modal input,
@@ -229,7 +234,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      background-color: rgba(0, 0, 0, 0.5);
    }
 
    .close {

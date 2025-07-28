@@ -9,7 +9,7 @@ body {
   min-height: 100vh;
 }
 
-body.modal-open>*:not(.modal):not(.homePage):not(#toast-container):not(#loader)  {
+body.modal-open>*:not(.modal):not(#toast-container):not(#loader)  {
   pointer-events: none;
   /* disable all interaction */
   user-select: none;
