@@ -105,19 +105,19 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   `;
   }
 
-async function renderMatchesTable(matchesData, section, leagueId, players = []) {
-  section.innerHTML = "";
+  async function renderMatchesTable(matchesData, section, leagueId, players = []) {
+    section.innerHTML = "";
 
-  const { matches, accessType } = matchesData;
-  const editable = accessType === "owner";
-  const isMobile = window.innerWidth <= 475;
+    const { matches, accessType } = matchesData;
+    const editable = accessType === "owner";
+    const isMobile = window.innerWidth <= 475;
 
-  if (!isMobile) {
-    // === DESKTOP TABLE VIEW ===
-    const table = document.createElement("table");
-    table.className = "matches-table";
+    if (!isMobile) {
+      // === DESKTOP TABLE VIEW ===
+      const table = document.createElement("table");
+      table.className = "matches-table";
 
-    table.innerHTML = `
+      table.innerHTML = `
       <thead>
         <tr>
           <th>Player</th>
@@ -150,18 +150,18 @@ async function renderMatchesTable(matchesData, section, leagueId, players = []) 
       </tbody>
     `;
 
-    section.appendChild(table);
-  } else {
-    // === MOBILE STACKED VIEW ===
-    const container = document.createElement("div");
-    container.className = "matches-row-stack";
+      section.appendChild(table);
+    } else {
+      // === MOBILE STACKED VIEW ===
+      const container = document.createElement("div");
+      container.className = "matches-row-stack";
 
-    matches.forEach(match => {
-      const matchWrapper = document.createElement("div");
-      matchWrapper.className = "match-block";
-      matchWrapper.dataset.matchId = match.id;
+      matches.forEach(match => {
+        const matchWrapper = document.createElement("div");
+        matchWrapper.className = "match-block";
+        matchWrapper.dataset.matchId = match.id;
 
-      matchWrapper.innerHTML = `
+        matchWrapper.innerHTML = `
         <div class="match-line">
           <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
             <option value="">${match.team1_username || "Select Player"}</option>
@@ -178,38 +178,49 @@ async function renderMatchesTable(matchesData, section, leagueId, players = []) 
         </div>
       `;
 
-      container.appendChild(matchWrapper);
-    });
-
-    section.appendChild(container);
-  }
-
-  section.style.display = "block";
-
-  // === Shared logic for dropdowns & scores ===
-  if (editable) {
-    section.querySelectorAll(".score-input").forEach(input => {
-      input.addEventListener("blur", async () => {
-        const row = input.closest("[data-match-id]");
-        const matchId = parseInt(row.dataset.matchId);
-        const scoreValue = input.value;
-
-        if (scoreValue === "" || isNaN(scoreValue)) return;
-
-        const payload = { matchId };
-        if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
-        if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
-
-        try {
-          const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
-          if (!updateResponse.success) {
-            console.warn(`⚠️ Failed to update score for match ${matchId}`);
-          }
-        } catch (err) {
-          console.error("⚠️ Error while updating score:", err);
-        }
+        container.appendChild(matchWrapper);
       });
-    });
+
+      section.appendChild(container);
+    }
+
+    section.style.display = "block";
+
+    // === Shared logic for dropdowns & scores ===
+    if (editable) {
+      section.querySelectorAll(".score-input").forEach(input => {
+        // Prevent typing negative numbers
+        input.addEventListener("input", () => {
+          if (parseInt(input.value) < 0) {
+            input.value = "";
+          }
+        });
+
+        // Save on blur if valid
+        input.addEventListener("blur", async () => {
+          const row = input.closest("[data-match-id]");
+          const matchId = parseInt(row.dataset.matchId);
+          const scoreValue = input.value;
+
+          if (scoreValue === "" || isNaN(scoreValue) || parseInt(scoreValue) < 0) {
+            input.value = ""; // Clear invalid values
+            return;
+          }
+
+          const payload = { matchId };
+          if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
+          if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
+
+          try {
+            const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
+            if (!updateResponse.success) {
+              console.warn(`⚠️ Failed to update score for match ${matchId}`);
+            }
+          } catch (err) {
+            console.error("⚠️ Error while updating score:", err);
+          }
+        });
+      });
 
     section.querySelectorAll(".user-dropdown").forEach(dropdown => {
       const defaultOption = `<option value="">Select Player</option>`;
