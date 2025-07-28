@@ -1,8 +1,11 @@
+import { showToast } from '../../utils/toast.js';
 import { apiPost } from '../../services/api.js';
 import { renderLeagueInstances } from './renderTable.js';
+import { langMap, currentLang } from '../LanguageManager.js';
 
 export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   const wrapper = document.getElementById("leagueType1");
+  const translation = langMap[currentLang];
   wrapper.innerHTML = `
     <div class="group-standings-header">
       <button id="backBtn">⬅ Back</button>
@@ -70,12 +73,12 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
   function renderStandingsTable(standings) {
     return `
-    <div class="standings-wrapper">
-      <table class="standings-table">
+  <div class="standings-wrapper">
+<table class="standings-table desktop-only">
         <thead>
           <tr>
-            <th>Club</th>
-            <th>MP</th>
+            <th>Teams</th>
+            <th>P</th>
             <th>W</th>
             <th>D</th>
             <th>L</th>
@@ -98,12 +101,51 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
               <td>${team.goal_difference ?? 0}</td>
               <td>${team.points ?? 0}</td>
             </tr>
-            `).join("")}
+          `).join("")}
         </tbody>
       </table>
+
+      <!-- 📱 Mobile version -->
+    <div class="mobile-standings-container">
+  <div class="scroll-layout">
+    <div class="fixed-clubs">
+      <div class="club-header">Teams</div>
+      ${standings.map((team, index) => `
+        <div class="club-name">${index + 1}. ${team.club_name}</div>
+      `).join("")}
     </div>
+
+    <div class="stats-scroll-wrapper">
+      <!-- Header row -->
+      <div class="stats-scroll-row header-row">
+        <div class="stat-head">P</div>
+        <div class="stat-head">GD</div>
+        <div class="stat-head">Pts</div>
+        <div class="stat-head">W</div>
+        <div class="stat-head">D</div>
+        <div class="stat-head">L</div>
+        <div class="stat-head">GF</div>
+        <div class="stat-head">GA</div>
+      </div>
+
+      <!-- Club rows -->
+      ${standings.map(team => `
+        <div class="stats-scroll-row">
+          <div class="stat-cell">${team.played ?? 0}</div>
+          <div class="stat-cell">${team.goal_difference ?? 0}</div>
+          <div class="stat-cell">${team.points ?? 0}</div>
+          <div class="stat-cell">${team.wins ?? 0}</div>
+          <div class="stat-cell">${team.draws ?? 0}</div>
+          <div class="stat-cell">${team.losses ?? 0}</div>
+          <div class="stat-cell">${team.goals_for ?? 0}</div>
+          <div class="stat-cell">${team.goals_against ?? 0}</div>
+        </div>
+      `).join("")}
+    </div>
+  </div>
+</div>
   `;
-  }
+}
 
   async function renderMatchesTable(matchesData, section, leagueId, players = []) {
     section.innerHTML = "";
@@ -213,8 +255,10 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
           try {
             const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
-            if (!updateResponse.success) {
-              console.warn(`⚠️ Failed to update score for match ${matchId}`);
+            if (updateResponse.success) {
+              showToast(translation.score_updated || "Score Updated", "success");
+            } else {
+              showToast(translation.score_update_failed || `Failed to update score for match ${matchId}`, "error");
             }
           } catch (err) {
             console.error("⚠️ Error while updating score:", err);
@@ -222,44 +266,46 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         });
       });
 
-    section.querySelectorAll(".user-dropdown").forEach(dropdown => {
-      const defaultOption = `<option value="">Select Player</option>`;
-      const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
-      dropdown.innerHTML = defaultOption + options;
+      section.querySelectorAll(".user-dropdown").forEach(dropdown => {
+        const defaultOption = `<option value="">Select Player</option>`;
+        const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
+        dropdown.innerHTML = defaultOption + options;
 
-      const currentUsername = dropdown.dataset.initialUsername?.trim();
-      if (currentUsername) {
-        const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
-        if (found) dropdown.value = found.value;
-      }
-
-      dropdown.addEventListener("change", async () => {
-        const row = dropdown.closest("[data-match-id]");
-        const matchId = parseInt(row.dataset.matchId);
-        const teamId = parseInt(dropdown.dataset.teamId);
-        const userId = parseInt(dropdown.value);
-
-        if (!matchId || !teamId || !userId || !leagueId) {
-          console.warn("⚠️ Missing values, cannot attach player");
-          return;
+        const currentUsername = dropdown.dataset.initialUsername?.trim();
+        if (currentUsername) {
+          const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
+          if (found) dropdown.value = found.value;
         }
 
-        try {
-          const res = await apiPost("/attach-players", {
-            matchId,
-            teamId,
-            userId,
-            leagueId
-          }, { showLoading: false });
+        dropdown.addEventListener("change", async () => {
+          const row = dropdown.closest("[data-match-id]");
+          const matchId = parseInt(row.dataset.matchId);
+          const teamId = parseInt(dropdown.dataset.teamId);
+          const userId = parseInt(dropdown.value);
 
-          if (!res.success) {
-            console.error("❌ Failed to attach user");
+          if (!matchId || !teamId || !userId || !leagueId) {
+            console.warn("⚠️ Missing values, cannot attach player");
+            return;
           }
-        } catch (err) {
-          console.error("⚠️ Error while attaching user:", err);
-        }
+
+          try {
+            const res = await apiPost("/attach-players", {
+              matchId,
+              teamId,
+              userId,
+              leagueId
+            }, { showLoading: false });
+
+            if (res.success) {
+              showToast(translation.user_success_attached || "User assigned successfully", "success");
+            } else {
+              showToast(translation.user_attach_failed || "Failed to attach user", "error");
+            }
+          } catch (err) {
+            console.error("⚠️ Error while attaching user:", err);
+          }
+        });
       });
-    });
+    }
   }
-}
 }

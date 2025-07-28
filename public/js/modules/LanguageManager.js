@@ -32,6 +32,10 @@ export const langMap = {
     selectedCount: "Selected",
     no_spaces_allowed: "Spaces are not allowed",
     clubSearch: "Search Teams...",
+    // score_updated
+    // score_update_failed
+    // user_success_attached
+    // user_attach_failed
 
     //BE translations
     username_exists: "Username already exists",

@@ -1,3 +1,11 @@
+.desktop-only {
+  display: table;
+}
+
+.scroll-layout {
+  display: none;
+}
+
 .tabs {
   margin-top: 20px;
   display: flex;
@@ -122,7 +130,7 @@
 }
 
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
   #backBtn {
     color: white;
@@ -139,38 +147,88 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
 
-  .group-standings-header h2 {
-    font-size: 20px;
+  .standings-wrapper {
+    padding: 20px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 0 20px 20px;
-    text-align: center;
-    margin-bottom: 10px;
-    padding: 15px;
+    margin: 20px auto;
+    max-width: 100%;
   }
 
-  .standings-table tr th {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-standings-container {
+    margin-top: 12px;
+  }
+
+  .scroll-layout {
+    display: flex;
+  }
+
+  .fixed-clubs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .club-header{
     font-size: 14px;
+    font-weight: bold;
+    color: white;
+    padding: 3.5px 2px;
+    white-space: nowrap;
   }
 
-  .standings-table td {
+  .club-name {
     font-size: 12px;
+    width: 150px;
+    font-weight: bold;
+    color: white;
+    padding: 3.8px 3%;
+    white-space: nowrap;
   }
 
-  .tab-btn {
-  /* border: 1px solid white; */
-  color: white;
-  background: transparent;
-  padding: 6px 8px;
-  cursor: pointer;
-  font-size: 12px;
-  margin: 3px;
-  border-radius: 6px;
-  transition: background 0.3s, color 0.3s, transform 0.1s;
-  white-space: nowrap;
-  width: 60px;
-  text-align: center;
-  box-sizing: content-box;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
+  .stats-scroll-wrapper {
+    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-left: 10px;
+    scrollbar-width: thin;
+  }
 
+  .stats-scroll-wrapper::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .stats-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+  }
+
+  .stats-scroll-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .stat-head,
+  .stat-cell {
+    min-width: 30px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .header-row {
+    background: rgba(255, 255, 255, 0.1);
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.15); */
+    font-weight: bold;
+  }
 }
