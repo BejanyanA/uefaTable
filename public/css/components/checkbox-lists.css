@@ -8,8 +8,8 @@
   padding: 8px 3px;
   /* tighter padding */
   background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  /* border: 1px solid #ccc; */
+  border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 480px;
@@ -42,7 +42,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: #333;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .club-list-scroll {
@@ -93,7 +93,7 @@
 
 .club-search input {
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 6px;
   outline: none;
   background: white;
 }
@@ -104,7 +104,7 @@
   left: 5px;
   transform: translateY(-50%);
   color: black;
-  font-size: 16px;
+  font-size: 14px;
   pointer-events: none;
   transition: 0.2s ease all;
   background: white;
@@ -119,7 +119,7 @@
   top: -10px;
   /* ⬅️ Move label closer to input */
   left: 4px;
-  font-size: 13px;
+  font-size: 12px;
   /* ⬅️ Slightly smaller label text */
   color: white;
   background: rgba(0, 0, 0, 0.9);
@@ -137,7 +137,7 @@
   /* tighter padding */
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 480px;
@@ -171,7 +171,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: #333;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .friend-list-error {
@@ -181,7 +181,7 @@
   font-size: 16px;
   font-weight: bold;
   position: absolute;
-  top: 50%;
+  top: 46%;
   left: 50%;
   margin-right: -50%;
   transform: translate(-50%, -50%)
@@ -201,7 +201,7 @@
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 12px;
     width: 190px;
   }
 
@@ -211,7 +211,7 @@
     left: 5px;
     transform: translateY(-50%);
     color: #aaa;
-    font-size: 16px;
+    font-size: 12px;
     pointer-events: none;
     transition: 0.2s ease all;
     background: white;
@@ -224,6 +224,6 @@
   .club-search button,
   .club-search select,
   .club-search textarea {
-    font-size: 16px;
+    font-size: 12px;
   }
 }

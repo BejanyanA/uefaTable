@@ -18,7 +18,7 @@
    background-color: rgba(0, 0, 0, 0.5);
    color: black;
    padding: 20px 30px;
-   border-radius: 8px;
+   border-radius: 6px;
    width: 100%;
    max-width: 350px;
    position: relative;
@@ -116,7 +116,7 @@
 
 .input-group input {
    border: 1px solid #ccc;
-   border-radius: 8px;
+   border-radius: 6px;
    outline: none;
    background: white;
 }
@@ -127,7 +127,7 @@
    left: 5px;
    transform: translateY(-50%);
    color: #aaa;
-   font-size: 16px;
+   font-size: 14px;
    pointer-events: none;
    transition: 0.2s ease all;
    background: white;
@@ -141,7 +141,7 @@
    top: -10px;
    /* ⬅️ Move label closer to input */
    left: 4px;
-   font-size: 13px;
+   font-size: 12px;
    /* ⬅️ Slightly smaller label text */
    color: white;
    background: rgba(0, 0, 0, 0.9);
@@ -197,7 +197,7 @@
       background: #1d1d1d;
       padding: 8px 3px;
       cursor: pointer;
-      font-size: 11px;
+      font-size: 12px;
       border-radius: 6px;
       transition: background 0.3s, color 0.3s, transform 0.1s;
       white-space: nowrap;
@@ -211,12 +211,12 @@
    .modal button,
    .modal select,
    .modal textarea {
-      font-size: 16px;
+      font-size: 12px;
    }
 
    .modal input {
-      padding: 4px;
-      margin-bottom: 3px;
+      padding: 6px;
+      margin-bottom: 1px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -227,7 +227,7 @@
       background: white;
       color: black;
       padding: 16px 30px;
-      border-radius: 8px;
+      border-radius: 6px;
       width: 100%;
       max-width: 300px;
       position: relative;
@@ -243,5 +243,16 @@
       top: 10px;
       right: 14px;
       font-size: 30px;
+   }
+
+   .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 64%;
+      width: 20px;
+      height: 20px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      opacity: 0.7;
    }
 }
