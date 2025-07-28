@@ -223,6 +223,12 @@
 
    }
 
+   .input-group label {
+      font-size: 12px;
+      top: 50%;
+      left: 5px;
+   }
+
    .modal-content {
       background: white;
       color: black;
