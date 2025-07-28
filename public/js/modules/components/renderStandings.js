@@ -105,113 +105,150 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   `;
   }
 
-  async function renderMatchesTable(matchesData, section, leagueId, players = []) {
-    section.innerHTML = "";
+async function renderMatchesTable(matchesData, section, leagueId, players = []) {
+  section.innerHTML = "";
 
-    const { matches, accessType } = matchesData;
-    const editable = accessType === "owner";
+  const { matches, accessType } = matchesData;
+  const editable = accessType === "owner";
+  const isMobile = window.innerWidth <= 475;
 
+  if (!isMobile) {
+    // === DESKTOP TABLE VIEW ===
     const table = document.createElement("table");
     table.className = "matches-table";
 
     table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Player</th>
-        <th>Team</th>
-        <th></th>
-        <th></th>
-        <th>Team</th>
-        <th>Player</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${matches.map(match => `
-        <tr data-match-id="${match.id}">
-          <td>
-            <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
-              <option value="">${match.team1_username || "Select user"}</option>
-            </select>
-          </td>
-          <td>${match.team1_name}</td>
-          <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
-          <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
-          <td>${match.team2_name}</td>
-          <td>
-            <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
-              <option value="">${match.team2_username || "Select user"}</option>
-            </select>
-          </td>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Team</th>
+          <th></th>
+          <th></th>
+          <th>Team</th>
+          <th>Player</th>
         </tr>
-      `).join("")}
-    </tbody>
-  `;
+      </thead>
+      <tbody>
+        ${matches.map(match => `
+          <tr data-match-id="${match.id}">
+            <td>
+              <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
+                <option value="">${match.team1_username || "Select user"}</option>
+              </select>
+            </td>
+            <td>${match.team1_name}</td>
+            <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
+            <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
+            <td>${match.team2_name}</td>
+            <td>
+              <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
+                <option value="">${match.team2_username || "Select user"}</option>
+              </select>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    `;
 
     section.appendChild(table);
-    section.style.display = "block";
+  } else {
+    // === MOBILE STACKED VIEW ===
+    const container = document.createElement("div");
+    container.className = "matches-row-stack";
 
-    if (editable) {
-      section.querySelectorAll(".score-input").forEach(input => {
-        input.addEventListener("blur", async () => {
-          const row = input.closest("tr");
-          const matchId = parseInt(row.dataset.matchId);
-          const scoreValue = input.value;
+    matches.forEach(match => {
+      const matchWrapper = document.createElement("div");
+      matchWrapper.className = "match-block";
+      matchWrapper.dataset.matchId = match.id;
 
-          if (scoreValue === "" || isNaN(scoreValue)) return;
+      matchWrapper.innerHTML = `
+        <div class="match-line">
+          <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
+            <option value="">${match.team1_username || "Select Player"}</option>
+          </select>
+          <div class="team-name">${match.team1_name}</div>
+          <input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}>
+        </div>
+        <div class="match-line">
+          <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
+            <option value="">${match.team2_username || "Select Player"}</option>
+          </select>
+          <div class="team-name">${match.team2_name}</div>
+          <input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}>
+        </div>
+      `;
 
-          const payload = { matchId };
-          if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
-          if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
+      container.appendChild(matchWrapper);
+    });
 
-          try {
-            const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
-            if (!updateResponse.success) {
-              console.warn(`⚠️ Failed to update score for match ${matchId}`);
-            }
-          } catch (err) {
-            console.error("⚠️ Error while updating score:", err);
+    section.appendChild(container);
+  }
+
+  section.style.display = "block";
+
+  // === Shared logic for dropdowns & scores ===
+  if (editable) {
+    section.querySelectorAll(".score-input").forEach(input => {
+      input.addEventListener("blur", async () => {
+        const row = input.closest("[data-match-id]");
+        const matchId = parseInt(row.dataset.matchId);
+        const scoreValue = input.value;
+
+        if (scoreValue === "" || isNaN(scoreValue)) return;
+
+        const payload = { matchId };
+        if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
+        if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
+
+        try {
+          const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
+          if (!updateResponse.success) {
+            console.warn(`⚠️ Failed to update score for match ${matchId}`);
           }
-        });
+        } catch (err) {
+          console.error("⚠️ Error while updating score:", err);
+        }
       });
+    });
 
-      section.querySelectorAll(".user-dropdown").forEach(dropdown => {
-        const defaultOption = `<option value="">Select user</option>`;
-        const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
-        dropdown.innerHTML = defaultOption + options;
+    section.querySelectorAll(".user-dropdown").forEach(dropdown => {
+      const defaultOption = `<option value="">Select Player</option>`;
+      const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
+      dropdown.innerHTML = defaultOption + options;
 
-        const currentUsername = dropdown.dataset.initialUsername?.trim();
-        if (currentUsername) {
-          const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
-          if (found) dropdown.value = found.value;
+      const currentUsername = dropdown.dataset.initialUsername?.trim();
+      if (currentUsername) {
+        const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
+        if (found) dropdown.value = found.value;
+      }
+
+      dropdown.addEventListener("change", async () => {
+        const row = dropdown.closest("[data-match-id]");
+        const matchId = parseInt(row.dataset.matchId);
+        const teamId = parseInt(dropdown.dataset.teamId);
+        const userId = parseInt(dropdown.value);
+
+        if (!matchId || !teamId || !userId || !leagueId) {
+          console.warn("⚠️ Missing values, cannot attach player");
+          return;
         }
 
-        dropdown.addEventListener("change", async () => {
-          const row = dropdown.closest("tr");
-          const matchId = parseInt(row.dataset.matchId);
-          const teamId = parseInt(dropdown.dataset.teamId);
-          const userId = parseInt(dropdown.value);
+        try {
+          const res = await apiPost("/attach-players", {
+            matchId,
+            teamId,
+            userId,
+            leagueId
+          }, { showLoading: false });
 
-          if (!matchId || !teamId || !userId || !leagueId) {
-            console.warn("⚠️ Missing values, cannot attach player");
-            return;
+          if (!res.success) {
+            console.error("❌ Failed to attach user");
           }
-
-          try {
-            const res = await apiPost("/attach-players", {
-              matchId,
-              teamId,
-              userId,
-              leagueId
-            }, { showLoading: false });
-
-            if (!res.success) {
-              console.error("❌ Failed to attach user");
-            }
-          } catch (err) {
-            console.error("⚠️ Error while attaching user:", err);
-          }
-        });
+        } catch (err) {
+          console.error("⚠️ Error while attaching user:", err);
+        }
       });
-    }
+    });
   }
+}
 }
