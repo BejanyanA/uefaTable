@@ -109,5 +109,24 @@
     animation: fadeInOut 5s ease forwards;
     pointer-events: none;
 
+    /* Toast types with icons */
+    .toast-success {
+      background-color: #28a745;
+      background-image: url('../../assets/icons/success.svg');
+      /* ✔ icon */
+    }
+
+    .toast-error {
+      background-color: #dc3545;
+      background-image: url('../../assets/icons/error.svg');
+      /* ❌ icon */
+    }
+
+    .toast-info {
+      background-color: #007bff;
+      background-image: url('../../assets/icons/info.svg');
+      /* ℹ️ icon */
+    }
+
   }
 }
