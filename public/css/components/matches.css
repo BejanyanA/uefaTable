@@ -53,6 +53,17 @@
   opacity: 0.6;
 }
 
+.score-input::-webkit-outer-spin-button,
+.score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove number spinners for Firefox */
+.score-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Dropdowns */
 .matches-table select.user-dropdown {
   padding: 6px 10px;
