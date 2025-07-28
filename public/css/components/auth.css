@@ -43,13 +43,13 @@
 .logout-button button {
       color: white;
       background: #1d1d1d;
-      padding: 8px 3px;
+      padding: 8px 8px;
       cursor: pointer;
       font-size: 14px;
       border-radius: 6px;
       transition: background 0.3s, color 0.3s, transform 0.1s;
       white-space: nowrap;
-      width: 80px;
+      width: auto;
       text-align: center;
       box-sizing: content-box;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
@@ -90,13 +90,13 @@
    .logout-button button {
       color: white;
       background: #1d1d1d;
-      padding: 8px 3px;
+      padding: 8px 6px;
       cursor: pointer;
       font-size: 12px;
       border-radius: 6px;
       transition: background 0.3s, color 0.3s, transform 0.1s;
       white-space: nowrap;
-      width: 70px;
+      width: auto;
       text-align: center;
       box-sizing: content-box;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
