@@ -12,14 +12,15 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       <h2>${groupName}</h2>
     </div>
     <div class="group-tabs">
-      <button class="tab-btn active" data-tab="standings" id="standingsBtn">Standings</button>
-      <button class="tab-btn" data-tab="matches" id="matchesBtn">Matches</button>
+      <button class="tab-btn active" data-tab="standings" id="standingsTabBtn"></button>
+      <button class="tab-btn" data-tab="matches" id="matchesTabBtn"></button>
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
 
-  const standingsBtn = document.getElementById("standingsBtn");
-  standingsBtn.innerText = translation.standingsBtn;
+  //Translations
+  document.getElementById("standingsTabBtn").innerText = translation.standings || "Standings";
+  document.getElementById("matchesTabBtn").innerText = translation.matches || "Matches";
 
   const backBtn = document.getElementById("backBtn");
   backBtn.textContent = translation.backButton;
@@ -37,6 +38,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   });
 
   loadTabContent("standings");
+
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -77,20 +79,21 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   }
 
   function renderStandingsTable(standings) {
+    const translation = langMap[currentLang];
     return `
   <div class="standings-wrapper">
 <table class="standings-table desktop-only">
         <thead>
           <tr>
-            <th>Teams</th>
-            <th>P</th>
-            <th>W</th>
-            <th>D</th>
-            <th>L</th>
-            <th>GF</th>
-            <th>GA</th>
-            <th>GD</th>
-            <th>Pts</th>
+            <th id="teamDesk">${translation.teams || "Teams"}</th>
+            <th id="playedDesk">${translation.played || "P"}</th>
+            <th id="winDesk">${translation.win || "W"}</th>
+            <th id="drawDesk">${translation.draw || "D"}</th>
+            <th id="loseDesk">${translation.lose || "L"}</th>
+            <th id="goalForDesk">${translation.goalFor || "GF"}</th>
+            <th id="goalAgainstDesk">${translation.goalAgainst || "GA"}</th>
+            <th id="goalDifferDesk">${translation.goalDiffer || "GD"}</th>
+            <th id="pointsDesk">${translation.points || "Pts"}</th>
           </tr>
         </thead>
         <tbody>
@@ -114,7 +117,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     <div class="mobile-standings-container">
   <div class="scroll-layout">
     <div class="fixed-clubs">
-      <div class="club-header">Teams</div>
+      <div class="club-header" id="teamMobile">${translation.teams || "Teams"}</div>
       ${standings.map((team, index) => `
         <div class="club-name">${index + 1}. ${team.club_name}</div>
       `).join("")}
@@ -123,14 +126,14 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     <div class="stats-scroll-wrapper">
       <!-- Header row -->
       <div class="stats-scroll-row header-row">
-        <div class="stat-head">P</div>
-        <div class="stat-head">GD</div>
-        <div class="stat-head">Pts</div>
-        <div class="stat-head">W</div>
-        <div class="stat-head">D</div>
-        <div class="stat-head">L</div>
-        <div class="stat-head">GF</div>
-        <div class="stat-head">GA</div>
+        <div class="stat-head" id="playedMob">${translation.played || "P"}</div>
+        <div class="stat-head" id="goalDifferMob">${translation.goalDiffer || "GD"}</div>
+        <div class="stat-head" id="pointsMob">${translation.points || "Pts"}</div>
+        <div class="stat-head" id="winMob">${translation.win || "W"}</div>
+        <div class="stat-head" id="drawMob">${translation.draw || "D"}</div>
+        <div class="stat-head" id="loseMob">${translation.lose || "L"}</div>
+        <div class="stat-head" id="goalForMob">${translation.goalFor || "GF"}</div>
+        <div class="stat-head" id="goalAgainstMob">${translation.goalAgainst || "GA"}</div>
       </div>
 
       <!-- Club rows -->
@@ -164,15 +167,17 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       const table = document.createElement("table");
       table.className = "matches-table";
 
+      const translation = langMap[currentLang];
+
       table.innerHTML = `
       <thead>
         <tr>
-          <th>Player</th>
-          <th>Team</th>
+          <th id="playerDesk">${translation.player || "Player"}</th>
+          <th id="teamDesk">${translation.team || "Team"}</th>
           <th></th>
           <th></th>
-          <th>Team</th>
-          <th>Player</th>
+          <th id="teamDesk2">${translation.team || "Team"}</th>
+          <th id="playerDesk2">${translation.player || "Player"}</th>
         </tr>
       </thead>
       <tbody>
@@ -259,6 +264,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
 
           try {
+            const translation = langMap[currentLang];
             const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
             if (updateResponse.success) {
               showToast(translation.score_updated || "Score Updated", "success");
@@ -272,7 +278,8 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       });
 
       section.querySelectorAll(".user-dropdown").forEach(dropdown => {
-        const defaultOption = `<option value="">Select Player</option>`;
+        const translation = langMap[currentLang];
+        const defaultOption = `<option value="" id="selectUserDesk">${translation.selectUser || "Select Player"}</option>`;
         const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
         dropdown.innerHTML = defaultOption + options;
 
@@ -294,6 +301,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           }
 
           try {
+            const translation = langMap[currentLang];
             const res = await apiPost("/attach-players", {
               matchId,
               teamId,

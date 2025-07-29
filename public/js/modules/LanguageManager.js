@@ -37,7 +37,20 @@ export const langMap = {
     score_update_failed: "Failed to update score",
     player_success_assigned: "Player assigned successfully",
     player_assign_failed: "Failed to assign Player",
-    standingsBtn: "Standings",
+    standings: "Standings",
+    matches: "Matches",
+    teams: "Teams",
+    played: "P",
+    win: "W",
+    draw: "D",
+    lose: "L",
+    goalFor: "GF",
+    goalAgainst: "GA",
+    goalDiffer: "GD",
+    points: "Pts",
+    player: "Player",
+    team: "Team",
+    selectUser: "Select Player",
 
     //BE translations
     username_exists: "Username already exists",
@@ -93,7 +106,20 @@ export const langMap = {
     score_update_failed: "Չհաջողվեց թարմացնել հաշիվը",
     player_success_assigned: "Խաղացողը հաջողությամբ կցվել է",
     player_assign_failed: "Չհաջողվեց կցել խաղացողին",
-    standingsBtn: "Աղյուսակ",
+    standings: "Աղյուսակ",
+    matches: "Խաղեր",
+    teams: "Թմեր",
+    played: "Խ",
+    win: "Հ",
+    draw: "Ո",
+    lose: "Պ",
+    goalFor: "ԳԽ",
+    goalAgainst: "ԳԲ",
+    goalDiffer: "ԳՏ",
+    points: "Մվր",
+    player: "Խաղացող",
+    team: "Թիմ",
+    selectUser: "Ընտրել խաղացող",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -149,7 +175,20 @@ export const langMap = {
     score_update_failed: "Échec de la mise à jour du score",
     player_success_assigned: "Utilisateur assigné avec succès",
     player_assign_failed: "Échec de l’assignation du joueur",
-    standingsBtn: "Classement",
+    standings: "Classement",
+    matches: "Rencontres",
+    teams: "Équipes",
+    played: "MJ",
+    win: "V",
+    draw: "N",
+    lose: "D",
+    goalFor: "F",
+    goalAgainst: "A",
+    goalDiffer: "DB",
+    points: "Pts",
+    player: "Joueur",
+    team: "Équipe",
+    selectUser: "Sélectionner un utilisateur",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -188,6 +227,47 @@ function changeLang(lang) {
 
   const t = langMap[lang];
 
+  const label = langMap[currentLang].selectUser || "Select Player";
+  document.querySelectorAll("#selectUserDesk").forEach(opt => {
+    opt.textContent = label;
+  });
+
+  const dynamicLabels = {
+
+    // Desktop
+    standingsTabBtn: t.standings,
+    matchesTabBtn: t.matches,
+    teamDesk: t.teams,
+    playedDesk: t.played,
+    winDesk: t.win,
+    drawDesk: t.draw,
+    loseDesk: t.lose,
+    goalForDesk: t.goalFor,
+    goalAgainstDesk: t.goalAgainst,
+    goalDifferDesk: t.goalDiffer,
+    pointsDesk: t.points,
+    playerDesk: t.player,
+    teamDesk: t.team,
+    playerDesk2: t.player,
+    teamDesk2: t.team,
+    selectUserDesk: t.selectUser,
+
+    // Mobile
+    teamMobile: t.teams,
+    playedMob: t.played,
+    goalDifferMob: t.goalDiffer,
+    pointsMob: t.points,
+    winMob: t.win,
+    drawMob: t.draw,
+    loseMob: t.lose,
+    goalForMob: t.goalFor,
+    goalAgainstMob: t.goalAgainst,
+  };
+
+for (const [id, value] of Object.entries(dynamicLabels)) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
   document.getElementById("loginBtn").innerText = t.login;
   document.getElementById("logoutBtn").innerText = t.logout;
   document.getElementById("registerBtn").innerText = t.registerBtn;
