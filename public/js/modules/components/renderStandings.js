@@ -298,9 +298,9 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
             }, { showLoading: false });
 
             if (res.success) {
-              showToast(translation.user_success_attached || "User assigned successfully", "success");
+              showToast(translation.player_success_assigned || "User assigned successfully", "success");
             } else {
-              showToast(translation.user_attach_failed || "Failed to attach user", "error");
+              showToast(translation.player_assign_failed || "Failed to attach user", "error");
             }
           } catch (err) {
             console.error("⚠️ Error while attaching user:", err);

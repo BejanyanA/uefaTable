@@ -33,10 +33,10 @@ export const langMap = {
     no_spaces_allowed: "Spaces are not allowed",
     clubSearch: "Search Teams...",
     backButton: "< Back",
-    // score_updated,
-    // score_update_failed,
-    // user_success_attached,
-    // user_attach_failed,
+    score_updated: "Score Updated",
+    score_update_failed: "Failed to update score",
+    player_success_assigned: "Player assigned successfully",
+    player_assign_failed: "Failed to assign Player",
 
     //BE translations
     username_exists: "Username already exists",
@@ -88,6 +88,10 @@ export const langMap = {
     no_spaces_allowed: "Բացատները թույլատրելի չեն",
     clubSearch: "Թմերի Որոնում...",
     backButton: "< Հետ",
+    score_updated: "Հաշիվը թարմացվել է",
+    score_update_failed: "Չհաջողվեց թարմացնել հաշիվը",
+    player_success_assigned: "Խաղացողը հաջողությամբ կցվել է",
+    player_assign_failed: "Չհաջողվեց կցել խաղացողին",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -139,6 +143,10 @@ export const langMap = {
     no_spaces_allowed: "Les espaces ne sont pas autorisés",
     clubSearch: "Recherche d’équipes...",
     backButton: "< Retour",
+    score_updated: "Score mis à jour",
+    score_update_failed: "Échec de la mise à jour du score",
+    player_success_assigned: "Utilisateur assigné avec succès",
+    player_assign_failed: "Échec de l’assignation du joueur",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
