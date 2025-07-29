@@ -17,6 +17,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
+
   const backBtn = document.getElementById("backBtn");
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
@@ -44,11 +45,11 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
   async function loadTabContent(tab) {
     const contentDiv = document.getElementById("tabContent");
-    contentDiv.innerHTML = "Loading...";
 
     try {
       if (tab === "standings") {
         const response = await apiPost("/standings", { leagueId, groupId });
+        
         if (response.success) {
           contentDiv.innerHTML = renderStandingsTable(response.data.standings);
         } else {

@@ -37,6 +37,7 @@ export const langMap = {
     score_update_failed: "Failed to update score",
     player_success_assigned: "Player assigned successfully",
     player_assign_failed: "Failed to assign Player",
+    standingsBtn: "Standings",
 
     //BE translations
     username_exists: "Username already exists",
@@ -92,6 +93,7 @@ export const langMap = {
     score_update_failed: "Չհաջողվեց թարմացնել հաշիվը",
     player_success_assigned: "Խաղացողը հաջողությամբ կցվել է",
     player_assign_failed: "Չհաջողվեց կցել խաղացողին",
+    standingsBtn: "Աղյուսակ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -147,6 +149,7 @@ export const langMap = {
     score_update_failed: "Échec de la mise à jour du score",
     player_success_assigned: "Utilisateur assigné avec succès",
     player_assign_failed: "Échec de l’assignation du joueur",
+    standingsBtn: "Classement",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -209,6 +212,7 @@ function changeLang(lang) {
   document.getElementById("clubCount").innerText = t.selectedCount;
   document.getElementById("clubSearch").placeholder = t.clubSearch;
   document.getElementById("backBtn").innerText = t.backButton;
+  document.getElementById("standingsBtn").innerText = t.standingsBtn;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
