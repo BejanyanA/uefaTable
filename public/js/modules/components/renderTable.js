@@ -39,6 +39,7 @@ export function renderLeagueTable(data) {
   if (!leagues.length) {
     const noDataMsg = document.createElement("div");
     noDataMsg.innerHTML = `<h2>No leagues found</h2>`;
+    noDataMsg.id = "noLeaguedata"; 
     section.appendChild(noDataMsg);
     return;
   }

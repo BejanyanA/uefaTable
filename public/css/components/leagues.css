@@ -10,7 +10,17 @@
   gap: 16px;               /* ✅ Space between items */
   margin: 30px auto;          /* Center if needed */
   padding-left: 0px;  
-  padding-right: 0px;    /* ✅ Prevent from sticking to left */
+  padding-right: 0px;    
+  margin-top: 60px;  /* ✅ Prevent from sticking to left */
+}
+
+#noLeaguedata {
+  display: flex;
+justify-content: center;
+  padding-left: 0px;  
+  padding-right: 0px;   
+  margin-top: 100px;
+
 }
 
 /* Each league box */
