@@ -1,7 +1,9 @@
 import { apiGet, apiPost } from '../../services/api.js';
 import { renderGroupStandingsPage } from './renderStandings.js'
+import { langMap, currentLang } from '../LanguageManager.js';
 
 export function renderLeagueTable(data) {
+  const translation = langMap[currentLang];
   const section = document.getElementById("leagueType1");
   const leagues = data.leagues || [];
 
@@ -10,7 +12,7 @@ export function renderLeagueTable(data) {
 
   // ✅ Add Back Button to /me
   const backBtn = document.createElement("button");
-  backBtn.textContent = "⬅ Back";
+  backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
 
   backBtn.addEventListener("click", async () => {
@@ -19,9 +21,9 @@ export function renderLeagueTable(data) {
     try {
       const response = await apiGet("/me", token);
       if (response.success && response.user) {
-         document.getElementById("logoutButtn").style.display = "block";
-         document.getElementById("bannerContainer").style.display = "block";
-         document.getElementById("leagueType1").style.display = "none";
+        document.getElementById("logoutButtn").style.display = "block";
+        document.getElementById("bannerContainer").style.display = "block";
+        document.getElementById("leagueType1").style.display = "none";
       } else {
         localStorage.removeItem("authToken");
         if (authButtons) authButtons.style.display = "flex";
@@ -39,7 +41,7 @@ export function renderLeagueTable(data) {
   if (!leagues.length) {
     const noDataMsg = document.createElement("div");
     noDataMsg.innerHTML = `<h2>No leagues found</h2>`;
-    noDataMsg.id = "noLeaguedata"; 
+    noDataMsg.id = "noLeaguedata";
     section.appendChild(noDataMsg);
     return;
   }
@@ -74,6 +76,7 @@ export function renderLeagueTable(data) {
 
 
 export function renderLeagueInstances(instanceData) {
+  const translation = langMap[currentLang];
   const wrapper = document.getElementById("leagueType1");
   wrapper.innerHTML = "";
 
@@ -88,7 +91,7 @@ export function renderLeagueInstances(instanceData) {
   // ✅ Back button to return to /leagues
 
   const backBtn = document.createElement("button");
-  backBtn.textContent = "⬅ Back";
+  backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
   const bannerId = parseInt(localStorage.getItem("currentBannerId"))
   backBtn.addEventListener("click", async () => {

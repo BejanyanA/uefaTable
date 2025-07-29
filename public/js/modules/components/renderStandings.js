@@ -17,8 +17,9 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
-
-  document.getElementById("backBtn").addEventListener("click", async () => {
+  const backBtn = document.getElementById("backBtn");
+  backBtn.textContent = translation.backButton;
+  backBtn.addEventListener("click", async () => {
     try {
       const response = await apiPost("/league-instances", { leagueId });
       if (response.success) {
@@ -145,7 +146,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   </div>
 </div>
   `;
-}
+  }
 
   async function renderMatchesTable(matchesData, section, leagueId, players = []) {
     section.innerHTML = "";

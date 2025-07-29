@@ -32,10 +32,11 @@ export const langMap = {
     selectedCount: "Selected",
     no_spaces_allowed: "Spaces are not allowed",
     clubSearch: "Search Teams...",
-    // score_updated
-    // score_update_failed
-    // user_success_attached
-    // user_attach_failed
+    backButton: "< Back",
+    // score_updated,
+    // score_update_failed,
+    // user_success_attached,
+    // user_attach_failed,
 
     //BE translations
     username_exists: "Username already exists",
@@ -86,6 +87,7 @@ export const langMap = {
     selectedCount: "Ընտրված է",
     no_spaces_allowed: "Բացատները թույլատրելի չեն",
     clubSearch: "Թմերի Որոնում...",
+    backButton: "< Հետ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -136,6 +138,7 @@ export const langMap = {
     selectedCount: "Sélectionné",
     no_spaces_allowed: "Les espaces ne sont pas autorisés",
     clubSearch: "Recherche d’équipes...",
+    backButton: "< Retour",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -197,6 +200,7 @@ function changeLang(lang) {
   document.getElementById("count-text").innerText = t.selectTeamCount;
   document.getElementById("clubCount").innerText = t.selectedCount;
   document.getElementById("clubSearch").placeholder = t.clubSearch;
+  document.getElementById("backBtn").innerText = t.backButton;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
