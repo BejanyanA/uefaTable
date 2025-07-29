@@ -1,5 +1,5 @@
 .league-instance {
-    margin-top: 60px;
+    margin-top: 40px;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.5);
     /* Dark semi-transparent background */
@@ -9,6 +9,7 @@
 
 /* League title */
 .league-instance h2 {
+    margin-top: 10px;
     color: white;
     padding: 0 20px 20px;
     font-size: 26px;
@@ -60,7 +61,8 @@
 
 .group-block h3 {
     font-size: 20px;
-    margin-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 20px;
     box-shadow: 0 3px rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     text-align: center;
@@ -82,7 +84,7 @@
 @media (max-width: 480px) {
 
     .league-instance {
-        margin-top: 45px;
+        margin-top: 40px;
         padding: 10px 10px;
         /* margin: 20px 10px; */
     }
