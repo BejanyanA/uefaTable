@@ -12,11 +12,14 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
       <h2>${groupName}</h2>
     </div>
     <div class="group-tabs">
-      <button class="tab-btn active" data-tab="standings">Standings</button>
-      <button class="tab-btn" data-tab="matches">Matches</button>
+      <button class="tab-btn active" data-tab="standings" id="standingsBtn">Standings</button>
+      <button class="tab-btn" data-tab="matches" id="matchesBtn">Matches</button>
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
+
+  const standingsBtn = document.getElementById("standingsBtn");
+  standingsBtn.innerText = translation.standingsBtn;
 
   const backBtn = document.getElementById("backBtn");
   backBtn.textContent = translation.backButton;
@@ -49,7 +52,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     try {
       if (tab === "standings") {
         const response = await apiPost("/standings", { leagueId, groupId });
-        
+
         if (response.success) {
           contentDiv.innerHTML = renderStandingsTable(response.data.standings);
         } else {

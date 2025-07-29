@@ -212,7 +212,6 @@ function changeLang(lang) {
   document.getElementById("clubCount").innerText = t.selectedCount;
   document.getElementById("clubSearch").placeholder = t.clubSearch;
   document.getElementById("backBtn").innerText = t.backButton;
-  document.getElementById("standingsBtn").innerText = t.standingsBtn;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
