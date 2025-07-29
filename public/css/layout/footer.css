@@ -1,8 +1,7 @@
-footer {
+footer.page-footer {
   background: transparent;
   color: white;
   text-align: center;
   padding: 6px;
-  margin-top: auto;
   font-size: x-small;
 }
