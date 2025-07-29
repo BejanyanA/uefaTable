@@ -1,6 +1,6 @@
 header {
   color: white;
-  padding: 15px 25px;
+  padding: 6px 25px;
   display: flex;
   justify-content: flex-end;
   flex-wrap: nowrap;
@@ -19,7 +19,7 @@ header {
     position: sticky;
     /*sticky or fixed if you want it always visible */
     top: 0;
-    padding: 10px 25px;
+    padding: 6px 25px;
     display: flex;
     justify-content: flex-end;
     flex-wrap: nowrap;
