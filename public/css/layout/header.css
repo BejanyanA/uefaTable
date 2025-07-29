@@ -7,7 +7,7 @@ header {
   gap: 10px;
   align-items: center;
   z-index: 2;
-    background: rgba(0, 0, 0, 0.329);
+  background: rgba(0, 0, 0, 0.329);
 }
 
 
@@ -26,6 +26,5 @@ header {
     gap: 10px;
     align-items: center;
     z-index: 2;
-    
   }
 }
