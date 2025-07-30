@@ -79,6 +79,7 @@ export function renderLeagueTable(data) {
     leagueRow.appendChild(leagueBox);
 
     // 👤 Check owner access
+    const translation = langMap[currentLang];
     const isOwner = league.accessType === "owner";
 
     // ✏️ Edit icon
@@ -86,8 +87,8 @@ export function renderLeagueTable(data) {
     editIcon.src = "assets/icons/edit.svg";
     editIcon.alt = "Edit";
     editIcon.className = "league-edit-icon";
-    
     editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
+    editIcon.title = isOwner ? "" : translation.owner_edit || "Only the owner can edit";
     if (!isOwner) {
       editIcon.classList.add("icon-disabled");
     }
@@ -96,7 +97,7 @@ export function renderLeagueTable(data) {
       if (isOwner) {
         LeagueManager.initEdit(league.id, league.name);
       } else {
-        showMobileTooltip(editIcon, "Only the owner can edit");
+        showMobileTooltip(editIcon, "owner_edit");
       }
     });
 
@@ -107,6 +108,7 @@ export function renderLeagueTable(data) {
     deleteIcon.alt = "Delete";
     deleteIcon.className = "league-delete-icon";
     deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
+    deleteIcon.title = isOwner ? "" : translation.owner_delete || "Only the owner can delete";
     if (!isOwner) {
       deleteIcon.classList.add("icon-disabled");
     }
@@ -115,7 +117,7 @@ export function renderLeagueTable(data) {
       if (isOwner) {
         LeagueManager.initDelete(league.id);
       } else {
-        showMobileTooltip(deleteIcon, "Only the owner can delete");
+        showMobileTooltip(deleteIcon, "owner_delete");
       }
     });
 
@@ -125,8 +127,17 @@ export function renderLeagueTable(data) {
     rowContainer.appendChild(leagueRow);
   });
 
-  function showMobileTooltip(targetElement, message) {
+  function showMobileTooltip(targetElement, messageKey) {
     if (document.querySelector(".mobile-tooltip")) return;
+
+    const translation = langMap[currentLang];
+    const message =
+      translation[messageKey] ||
+      (messageKey === "owner_edit"
+        ? "Only the owner can edit"
+        : messageKey === "owner_delete"
+          ? "Only the owner can delete"
+          : "Restricted");
 
     const tooltip = document.createElement("div");
     tooltip.className = "mobile-tooltip";
@@ -137,9 +148,9 @@ export function renderLeagueTable(data) {
     // Get positions
     const rect = targetElement.getBoundingClientRect();
 
-    // Adjust: move lower and left
-    const verticalOffset = 8; // pixels lower
-    const horizontalOffset = 1; // pixels more to the left
+    // Adjust: move lower and to the left
+    const verticalOffset = 8;
+    const horizontalOffset = 1;
 
     const top = rect.bottom + window.scrollY + verticalOffset;
     const left = rect.left + window.scrollX - tooltip.offsetWidth - horizontalOffset;
@@ -152,7 +163,7 @@ export function renderLeagueTable(data) {
       setTimeout(() => {
         tooltip.classList.remove("show");
         setTimeout(() => tooltip.remove(), 300);
-      }, 2000);
+      }, 1500);
     }, 10);
   }
 }

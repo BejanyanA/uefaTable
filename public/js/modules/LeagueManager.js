@@ -136,7 +136,7 @@ export const LeagueManager = {
                 document.getElementById("bannerContainer").style.display = "none";
                 renderLeagueTable(data.data);
               } else {
-                showToast(translation.table_not_found || "Table not found", "info");
+                showToast(translation.not_found || "Not found", "info");
               }
             } catch (err) {
               showToast(translation.something_went_wrong || "Something went wrong", "error");
@@ -195,7 +195,7 @@ export const LeagueManager = {
           document.getElementById("bannerContainer").style.display = "none";
           renderLeagueTable(data.data);
         } else {
-          showToast(translation.table_not_found || "Table not found", "info");
+          showToast(translation.not_found || "Not found", "info");
         }
       } catch (err) {
         showToast(translation.something_went_wrong || "Something went wrong", "error");
@@ -237,7 +237,7 @@ export const LeagueManager = {
             document.getElementById("bannerContainer").style.display = "none";
             renderLeagueTable(data.data);
           } else {
-            showToast(translation.table_not_found || "Table not found", "info");
+            showToast(translation.not_found || "Not found", "info");
           }
         } catch (err) {
           showToast(translation.something_went_wrong || "Something went wrong", "error");

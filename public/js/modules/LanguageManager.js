@@ -54,6 +54,8 @@ export const langMap = {
     leagueNotExist: "No leagues found",
     league_delete_success: "League deleted successfully",
     league_delete_failed: "Failed to delete league",
+    owner_edit: "Only the owner can Edit",
+    owner_delete: "Only the owner can Delete",
 
     //BE translations
     username_exists: "Username already exists",
@@ -66,7 +68,7 @@ export const langMap = {
     invalid_leauge_password: "Table Password is incorrect",
     no_friends_found: "No friends found",
     no_clubs_found: "No teams found",
-    table_not_found: "Leagues not found",
+    not_found: "Not found",
     league_create_success: "League Successfully Created",
     league_creation_failed: "League Creation failed",
   },
@@ -126,6 +128,8 @@ export const langMap = {
     leagueNotExist: "Լիգաներ չեն գտնվել",
     league_delete_success: "Լիգան հաջողությամբ ջնջվեց",
     league_delete_failed: "Չհաջողվեց ջնջել լիգան",
+    owner_edit: "Միայն ստեղծողը կարող է խմբագրել",
+    owner_delete: "Միայն ստեղծողը կարող է ջնջել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -138,7 +142,7 @@ export const langMap = {
     invalid_leauge_password: "Աղյուսակի Գաղտնաբառը սխալ է",
     no_friends_found: "Ընկերներ չեն գտնվել",
     no_clubs_found: "Թմեր չեն գտնվել",
-    table_not_found: "Լիգաներ չեն գտնվել",
+    not_found: "Չի գտնվել",
     league_create_success: "Լիգան հաջողությամբ ստեղծվեց",
     league_creation_failed: "Լիգայի ստեղծումը ձախողվեց",
   },
@@ -198,6 +202,8 @@ export const langMap = {
     leagueNotExist: "Aucune ligue trouvée",
     league_delete_success: "Ligue supprimée avec succès",
     league_delete_failed: "Échec de la suppression de la ligue",
+    owner_edit: "Seul le propriétaire peut modifier",
+    owner_delete: "Seul le propriétaire peut supprimer",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -210,7 +216,7 @@ export const langMap = {
     invalid_leauge_password: "Mot de passe de table incorrect",
     no_friends_found: "Pas d’amis trouvés",
     no_clubs_found: "Aucune équipe trouvée",
-    table_not_found: "Ligues introuvables",
+    not_found: "Introuvable",
     league_create_success: "Ligue créée avec succès",
     league_creation_failed: "Échec de la création de la ligue",
   }
@@ -233,6 +239,7 @@ function updateURLWithLang(lang) {
 function changeLang(lang) {
   currentLang = lang;
   updateURLWithLang(lang);
+  updateIconTitles();
 
   const t = langMap[lang];
 
@@ -319,6 +326,25 @@ function changeLang(lang) {
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;
+}
+
+// Icon Titles
+function updateIconTitles() {
+  const translation = langMap[currentLang];
+
+  document.querySelectorAll(".league-edit-icon").forEach(icon => {
+    const isDisabled = icon.classList.contains("icon-disabled");
+    icon.title = isDisabled
+      ? translation.owner_edit || "Only the owner can edit"
+      : translation.edit || "Edit League";
+  });
+
+  document.querySelectorAll(".league-delete-icon").forEach(icon => {
+    const isDisabled = icon.classList.contains("icon-disabled");
+    icon.title = isDisabled
+      ? translation.owner_delete || "Only the owner can delete"
+      : translation.delete || "Delete League";
+  });
 }
 
 // Export + global registration
