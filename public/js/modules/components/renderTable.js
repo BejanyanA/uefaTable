@@ -39,8 +39,9 @@ export function renderLeagueTable(data) {
 
   // ✅ If no leagues
   if (!leagues.length) {
+    const translation = langMap[currentLang];
     const noDataMsg = document.createElement("div");
-    noDataMsg.innerHTML = `<h2>No leagues found</h2>`;
+    noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
     noDataMsg.id = "noLeaguedata";
     section.appendChild(noDataMsg);
     return;

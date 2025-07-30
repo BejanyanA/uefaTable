@@ -51,6 +51,7 @@ export const langMap = {
     player: "Player",
     team: "Team",
     selectUser: "Select Player",
+    leagueNotExist: "No leagues found",
 
     //BE translations
     username_exists: "Username already exists",
@@ -120,6 +121,7 @@ export const langMap = {
     player: "Խաղացող",
     team: "Թիմ",
     selectUser: "Ընտրել խաղացող",
+    leagueNotExist: "Լիգաներ չեն գտնվել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -189,6 +191,7 @@ export const langMap = {
     player: "Joueur",
     team: "Équipe",
     selectUser: "Sélectionner un utilisateur",
+    leagueNotExist: "Aucune ligue trouvée",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -227,10 +230,15 @@ function changeLang(lang) {
 
   const t = langMap[lang];
 
-  const label = langMap[currentLang].selectUser || "Select Player";
+  const selectUser = langMap[currentLang].selectUser || "Select Player";
   document.querySelectorAll("#selectUserDesk").forEach(opt => {
-    opt.textContent = label;
+    opt.textContent = selectUser;
   });
+
+  const leagueNotExistEl = document.getElementById("leagueNotExist");
+  if (leagueNotExistEl) {
+    leagueNotExistEl.textContent = langMap[currentLang].leagueNotExist || "No leagues found";
+  }
 
   const dynamicLabels = {
 
@@ -264,10 +272,10 @@ function changeLang(lang) {
     goalAgainstMob: t.goalAgainst,
   };
 
-for (const [id, value] of Object.entries(dynamicLabels)) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
-}
+  for (const [id, value] of Object.entries(dynamicLabels)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
   document.getElementById("loginBtn").innerText = t.login;
   document.getElementById("logoutBtn").innerText = t.logout;
   document.getElementById("registerBtn").innerText = t.registerBtn;
