@@ -4,7 +4,7 @@ import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
-import { handleLeagues, handleLeaguesCreate } from './routes_endpoints/leagues.js';
+import { handleLeagues, handleLeaguesCreate, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleLeagueStandings } from './routes_endpoints/standings.js';
 import { handleLeagueMatches } from './routes_endpoints/matches.js';
@@ -24,6 +24,7 @@ const routeRegistry = {
   "/search-clubs": { POST: handleSearchClubs },
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
+  "/delete-league": { POST: handleLeaguesDelete },
   "/league-instances": { POST: handleLeagueInstances },
   "/standings": { POST: handleLeagueStandings },
   "/matches": { POST: handleLeagueMatches },

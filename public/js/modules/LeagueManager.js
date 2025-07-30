@@ -136,10 +136,10 @@ export const LeagueManager = {
                 document.getElementById("bannerContainer").style.display = "none";
                 renderLeagueTable(data.data);
               } else {
-                showToast(translation.table_not_found || "Table not found.");
+                showToast(translation.table_not_found || "Table not found", "info");
               }
             } catch (err) {
-              showToast(translation.something_went_wrong || "Something went wrong.", "error");
+              showToast(translation.something_went_wrong || "Something went wrong", "error");
               console.error("Error opening table:", err);
             }
           } else {
@@ -195,12 +195,61 @@ export const LeagueManager = {
           document.getElementById("bannerContainer").style.display = "none";
           renderLeagueTable(data.data);
         } else {
-          showToast(translation.table_not_found || "Table not found.");
+          showToast(translation.table_not_found || "Table not found", "info");
         }
       } catch (err) {
-        showToast(translation.something_went_wrong || "Something went wrong.", "error");
+        showToast(translation.something_went_wrong || "Something went wrong", "error");
         console.error("Error opening table:", err);
       }
     });
+  },
+
+
+
+
+  initEdit: async function (leagueId, leagueName) {
+    console.log("Editing", leagueId, leagueName);
+    // TODO: Show modal to edit name, call API and update UI
+  },
+
+
+
+
+
+  initDelete: async function (leagueId) {
+    const translation = langMap[currentLang];
+
+    const confirmed = confirm("Are you sure you want to delete this league?");
+    if (!confirmed) return;
+
+    try {
+      const response = await apiPost("/delete-league", { leagueId });
+      if (response.success) {
+        showToast(translation.league_delete_success || "League deleted successfully", "success");
+
+        try {
+          const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+          localStorage.setItem("currentBannerId", bannerId);
+          const data = await apiPost("/leagues", { bannerId });
+
+          if (data.success && data.data) {
+            window.closeModal("tableModal");
+            document.getElementById("bannerContainer").style.display = "none";
+            renderLeagueTable(data.data);
+          } else {
+            showToast(translation.table_not_found || "Table not found", "info");
+          }
+        } catch (err) {
+          showToast(translation.something_went_wrong || "Something went wrong", "error");
+          console.error("Error opening table:", err);
+        }
+
+      } else {
+        showToast(translation.league_delete_failed || "Failed to delete league", "error");
+      }
+    } catch (err) {
+      console.error("Error deleting league:", err);
+      showToast("Server error", "error");
+    }
   }
 };

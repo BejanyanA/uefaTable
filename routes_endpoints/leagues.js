@@ -34,10 +34,15 @@ export async function handleLeagues(request, env) {
   WHERE la.user_id = ? AND l.banner_id = ?
 `).bind(userId, bannerId).all();
 
-  // Step 3: Combine and deduplicate
+  // Step 3: Combine with access type
   const leagueMap = new Map();
-  for (const league of [...created.results, ...granted.results]) {
-    leagueMap.set(league.id, league);
+  for (const league of created.results) {
+    leagueMap.set(league.id, { ...league, accessType: "owner" });
+  }
+  for (const league of granted.results) {
+    if (!leagueMap.has(league.id)) {
+      leagueMap.set(league.id, { ...league, accessType: "granted" });
+    }
   }
 
   // Step 4: Respond with combined data
@@ -46,19 +51,17 @@ export async function handleLeagues(request, env) {
     data: {
       leagues: Array.from(leagueMap.values())
         .sort((a, b) => b.id - a.id)
-        .map(({ id, name, banner_id, created_by_user_id, created_at }) => ({
+        .map(({ id, name, banner_id, created_by_user_id, created_at, accessType }) => ({
           id,
           name,
           banner_id,
           created_by_user_id,
-          created_at
+          created_at,
+          accessType
         }))
     }
   }, 200);
 }
-
-
-
 
 
 export async function handleLeaguesCreate(request, env) {
@@ -183,5 +186,54 @@ export async function handleLeaguesCreate(request, env) {
     }, 201);
   } catch (err) {
     return jsonResponse({ success: false, error: "creation_failed", details: err.message }, 500);
+  }
+}
+
+
+export async function handleLeaguesDelete(request, env) {
+  const authHeader = request.headers.get("Authorization");
+
+  if (!authHeader?.startsWith("Bearer ")) {
+    return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  const payload = await verifyToken(token, env.JWT_SECRET);
+
+  if (!payload) {
+    return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+  }
+
+  const userId = payload.id;
+  const { leagueId } = await parseBody(request);
+
+  if (!leagueId || typeof leagueId !== 'number') {
+    return jsonResponse({ success: false, error: "league_id_required" }, 400);
+  }
+
+  // Step 1: Check if user is owner or granted access
+  const league = await env.core_data.prepare(`
+  SELECT created_by_user_id FROM leagues WHERE id = ?
+`).bind(leagueId).first();
+
+  if (!league) {
+    return jsonResponse({ success: false, error: "league_not_found" }, 404);
+  }
+
+  const isOwner = league.created_by_user_id === userId;
+
+  if (!isOwner) {
+    return jsonResponse({ success: false, error: "access_denied" }, 403);
+  }
+
+  // Step 2: Delete only the league
+  try {
+    await env.core_data.prepare(`
+    DELETE FROM leagues WHERE id = ?
+  `).bind(leagueId).run();
+
+    return jsonResponse({ success: true, message: "League deleted successfully" }, 200);
+  } catch (error) {
+    return jsonResponse({ success: false, error: "deletion_failed", details: error.message }, 500);
   }
 }

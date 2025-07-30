@@ -1,6 +1,7 @@
 import { apiGet, apiPost } from '../../services/api.js';
 import { renderGroupStandingsPage } from './renderStandings.js'
 import { langMap, currentLang } from '../LanguageManager.js';
+import { LeagueManager } from '../LeagueManager.js';
 
 export function renderLeagueTable(data) {
   const translation = langMap[currentLang];
@@ -53,9 +54,13 @@ export function renderLeagueTable(data) {
   section.appendChild(rowContainer);
 
   leagues.forEach(league => {
+    const leagueRow = document.createElement("div");
+    leagueRow.className = "league-names-row-item";
+
     const leagueBox = document.createElement("div");
     leagueBox.className = "league-name-box";
     leagueBox.textContent = league.name;
+    leagueBox.style.cursor = "pointer";
 
     leagueBox.addEventListener("click", async () => {
       try {
@@ -71,8 +76,81 @@ export function renderLeagueTable(data) {
       }
     });
 
-    rowContainer.appendChild(leagueBox);
+    leagueRow.appendChild(leagueBox);
+
+    // Access control: true if owner
+    const isOwner = league.accessType === "owner";
+
+    // ✏️ Edit Icon
+    const editIcon = document.createElement("span");
+    editIcon.innerHTML = "✏️";
+    editIcon.className = "league-edit-icon";
+    editIcon.style.marginLeft = "8px";
+    editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
+    editIcon.style.opacity = isOwner ? "1" : "0.4";
+    editIcon.title = isOwner ? "Edit League" : "Only the owner can edit";
+    editIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (isOwner) {
+        LeagueManager.initEdit(league.id, league.name);
+      } else {
+        showMobileTooltip(editIcon, "Only the owner can edit");
+      }
+    });
+
+    // 🗑️ Delete Icon
+    const deleteIcon = document.createElement("span");
+    deleteIcon.innerHTML = "🗑️";
+    deleteIcon.className = "league-delete-icon";
+    deleteIcon.style.marginLeft = "8px";
+    deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
+    deleteIcon.style.opacity = isOwner ? "1" : "0.4";
+    deleteIcon.title = isOwner ? "Delete League" : "Only the owner can delete";
+    deleteIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (isOwner) {
+        LeagueManager.initDelete(league.id);
+      } else {
+        showMobileTooltip(deleteIcon, "Only the owner can delete");
+      }
+    });
+
+    leagueRow.appendChild(editIcon);
+    leagueRow.appendChild(deleteIcon);
+
+    rowContainer.appendChild(leagueRow);
   });
+
+  function showMobileTooltip(targetElement, message) {
+    if (document.querySelector(".mobile-tooltip")) return;
+
+    const tooltip = document.createElement("div");
+    tooltip.className = "mobile-tooltip";
+    tooltip.textContent = message;
+
+    document.body.appendChild(tooltip);
+
+    // Get positions
+    const rect = targetElement.getBoundingClientRect();
+
+    // Adjust: move lower and left
+    const verticalOffset = 8; // pixels lower
+    const horizontalOffset = 1; // pixels more to the left
+
+    const top = rect.bottom + window.scrollY + verticalOffset;
+    const left = rect.left + window.scrollX - tooltip.offsetWidth - horizontalOffset;
+
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+
+    setTimeout(() => {
+      tooltip.classList.add("show");
+      setTimeout(() => {
+        tooltip.classList.remove("show");
+        setTimeout(() => tooltip.remove(), 300);
+      }, 2000);
+    }, 10);
+  }
 }
 
 

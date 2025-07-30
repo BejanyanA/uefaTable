@@ -52,6 +52,8 @@ export const langMap = {
     team: "Team",
     selectUser: "Select Player",
     leagueNotExist: "No leagues found",
+    league_delete_success: "League deleted successfully",
+    league_delete_failed: "Failed to delete league",
 
     //BE translations
     username_exists: "Username already exists",
@@ -122,6 +124,8 @@ export const langMap = {
     team: "Թիմ",
     selectUser: "Ընտրել խաղացող",
     leagueNotExist: "Լիգաներ չեն գտնվել",
+    league_delete_success: "Լիգան հաջողությամբ ջնջվեց",
+    league_delete_failed: "Չհաջողվեց ջնջել լիգան",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -192,6 +196,8 @@ export const langMap = {
     team: "Équipe",
     selectUser: "Sélectionner un utilisateur",
     leagueNotExist: "Aucune ligue trouvée",
+    league_delete_success: "Ligue supprimée avec succès",
+    league_delete_failed: "Échec de la suppression de la ligue",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",

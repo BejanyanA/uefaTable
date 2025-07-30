@@ -1,79 +1,134 @@
 /* Outer section or container */
 #leagueType1 {
-  padding: 24px; 
+  padding: 24px;
 }
 
 /* League name row (horizontal layout) */
 .league-names-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;               /* ✅ Space between items */
-  margin: 30px auto;          /* Center if needed */
-  padding-left: 0px;  
-  padding-right: 0px;    
-  margin-top: 60px;  /* ✅ Prevent from sticking to left */
+  gap: 16px;
+  margin: 30px auto;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-top: 60px;
+}
+
+/* Each league box */
+.league-name-box {
+  padding: 14px 12px;
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  min-width: 250px;
+  max-width: 280px;
+}
+
+.league-name-box:hover {
+  background: rgba(7, 7, 7, 0.705);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.league-name-box:active {
+  transform: scale(0.96);
+}
+
+.league-names-row-item {
+  display: flex;
+  align-items: center;
+  margin-right: 55px;
+}
+
+.league-edit-icon,
+.league-delete-icon {
+  margin-left: 10px;
+  font-size: 1.1rem;
+}
+
+.icon-disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 #noLeaguedata {
   display: flex;
-justify-content: center;
-  padding-left: 0px;  
-  padding-right: 0px;   
+  justify-content: center;
+  padding-left: 0px;
+  padding-right: 0px;
   margin-top: 100px;
+  font-size: 18px;
 
-}
-
-/* Each league box */
-.league-name-box {
-  padding: 12px 20px;        /* ✅ More internal space */
-  background-color: #e1ecf4;
-  border: 1px solid #0077cc;
-  border-radius: 10px;
-  font-weight: bold;
-  white-space: nowrap;
-  color: #000;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.league-name-box:hover {
-  background-color: #d0e7fa;
-  transform: translateY(-2px);
 }
 
 /* Mobile */
 @media (max-width: 480px) {
-/* Outer section or container */
-#leagueType1 {
-  padding: 24px; /* ✅ Add spacing inside the section */
-}
 
-/* League name row (horizontal layout) */
-.league-names-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 60px;               /* ✅ Space between items */
-  margin: 30 auto;          /* Center if needed */
-  padding-left: 0px;   
-  padding-right: 0px;   /* ✅ Prevent from sticking to left */
-}
+  /* Outer section or container */
+  #leagueType1 {
+    padding: 24px;
+  }
 
-/* Each league box */
-.league-name-box {
-  padding: 12px 20px;        /* ✅ More internal space */
-  background-color: #e1ecf4;
-  border: 1px solid #0077cc;
-  border-radius: 10px;
-  font-weight: bold;
+  /* League name row (horizontal layout) */
+  .league-names-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 60px;
+    margin: 30 auto;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+  }
+
+  /* Each league box */
+  .league-name-box {
+    padding: 6px 25px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .league-names-row-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .league-edit-icon,
+  .league-delete-icon {
+    margin-left: 10px;
+    font-size: 1.1rem;
+  }
+
+.mobile-tooltip {
+  position: absolute;
+  background: #222;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10000;
+  max-width: 220px;
   white-space: nowrap;
-  color: #000;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+}
+.mobile-tooltip.show {
+  opacity: 1;
 }
 
-.league-name-box:hover {
-  background-color: #d0e7fa;
-  transform: translateY(-2px);
-}
+  #noLeaguedata {
+    display: flex;
+    justify-content: center;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-top: 100px;
+    font-size: 14px;
+
+  }
 }
