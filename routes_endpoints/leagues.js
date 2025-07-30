@@ -205,7 +205,7 @@ export async function handleLeaguesEdit(request, env) {
   }
 
   const loggedInUserId = payload.id;
-  const { leagueId, name, friendIds } = await parseBody(request);
+  const { leagueId, name, friendIds, denyFriendIds } = await parseBody(request);
 
   const errors = {};
   if (!leagueId || typeof leagueId !== 'number') {
@@ -230,22 +230,40 @@ export async function handleLeaguesEdit(request, env) {
     return jsonResponse({ success: false, error: "access_denied" }, 403);
   }
 
-  // Step 2: Validate friend IDs if present
+  // Step 2: Fetch approved friend IDs once
+  const approvedFriends = await env.core_data.prepare(`
+  SELECT friend_id AS id FROM friends WHERE user_id = ? AND status = 'approved'
+  UNION
+  SELECT user_id AS id FROM friends WHERE friend_id = ? AND status = 'approved'
+`).bind(loggedInUserId, loggedInUserId).all();
+  const approvedIds = approvedFriends.results.map(row => row.id);
+
+  // Step 2.1: Validate friendIds
   let flatFriendIds = [];
   if (Array.isArray(friendIds)) {
     flatFriendIds = friendIds.map(f => typeof f === 'object' ? f.id : f);
-
-    const approvedFriends = await env.core_data.prepare(`
-    SELECT friend_id AS id FROM friends WHERE user_id = ? AND status = 'approved'
-    UNION
-    SELECT user_id AS id FROM friends WHERE friend_id = ? AND status = 'approved'
-  `).bind(loggedInUserId, loggedInUserId).all();
-
-    const approvedIds = approvedFriends.results.map(row => row.id);
-
     const allValid = flatFriendIds.every(id => approvedIds.includes(id));
     if (!allValid) {
       return jsonResponse({ success: false, error: "invalid_friends", message: "All provided friend IDs must be approved friends." }, 400);
+    }
+  }
+
+  // Step 2.2: Validate denyFriendIds only for presence in league_access
+  let flatDenyIds = [];
+  if (Array.isArray(denyFriendIds)) {
+    flatDenyIds = denyFriendIds.map(f => typeof f === 'object' ? f.id : f);
+
+    // Batch check denyFriendIds in league_access
+    const denyPlaceholders = flatDenyIds.map(() => '?').join(',');
+    const denyAccessRows = await env.core_data.prepare(`
+    SELECT user_id FROM league_access WHERE league_id = ? AND user_id IN (${denyPlaceholders})
+  `).bind(leagueId, ...flatDenyIds).all();
+    const denyAccessIds = denyAccessRows.results.map(r => r.user_id);
+
+    for (const denyId of flatDenyIds) {
+      if (!denyAccessIds.includes(denyId)) {
+        return jsonResponse({ success: false, error: "deny_id_not_found", message: `User ID ${denyId} not found in league access.` }, 400);
+      }
     }
   }
 
@@ -254,14 +272,28 @@ export async function handleLeaguesEdit(request, env) {
   UPDATE leagues SET name = ? WHERE id = ?
 `).bind(name, leagueId).run();
 
-  // Step 4: Update league access (if valid)
+  // Step 4: Update league access (add new)
   if (flatFriendIds.length > 0) {
-    for (const id of flatFriendIds) {
-      await env.core_data.prepare(`
-      INSERT INTO league_access (league_id, user_id, granted_by_user_id)
-      VALUES (?, ?, ?) ON CONFLICT DO NOTHING
-    `).bind(leagueId, id, loggedInUserId).run();
+    const existingAccess = await env.core_data.prepare(`
+    SELECT user_id FROM league_access WHERE league_id = ?
+  `).bind(leagueId).all();
+    const existingIds = new Set(existingAccess.results.map(row => row.user_id));
+    const newAccessIds = flatFriendIds.filter(id => !existingIds.has(id));
+
+    if (newAccessIds.length > 0) {
+      const values = newAccessIds.map(id => `(${leagueId}, ${id}, ${loggedInUserId})`).join(',');
+      await env.core_data.exec(`
+      INSERT INTO league_access (league_id, user_id, granted_by_user_id) VALUES ${values}
+    `);
     }
+  }
+
+  // Step 5: Remove access for denyFriendIds
+  if (flatDenyIds.length > 0) {
+    const denyPlaceholders = flatDenyIds.map(() => '?').join(',');
+    await env.core_data.prepare(`
+    DELETE FROM league_access WHERE league_id = ? AND user_id IN (${denyPlaceholders})
+  `).bind(leagueId, ...flatDenyIds).run();
   }
 
   return jsonResponse({
