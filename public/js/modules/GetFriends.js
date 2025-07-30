@@ -1,11 +1,11 @@
 import { clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
-import { apiGet } from '../services/api.js';
+import { apiPost } from '../services/api.js';
 
 export const getFriends = {
     initGetAllFriends: async function () {
         try {
-            const response = await apiGet("/friends");
+            const response = await apiPost("/friends");
             const container = document.getElementById("user-select");
             const friendError = document.getElementById("friendError");
             const translation = langMap[currentLang];

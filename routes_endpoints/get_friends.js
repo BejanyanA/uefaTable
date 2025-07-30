@@ -1,6 +1,6 @@
 // routes/leagues.js
 
-import { jsonResponse } from '../utils/helper.js';
+import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
 
 export async function handleGetApprovedFriends(request, env) {
@@ -18,29 +18,42 @@ export async function handleGetApprovedFriends(request, env) {
     }
 
     const loggedInUserId = payload.id;
+    const { leagueId } = await parseBody(request);
 
     const friends = await env.core_data.prepare(`
-  SELECT u.id, u.username
-  FROM friends f
-  JOIN users u ON u.id = f.friend_id
-  WHERE f.user_id = ? AND f.status = 'approved'
+    SELECT u.id, u.username
+    FROM friends f
+    JOIN users u ON u.id = f.friend_id
+    WHERE f.user_id = ? AND f.status = 'approved'
 
-  UNION
+    UNION
 
-  SELECT u.id, u.username
-  FROM friends f
-  JOIN users u ON u.id = f.user_id
-  WHERE f.friend_id = ? AND f.status = 'approved';
-`).bind(loggedInUserId, loggedInUserId).all();
+    SELECT u.id, u.username
+    FROM friends f
+    JOIN users u ON u.id = f.user_id
+    WHERE f.friend_id = ? AND f.status = 'approved';
+  `).bind(loggedInUserId, loggedInUserId).all();
 
     if (friends.results.length === 0) {
         return jsonResponse({ success: false, message: "no_friends_found" }, 404);
     }
 
+    let accessUserIds = [];
+    if (leagueId) {
+        const accessRows = await env.core_data.prepare(`
+      SELECT u.id, u.username
+      FROM league_access la
+      JOIN users u ON u.id = la.user_id
+      WHERE la.league_id = ?
+    `).bind(leagueId).all();
+        accessUserIds = accessRows.results;
+    }
+
     return jsonResponse({
         success: true,
         data: {
-            friends: friends.results
+            friends: friends.results,
+            accessUserIds
         }
     }, 200);
 }

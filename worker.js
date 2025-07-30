@@ -19,7 +19,7 @@ const routeRegistry = {
   "/register": { POST: handleRegister },
   "/login": { POST: handleLogin },
   "/me": { GET: handleMe },
-  "/friends": { GET: handleGetApprovedFriends },
+  "/friends": { POST: handleGetApprovedFriends },
   "/clubs": { GET: handleGetAllClubs },
   "/search-clubs": { POST: handleSearchClubs },
   "/leagues": { POST: handleLeagues },
