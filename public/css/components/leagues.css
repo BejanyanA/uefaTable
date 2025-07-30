@@ -46,13 +46,22 @@
 
 .league-edit-icon,
 .league-delete-icon {
-  margin-left: 10px;
   font-size: 1.1rem;
 }
 
+.league-edit-icon {
+  margin-left: 12px;
+  height: 28px;
+}
+
+.league-delete-icon {
+  margin-left: 4px;
+  height: 32px;
+}
+
 .icon-disabled {
-  cursor: not-allowed;
   opacity: 0.4;
+  pointer-events: auto;
 }
 
 #noLeaguedata {
@@ -101,26 +110,36 @@
 
   .league-edit-icon,
   .league-delete-icon {
-    margin-left: 10px;
     font-size: 1.1rem;
   }
 
-.mobile-tooltip {
-  position: absolute;
-  background: #222;
-  color: #fff;
-  padding: 6px 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 10000;
-  max-width: 220px;
-  white-space: nowrap;
-}
-.mobile-tooltip.show {
-  opacity: 1;
-}
+  .league-edit-icon {
+    height: 20px;
+    margin-left: 12px;
+  }
+
+  .league-delete-icon {
+    margin-left: 4px;
+    height: 26px;
+  }
+
+  .mobile-tooltip {
+    position: absolute;
+    background: #222;
+    color: #fff;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10000;
+    max-width: 220px;
+    white-space: nowrap;
+  }
+
+  .mobile-tooltip.show {
+    opacity: 1;
+  }
 
   #noLeaguedata {
     display: flex;

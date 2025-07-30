@@ -78,17 +78,19 @@ export function renderLeagueTable(data) {
 
     leagueRow.appendChild(leagueBox);
 
-    // Access control: true if owner
+    // 👤 Check owner access
     const isOwner = league.accessType === "owner";
 
-    // ✏️ Edit Icon
-    const editIcon = document.createElement("span");
-    editIcon.innerHTML = "✏️";
+    // ✏️ Edit icon
+    const editIcon = document.createElement("img");
+    editIcon.src = "assets/icons/edit.svg";
+    editIcon.alt = "Edit";
     editIcon.className = "league-edit-icon";
-    editIcon.style.marginLeft = "8px";
+    
     editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    editIcon.style.opacity = isOwner ? "1" : "0.4";
-    editIcon.title = isOwner ? "Edit League" : "Only the owner can edit";
+    if (!isOwner) {
+      editIcon.classList.add("icon-disabled");
+    }
     editIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
@@ -98,14 +100,16 @@ export function renderLeagueTable(data) {
       }
     });
 
-    // 🗑️ Delete Icon
-    const deleteIcon = document.createElement("span");
-    deleteIcon.innerHTML = "🗑️";
+
+    // 🗑️ Delete icon
+    const deleteIcon = document.createElement("img");
+    deleteIcon.src = "assets/icons/delete.svg";
+    deleteIcon.alt = "Delete";
     deleteIcon.className = "league-delete-icon";
-    deleteIcon.style.marginLeft = "8px";
     deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    deleteIcon.style.opacity = isOwner ? "1" : "0.4";
-    deleteIcon.title = isOwner ? "Delete League" : "Only the owner can delete";
+    if (!isOwner) {
+      deleteIcon.classList.add("icon-disabled");
+    }
     deleteIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
