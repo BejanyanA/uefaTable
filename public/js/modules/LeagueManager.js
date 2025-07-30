@@ -219,37 +219,62 @@ export const LeagueManager = {
   initDelete: async function (leagueId) {
     const translation = langMap[currentLang];
 
-    const confirmed = confirm("Are you sure you want to delete this league?");
-    if (!confirmed) return;
+    const modal = document.getElementById("deleteModal");
+    const title = document.getElementById("deleteModalTitle");
+    const message = document.getElementById("deleteModalText");
+    const confirmBtn = document.getElementById("confirmDeleteBtn");
+    const cancelBtn = document.getElementById("cancelDeleteBtn");
 
-    try {
-      const response = await apiPost("/delete-league", { leagueId });
-      if (response.success) {
-        showToast(translation.league_delete_success || "League deleted successfully", "success");
+    // Set translation-based text
+    title.textContent = translation.confirm_delete_title || "Confirm Deletion";
+    message.textContent = translation.confirm_delete_text || "Are you sure you want to delete this league?";
+    confirmBtn.textContent = translation.delete || "Delete";
+    cancelBtn.textContent = translation.cancel || "Cancel";
 
-        try {
-          const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
-          localStorage.setItem("currentBannerId", bannerId);
-          const data = await apiPost("/leagues", { bannerId });
+    modal.classList.remove("hidden");
 
-          if (data.success && data.data) {
-            window.closeModal("tableModal");
-            document.getElementById("bannerContainer").style.display = "none";
-            renderLeagueTable(data.data);
-          } else {
-            showToast(translation.not_found || "Not found", "info");
+    // 🔁 Remove previous click handler (clone & replace)
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    // ✅ On confirm
+    newConfirmBtn.addEventListener("click", async () => {
+      modal.classList.add("hidden");
+
+      try {
+        const response = await apiPost("/delete-league", { leagueId });
+        if (response.success) {
+          showToast(translation.league_delete_success || "League deleted successfully", "success");
+
+          try {
+            const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+            localStorage.setItem("currentBannerId", bannerId);
+            const data = await apiPost("/leagues", { bannerId });
+
+            if (data.success && data.data) {
+              window.closeModal("tableModal");
+              document.getElementById("bannerContainer").style.display = "none";
+              renderLeagueTable(data.data);
+            } else {
+              showToast(translation.not_found || "Not found", "info");
+            }
+          } catch (err) {
+            showToast(translation.something_went_wrong || "Something went wrong", "error");
+            console.error("Error opening table:", err);
           }
-        } catch (err) {
-          showToast(translation.something_went_wrong || "Something went wrong", "error");
-          console.error("Error opening table:", err);
-        }
 
-      } else {
-        showToast(translation.league_delete_failed || "Failed to delete league", "error");
+        } else {
+          showToast(translation.league_delete_failed || "Failed to delete league", "error");
+        }
+      } catch (err) {
+        console.error("Error deleting league:", err);
+        showToast("Server error", "error");
       }
-    } catch (err) {
-      console.error("Error deleting league:", err);
-      showToast("Server error", "error");
-    }
+    });
+
+    // ❌ On cancel
+    cancelBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
   }
 };
