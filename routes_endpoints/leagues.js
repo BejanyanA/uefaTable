@@ -190,6 +190,92 @@ export async function handleLeaguesCreate(request, env) {
 }
 
 
+export async function handleLeaguesEdit(request, env) {
+  const authHeader = request.headers.get("Authorization");
+
+  if (!authHeader?.startsWith("Bearer ")) {
+    return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  const payload = await verifyToken(token, env.JWT_SECRET);
+
+  if (!payload) {
+    return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+  }
+
+  const loggedInUserId = payload.id;
+  const { leagueId, name, friendIds } = await parseBody(request);
+
+  const errors = {};
+  if (!leagueId || typeof leagueId !== 'number') {
+    errors.leagueId = "League ID is required and must be a number";
+  }
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    errors.name = "League name is required and must be a non-empty string";
+  }
+  if (Object.keys(errors).length > 0) {
+    return jsonResponse({ success: false, errors }, 400);
+  }
+
+  // Step 1: Verify league ownership
+  const league = await env.core_data.prepare(`
+  SELECT created_by_user_id FROM leagues WHERE id = ?
+`).bind(leagueId).first();
+
+  if (!league) {
+    return jsonResponse({ success: false, error: "league_not_found" }, 404);
+  }
+  if (league.created_by_user_id !== loggedInUserId) {
+    return jsonResponse({ success: false, error: "access_denied" }, 403);
+  }
+
+  // Step 2: Validate friend IDs if present
+  let flatFriendIds = [];
+  if (Array.isArray(friendIds)) {
+    flatFriendIds = friendIds.map(f => typeof f === 'object' ? f.id : f);
+
+    const approvedFriends = await env.core_data.prepare(`
+    SELECT friend_id AS id FROM friends WHERE user_id = ? AND status = 'approved'
+    UNION
+    SELECT user_id AS id FROM friends WHERE friend_id = ? AND status = 'approved'
+  `).bind(loggedInUserId, loggedInUserId).all();
+
+    const approvedIds = approvedFriends.results.map(row => row.id);
+
+    const allValid = flatFriendIds.every(id => approvedIds.includes(id));
+    if (!allValid) {
+      return jsonResponse({ success: false, error: "invalid_friends", message: "All provided friend IDs must be approved friends." }, 400);
+    }
+  }
+
+  // Step 3: Update league name
+  await env.core_data.prepare(`
+  UPDATE leagues SET name = ? WHERE id = ?
+`).bind(name, leagueId).run();
+
+  // Step 4: Update league access (if valid)
+  if (flatFriendIds.length > 0) {
+    for (const id of flatFriendIds) {
+      await env.core_data.prepare(`
+      INSERT INTO league_access (league_id, user_id, granted_by_user_id)
+      VALUES (?, ?, ?) ON CONFLICT DO NOTHING
+    `).bind(leagueId, id, loggedInUserId).run();
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    message: "League updated successfully",
+    data: {
+      leagueId,
+      name,
+      friendIds: flatFriendIds
+    }
+  }, 200);
+}
+
+
 export async function handleLeaguesDelete(request, env) {
   const authHeader = request.headers.get("Authorization");
 

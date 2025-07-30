@@ -15,7 +15,7 @@
 
 /* Each league box */
 .league-name-box {
-  padding: 14px 12px;
+  padding: 12px 12px;
   color: white;
   background: rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
@@ -51,12 +51,12 @@
 
 .league-edit-icon {
   margin-left: 12px;
-  height: 28px;
+  height: 26px;
 }
 
 .league-delete-icon {
   margin-left: 4px;
-  height: 32px;
+  height: 30px;
 }
 
 .icon-disabled {
