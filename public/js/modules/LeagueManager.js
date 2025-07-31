@@ -207,13 +207,127 @@ export const LeagueManager = {
 
 
 
-  initEdit: async function (leagueId, leagueName) {
-    console.log("Editing", leagueId, leagueName);
-    // TODO: Show modal to edit name, call API and update UI
+  initEdit: async function (leagueId, currentLeagueName) {
+    const modal = document.getElementById("editModal");
+    const input = document.getElementById("leagueNameInput");
+    const error = document.getElementById("leagueNameError");
+    const accessContainer = document.getElementById("accessUsersContainer");
+    const friendsContainer = document.getElementById("friendsListContainer");
+    const cancelBtn = document.getElementById("cancelEditBtn");
+    const confirmBtn = document.getElementById("confirmEditBtn");
+
+    const translation = langMap[currentLang];
+    modal.classList.remove("hidden");
+    input.value = currentLeagueName;
+    error.textContent = "";
+    accessContainer.innerHTML = "";
+    friendsContainer.innerHTML = "";
+
+    // Fetch access + friends data
+    const response = await apiPost("/friends", { leagueId })
+    const accessUserIds = response?.data?.accessUserIds || [];
+    const friends = response?.data?.friends || [];
+
+    const selectedFriendIds = new Set(accessUserIds.map(f => f.id));
+    const denyFriendIds = new Set();
+
+    const createUserPill = (user, isExisting = true) => {
+      const pill = document.createElement("div");
+      pill.className = "user-pill";
+      pill.textContent = user.username;
+
+      const removeBtn = document.createElement("span");
+      removeBtn.textContent = "✖";
+      removeBtn.className = "remove-btn";
+      removeBtn.onclick = () => {
+        accessContainer.removeChild(pill);
+        selectedFriendIds.delete(user.id);
+        denyFriendIds.add(user.id);
+        // Enable the friend button again
+        const friendBtn = friendsContainer.querySelector(`[data-id="${user.id}"]`);
+        if (friendBtn) friendBtn.disabled = false;
+      };
+
+      pill.appendChild(removeBtn);
+      accessContainer.appendChild(pill);
+    };
+
+    // Render existing access users
+    accessUserIds.forEach(user => createUserPill(user));
+
+    // Render friends list
+    friends.forEach(friend => {
+      const btn = document.createElement("button");
+      btn.textContent = friend.username;
+      btn.className = "add-friend-btn";
+      btn.disabled = selectedFriendIds.has(friend.id);
+      btn.dataset.id = friend.id;
+
+      btn.onclick = () => {
+        if (!selectedFriendIds.has(friend.id)) {
+          selectedFriendIds.add(friend.id);
+          denyFriendIds.delete(friend.id);
+          createUserPill(friend, false);
+          btn.disabled = true;
+        }
+      };
+
+      friendsContainer.appendChild(btn);
+    });
+
+    // Cancel button
+    cancelBtn.onclick = () => {
+      modal.classList.add("hidden");
+    };
+
+    // Confirm update
+    confirmBtn.onclick = async () => {
+      const name = input.value;
+
+      if (!name) {
+        setError("leagueNameError", translation.required);
+        hasError = true;
+      } else if (name.length < 3) {
+        setError("leagueNameError", translation.shortLeagueName);
+        hasError = true;
+      } else if (name.length > 30) {
+        setError("leagueNameError", translation.longLeagueName);
+        hasError = true;
+      }
+
+      const friendIds = Array.from(selectedFriendIds);
+      const denyIds = Array.from(denyFriendIds);
+
+      try {
+        const res = await apiPost("/update-leagues", {
+          leagueId,
+          name,
+          friendIds,
+          denyFriendIds: denyIds
+        });
+
+        if (res.success) {
+          modal.classList.add("hidden");
+          showToast(translation.league_updated || "League updated", "success");
+
+          const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+          localStorage.setItem("currentBannerId", bannerId);
+          const data = await apiPost("/leagues", { bannerId });
+
+          if (data.success && data.data) {
+            window.closeModal("tableModal");
+            document.getElementById("bannerContainer").style.display = "none";
+            renderLeagueTable(data.data);
+          }
+        } else {
+          showToast(translation.update_failed || "Update failed", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast(translation.something_went_wrong || "Something went wrong", "error");
+      }
+    };
   },
-
-
-
 
 
   initDelete: async function (leagueId) {
@@ -246,23 +360,15 @@ export const LeagueManager = {
         if (response.success) {
           showToast(translation.league_delete_success || "League deleted successfully", "success");
 
-          try {
-            const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
-            localStorage.setItem("currentBannerId", bannerId);
-            const data = await apiPost("/leagues", { bannerId });
+          const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+          localStorage.setItem("currentBannerId", bannerId);
+          const data = await apiPost("/leagues", { bannerId });
 
-            if (data.success && data.data) {
-              window.closeModal("tableModal");
-              document.getElementById("bannerContainer").style.display = "none";
-              renderLeagueTable(data.data);
-            } else {
-              showToast(translation.not_found || "Not found", "info");
-            }
-          } catch (err) {
-            showToast(translation.something_went_wrong || "Something went wrong", "error");
-            console.error("Error opening table:", err);
+          if (data.success && data.data) {
+            window.closeModal("tableModal");
+            document.getElementById("bannerContainer").style.display = "none";
+            renderLeagueTable(data.data);
           }
-
         } else {
           showToast(translation.league_delete_failed || "Failed to delete league", "error");
         }

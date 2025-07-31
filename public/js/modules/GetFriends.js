@@ -5,7 +5,7 @@ import { apiPost } from '../services/api.js';
 export const getFriends = {
     initGetAllFriends: async function () {
         try {
-            const response = await apiPost("/friends");
+            const response = await apiPost("/friends", { showLoading: false });
             const container = document.getElementById("user-select");
             const friendError = document.getElementById("friendError");
             const translation = langMap[currentLang];

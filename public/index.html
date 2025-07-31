@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/components/standings.css">
   <link rel="stylesheet" href="css/components/matches.css">
   <link rel="stylesheet" href="css/components/delete-modal.css">
+  <link rel="stylesheet" href="css/components/edit-modal.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -274,6 +275,31 @@
       </div>
     </div>
 
+    <div id="editModal" class="edit-modal hidden">
+      <div class="edit-modal-content">
+        <h3 id="editModalTitle">Edit League</h3>
+
+        <label for="leagueNameInput">League Name</label>
+        <input id="leagueNameInput" type="text"/>
+        <p class="input-error" id="leagueNameError"></p>
+
+        <div>
+          <h4>Users with Access</h4>
+          <div id="accessUsersContainer" class="user-list"></div>
+        </div>
+
+        <div>
+          <h4>Friends</h4>
+          <div id="friendsListContainer" class="user-list"></div>
+        </div>
+
+        <div class="edit-modal-buttons">
+          <button id="cancelEditBtn" class="cancel-edit-btn">Cancel</button>
+          <button id="confirmEditBtn" class="confirm-edit-btn">Update</button>
+        </div>
+      </div>
+    </div>
+
 
     <footer class="page-footer">
       Powered by And Bejanyan © 2025 All rights reserved
@@ -283,4 +309,5 @@
     <script type="module" src="js/app.js"></script>
   </div>
 </body>
+
 </html>
