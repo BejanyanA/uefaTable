@@ -217,8 +217,6 @@ export const LeagueManager = {
 
 
   initDelete: async function (leagueId) {
-    // injectDeleteModalCSS();
-    // injectDeleteModalHTML();
     const translation = langMap[currentLang];
 
     const modal = document.getElementById("deleteModal");
@@ -274,7 +272,7 @@ export const LeagueManager = {
       }
     });
 
-    // ❌ On cancel
+    // On cancel
     cancelBtn.addEventListener("click", () => {
       modal.classList.add("hidden");
     });

@@ -56,6 +56,10 @@ export const langMap = {
     league_delete_failed: "Failed to delete league",
     owner_edit: "Only the owner can Edit",
     owner_delete: "Only the owner can Delete",
+    confirm_delete_title: "Confirm Deletion",
+    confirm_delete_text: "Are you sure you want to delete this league?",
+    delete: "Delete",
+    cancel: "Cancel",
 
     //BE translations
     username_exists: "Username already exists",
@@ -130,6 +134,10 @@ export const langMap = {
     league_delete_failed: "Չհաջողվեց ջնջել լիգան",
     owner_edit: "Միայն ստեղծողը կարող է խմբագրել",
     owner_delete: "Միայն ստեղծողը կարող է ջնջել",
+    confirm_delete_title: "Հաստատել ջնջումը",
+    confirm_delete_text: "Վստա՞հ եք, որ ցանկանում եք ջնջել այս լիգան։",
+    delete: "Ջնջել",
+    cancel: "Չեղարկել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -204,6 +212,10 @@ export const langMap = {
     league_delete_failed: "Échec de la suppression de la ligue",
     owner_edit: "Seul le propriétaire peut modifier",
     owner_delete: "Seul le propriétaire peut supprimer",
+    confirm_delete_title: "Confirmer la suppression",
+    confirm_delete_text: "Êtes-vous sûr de vouloir supprimer cette ligue ?",
+    delete: "Supprimer",
+    cancel: "Annuler",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
