@@ -216,7 +216,10 @@ export const LeagueManager = {
     const cancelBtn = document.getElementById("cancelEditBtn");
     const confirmBtn = document.getElementById("confirmEditBtn");
 
+    let hasError = false;
+
     const translation = langMap[currentLang];
+    
     modal.classList.remove("hidden");
     input.value = currentLeagueName;
     error.textContent = "";

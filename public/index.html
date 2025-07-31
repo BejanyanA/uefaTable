@@ -277,11 +277,13 @@
 
     <div id="editModal" class="edit-modal hidden">
       <div class="edit-modal-content">
-        <h3 id="editModalTitle">Edit League</h3>
+        <div class="editModalTitle">
+          <h3 id="editModalTitle">Edit League</h3>
 
-        <label for="leagueNameInput">League Name</label>
-        <input id="leagueNameInput" type="text"/>
-        <p class="input-error" id="leagueNameError"></p>
+          <label for="leagueNameInput">League Name</label>
+          <input id="leagueNameInput" type="text" />
+        </div>
+        <div id="leagueNameError" class="input-error"></div>
 
         <div>
           <h4>Users with Access</h4>
