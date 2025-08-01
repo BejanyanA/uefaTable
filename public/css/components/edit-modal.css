@@ -215,4 +215,11 @@
       text-align: left;
       margin-bottom: 10px;
    }
+
+   .remove-btn {
+      margin-left: 6px;
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+   }
 }
