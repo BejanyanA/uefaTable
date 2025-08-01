@@ -26,6 +26,7 @@
    max-width: 350px;
    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
    flex-direction: column;
+     font-family: system-ui, sans-serif;
 }
 
 .edit-modal-content h3 {
@@ -58,7 +59,7 @@
 
 .edit-input-wrapper label {
    position: absolute;
-   top: 52%;
+   top: 44%;
    left: 8px;
    transform: translateY(-50%);
    color: #929292;
@@ -74,7 +75,7 @@
    top: -8px;
    left: 2px;
    font-size: 12px;
-   background: rgb(0, 0, 0);
+   background: transparent;
    color: #ffffff;
 }
 
@@ -231,9 +232,8 @@
 
    #leagueNameEdit {
       font-size: 12px;
+      bottom: 10px;
    }
-
-
 
    .edit-modal-content h3 {
       font-size: 16px;
