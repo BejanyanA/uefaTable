@@ -210,19 +210,16 @@ export const LeagueManager = {
   initEdit: async function (leagueId, currentLeagueName) {
     const modal = document.getElementById("editModal");
     const input = document.getElementById("leagueNameInput");
-    const error = document.getElementById("leagueNameError");
+    const leagueNameError = document.getElementById("leagueNameUpdateError");
     const accessContainer = document.getElementById("accessUsersContainer");
     const friendsContainer = document.getElementById("friendsListContainer");
     const cancelBtn = document.getElementById("cancelEditBtn");
-    const confirmBtn = document.getElementById("confirmEditBtn");
-
-    let hasError = false;
+    clearErrors(["leagueNameUpdateError"]);
 
     const translation = langMap[currentLang];
-    
+
     modal.classList.remove("hidden");
     input.value = currentLeagueName;
-    error.textContent = "";
     accessContainer.innerHTML = "";
     friendsContainer.innerHTML = "";
 
@@ -284,19 +281,34 @@ export const LeagueManager = {
     };
 
     // Confirm update
-    confirmBtn.onclick = async () => {
-      const name = input.value;
+    const confirmBtn = document.getElementById("confirmEditBtn");
 
+    // ✅ Replace with clone to remove old listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener("click", async () => {
+
+      const name = document.getElementById("leagueNameInput").value.trim();
+
+      // 🔁 Always reset error
+      let hasError = false;
+
+      // ✅ Validation
       if (!name) {
-        setError("leagueNameError", translation.required);
+        setError("leagueNameUpdateError", translation.required);
         hasError = true;
       } else if (name.length < 3) {
-        setError("leagueNameError", translation.shortLeagueName);
+        setError("leagueNameUpdateError", translation.shortLeagueName);
         hasError = true;
       } else if (name.length > 30) {
-        setError("leagueNameError", translation.longLeagueName);
+        setError("leagueNameUpdateError", translation.longLeagueName);
         hasError = true;
       }
+
+      if (hasError) return;
+
+      leagueNameError.textContent = "";
 
       const friendIds = Array.from(selectedFriendIds);
       const denyIds = Array.from(denyFriendIds);
@@ -329,7 +341,7 @@ export const LeagueManager = {
         console.error(err);
         showToast(translation.something_went_wrong || "Something went wrong", "error");
       }
-    };
+    });
   },
 
 
