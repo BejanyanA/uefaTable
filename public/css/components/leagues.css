@@ -96,7 +96,7 @@
 
   /* Each league box */
   .league-name-box {
-    padding: 6px 25px;
+    padding: 6px 14px;
     font-weight: bold;
     white-space: nowrap;
     transition: background 0.3s, transform 0.2s;
@@ -106,6 +106,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 5px;
+    margin-right: 1;
   }
 
   .league-edit-icon,
