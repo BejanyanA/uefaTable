@@ -209,7 +209,7 @@ export const LeagueManager = {
 
   initEdit: async function (leagueId, currentLeagueName) {
     const modal = document.getElementById("editModal");
-    const input = document.getElementById("leagueNameInput");
+    const input = document.getElementById("leagueNameEdit");
     const leagueNameError = document.getElementById("leagueNameUpdateError");
     const accessContainer = document.getElementById("accessUsersContainer");
     const friendsContainer = document.getElementById("friendsListContainer");
@@ -289,7 +289,7 @@ export const LeagueManager = {
 
     newConfirmBtn.addEventListener("click", async () => {
 
-      const name = document.getElementById("leagueNameInput").value.trim();
+      const name = document.getElementById("leagueNameEdit").value.trim();
 
       // 🔁 Always reset error
       let hasError = false;

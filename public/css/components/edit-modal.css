@@ -18,8 +18,8 @@
 }
 
 .edit-modal-content {
-   background: rgba(255, 255, 255, 0.932);
-   color: black;
+   background-color: rgba(0, 0, 0, 0.5);
+   color: #fff;
    padding: 20px 30px;
    border-radius: 6px;
    width: 100%;
@@ -30,31 +30,69 @@
 .edit-modal-content h3 {
    margin-top: 0;
    font-size: 20px;
+   margin-bottom: 30px;
    text-align: center;
 }
 
 .edit-modal-content h4 {
-   margin-top: 20px;
+   margin-top: 25px;
    font-size: 16px;
    text-align: left;
-   margin-bottom: 10px;
+   margin-bottom: 5px;
 }
 
-#leagueNameInput {
+.edit-input-wrapper {
+   position: relative;
+   margin-bottom: -2px;
+}
+
+.edit-input-wrapper input {
    width: 100%;
    padding: 10px;
-   margin-top: 6px;
-   margin-bottom: 4px;
    border-radius: 6px;
    border: 1px solid #ccc;
    font-size: 14px;
    box-sizing: border-box;
 }
 
-.input-error {
+.edit-input-wrapper label {
+   position: absolute;
+   top: 52%;
+   left: 8px;
+   transform: translateY(-50%);
+   color: #929292;
+   font-size: 14px;
+   pointer-events: none;
+   transition: 0.2s ease all;
+   background: white;
+   padding: 0 2px;
+}
+
+.edit-input-wrapper input:focus+label,
+.edit-input-wrapper input:not(:placeholder-shown)+label {
+   top: -8px;
+   left: 2px;
+   font-size: 12px;
+   background: rgb(0, 0, 0);
+   color: #ffffff;
+}
+
+#leagueNameEdit {
+   width: 100%;
+   padding: 8px;
+   margin-top: 2px;
+   margin-bottom: 5px;
+   border-radius: 6px;
+   border: 1px solid #ccc;
+   font-size: 14px;
+   box-sizing: border-box;
+}
+
+.edit-error {
    color: red;
-   font-size: 13px;
-   margin: 0 0 12px 0;
+   font-size: 12px;
+   margin-top: -1px;
+   margin-bottom: 1px;
 }
 
 .user-list {
@@ -82,7 +120,7 @@
    color: white;
    padding: 4px 8px;
    border-radius: 12px;
-   margin: 4px;
+   margin: 1px;
    font-size: 13px;
 }
 
@@ -103,7 +141,7 @@
 
 .add-friend-btn {
    display: inline-block;
-   margin: 3px;
+   margin: 1px;
    padding: 6px 10px;
    font-size: 13px;
    cursor: pointer;
@@ -126,7 +164,8 @@
 .edit-modal-buttons {
    display: flex;
    justify-content: space-between;
-   margin-top: 20px;
+   margin-top: 40px;
+   margin-bottom: 10px;
    gap: 12px;
 }
 
@@ -193,7 +232,7 @@
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
    }
 
-   #leagueNameInput {
+   #leagueNameEdit {
       width: 100%;
       padding: 10px;
       margin-top: 6px;

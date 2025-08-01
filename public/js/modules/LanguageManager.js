@@ -319,6 +319,7 @@ function changeLang(lang) {
   document.getElementById("actionTitle").innerText = t.tableActions;
   document.getElementById("confirmCreateBtn").innerText = t.registerSubmit;
   document.getElementById("leagueName").placeholder = t.leagueName;
+  document.getElementById("leagueNameEdit").placeholder = t.leagueName;
   document.getElementById("competition-types").innerText = t.competitionTypes;
   document.getElementById("createCompetition").innerText = t.createCompetition;
   document.getElementById("count-text").innerText = t.selectTeamCount;
@@ -335,6 +336,7 @@ function changeLang(lang) {
   document.getElementById("loginPasswordLabel").textContent = t.password;
   document.getElementById("leagueNameLabel").textContent = t.leagueName;
   document.getElementById("clubSearchLabel").textContent = t.clubSearch;
+  document.getElementById("leagueNameEditlabel").textContent = t.leagueName;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;
