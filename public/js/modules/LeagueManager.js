@@ -208,15 +208,19 @@ export const LeagueManager = {
 
 
   initEdit: async function (leagueId, currentLeagueName) {
+    const translation = langMap[currentLang];
+
     const modal = document.getElementById("editModal");
     const input = document.getElementById("leagueNameEdit");
     const leagueNameError = document.getElementById("leagueNameUpdateError");
     const accessContainer = document.getElementById("accessUsersContainer");
     const friendsContainer = document.getElementById("friendsListContainer");
     const cancelBtn = document.getElementById("cancelEditBtn");
-    clearErrors(["leagueNameUpdateError"]);
+    const confirmBtn = document.getElementById("confirmEditBtn");
 
-    const translation = langMap[currentLang];
+    confirmBtn.textContent = translation.update || "Update";
+    cancelBtn.textContent = translation.cancel || "Cancel";
+    clearErrors(["leagueNameUpdateError"]);
 
     modal.classList.remove("hidden");
     input.value = currentLeagueName;
@@ -281,8 +285,6 @@ export const LeagueManager = {
     };
 
     // Confirm update
-    const confirmBtn = document.getElementById("confirmEditBtn");
-
     // ✅ Replace with clone to remove old listeners
     const newConfirmBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
@@ -323,7 +325,7 @@ export const LeagueManager = {
 
         if (res.success) {
           modal.classList.add("hidden");
-          showToast(translation.league_updated || "League updated", "success");
+          showToast(translation.league_update_success || "League updated", "success");
 
           const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
           localStorage.setItem("currentBannerId", bannerId);
@@ -335,7 +337,7 @@ export const LeagueManager = {
             renderLeagueTable(data.data);
           }
         } else {
-          showToast(translation.update_failed || "Update failed", "error");
+          showToast(translation.league_update_failed || "Update failed", "error");
         }
       } catch (err) {
         console.error(err);
@@ -352,7 +354,7 @@ export const LeagueManager = {
     const title = document.getElementById("deleteModalTitle");
     const message = document.getElementById("deleteModalText");
     const confirmBtn = document.getElementById("confirmDeleteBtn");
-    const cancelBtn = document.getElementById("cancelDeleteBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
 
     // Set translation-based text
     title.textContent = translation.confirm_delete_title || "Confirm Deletion";

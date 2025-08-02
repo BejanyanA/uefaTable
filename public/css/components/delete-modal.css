@@ -46,7 +46,7 @@
 }
 
 .confirm-delete-btn,
-.cancel-delete-btn {
+.cancel-btn {
   flex: 1;
   padding: 10px 16px;
   border-radius: 6px;
@@ -66,11 +66,11 @@
   transform: scale(1.03);
 }
 
-.cancel-delete-btn {
+.cancel-btn {
   background-color: #444;
   color: #ccc;
 }
-.cancel-delete-btn:hover {
+.cancel-btn:hover {
   background-color: #555;
   transform: scale(1.03);
 }

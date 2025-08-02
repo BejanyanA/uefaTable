@@ -60,6 +60,9 @@ export const langMap = {
     confirm_delete_text: "Are you sure you want to delete this league?",
     delete: "Delete",
     cancel: "Cancel",
+    update: "Update",
+    league_update_success: "League updated successfully",
+    league_update_failed: "Failed to update league",
 
     //BE translations
     username_exists: "Username already exists",
@@ -138,6 +141,9 @@ export const langMap = {
     confirm_delete_text: "Վստա՞հ եք, որ ցանկանում եք ջնջել այս լիգան։",
     delete: "Ջնջել",
     cancel: "Չեղարկել",
+    update: "Թարմացնել",
+    league_update_success: "Լիգան հաջողությամբ թարմացվել է",
+    league_update_failed: "Լիգան չհաջողվեց թարմացնել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -216,6 +222,9 @@ export const langMap = {
     confirm_delete_text: "Êtes-vous sûr de vouloir supprimer cette ligue ?",
     delete: "Supprimer",
     cancel: "Annuler",
+    update: "Mettre à jour",
+    league_update_success: "Ligue mise à jour avec succès",
+    league_update_failed: "Échec de la mise à jour de la ligue",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -326,6 +335,7 @@ function changeLang(lang) {
   document.getElementById("clubCount").innerText = t.selectedCount;
   document.getElementById("clubSearch").placeholder = t.clubSearch;
   document.getElementById("backBtn").innerText = t.backButton;
+  document.getElementById("cancelBtn").innerText = t.cancel;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
