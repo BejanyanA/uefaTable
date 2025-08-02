@@ -63,6 +63,9 @@ export const langMap = {
     update: "Update",
     league_update_success: "League updated successfully",
     league_update_failed: "Failed to update league",
+    friends: "All friends",
+    usersWithAccess: "Friends with Access",
+    edit_league_title: "Edit League",
 
     //BE translations
     username_exists: "Username already exists",
@@ -144,6 +147,9 @@ export const langMap = {
     update: "Թարմացնել",
     league_update_success: "Լիգան հաջողությամբ թարմացվել է",
     league_update_failed: "Լիգան չհաջողվեց թարմացնել",
+    friends: "Բոլոր ընկերները",
+    usersWithAccess: "Մուտքի իրավունք ունեցող",
+    edit_league_title: "Խմբագրել լիգան",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -225,6 +231,9 @@ export const langMap = {
     update: "Mettre à jour",
     league_update_success: "Ligue mise à jour avec succès",
     league_update_failed: "Échec de la mise à jour de la ligue",
+    friends: "Tous les amis",
+    usersWithAccess: "Amis avec accès",
+    edit_league_title: "Modifier la ligue",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",

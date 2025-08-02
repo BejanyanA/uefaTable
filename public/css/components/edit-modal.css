@@ -116,6 +116,7 @@
    margin-top: 6px;
    border-radius: 6px;
    background-color: #ffffff;
+   line-height: 1.2;
 }
 
 .user-pill {
@@ -192,6 +193,16 @@
    background-color: #218838;
 }
 
+.no-access-msg,
+.no-friend-msg {
+   color: rgb(122, 116, 116);
+   font-size: 14px;
+   font-weight: bold;
+   text-align: center;
+   margin-top: 4px;
+   width: 100%;
+   box-sizing: border-box;
+}
 
 @media (max-width: 480px) {
 
@@ -246,5 +257,17 @@
       margin-top: 30px;
       margin-bottom: 10px;
       gap: 12px;
+   }
+
+   .no-access-msg,
+   .no-friend-msg {
+      color: rgb(122, 116, 116);
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-top: 4px;
+      box-sizing: border-box;
+      position: relative;
    }
 }

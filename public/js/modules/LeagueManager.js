@@ -211,13 +211,19 @@ export const LeagueManager = {
     const translation = langMap[currentLang];
 
     const modal = document.getElementById("editModal");
+    const title = document.getElementById("editLeagueTitle");
     const input = document.getElementById("leagueNameEdit");
     const leagueNameError = document.getElementById("leagueNameUpdateError");
     const accessContainer = document.getElementById("accessUsersContainer");
     const friendsContainer = document.getElementById("friendsListContainer");
+    const frineds = document.getElementById("friends");
+    const usersWithAccess = document.getElementById("usersWithAccess");
     const cancelBtn = document.getElementById("cancelEditBtn");
     const confirmBtn = document.getElementById("confirmEditBtn");
 
+    title.textContent = translation.edit_league_title || "Edit League";
+    usersWithAccess.textContent = translation.usersWithAccess || "Users with Access";
+    frineds.textContent = translation.friends || "Friends";
     confirmBtn.textContent = translation.update || "Update";
     cancelBtn.textContent = translation.cancel || "Cancel";
     clearErrors(["leagueNameUpdateError"]);
@@ -227,8 +233,19 @@ export const LeagueManager = {
     accessContainer.innerHTML = "";
     friendsContainer.innerHTML = "";
 
+    const messageFriend = translation.no_friends_found || "No friends found.";
+    const messageAccess = translation.no_friends_found || "No friends found.";
+
+    const accessMsg = document.createElement("div");
+    accessMsg.textContent = messageAccess;
+    accessMsg.className = "no-access-msg";
+
+    const friendMsg = document.createElement("div");
+    friendMsg.textContent = messageFriend;
+    friendMsg.className = "no-friend-msg";
+
     // Fetch access + friends data
-    const response = await apiPost("/friends", { leagueId })
+    const response = await apiPost("/friends", { leagueId });
     const accessUserIds = response?.data?.accessUserIds || [];
     const friends = response?.data?.friends || [];
 
@@ -236,6 +253,11 @@ export const LeagueManager = {
     const denyFriendIds = new Set();
 
     const createUserPill = (user, isExisting = true) => {
+      // Remove placeholder if shown
+      if (accessContainer.contains(accessMsg)) {
+        accessContainer.removeChild(accessMsg);
+      }
+
       const pill = document.createElement("div");
       pill.className = "user-pill";
       pill.textContent = user.username;
@@ -247,9 +269,14 @@ export const LeagueManager = {
         accessContainer.removeChild(pill);
         selectedFriendIds.delete(user.id);
         denyFriendIds.add(user.id);
-        // Enable the friend button again
+
         const friendBtn = friendsContainer.querySelector(`[data-id="${user.id}"]`);
         if (friendBtn) friendBtn.disabled = false;
+
+        // Re-add placeholder if container is empty
+        if (accessContainer.querySelectorAll(".user-pill").length === 0) {
+          accessContainer.appendChild(accessMsg);
+        }
       };
 
       pill.appendChild(removeBtn);
@@ -257,27 +284,41 @@ export const LeagueManager = {
     };
 
     // Render existing access users
-    accessUserIds.forEach(user => createUserPill(user));
+    if (accessUserIds.length > 0) {
+      accessUserIds.forEach(user => createUserPill(user));
+    } else {
+      accessContainer.appendChild(accessMsg);
+    }
 
     // Render friends list
-    friends.forEach(friend => {
-      const btn = document.createElement("button");
-      btn.textContent = friend.username;
-      btn.className = "add-friend-btn";
-      btn.disabled = selectedFriendIds.has(friend.id);
-      btn.dataset.id = friend.id;
+    if (friends.length > 0) {
+      friends.forEach(friend => {
+        const btn = document.createElement("button");
+        btn.textContent = friend.username;
+        btn.className = "add-friend-btn";
+        btn.disabled = selectedFriendIds.has(friend.id);
+        btn.dataset.id = friend.id;
 
-      btn.onclick = () => {
-        if (!selectedFriendIds.has(friend.id)) {
-          selectedFriendIds.add(friend.id);
-          denyFriendIds.delete(friend.id);
-          createUserPill(friend, false);
-          btn.disabled = true;
-        }
-      };
+        btn.onclick = () => {
+          if (!selectedFriendIds.has(friend.id)) {
+            selectedFriendIds.add(friend.id);
+            denyFriendIds.delete(friend.id);
 
-      friendsContainer.appendChild(btn);
-    });
+            // Remove placeholder if shown
+            if (accessContainer.contains(accessMsg)) {
+              accessContainer.removeChild(accessMsg);
+            }
+
+            createUserPill(friend, false);
+            btn.disabled = true;
+          }
+        };
+
+        friendsContainer.appendChild(btn);
+      });
+    } else {
+      friendsContainer.appendChild(friendMsg);
+    }
 
     // Cancel button
     cancelBtn.onclick = () => {
@@ -285,18 +326,14 @@ export const LeagueManager = {
     };
 
     // Confirm update
-    // ✅ Replace with clone to remove old listeners
     const newConfirmBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
     newConfirmBtn.addEventListener("click", async () => {
-
       const name = document.getElementById("leagueNameEdit").value.trim();
 
-      // 🔁 Always reset error
       let hasError = false;
 
-      // ✅ Validation
       if (!name) {
         setError("leagueNameUpdateError", translation.required);
         hasError = true;
@@ -309,7 +346,6 @@ export const LeagueManager = {
       }
 
       if (hasError) return;
-
       leagueNameError.textContent = "";
 
       const friendIds = Array.from(selectedFriendIds);
