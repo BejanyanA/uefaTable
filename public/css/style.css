@@ -42,12 +42,6 @@ body {
   width: 100%;
 }
 
-.input-league-name input {
-  width: 100%;
-  padding-right: 35px;
-  /* space for icon */
-}
-
 
 /* Mobile */
 @media (max-width: 480px) {

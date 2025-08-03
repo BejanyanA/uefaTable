@@ -62,11 +62,12 @@
    top: 44%;
    left: 8px;
    transform: translateY(-50%);
-   color: #929292;
+   color: #aaa;
    font-size: 14px;
    pointer-events: none;
    transition: 0.2s ease all;
-   background: white;
+   background: transparent;
+   /* darker background for contrast */
    padding: 0 2px;
 }
 
@@ -76,7 +77,7 @@
    left: 2px;
    font-size: 12px;
    background: transparent;
-   color: #ffffff;
+   color: white;
 }
 
 #leagueNameEdit {
@@ -85,9 +86,13 @@
    margin-top: 2px;
    margin-bottom: 5px;
    border-radius: 6px;
-   border: 1px solid #ccc;
+   border: 1px solid rgba(255, 255, 255, 0.1);
    font-size: 14px;
    box-sizing: border-box;
+   background: rgba(255, 255, 255, 0.03);
+   color: #f0f0f0;
+   backdrop-filter: blur(4px);
+   box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
 .edit-error {
@@ -115,8 +120,13 @@
    padding: 6px;
    margin-top: 6px;
    border-radius: 6px;
-   background-color: #ffffff;
+   background: rgba(255, 255, 255, 0.04);
+   /* translucent dark */
+   color: #f0f0f0;
    line-height: 1.2;
+   border: 1px solid rgba(255, 255, 255, 0.1);
+   box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
+   backdrop-filter: blur(4px);
 }
 
 .user-pill {
@@ -159,12 +169,15 @@
 
 
 .add-friend-btn:hover:not(:disabled) {
-   background-color: #0056b3;
+   background-color: #1ab914;
 }
 
 .add-friend-btn:disabled {
    opacity: 0.5;
    cursor: not-allowed;
+   background-color: #1d1d1d;
+   color: rgb(83, 83, 83);
+   border: 1px solid #555;
 }
 
 .edit-modal-buttons {
@@ -185,12 +198,14 @@
 }
 
 .confirm-edit-btn {
-   background-color: #28a745;
+   background-color: #218838;
    color: white;
 }
 
 .confirm-edit-btn:hover {
-   background-color: #218838;
+
+   background-color: #28a745;
+   transform: scale(1.03);
 }
 
 .no-access-msg,
