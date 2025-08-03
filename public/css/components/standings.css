@@ -85,6 +85,24 @@
   font-size: 14px;
 }
 
+.standings-table tbody td:first-child {
+  position: relative;
+}
+
+/* Add green bar under place numbers 1 and 2 */
+.standings-table tbody tr:nth-child(1) td:first-child::after,
+.standings-table tbody tr:nth-child(2) td:first-child::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 3px;
+  /* adjust to match number position */
+  width: 18px;
+  height: 5px;
+  background-color: #00ff00;
+  border-radius: 15px;
+}
+
 .standings-table thead {
   background-color: rgba(255, 255, 255, 0.15);
 }
@@ -178,7 +196,7 @@
     gap: 6px;
   }
 
-  .club-header{
+  .club-header {
     font-size: 14px;
     font-weight: bold;
     color: white;
@@ -234,4 +252,24 @@
     /* border-bottom: 1px solid rgba(255, 255, 255, 0.15); */
     font-weight: bold;
   }
+
+  .club-name:nth-child(2),
+  .club-name:nth-child(3) {
+    position: relative;
+  }
+
+  .club-name:nth-child(2)::after,
+  .club-name:nth-child(3)::after {
+    content: '';
+    position: absolute;
+    bottom: 0.5px;
+    left: 2px;
+    /* adjust to position under number */
+    width: 13px;
+    height: 3px;
+    background-color: #00ff00;
+    border-radius: 2px;
+  }
+
+
 }
