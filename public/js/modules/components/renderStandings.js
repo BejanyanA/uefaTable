@@ -323,7 +323,11 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
             }, { showLoading: false });
 
             if (res.success) {
-              showToast(translation.player_success_assigned || "User assigned successfully", "success");
+              if (!dropdown.value) {
+                showToast(translation.player_success_unassigned || "User unassigned successfully", "success");
+              } else {
+                showToast(translation.player_success_assigned || "User assigned successfully", "success");
+              }
             } else {
               showToast(translation.player_assign_failed || "Failed to attach user", "error");
             }
