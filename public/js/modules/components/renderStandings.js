@@ -61,13 +61,19 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           contentDiv.innerHTML = "Failed to load standings.";
         }
       } else if (tab === "matches") {
+        // ✅ Show loading message immediately
+        contentDiv.innerHTML = `<div style="padding: 20px; font-size: 16px;">${translation.loading || "Loading matches..."}</div>`;
+
         const [matchesResponse, playersResponse] = await Promise.all([
           apiPost("/matches", { leagueId, groupId }),
           apiPost("/league-players", { leagueId }, { showLoading: false })
         ]);
 
         if (matchesResponse.success && playersResponse.success) {
-          contentDiv.innerHTML = "";
+          // ✅ Force a repaint before rendering heavy UI
+          await new Promise(resolve => requestAnimationFrame(resolve));
+
+          contentDiv.innerHTML = ""; // Now clear and render
           await renderMatchesTable(matchesResponse.data, contentDiv, leagueId, playersResponse.data.players);
         } else {
           contentDiv.innerHTML = "Failed to load matches.";
@@ -295,10 +301,17 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           const teamId = parseInt(dropdown.dataset.teamId);
           const userId = parseInt(dropdown.value);
 
-          if (!matchId || !teamId || !userId || !leagueId) {
+          if (!matchId || !teamId || leagueId === undefined) {
             console.warn("⚠️ Missing values, cannot attach player");
             return;
           }
+
+          const payload = {
+            matchId,
+            teamId,
+            userId: dropdown.value ? parseInt(dropdown.value) : null,
+            leagueId
+          };
 
           try {
             const translation = langMap[currentLang];
