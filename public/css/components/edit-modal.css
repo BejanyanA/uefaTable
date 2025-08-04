@@ -150,8 +150,11 @@
 .remove-btn {
    margin-left: 6px;
    cursor: pointer;
-   color: red;
+   color: red !important;
    font-weight: bold;
+   font-family: inherit;
+   font-size: 14px;
+   line-height: 1;
 }
 
 

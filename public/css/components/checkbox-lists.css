@@ -139,14 +139,17 @@
   /* 👈 Optional: keep consistent height */
 }
 
+.friend-list-error,
 .clubs-list-error {
-  color: rgb(255, 255, 255);
+  color: #bbb;
+  position: relative;
   font-size: 16px;
-  margin-top: 4px;
-  min-height: 18px;
   font-weight: bold;
-  text-align: center;
-  padding: 50px 10px;
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
 }
 
 .club-search {
@@ -161,12 +164,12 @@
   outline: none;
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
-  
 
-  height: 29px;           
-  padding: 6px 10px;       
-  width: 60%;           
-  font-size: 14px;         
+
+  height: 29px;
+  padding: 6px 10px;
+  width: 60%;
+  font-size: 14px;
 }
 
 .club-search label {
@@ -203,18 +206,6 @@
   opacity: 0;
 }
 
-
-.friend-list-error {
-  color: rgb(255, 255, 255);
-  position: relative;
-  font-size: 16px;
-  font-weight: bold;
-  position: absolute;
-  top: 46%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%)
-}
 
 /* Mobile */
 @media (max-width: 480px) {
@@ -306,5 +297,10 @@
   .club-search select,
   .club-search textarea {
     font-size: 12px;
+  }
+
+  .friend-list-error,
+  .clubs-list-error {
+    font-size: 14px;
   }
 }
