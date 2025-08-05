@@ -163,7 +163,7 @@ export function renderLeagueTable(data) {
       setTimeout(() => {
         tooltip.classList.remove("show");
         setTimeout(() => tooltip.remove(), 300);
-      }, 1500);
+      }, 2000);
     }, 10);
   }
 }
