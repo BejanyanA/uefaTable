@@ -150,6 +150,7 @@ export async function handleUpdateMatches(request, env) {
 
       const sorted = allTeams.results.sort((a, b) => {
         if (b.points !== a.points) return b.points - a.points;
+        if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
         return a.team_id - b.team_id;
       });
 
