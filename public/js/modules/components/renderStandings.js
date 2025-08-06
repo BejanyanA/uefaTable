@@ -62,7 +62,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         }
       } else if (tab === "matches") {
         // ✅ Show loading message immediately
-        contentDiv.innerHTML = `<div style="padding: 20px; font-size: 16px;">${translation.loading || "Loading matches..."}</div>`;
+        contentDiv.innerHTML = `<div style="padding: 20px; font-size: 16px;"></div>`;
 
         const [matchesResponse, playersResponse] = await Promise.all([
           apiPost("/matches", { leagueId, groupId }),
