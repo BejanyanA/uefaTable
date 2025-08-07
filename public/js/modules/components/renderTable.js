@@ -237,11 +237,11 @@ export function renderLeagueInstances(instanceData) {
       groupDiv.dataset.groupName = groupName;
 
       groupDiv.innerHTML = `
-        <h3>${groupName}</h3>
-        <ul class="club-list">
-          ${groupData.clubs.map(club => `<li>${club.name}</li>`).join("")}
-        </ul>
-      `;
+  <h3>${groupName}</h3>
+  <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
+    ${groupData.clubs.map((club, index) => `<li>${index + 1}.&nbsp;&nbsp;${club.name}</li>`).join("")}
+  </ul>
+`;
 
       // ✅ CLICK HANDLER
       groupDiv.addEventListener("click", () => {
