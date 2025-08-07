@@ -121,53 +121,81 @@ export async function handleUpdateMatches(request, env) {
     const matchOrder = Math.min(match.group_id, getPairedGroupId(match.group_id));
 
     await env.core_data.prepare(`
-    DELETE FROM league_knockouts
-    WHERE round = '1/8' AND league_id = ? AND match_order = ?
-  `).bind(match.league_id, matchOrder).run();
+      DELETE FROM league_knockouts
+      WHERE round = '1/8' AND league_id = ? AND match_order = ?
+    `).bind(match.league_id, matchOrder).run();
 
     await env.core_data.prepare(`
-    INSERT INTO league_knockouts (
+      INSERT INTO league_knockouts (
       league_id, round, match_order, team1_id, team2_id, match_type
-    ) VALUES (?, '1/8', ?, ?, NULL, 'home')
-  `).bind(match.league_id, matchOrder, top2[0].team_id).run();
+      ) VALUES (?, '1/8', ?, ?, NULL, 'home')
+    `).bind(match.league_id, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
-    INSERT INTO league_knockouts (
+      INSERT INTO league_knockouts (
       league_id, round, match_order, team1_id, team2_id, match_type
-    ) VALUES (?, '1/8', ?, NULL, ?, 'home')
-  `).bind(match.league_id, matchOrder, top2[1].team_id).run();
+      ) VALUES (?, '1/8', ?, NULL, ?, 'home')
+    `).bind(match.league_id, matchOrder, top2[1].team_id).run();
+
+    // Second leg: away matches
+    await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+      league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, '1/8', ?, NULL, ?, 'away')
+    `).bind(match.league_id, matchOrder, top2[0].team_id).run();
+
+    await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+      league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, '1/8', ?, ?, NULL, 'away')
+    `).bind(match.league_id, matchOrder, top2[1].team_id).run();
 
     const pairedGroupId = getPairedGroupId(match.group_id);
     const pairedComplete = await env.core_data.prepare(`
-    SELECT COUNT(*) as total, SUM(CASE WHEN played = 6 THEN 1 ELSE 0 END) as played_count
-    FROM group_standings
-    WHERE group_id = ?
-  `).bind(pairedGroupId).first();
+      SELECT COUNT(*) as total, SUM(CASE WHEN played = 6 THEN 1 ELSE 0 END) as played_count
+      FROM group_standings
+      WHERE group_id = ?
+    `).bind(pairedGroupId).first();
 
     const isPairedReady = pairedComplete && pairedComplete.total >= 4 && pairedComplete.played_count === pairedComplete.total;
 
     if (isPairedReady) {
       const pairedTeams = await env.core_data.prepare(`
-      SELECT team_id, points, goal_difference
-      FROM group_standings
-      WHERE group_id = ?
-      ORDER BY points DESC, goal_difference DESC, goals_for DESC
-      LIMIT 2
-    `).bind(pairedGroupId).all();
+    SELECT team_id, points, goal_difference, goals_for
+    FROM group_standings
+    WHERE group_id = ?
+    ORDER BY points DESC, goal_difference DESC, goals_for DESC, team_id ASC
+    LIMIT 2
+  `).bind(pairedGroupId).all();
 
       const [p1, p2] = pairedTeams.results;
 
+      // 🔁 Update both match types separately
+      // 👉 In HOME match: Group A team1 vs Group B team2
       await env.core_data.prepare(`
-      UPDATE league_knockouts
-      SET team2_id = ?
-      WHERE league_id = ? AND match_order = ? AND team1_id IS NOT NULL AND team2_id IS NULL
-    `).bind(p2.team_id, match.league_id, matchOrder).run();
+    UPDATE league_knockouts
+    SET team2_id = ?
+    WHERE league_id = ? AND match_order = ? AND match_type = 'home' AND team2_id IS NULL
+  `).bind(p2.team_id, match.league_id, matchOrder).run();
 
       await env.core_data.prepare(`
-      UPDATE league_knockouts
-      SET team1_id = ?
-      WHERE league_id = ? AND match_order = ? AND team1_id IS NULL AND team2_id IS NOT NULL
-    `).bind(p1.team_id, match.league_id, matchOrder).run();
+    UPDATE league_knockouts
+    SET team1_id = ?
+    WHERE league_id = ? AND match_order = ? AND match_type = 'home' AND team1_id IS NULL
+  `).bind(p1.team_id, match.league_id, matchOrder).run();
+
+      // 👉 In AWAY match: Group B team1 vs Group A team2 (⚠️ flipped)
+      await env.core_data.prepare(`
+    UPDATE league_knockouts
+    SET team1_id = ?
+    WHERE league_id = ? AND match_order = ? AND match_type = 'away' AND team1_id IS NULL
+  `).bind(p2.team_id, match.league_id, matchOrder).run();
+
+      await env.core_data.prepare(`
+    UPDATE league_knockouts
+    SET team2_id = ?
+    WHERE league_id = ? AND match_order = ? AND match_type = 'away' AND team2_id IS NULL
+  `).bind(p1.team_id, match.league_id, matchOrder).run();
     }
   };
 
