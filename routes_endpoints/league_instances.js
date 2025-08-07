@@ -68,7 +68,7 @@ export async function handleLeagueInstances(request, env) {
     JOIN group_standings gs ON gs.group_id = lg.id
     JOIN all_clubs ac ON ac.id = gs.team_id
     WHERE lg.league_instance_id IN (${placeholders})
-    ORDER BY lg.group_name ASC
+    ORDER BY lg.group_name ASC, gs.points DESC, gs.goal_difference DESC, gs.goals_for DESC, team_id ASC
   `).bind(...instanceIds).all();
 
     groupRows.results.forEach(row => {
