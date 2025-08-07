@@ -65,7 +65,7 @@ export async function handleLeagueStandings(request, env) {
   FROM group_standings gs
   JOIN all_clubs ac ON ac.id = gs.team_id
   WHERE gs.group_id = ?
-  ORDER BY gs.points DESC, gs.goal_difference DESC, gs.goals_for DESC
+  ORDER BY gs.points DESC, gs.goal_difference DESC, gs.goals_for DESC, team_id ASC
 `).bind(groupId).all();
 
     return jsonResponse({
