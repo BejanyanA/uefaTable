@@ -271,7 +271,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
           try {
             const translation = langMap[currentLang];
-            const updateResponse = await apiPost("/update-score", payload, { showLoading: false });
+            const updateResponse = await apiPost("/update-score", payload);
             if (updateResponse.success) {
               showToast(translation.score_updated || "Score Updated", "success");
             } else {
