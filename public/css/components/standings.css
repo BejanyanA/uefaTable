@@ -15,7 +15,7 @@
 .tab-btn {
   /* border: 1px solid white; */
   color: white;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.5);
   padding: 8px 16px;
   cursor: pointer;
   font-size: 14px;
@@ -26,7 +26,12 @@
   width: 80px;
   text-align: center;
   box-sizing: content-box;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn:hover {
+  /* background: rgba(255, 255, 255, 0.12); */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .tab-btn.active {

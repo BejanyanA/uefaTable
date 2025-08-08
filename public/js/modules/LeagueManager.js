@@ -4,7 +4,7 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
 import { getFriends } from './GetFriends.js';
 import { getClubs } from './GetClubs.js';
-import { apiPost } from '../services/api.js';
+import { apiGet, apiPost } from '../services/api.js';
 
 export const LeagueManager = {
   initCreate: function () {
@@ -178,29 +178,83 @@ export const LeagueManager = {
       });
     });
 
-    // 🔹 "Open" button: hide options, show password
-    document.getElementById("openBtn").addEventListener("click", async () => {
+    // 🔹 "Open"
+    document.getElementById("openBtn").addEventListener("click", () => {
       document.getElementById("tableModal").style.display = "none";
+      document.getElementById("bannerContainer").style.display = "none";
+      document.getElementById("stageContainer").style.display = "block";
 
       const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
-      const translation = langMap[currentLang];
       localStorage.setItem("currentBannerId", bannerId);
 
+      // ✅ Insert Back Button into stageContainerWrapper if not already added
+      const translation = langMap[currentLang];
+      const section = document.getElementById("stageContainer");
+      const backBtn = document.getElementById("stageBackBtn");
+      backBtn.textContent = translation.backButton;
 
-      try {
-        const data = await apiPost("/leagues", { bannerId });
+      backBtn.addEventListener("click", async () => {
+        const token = localStorage.getItem("authToken");
 
-        if (data.success && data.data) {
-          window.closeModal("tableModal");
-          document.getElementById("bannerContainer").style.display = "none";
-          renderLeagueTable(data.data);
-        } else {
-          showToast(translation.not_found || "Not found", "info");
+        try {
+          const response = await apiGet("/me", token);
+          if (response.success && response.user) {
+            document.getElementById("logoutButtn").style.display = "block";
+            document.getElementById("bannerContainer").style.display = "block";
+            document.getElementById("stageContainer").style.display = "none";
+          } else {
+            localStorage.removeItem("authToken");
+            if (authButtons) authButtons.style.display = "flex";
+          }
+        } catch (err) {
+          console.error("🔴 Error in Back button to /me:", err);
+          localStorage.removeItem("authToken");
+          if (authButtons) authButtons.style.display = "flex";
         }
-      } catch (err) {
-        showToast(translation.something_went_wrong || "Something went wrong", "error");
-        console.error("Error opening table:", err);
-      }
+      });
+
+      section.appendChild(backBtn);
+
+    });
+
+
+    // ✅ Function to handle stage banner click and send request
+    function handleStageBannerClick(stageBannerId) {
+      const bannerId = parseInt(localStorage.getItem("currentBannerId"));
+      const translation = langMap[currentLang];
+
+      apiPost("/leagues", { bannerId })
+        .then((data) => {
+          if (data.success && data.data) {
+            // Optional: store selected stage type for future logic
+            localStorage.setItem("selectedStageType", stageBannerId);
+
+            document.getElementById("stageContainer").style.display = "none";
+            document.getElementById("tableModal").style.display = "none";
+            document.getElementById("bannerContainer").style.display = "none";
+
+            if (stageBannerId === 1) {
+              renderLeagueTable(data.data);
+            } else {
+              renderKnockouts(data.data);
+            }
+          } else {
+            showToast(translation.not_found || "Not found", "info");
+          }
+        })
+        .catch((err) => {
+          showToast(translation.something_went_wrong || "Something went wrong", "error");
+          console.error("Error loading league data:", err);
+        });
+    }
+
+    // ✅ Event listeners for stage banners
+    document.getElementById("stageBanner1").addEventListener("click", () => {
+      handleStageBannerClick(1);
+    });
+
+    document.getElementById("stageBanner2").addEventListener("click", () => {
+      handleStageBannerClick(2);
     });
   },
 

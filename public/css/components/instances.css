@@ -1,5 +1,5 @@
 .league-instance {
-    margin-top: 40px;
+    margin-top: 10px;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.5);
     /* Dark semi-transparent background */
@@ -77,6 +77,41 @@
     margin: 10px 0;
     color: #eee;
     font-size: 16px;
+}
+
+.tab-switcher {
+    display: flex;
+    gap: 10px;
+    margin: 100px 0;
+    margin-bottom: 10px;
+}
+
+.tab-switcher button {
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 3px;
+  border-radius: 6px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 80px;
+  text-align: center;
+  box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.tab-switcher button:hover {
+    /* background: rgba(255, 255, 255, 0.12); */
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.tab-switcher .active-tab {
+  background: rgb(255, 255, 255);
+  color: black;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 

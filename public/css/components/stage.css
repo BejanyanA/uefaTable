@@ -1,0 +1,181 @@
+  .stage-container {
+      padding-top: 60px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+  }
+
+  #stageBanner-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 150px;
+      /* Space between stageBanners */
+      flex-wrap: wrap;
+      /* Allows wrapping on small screens */
+      margin: 20px auto;
+      /* Optional centering */
+  }
+
+  #stageBanner-title {
+      display: block;
+      text-align: center;
+      margin: 0 auto;
+      font-size: 24px;
+      color: rgb(243, 241, 241);
+      /* margin-left: 10px; */
+      max-width: 100%;
+      padding-bottom: 10px;
+  }
+
+  #stage-types {
+      font-size: 36px;
+      color: white;
+      width: fit-content;
+      margin: 30px auto;
+      padding: 40px 20px;
+      text-align: center;
+  }
+
+  .stageBanner {
+      height: 350px;
+      width: 600px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      justify-content: flex-start;
+      align-items: flex-end;
+      text-align: center;
+  }
+
+  .stageBanner-wrap {
+
+      flex-direction: row;
+      position: relative;
+      display: flex;
+      margin-left: 30px;
+      margin-right: 15px;
+      margin-top: 10px;
+  }
+
+  #stageBanner1 {
+
+      background-image: url('../../assets/images/greoupKnockout.png');
+  }
+
+  #stageBanner2 {
+
+      background-image: url('../../assets/images/knockout.png');
+  }
+
+  #stageBackBtn {
+      top: 88px;
+      left: 25px;
+      z-index: 10;
+      color: white;
+      background: #1d1d1d;
+      padding: 6px 3px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s, transform 0.1s;
+      white-space: nowrap;
+      width: 80px;
+      text-align: center;
+      box-sizing: content-box;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      position: fixed;
+  }
+
+  #stageBackBtn:hover {
+      background: black;
+  }
+
+  #stageBackBtn:active {
+      transform: scale(0.96);
+  }
+
+
+
+  /* Mobile */
+  @media (max-width: 480px) {
+
+      .stage-container {
+          padding-top: 75px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+      }
+
+
+      #stageBanner-title {
+          font-size: 14px;
+      }
+
+      #stage-types {
+          font-size: 25px;
+          color: white;
+          width: fit-content;
+          margin: 15px auto;
+          padding: 5px 20px;
+          text-align: center;
+      }
+
+      .stageBanner {
+          text-align: center;
+          display: flex;
+          margin-bottom: 3px;
+          height: 200px;
+          width: 360px;
+          justify-content: flex-start;
+          align-items: flex-end;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+      }
+
+      #stageBanner-wrap {
+          display: flex;
+          justify-content: center;
+          gap: 50px;
+          /* Space between stageBanners */
+          flex-wrap: wrap;
+          /* Allows wrapping on small screens */
+          margin: 3%;
+          /* Optional centering */
+      }
+
+      #stageBackBtn {
+          top: 25px;
+          left: 25px;
+          z-index: 10;
+          color: white;
+          background: #1d1d1d;
+          padding: 6px 3px;
+          cursor: pointer;
+          font-size: 12px;
+          border-radius: 6px;
+          transition: background 0.3s, color 0.3s, transform 0.1s;
+          white-space: nowrap;
+          width: 60px;
+          text-align: center;
+          box-sizing: content-box;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+          position: absolute;
+      }
+
+
+      #stageBanner1 {
+
+          background-image: url('../../assets/images/greoupKnockout.png') !important;
+      }
+
+      #stageBanner2 {
+
+          background-image: url('../../assets/images/knockout.png') !important;
+      }
+  }

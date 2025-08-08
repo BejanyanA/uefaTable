@@ -23,7 +23,7 @@ export function renderLeagueTable(data) {
       const response = await apiGet("/me", token);
       if (response.success && response.user) {
         document.getElementById("logoutButtn").style.display = "block";
-        document.getElementById("bannerContainer").style.display = "block";
+        document.getElementById("stageContainer").style.display = "block";
         document.getElementById("leagueType1").style.display = "none";
       } else {
         localStorage.removeItem("authToken");
@@ -182,19 +182,18 @@ export function renderLeagueInstances(instanceData) {
     return;
   }
 
-  // ✅ Back button to return to /leagues
-
+  // ✅ Back button
   const backBtn = document.createElement("button");
   backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
-  const bannerId = parseInt(localStorage.getItem("currentBannerId"))
-  backBtn.addEventListener("click", async () => {
 
+  const bannerId = parseInt(localStorage.getItem("currentBannerId"));
+  backBtn.addEventListener("click", async () => {
     try {
       const data = await apiPost("/leagues", { bannerId });
       if (data.success && data.data) {
         wrapper.style.display = "none";
-        document.getElementById("bannerContainer").style.display = "none"; // Optional if modal used
+        document.getElementById("bannerContainer").style.display = "none";
         renderLeagueTable(data.data);
       } else {
         showToast("Table not found.");
@@ -205,11 +204,51 @@ export function renderLeagueInstances(instanceData) {
     }
   });
 
-  wrapper.appendChild(backBtn); // ✅ Add back button to wrapper
-
-
+  wrapper.appendChild(backBtn);
   wrapper.style.display = "block";
 
+  // ✅ TAB SWITCHERS
+  const tabWrapper = document.createElement("div");
+  tabWrapper.className = "tab-switcher";
+
+  const groupStageBtn = document.createElement("button");
+  groupStageBtn.textContent = "Group Stage";
+  groupStageBtn.classList.add("active-tab");
+
+  const knockoutBtn = document.createElement("button");
+  knockoutBtn.textContent = "Knockouts";
+
+  tabWrapper.appendChild(groupStageBtn);
+  tabWrapper.appendChild(knockoutBtn);
+  wrapper.appendChild(tabWrapper);
+
+  // ✅ Containers for tab content
+  const groupStageContainer = document.createElement("div");
+  groupStageContainer.className = "tab-content";
+  groupStageContainer.id = "groupStageTab";
+
+  const knockoutContainer = document.createElement("div");
+  knockoutContainer.className = "tab-content";
+  knockoutContainer.id = "knockoutTab";
+  knockoutContainer.style.display = "none"; // will be shown later
+
+  // ✅ Handle tab switching
+  groupStageBtn.addEventListener("click", () => {
+    groupStageBtn.classList.add("active-tab");
+    knockoutBtn.classList.remove("active-tab");
+    groupStageContainer.style.display = "block";
+    knockoutContainer.style.display = "none";
+  });
+
+  knockoutBtn.addEventListener("click", () => {
+    knockoutBtn.classList.add("active-tab");
+    groupStageBtn.classList.remove("active-tab");
+    groupStageContainer.style.display = "none";
+    knockoutContainer.style.display = "block";
+    // 👉 You can call renderKnockoutStage() here in future
+  });
+
+  // ✅ Loop through instances and render inside groupStageContainer
   instances.forEach(instance => {
     const groups = instance.groups || {};
     if (!Object.keys(groups).length) return;
@@ -230,20 +269,17 @@ export function renderLeagueInstances(instanceData) {
     for (const [groupName, groupData] of Object.entries(groups)) {
       const groupDiv = document.createElement("div");
       groupDiv.className = "group-block";
-
-      // 🔹 Set data attributes for click handler
       groupDiv.dataset.leagueId = instance.id;
       groupDiv.dataset.groupId = groupData.groupId;
       groupDiv.dataset.groupName = groupName;
 
       groupDiv.innerHTML = `
-  <h3>${groupName}</h3>
-  <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
-    ${groupData.clubs.map((club, index) => `<li>${index + 1}.&nbsp;&nbsp;${club.name}</li>`).join("")}
-  </ul>
-`;
+        <h3>${groupName}</h3>
+        <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
+          ${groupData.clubs.map((club, index) => `<li>${index + 1}.&nbsp;&nbsp;${club.name}</li>`).join("")}
+        </ul>
+      `;
 
-      // ✅ CLICK HANDLER
       groupDiv.addEventListener("click", () => {
         const leagueId = parseInt(groupDiv.dataset.leagueId);
         const groupId = parseInt(groupDiv.dataset.groupId);
@@ -256,6 +292,10 @@ export function renderLeagueInstances(instanceData) {
 
     centeredWrapper.appendChild(groupsRow);
     instanceDiv.appendChild(centeredWrapper);
-    wrapper.appendChild(instanceDiv);
+    groupStageContainer.appendChild(instanceDiv);
   });
+
+  // ✅ Append both tab containers
+  wrapper.appendChild(groupStageContainer);
+  wrapper.appendChild(knockoutContainer);
 }
