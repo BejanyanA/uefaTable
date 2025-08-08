@@ -188,9 +188,13 @@ export function renderLeagueInstances(instanceData) {
   backBtn.id = "backBtn";
 
   const bannerId = parseInt(localStorage.getItem("currentBannerId"));
+
+  const stageBannerId = parseInt(localStorage.getItem("selectedStageType"));
+  const isGroup = stageBannerId === 1;
+  
   backBtn.addEventListener("click", async () => {
     try {
-      const data = await apiPost("/leagues", { bannerId });
+      const data = await apiPost("/leagues", { bannerId, isGroup });
       if (data.success && data.data) {
         wrapper.style.display = "none";
         document.getElementById("bannerContainer").style.display = "none";

@@ -158,6 +158,7 @@ export const LeagueManager = {
   },
 
 
+
   initOpen: async function () {
 
     // 🔹 Banner click logic
@@ -217,34 +218,35 @@ export const LeagueManager = {
 
     });
 
-
     // ✅ Function to handle stage banner click and send request
     function handleStageBannerClick(stageBannerId) {
       const bannerId = parseInt(localStorage.getItem("currentBannerId"));
       const translation = langMap[currentLang];
 
-      apiPost("/leagues", { bannerId })
+      const isGroup = stageBannerId === 1;
+      localStorage.setItem("selectedStageType", stageBannerId);
+
+      // ✅ Send request
+      apiPost("/leagues", { bannerId, isGroup })
         .then((data) => {
           if (data.success && data.data) {
-            // Optional: store selected stage type for future logic
-            localStorage.setItem("selectedStageType", stageBannerId);
-
             document.getElementById("stageContainer").style.display = "none";
             document.getElementById("tableModal").style.display = "none";
             document.getElementById("bannerContainer").style.display = "none";
 
-            if (stageBannerId === 1) {
+            if (isGroup) {
               renderLeagueTable(data.data);
             } else {
-              renderKnockouts(data.data);
+              renderLeagueTable(data.data); // Need to be changed when the Knockout is ready
             }
           } else {
             showToast(translation.not_found || "Not found", "info");
+            console.warn("⛔ Response data:", data);
           }
         })
         .catch((err) => {
           showToast(translation.something_went_wrong || "Something went wrong", "error");
-          console.error("Error loading league data:", err);
+          console.error("❌ Error loading league data:", err);
         });
     }
 
@@ -257,7 +259,6 @@ export const LeagueManager = {
       handleStageBannerClick(2);
     });
   },
-
 
 
 
@@ -419,7 +420,11 @@ export const LeagueManager = {
 
           const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
           localStorage.setItem("currentBannerId", bannerId);
-          const data = await apiPost("/leagues", { bannerId });
+
+          const stageBannerId = parseInt(localStorage.getItem("selectedStageType"));
+          const isGroup = stageBannerId === 1;
+
+          const data = await apiPost("/leagues", { bannerId, isGroup });
 
           if (data.success && data.data) {
             window.closeModal("tableModal");
@@ -435,6 +440,7 @@ export const LeagueManager = {
       }
     });
   },
+
 
 
   initDelete: async function (leagueId) {
@@ -469,7 +475,11 @@ export const LeagueManager = {
 
           const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
           localStorage.setItem("currentBannerId", bannerId);
-          const data = await apiPost("/leagues", { bannerId });
+
+          const stageBannerId = parseInt(localStorage.getItem("selectedStageType"));
+          const isGroup = stageBannerId === 1;
+
+          const data = await apiPost("/leagues", { bannerId, isGroup });
 
           if (data.success && data.data) {
             window.closeModal("tableModal");

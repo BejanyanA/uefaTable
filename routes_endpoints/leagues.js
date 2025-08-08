@@ -19,20 +19,21 @@ export async function handleLeagues(request, env) {
   }
 
   const userId = payload.id;
-  const { bannerId } = await parseBody(request);
+  const { bannerId, isGroup } = await parseBody(request);
 
-  // Step 1: Get created leagues
+  // Step 1: Get created leagues with filter
   const created = await env.core_data.prepare(`
-  SELECT * FROM leagues WHERE banner_id = ? AND created_by_user_id = ?
-`).bind(bannerId, userId).all();
+    SELECT * FROM leagues 
+    WHERE banner_id = ? AND created_by_user_id = ? AND is_group = ?
+  `).bind(bannerId, userId, isGroup).all();
 
-  // Step 2: Get granted leagues
+  // Step 2: Get granted leagues with filter
   const granted = await env.core_data.prepare(`
-  SELECT l.*
-  FROM league_access la
-  JOIN leagues l ON la.league_id = l.id
-  WHERE la.user_id = ? AND l.banner_id = ?
-`).bind(userId, bannerId).all();
+    SELECT l.*
+    FROM league_access la
+    JOIN leagues l ON la.league_id = l.id
+    WHERE la.user_id = ? AND l.banner_id = ? AND l.is_group = ?
+  `).bind(userId, bannerId, isGroup).all();
 
   // Step 3: Combine with access type
   const leagueMap = new Map();
@@ -51,12 +52,13 @@ export async function handleLeagues(request, env) {
     data: {
       leagues: Array.from(leagueMap.values())
         .sort((a, b) => b.id - a.id)
-        .map(({ id, name, banner_id, created_by_user_id, created_at, accessType }) => ({
+        .map(({ id, name, banner_id, created_by_user_id, created_at, accessType, is_group }) => ({
           id,
           name,
           banner_id,
           created_by_user_id,
           created_at,
+          is_group,
           accessType
         }))
     }
