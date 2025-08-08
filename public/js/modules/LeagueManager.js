@@ -32,6 +32,7 @@ export const LeagueManager = {
         document.getElementById("clubSearchLabel").style.display = "none";
         document.getElementById("stageSelect").style.display = "none";
         document.getElementById("stageError").style.display = "none";
+        document.getElementById("dropdownRow").style.display = "none";
       });
     });
 
@@ -60,6 +61,7 @@ export const LeagueManager = {
       document.getElementById("clubSearch").style.display = "block";
       document.getElementById("clubSearchLabel").style.display = "block";
       document.getElementById("stageError").style.display = "block";
+      document.getElementById("dropdownRow").style.display = "flex";
     });
 
     // 🔹 Submit password
@@ -104,7 +106,7 @@ export const LeagueManager = {
 
         if (rawValue === "") {
           setError("stageError", translation.required);
-          hasError = true; 
+          hasError = true;
         }
 
         if (!clubIds.length) {

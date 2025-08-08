@@ -203,10 +203,10 @@
         </div>
         <div class="banner-wrap" id="stageBanner-wrap">
           <div id="stageBanner1" class="stageBanner" stageBanner-id="1">
-            <h2 id="stageBanner-title">Group + Knockouts</h2>
+            <h2 id="groupStage-title">Group + Knockouts</h2>
           </div>
           <div id="stageBanner2" class="stageBanner" stageBanner-id="2">
-            <h2 id="stageBanner-title">Knockouts</h2>
+            <h2 id="knockoutStage-title">Knockouts</h2>
           </div>
         </div>
       </div>
@@ -243,17 +243,23 @@
             <div id="friendError" class="friend-list-error" style="display: none;"></div>
 
             <!-- Single Select Dropdown -->
-            <div class="dropdown-row">
-              <select id="stageSelect" class="stageModal-dropdown" placeholder=" " >
-                <option class="teamCount" value="true">Group</option>
-                <option class="teamCount" value="false">Knockout</option>
-              </select>
+            <div class="dropdown-row" id="dropdownRow">
+              <div class="dropdown-block">
+                <label for="stageSelect" id="stageSelectLabel">Stage Type</label>
+                <select id="stageSelect" class="stageModal-dropdown">
+                  <option class="teamCount" id="groupStage" value="true">Group</option>
+                  <option class="teamCount" id="knockoutStage" value="false">Knockout</option>
+                </select>
+              </div>
 
-              <select id="count-select" class="modal-dropdown" placeholder=" " >
-                <label for="count-select" id="countSelectLabel"></label>
-                <option class="teamCount" value="32">32</option>
-                <option class="teamCount" value="64">64</option>
-              </select>
+
+              <div class="dropdown-block">
+                <label for="count-select" id="countSelectLabel">Team Count</label>
+                <select id="count-select" class="modal-dropdown">
+                  <option class="teamCount" value="32">32</option>
+                  <option class="teamCount" value="64">64</option>
+                </select>
+              </div>
             </div>
             <div id="stageError" class="stageModal-dropdown-error"></div>
             <div id="teamCountError" class="modal-dropdown-error"></div>

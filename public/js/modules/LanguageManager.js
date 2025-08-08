@@ -67,6 +67,9 @@ export const langMap = {
     friends: "All friends",
     usersWithAccess: "Friends with Access",
     edit_league_title: "Edit League",
+    stageType: "Competition Type",
+    groupStage: "Group + Playoff",
+    knockoutStage: "Only Playoff",
 
     //BE translations
     username_exists: "Username already exists",
@@ -108,7 +111,7 @@ export const langMap = {
     tableActions: "Աղյուսակի գործողություն",
     leagueName: "Լիգայի անվանում",
     competitionTypes: "Մրցույթի տեսակներ",
-    createCompetition: "Ստեղծել մրցույթ",
+    createCompetition: "Ստեղծել մրցաշար",
     shortLeagueName: "Լիգայի անվանում պետք է պարունակի առնվազն 3 նիշ",
     longLeagueName: "Լիգայի անվանում չպետք է գերազանցի 30 նիշը",
     selectTeamCount: "Թմերի քանակը",
@@ -152,6 +155,9 @@ export const langMap = {
     friends: "Բոլոր ընկերները",
     usersWithAccess: "Մուտքի իրավունք ունեցող",
     edit_league_title: "Խմբագրել լիգան",
+    stageType: "Մրցաշարի տեսակը",
+    groupStage: "Խմբային + Փլեյ-օֆֆ",
+    knockoutStage: "Միայն Փլեյ-օֆֆ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -237,6 +243,9 @@ export const langMap = {
     friends: "Tous les amis",
     usersWithAccess: "Amis avec accès",
     edit_league_title: "Modifier la ligue",
+    stageType: "Type de compétition",
+    groupStage: "Groupe + Playoffs",
+    knockoutStage: "Playoffs Seulement",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -348,6 +357,11 @@ function changeLang(lang) {
   // document.getElementById("clubSearch").placeholder = t.clubSearch;
   document.getElementById("backBtn").innerText = t.backButton;
   document.getElementById("cancelBtn").innerText = t.cancel;
+  document.getElementById("groupStage").innerText = t.groupStage;
+  document.getElementById("knockoutStage").innerText = t.knockoutStage;
+  document.getElementById("stage-types").innerText = t.stageType;
+  document.getElementById("groupStage-title").innerText = t.groupStage;
+  document.getElementById("knockoutStage-title").innerText = t.knockoutStage;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;
@@ -359,7 +373,8 @@ function changeLang(lang) {
   document.getElementById("leagueNameLabel").textContent = t.leagueName;
   document.getElementById("clubSearchLabel").textContent = t.clubSearch;
   document.getElementById("leagueNameEditlabel").textContent = t.leagueName;
-  // document.getElementById("countSelectLabel").textContent = t.selectTeamCount;
+  document.getElementById("countSelectLabel").textContent = t.selectTeamCount;
+  document.getElementById("stageSelectLabel").textContent = t.stageType;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;

@@ -2,14 +2,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     margin-top: 15px;
     margin-bottom: 30px;
     width: 100%;
   }
 
   .modal-dropdown {
-    width: 45%;
+    width: 100%;
     padding: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
@@ -23,7 +23,7 @@
   }
 
   .stageModal-dropdown {
-    width: 50%;
+    width: 105%;
     padding: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
@@ -34,6 +34,20 @@
     color: #f0f0f0;
     backdrop-filter: blur(4px);
     box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
+  }
+
+  .dropdown-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+
+  .dropdown-block label {
+    color: white;
+    font-size: 12px;
+    margin-bottom: 4px;
+    margin-left: 4px;
   }
 
   .stageModal-dropdown option {
@@ -63,6 +77,8 @@
   min-height: 18px;
 } */
 
+
+
   /* Mobile */
   @media (max-width: 480px) {
 
@@ -70,7 +86,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       margin-top: 10px;
       margin-bottom: 35px;
       width: 100%;
@@ -78,16 +94,29 @@
 
     .modal-dropdown {
       position: relative;
-      margin-bottom: -10px;
+      margin-bottom: -5px;
       padding: 4px;
-      width: 45%;
+      width: 100%;
     }
 
     .stageModal-dropdown {
       position: relative;
-      margin-bottom: -10px;
+      margin-bottom: -5px;
       padding: 4px;
-      width: 50%;
+      width: 105%;
+      color: white;
+    }
+
+    .dropdown-block {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .dropdown-block label {
+      color: white;
+      font-size: 12px;
+      margin-bottom: 4px;
     }
 
     #count-stageSelect {

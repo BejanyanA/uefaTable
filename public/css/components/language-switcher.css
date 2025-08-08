@@ -41,6 +41,7 @@
 
 .dropdown-menu.show {
    display: flex;
+   z-index: 1000;
 }
 
 .language-option {
@@ -78,6 +79,7 @@
       top: 30px;
       min-width: 100px;
       padding: 5px 0;
+      z-index: 1000;
    }
 
    .language-auth-group {
@@ -91,8 +93,6 @@
       margin-right: 0;
       order: -1;
    }
-
-
 
    .lang-flag {
       width: 24px;

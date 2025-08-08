@@ -16,7 +16,8 @@
       /* Optional centering */
   }
 
-  #stageBanner-title {
+  #knockoutStage-title,
+  #groupStage-title {
       display: block;
       text-align: center;
       margin: 0 auto;
@@ -74,7 +75,7 @@
   #stageBackBtn {
       top: 88px;
       left: 25px;
-      z-index: 10;
+      z-index: 1;
       color: white;
       background: #1d1d1d;
       padding: 6px 3px;
@@ -111,7 +112,8 @@
       }
 
 
-      #stageBanner-title {
+      #knockoutStage-title,
+      #groupStage-title {
           font-size: 14px;
       }
 
@@ -151,7 +153,7 @@
       #stageBackBtn {
           top: 25px;
           left: 25px;
-          z-index: 10;
+          z-index: 1;
           color: white;
           background: #1d1d1d;
           padding: 6px 3px;
