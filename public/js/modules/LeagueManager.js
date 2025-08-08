@@ -30,6 +30,8 @@ export const LeagueManager = {
         document.getElementById("clubCount").innerHTML = "";
         document.getElementById("clubSearch").style.display = "none";
         document.getElementById("clubSearchLabel").style.display = "none";
+        document.getElementById("stageSelect").style.display = "none";
+        document.getElementById("stageError").style.display = "none";
       });
     });
 
@@ -50,12 +52,14 @@ export const LeagueManager = {
       document.getElementById("openCreateSection").style.display = "block";
       document.getElementById("count-select").style.display = "block";
       document.getElementById("user-select").style.display = "block";
+      document.getElementById("stageSelect").style.display = "block";
       document.getElementById("teamCountError").style.display = "block";
       document.getElementById("clubList").style.display = "block";
       document.getElementById("clubsError").style.display = "block";
       document.getElementById("clubCount").style.display = "block";
       document.getElementById("clubSearch").style.display = "block";
       document.getElementById("clubSearchLabel").style.display = "block";
+      document.getElementById("stageError").style.display = "block";
     });
 
     // 🔹 Submit password
@@ -63,7 +67,7 @@ export const LeagueManager = {
     if (createBtn) {
       createBtn.addEventListener("click", async () => {
         const translation = langMap[currentLang];
-        clearErrors(["leagueNameError", "teamCountError", "clubsError"]);
+        clearErrors(["leagueNameError", "teamCountError", "clubsError", "stageError"]);
 
         let hasError = false;
 
@@ -74,10 +78,13 @@ export const LeagueManager = {
         const selectedClubIds = Array.from(document.querySelectorAll('#clubList input[type="checkbox"]:checked'))
           .map(cb => parseInt(cb.value));
         const clubIds = selectedClubIds;
+        const rawValue = document.getElementById("stageSelect").value;
+        const isGroup = rawValue === "true";
 
         const leagueNameError = document.getElementById("leagueNameError");
         const teamCountError = document.getElementById("teamCountError");
         const clubsError = document.getElementById("clubsError");
+        const stageError = document.getElementById("stageError");
 
         if (!name) {
           setError("leagueNameError", translation.required);
@@ -93,6 +100,11 @@ export const LeagueManager = {
         if (!teamCount) {
           setError("teamCountError", translation.required);
           hasError = true;
+        }
+
+        if (rawValue === "") {
+          setError("stageError", translation.required);
+          hasError = true; 
         }
 
         if (!clubIds.length) {
@@ -121,14 +133,14 @@ export const LeagueManager = {
         leagueNameError.textContent = "";
         teamCountError.textContent = "";
         clubsError.textContent = "";
+        stageError.textContent = "";
 
         try {
-          const createLeague = await apiPost("/create-leagues", { bannerId, name, teamCount, friendIds, clubIds });
-
+          const createLeague = await apiPost("/create-leagues", { bannerId, name, teamCount, friendIds, clubIds, isGroup });
 
           if (createLeague.success && createLeague.data) {
             try {
-              const data = await apiPost("/leagues", { bannerId });
+              const data = await apiPost("/leagues", { bannerId, isGroup });
 
               if (data.success && data.data) {
                 window.closeModal("tableModal");

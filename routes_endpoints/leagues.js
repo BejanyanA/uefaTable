@@ -81,7 +81,7 @@ export async function handleLeaguesCreate(request, env) {
   }
 
 
-  const { name, bannerId, clubIds, teamCount, friendIds } = await request.json();
+  const { name, bannerId, clubIds, teamCount, friendIds, isGroup } = await request.json();
 
   const errors = {};
   if (!bannerId) {
@@ -103,6 +103,10 @@ export async function handleLeaguesCreate(request, env) {
   }
   if (!Array.isArray(clubIds) || clubIds.length === 0 || !clubIds.every(id => typeof id === 'number')) {
     errors.clubIds = "Club IDs must be a non-empty array of numbers";
+  }
+
+  if (typeof isGroup !== 'boolean') {
+    errors.isGroup = "Stage is required";
   }
 
   if (!teamCount) {
@@ -127,10 +131,10 @@ export async function handleLeaguesCreate(request, env) {
 
   try {
     const league = await db.prepare(`
-      INSERT INTO leagues (name, banner_id, created_by_user_id)
-      VALUES (?, ?, ?)
+      INSERT INTO leagues (name, banner_id, created_by_user_id, is_group)
+      VALUES (?, ?, ?, ?)
       RETURNING id
-    `).bind(name, bannerId, userId).first();
+    `).bind(name, bannerId, userId, isGroup).first();
     const leagueId = league.id;
 
     const instance = await db.prepare(`
