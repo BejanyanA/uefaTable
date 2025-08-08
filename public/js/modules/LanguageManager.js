@@ -26,7 +26,7 @@ export const langMap = {
     createCompetition: "Create Competition",
     shortLeagueName: "League Name must be at least 3 characters",
     longLeagueName: "League Name must not exceed 30 characters",
-    selectTeamCount: "Select Team Count",
+    selectTeamCount: "Team Count",
     lessClubCount: "The number of selected teams is less than the required maximum",
     largeClubCount: "The number of selected teams is greater than the required maximum",
     selectedCount: "Selected",
@@ -111,7 +111,7 @@ export const langMap = {
     createCompetition: "Ստեղծել մրցույթ",
     shortLeagueName: "Լիգայի անվանում պետք է պարունակի առնվազն 3 նիշ",
     longLeagueName: "Լիգայի անվանում չպետք է գերազանցի 30 նիշը",
-    selectTeamCount: "Ընտրեք թմերի քանակը",
+    selectTeamCount: "Թմերի քանակը",
     lessClubCount: "Ընտրված թմերի քանակը պակաս է պահանջվող առավելագույնից",
     largeClubCount: "Ընտրված թմերի քանակը գերազանցում է պահանջվող առավելագույնը",
     selectedCount: "Ընտրված է",
@@ -343,7 +343,7 @@ function changeLang(lang) {
   // document.getElementById("leagueNameEdit").placeholder = t.leagueName;
   document.getElementById("competition-types").innerText = t.competitionTypes;
   document.getElementById("createCompetition").innerText = t.createCompetition;
-  document.getElementById("count-text").innerText = t.selectTeamCount;
+  // document.getElementById("count-text").innerText = t.selectTeamCount;
   document.getElementById("clubCount").innerText = t.selectedCount;
   // document.getElementById("clubSearch").placeholder = t.clubSearch;
   document.getElementById("backBtn").innerText = t.backButton;
@@ -359,6 +359,7 @@ function changeLang(lang) {
   document.getElementById("leagueNameLabel").textContent = t.leagueName;
   document.getElementById("clubSearchLabel").textContent = t.clubSearch;
   document.getElementById("leagueNameEditlabel").textContent = t.leagueName;
+  // document.getElementById("countSelectLabel").textContent = t.selectTeamCount;
 
   const flag = document.getElementById("langTrigger");
   if (flag) flag.src = `assets/flags/${lang}.svg`;

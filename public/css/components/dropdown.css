@@ -1,122 +1,132 @@
-.modal-dropdown {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  margin-bottom: -8px;
-  margin-top: 10px;
-  font-size: 14px;
-  box-sizing: border-box;
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  color: #f0f0f0;
-  backdrop-filter: blur(4px);
-  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
-}
-
-.stageModal-dropdown {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  margin-bottom: -8px;
-  margin-top: 10px;
-  font-size: 14px;
-  box-sizing: border-box;
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  color: #f0f0f0;
-  backdrop-filter: blur(4px);
-  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
-}
-
-.stageModal-dropdown option {
-  color: #f0f0f0;
-  font-size: 14px;
-  background: rgba(30, 30, 30, 0.95);
-  padding: 6px 10px;
-  line-height: 1.4;
-  border: none;
-}
-
-.modal-dropdown option {
-  color: #f0f0f0;
-  font-size: 14px;
-  background: rgba(30, 30, 30, 0.95);
-  padding: 6px 10px;
-  line-height: 1.4;
-  border: none;
-}
-
-.modal-dropdown-error {
-  color: red;
-  font-size: 12px;
-  margin-top: 12px;
-  /* 👈 Add this for spacing above */
-  margin-bottom: 18px;
-  /* 👈 Reduce bottom if needed */
-  align-self: flex-start;
-  min-height: 18px;
-  /* 👈 Optional: keep consistent height */
-}
-
-/* Mobile */
-@media (max-width: 480px) {
+  .dropdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    width: 100%;
+  }
 
   .modal-dropdown {
+    width: 45%;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
     position: relative;
-    margin-bottom: -10px;
-    padding: 4px;
-    width: 100%;
-    margin-top: 0px;
+    background: rgba(255, 255, 255, 0.03);
+    color: #f0f0f0;
+    backdrop-filter: blur(4px);
+    box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
   }
 
   .stageModal-dropdown {
-    position: relative;
-    margin-bottom: -10px;
-    padding: 4px;
-    width: 100%;
-    margin-top: 5px;
-  }
-
-
-  #count-stageSelect {
-    padding: 5px;
-    font-size: 12px;
-  }
-
-  #count-select {
-    padding: 4px;
-    font-size: 12px;
-  }
-
-  .modal-dropdown input {
-    padding: 4px;
-    margin-bottom: 3px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
+    width: 50%;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 14px;
+    box-sizing: border-box;
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    color: #f0f0f0;
+    backdrop-filter: blur(4px);
+    box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
+  }
+
+  .stageModal-dropdown option {
+    color: #f0f0f0;
+    font-size: 14px;
+    background: rgba(30, 30, 30, 0.95);
+    padding: 6px 10px;
+    line-height: 1.4;
+    border: none;
   }
 
   .modal-dropdown option {
-    position: absolute;
-    top: 50%;
-    left: 5px;
-    transform: translateY(-50%);
     color: #f0f0f0;
-    font-size: 12px;
-    pointer-events: none;
-    transition: 0.2s ease all;
+    font-size: 14px;
     background: rgba(30, 30, 30, 0.95);
-    padding: 0 3px;
-    line-height: 1;
+    padding: 6px 10px;
+    line-height: 1.4;
+    border: none;
   }
 
-  .modal-dropdown input,
-  .modal-dropdown button,
-  .modal-dropdown select,
-  .modal-dropdown textarea {
-    font-size: 16px;
+  /* .modal-dropdown-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 12px;
+  margin-bottom: 18px;
+  align-self: flex-start;
+  min-height: 18px;
+} */
+
+  /* Mobile */
+  @media (max-width: 480px) {
+
+    .dropdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 35px;
+      width: 100%;
+    }
+
+    .modal-dropdown {
+      position: relative;
+      margin-bottom: -10px;
+      padding: 4px;
+      width: 45%;
+    }
+
+    .stageModal-dropdown {
+      position: relative;
+      margin-bottom: -10px;
+      padding: 4px;
+      width: 50%;
+    }
+
+    #count-stageSelect {
+      padding: 5px;
+      font-size: 12px;
+    }
+
+    #count-select {
+      padding: 4px;
+      font-size: 12px;
+    }
+
+    .modal-dropdown input {
+      padding: 4px;
+      margin-bottom: 3px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .modal-dropdown option {
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      transform: translateY(-50%);
+      color: #f0f0f0;
+      font-size: 12px;
+      pointer-events: none;
+      transition: 0.2s ease all;
+      background: rgba(30, 30, 30, 0.95);
+      padding: 0 3px;
+      line-height: 1;
+    }
+
+    .modal-dropdown input,
+    .modal-dropdown button,
+    .modal-dropdown select,
+    .modal-dropdown textarea {
+      font-size: 16px;
+    }
   }
-}

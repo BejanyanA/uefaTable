@@ -19,11 +19,11 @@
 }
 
 .friend-checkbox-list {
-  height: 80px;
+  height: 150px;
 }
 
 .club-checkbox-list {
-  height: 230px;
+  height: 300px;
 }
 
 .club-checkbox-checkbox,
@@ -102,15 +102,7 @@
 }
 
 .club-list-scroll {
-  max-height: 250px;
-  overflow-y: auto;
-  padding: 3px;
-  border-radius: 6px;
-  margin-bottom: 0px;
-}
-
-.club-list-scroll {
-  max-height: 250px;
+  max-height: 300px;
   overflow-y: auto;
   padding: 3px;
   border-radius: 6px;
@@ -215,6 +207,15 @@
     margin-bottom: -18px;
     width: 100%;
   }
+
+  .club-checkbox-list {
+    height: 250px;
+  }
+
+  .friend-checkbox-list {
+    height: 100px;
+  }
+
 
   .club-search input {
     margin-bottom: 2px;
