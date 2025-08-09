@@ -42,10 +42,11 @@ export async function handleGroupKnockoutMatches(request, env) {
 
     // Get team_count once from leagues
     const leagueRow = await env.core_data.prepare(`
-    SELECT team_count FROM leagues WHERE id = ?
+    SELECT team_count, banner_id FROM leagues WHERE id = ?
     `).bind(leagueId).first();
 
     const teamCount = leagueRow?.team_count ?? 0;
+    const leagueType = leagueRow?.banner_id ?? 0;
 
     // Fetch knockout matches
     const knockouts = await env.core_data.prepare(`
@@ -64,6 +65,7 @@ export async function handleGroupKnockoutMatches(request, env) {
         data: {
             teamCount,
             leagueId,
+            leagueType,
             accessType,
             matches: knockouts.results
         }
