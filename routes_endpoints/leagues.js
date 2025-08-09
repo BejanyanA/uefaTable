@@ -131,10 +131,10 @@ export async function handleLeaguesCreate(request, env) {
 
   try {
     const league = await db.prepare(`
-      INSERT INTO leagues (name, banner_id, created_by_user_id, is_group)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO leagues (name, banner_id, created_by_user_id, is_group, team_count)
+      VALUES (?, ?, ?, ?, ?)
       RETURNING id
-    `).bind(name, bannerId, userId, isGroup).first();
+    `).bind(name, bannerId, userId, isGroup, teamCount).first();
     const leagueId = league.id;
 
     const instance = await db.prepare(`
