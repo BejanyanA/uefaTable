@@ -122,32 +122,32 @@ export async function handleUpdateMatches(request, env) {
 
     await env.core_data.prepare(`
       DELETE FROM league_knockouts
-      WHERE round = '1/8' AND league_id = ? AND match_order = ?
+      WHERE league_id = ? AND match_order = ?
     `).bind(match.league_id, matchOrder).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, '1/8', ?, ?, NULL, 'home')
+      league_id, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, NULL, 'home')
     `).bind(match.league_id, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, '1/8', ?, NULL, ?, 'home')
+      league_id, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, NULL, ?, 'home')
     `).bind(match.league_id, matchOrder, top2[1].team_id).run();
 
     // Second leg: away matches
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, '1/8', ?, NULL, ?, 'away')
+      league_id, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, NULL, ?, 'away')
     `).bind(match.league_id, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, '1/8', ?, ?, NULL, 'away')
+      league_id, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, NULL, 'away')
     `).bind(match.league_id, matchOrder, top2[1].team_id).run();
 
     const pairedGroupId = getPairedGroupId(match.group_id);
