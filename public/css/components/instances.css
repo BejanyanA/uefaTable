@@ -1,7 +1,7 @@
 .league-instance {
     margin-top: 10px;
     padding: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
+    /* background-color: rgba(0, 0, 0, 0.5); */
     /* Dark semi-transparent background */
     border-radius: 12px;
     box-sizing: border-box;
@@ -12,7 +12,7 @@
     margin-top: 10px;
     color: white;
     padding: 0 20px 20px;
-    font-size: 26px;
+    font-size: 30px;
     text-align: center;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .group-block {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
     margin-bottom: 10px;
     margin-right: 10px;
@@ -42,7 +42,6 @@
     min-width: 250px;
     max-width: 280px;
     box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.2);
-    /* ✅ white shadow */
     transition: transform 0.3s ease;
     color: white;
     flex: 0 1 auto;
@@ -129,25 +128,26 @@
     .league-instance {
         margin-top: 130px;
         padding: 10px 10px;
-        /* margin: 20px 10px; */
     }
 
     .league-instance h2 {
         font-size: 20px;
+        margin-bottom: 0px;
+        padding: 0 10px 10px;
     }
 
     .groups-row {
-        flex-direction: column;
+        /* flex-direction: column; */
         align-items: center;
         padding: 10px;
     }
 
     .group-block {
-        width: 90%;
+        width: 100%;
         max-width: 100%;
         margin-bottom: 5px;
         text-align: left;
-        margin-left: -10px;
+        margin-right: 0px;
     }
 
     .group-block h3 {

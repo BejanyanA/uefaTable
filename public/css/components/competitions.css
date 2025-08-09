@@ -2,35 +2,33 @@
     display: flex;
     justify-content: center;
     gap: 50px;
-    /* Space between banners */
     flex-wrap: wrap;
-    /* Allows wrapping on small screens */
     margin: 20px auto;
-    /* Optional centering */
 }
 
 #banner-title {
-    display: inline-block;
-    text-align: bottom;
-    font-size: 20px;
-    color: rgb(165, 165, 165);
+    display: block;
+    font-size: 24px;
+    color: white;
     margin-left: 10px;
-    /* Optional styles: */
+    width: 100%;
     max-width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
 }
 
 #bannerContainerWrapper {
     display: flex;
     justify-content: center;
-    /* ⬅️ center horizontally */
+    margin-top: 70px;
 }
 
 #competition-types {
     font-size: 36px;
     color: white;
     width: fit-content;
-    margin: 30px auto;
-    padding: 50px 20px;
+    margin-bottom: 10px;
+    padding: 30px 20px;
     text-align: center;
 }
 
@@ -45,9 +43,9 @@
     background-repeat: no-repeat;
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    justify-content: flex-start;
-    /* left alignment */
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
 }
 
 .banner-wrap {
@@ -87,20 +85,19 @@
 @media (max-width: 480px) {
 
     #banner-title {
-        display: inline-block;
-        text-align: bottom;
-        font-size: 14px;
-        color: rgb(165, 165, 165);
+        display: block;
+        text-align: center;
+        font-size: 16px;
         margin-left: 10px;
-        /* Optional styles: */
         max-width: 100%;
+        width: 100%;
     }
 
     #competition-types {
         font-size: 25px;
         color: white;
         width: fit-content;
-        margin: 15px auto;
+        margin: 20px auto;
         padding: 5px 20px;
         text-align: center;
     }
@@ -112,6 +109,9 @@
         width: 343px;
         justify-content: flex-start;
         /* left alignment */
+        flex-direction: column;
+        align-items: center;
+        justify-content: end;
         align-items: flex-end;
         background-size: cover;
         background-position: center;

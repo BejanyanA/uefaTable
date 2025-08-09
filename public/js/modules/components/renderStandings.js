@@ -8,12 +8,12 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
   <button id="backBtn">⬅ Back</button>
-    <div class="group-standings-header">
-      <h2>${groupName}</h2>
-    </div>
     <div class="group-tabs">
       <button class="tab-btn active" data-tab="standings" id="standingsTabBtn"></button>
       <button class="tab-btn" data-tab="matches" id="matchesTabBtn"></button>
+    </div>
+    <div class="group-standings-header">
+      <h2>${groupName}</h2>
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;

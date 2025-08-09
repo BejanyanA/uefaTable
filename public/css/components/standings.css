@@ -6,10 +6,11 @@
   display: none;
 }
 
-.tabs {
-  margin-top: 20px;
+.group-tabs {
+  margin-top: 130px;
   display: flex;
   gap: 10px;
+  position: relative;
 }
 
 .tab-btn {
@@ -157,6 +158,22 @@
 
 @media (max-width: 600px) {
 
+  .group-tabs {
+    margin-top: 60px;
+    display: flex;
+    gap: 10px;
+    position: fixed;
+  }
+
+  .group-standings-header h2 {
+    color: white;
+    margin-top: 130px;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 10px;
+  }
+
   #backBtn {
     color: white;
     background: #1d1d1d;
@@ -253,8 +270,7 @@
   }
 
   .header-row {
-    background: rgba(255, 255, 255, 0.1);
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.15); */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     font-weight: bold;
   }
 
