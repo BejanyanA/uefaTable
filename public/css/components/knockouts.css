@@ -1,113 +1,155 @@
-#knockoutTab .bracket-frame {
-  display: grid;
-  grid-template-columns: 1fr 220px 1fr; /* left | center cup | right */
-  gap: 24px;
-  align-items: start;
+#knockoutTab .bracket-frame{
+  display:grid;
+  grid-template-columns:1fr 200px 1fr;
+  gap:20px;
+  align-items:start;
 }
 
-/* Side containers */
-#knockoutTab .bracket-side {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* R1, QF, SF */
-  gap: 24px;
+#knockoutTab .bracket-side{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px; /* tighter */
 }
 
-#knockoutTab .left-side  { direction: ltr; }
-#knockoutTab .right-side { direction: rtl; } /* mirror columns to flow toward center */
-#knockoutTab .right-side > * { direction: ltr; } /* keep inner content normal */
+#knockoutTab .left-side{ direction:ltr; }
+#knockoutTab .right-side{ direction:rtl; }
+#knockoutTab .right-side > *{ direction:ltr; }
 
-/* Round column */
-#knockoutTab .side-round > h3 {
-  text-align: center;
-  color: #fff;
-  margin: 0 0 10px;
+#knockoutTab .side-round > h3,
+#knockoutTab .center-final > h3{
+  color:#fff;
+  text-align:center;
+  margin:0 0 6px; /* tighter */
+  font-weight:700;
+  letter-spacing:.2px;
 }
 
-/* Center cup + final */
-#knockoutTab .bracket-center {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 16px;
-  align-items: start;
-  justify-items: center;
-}
-#knockoutTab .center-final h3 { color: #fff; text-align: center; margin: 0 0 8px; }
-#knockoutTab .cup-wrap { display: grid; place-items: center; }
-#knockoutTab .cup-image { max-width: 180px; opacity: .9; }
-
-/* Cards */
-#knockoutTab .ko-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 12px;
-  padding: 10px;
-  margin-bottom: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+/* ===== Center (Final + Cup) ===== */
+#knockoutTab .bracket-center{
+  display:grid;
+  grid-template-rows:auto 1fr;
+  gap:12px;
+  justify-items:center;
 }
 
-#knockoutTab .ko-placeholder { 
-  background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.25);
-  color: #cbd5e0;
-}
-#knockoutTab .ko-placeholder-row { padding: 10px; text-align: center; }
-
-/* Combined row in card */
-#knockoutTab .ko-combined-row {
-  display: grid;
-  grid-template-columns:
-    140px                     /* player left */
-    minmax(140px, 1fr)        /* team1 */
-    60px 60px                 /* home leg */
-    60px 60px                 /* away leg */
-    minmax(140px, 1fr)        /* team2 */
-    140px;                    /* player right */
-  gap: 8px;
-  align-items: center;
+#knockoutTab .cup-wrap{
+  display:grid;
+  place-items:center;
 }
 
+#knockoutTab .cup-image{
+  max-width:120px;   /* balanced desktop size */
+  height:auto;
+  opacity:.95;
+}
+
+/* ===== Cards ===== */
+#knockoutTab .ko-card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;
+  padding:6px;              /* compact */
+  margin-bottom:8px;        /* compact */
+  box-shadow:0 4px 12px rgba(0,0,0,.28);
+}
+
+#knockoutTab .ko-placeholder{
+  background:rgba(255,255,255,.04);
+  border:1px dashed rgba(255,255,255,.25);
+  color:#cbd5e0;
+}
+
+#knockoutTab .ko-placeholder-row{
+  padding:8px;
+  text-align:center;
+}
+
+/* ===== Two-row compact layout per tie ===== */
+/* Card body that stacks two team rows */
+#knockoutTab .ko-row-2{
+  display:grid;
+  gap:6px;
+}
+
+/* One team per row */
+#knockoutTab .ko-team-row{
+  display:grid;
+  align-items:center;
+  gap:6px;
+  /* [U][Team][Score][Score] */
+  grid-template-columns: 120px minmax(140px,1fr) 44px 44px;
+}
+
+#knockoutTab .ko-team-row.right{
+  /* rotated for right side: [Score][Score][Team][U] */
+  grid-template-columns: 44px 44px minmax(140px,1fr) 120px;
+}
+
+/* ===== Inputs / selects ===== */
 #knockoutTab .user-dropdown,
-#knockoutTab .score-input {
-  height: 36px;
-  width: 100%;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: #fff;
-  padding: 6px 10px;
+#knockoutTab .score-input{
+  height:30px;  /* compact but readable */
+  width:100%;
+  border-radius:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  color:#fff;
+  padding:2px 8px;
 }
-#knockoutTab .user-dropdown:disabled { opacity: .6; cursor: not-allowed; }
-#knockoutTab .score-input { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+#knockoutTab .user-dropdown:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+#knockoutTab .score-input{
+  text-align:center;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+
 #knockoutTab .score-input::-webkit-outer-spin-button,
-#knockoutTab .score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-#knockoutTab .score-input[type="number"] { -moz-appearance: textfield; }
-
-#knockoutTab .team-name {
-  color: #fff;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+#knockoutTab .score-input::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
 }
 
-/* Leg badges spanning both inputs of each leg */
-#knockoutTab .ko-leg-badges {
-  display: grid;
-  grid-template-columns:
-    140px minmax(140px, 1fr) 60px 60px 60px 60px minmax(140px, 1fr) 140px;
-  gap: 8px;
-  margin-top: 6px;
-  font-size: 10px;
-  color: #cbd5e0;
+#knockoutTab .score-input[type="number"]{
+  -moz-appearance:textfield;
 }
-#knockoutTab .ko-leg-badges .span-home { grid-column: 3 / 5; text-align: center; }
-#knockoutTab .ko-leg-badges .span-away { grid-column: 5 / 7; text-align: center; }
 
-/* Mobile: make sides scroll horizontally (optional) */
-@media (max-width: 900px) {
-  #knockoutTab .bracket-frame {
-    grid-template-columns: 100%;
+/* ===== Team name ===== */
+#knockoutTab .team-name{
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 900px){
+  #knockoutTab .bracket-frame{
+    grid-template-columns:100%;
+    gap:14px;
   }
-  #knockoutTab .bracket-center { order: -1; }
-  #knockoutTab .bracket-side {
-    display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
+
+  #knockoutTab .bracket-center{
+    order:-1; /* show cup/final first on mobile */
   }
-  #knockoutTab .side-round { min-width: 280px; }
+
+  #knockoutTab .bracket-side{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #knockoutTab .side-round{
+    min-width:300px; /* slightly narrower column on mobile */
+  }
+
+  #knockoutTab .cup-image{
+    max-width:88px; /* balanced mobile size */
+  }
 }

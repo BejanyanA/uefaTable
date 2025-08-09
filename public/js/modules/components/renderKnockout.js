@@ -189,31 +189,23 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
 
     const accessType = data.accessType;
     const editable = accessType === "owner";
-    const teamCount = Number(data.teamCount) || 32;           // 32 or 64
-    const koTeams   = teamCount === 64 ? 32 : 16;              // entrants at first KO round
-    const groupsCnt = Math.max(2, Math.min(16, Math.round(teamCount / 4)));
-    const GROUPS    = Array.from({ length: groupsCnt }, (_, i) => String.fromCharCode(65 + i));
 
-    // Rounds left -> center (left side) and center -> right (right side mirrored)
-    const ROUND_ORDER = koTeams === 32
-      ? ["1/16", "1/8", "1/4", "1/2"]   // Final is shown center
-      : ["1/8", "1/4", "1/2"];
-
-    const ROUND_LABELS = {
-      "1/16": "Round of 32",
-      "1/8": "Round of 16",
-      "1/4": "Quarter-finals",
-      "1/2": "Semi-finals",
-      "Final": "Final"
-    };
-
+    // KO sizing
+    const teamCount = Number(data.teamCount) || 32;       // 32 or 64
+    const koTeams = teamCount === 64 ? 32 : 16;         // first KO entrants
+    const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2"] : ["1/8", "1/4", "1/2"];
+    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": "Round of 16", "1/4": "Quarter-finals", "1/2": "Semi-finals", "Final": "Final" };
     const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
+
+    // Group labels for first-round placeholders (A..H or A..P)
+    const groupsCnt = Math.max(2, Math.min(16, Math.round(teamCount / 4)));
+    const GROUPS = Array.from({ length: groupsCnt }, (_, i) => String.fromCharCode(65 + i));
 
     const matches = Array.isArray(data.matches) ? data.matches : [];
     const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
 
-    // --- Group matches by round (fallback to first)
-    const firstRound = ROUND_ORDER[0];
+    // --- Bucket by round (default to first round if missing)
+    const firstRound = rounds[0];
     const byRound = new Map();
     for (const m of matches) {
       const r = m.round || firstRound;
@@ -221,7 +213,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       byRound.get(r).push(m);
     }
 
-    // --- Build ties within a round (pair legs by match_order)
+    // --- Build ties from matches (pair legs by match_order)
     function tiesFromMatches(roundMatches) {
       const byTie = new Map();
       for (const m of roundMatches) {
@@ -235,52 +227,41 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       return arr;
     }
 
-    // --- Placeholder text for first round (A1 vs B2, etc.)
+    // --- Placeholder text for first round (A1 vs B2, B1 vs A2, …)
     function placeholderFirstRound(i) {
-      const pairIndex = Math.floor(i / 2);   // (A,B), (C,D), ...
-      const even = i % 2 === 0;
-      const g1 = GROUPS[pairIndex * 2];
-      const g2 = GROUPS[pairIndex * 2 + 1];
-      if (!g1 || !g2) {
-        const n1 = i * 2 + 1, n2 = i * 2 + 2;
-        return { t1: `Qualifier ${n1}`, t2: `Qualifier ${n2}` };
-      }
-      return even
-        ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
+      const pair = Math.floor(i / 2);
+      const even = (i % 2) === 0;
+      const g1 = GROUPS[pair * 2], g2 = GROUPS[pair * 2 + 1];
+      if (!g1 || !g2) return { t1: `Qualifier ${i * 2 + 1}`, t2: `Qualifier ${i * 2 + 2}` };
+      return even ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
         : { t1: `Group ${g2} 1st`, t2: `Group ${g1} 2nd` };
     }
 
-    // --- Split a list of ties into left/right halves (by order)
-    function splitLeftRight(ties, expectedForRound) {
-      const total = expectedForRound;
-      const half  = total / 2;
-      const left  = ties.slice(0, half);
-      const right = ties.slice(half, total); // may be shorter if missing
+    // --- Alternate ties to sides so partial data fills both
+    function splitLeftRightAlt(ties) {
+      const left = [], right = [];
+      ties.forEach((t, i) => (i % 2 === 0 ? left : right).push(t));
       return { left, right };
     }
 
-    // --- Create the bracket frame (left | center | right)
+    // --- Frame (left | center | right)
     const frame = document.createElement("div");
     frame.className = "bracket-frame";
-
-    const leftSide   = document.createElement("div"); leftSide.className = "bracket-side left-side";
+    const leftSide = document.createElement("div"); leftSide.className = "bracket-side left-side";
     const centerSide = document.createElement("div"); centerSide.className = "bracket-center";
-    const rightSide  = document.createElement("div"); rightSide.className = "bracket-side right-side";
-
-    frame.appendChild(leftSide);
-    frame.appendChild(centerSide);
-    frame.appendChild(rightSide);
+    const rightSide = document.createElement("div"); rightSide.className = "bracket-side right-side";
+    frame.append(leftSide, centerSide, rightSide);
     root.appendChild(frame);
 
-    // --- Center cup + final placeholder (final is center)
-    const cupWrap = document.createElement("div");
-    cupWrap.className = "cup-wrap";
-
-    const cupImg = document.createElement("img");
-    cupImg.className = "cup-image";
-    // Use your own asset path here:
-    cupImg.src = "/assets/cup.png";
-    cupImg.alt = "Trophy";
+    // --- Cup by leagueType
+    const leagueType = Number(data.leagueType ?? localStorage.getItem("leagueType")) || 1;
+    const CUP_MAP = {
+      1: "public/assets/images/champ1.png",
+      2: "public/assets/images/eur2.png",
+      3: "public/assets/images/europ3.png",
+      4: "public/assets/images/wrld4.png"
+    };
+    const cupSrc = CUP_MAP[leagueType] || CUP_MAP[1];
 
     const finalCol = document.createElement("div");
     finalCol.className = "center-final";
@@ -288,48 +269,44 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     finalTitle.textContent = ROUND_LABELS["Final"];
     finalCol.appendChild(finalTitle);
 
-    // If a final match exists, show it; else show a placeholder “Winner of SF L vs Winner of SF R”
     const finals = byRound.get("Final") ? tiesFromMatches(byRound.get("Final")) : [];
-    if (finals.length) {
-      finalCol.appendChild(renderTieRowCombined(finals[0], 0, "Final"));
-    } else {
-      finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
-    }
+    if (finals.length) finalCol.appendChild(renderTieRowOneLine(finals[0], "center", "Final"));
+    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
 
-    centerSide.appendChild(finalCol);
-    centerSide.appendChild(cupWrap);
+    const cupWrap = document.createElement("div");
+    cupWrap.className = "cup-wrap";
+    const cupImg = document.createElement("img");
+    cupImg.className = "cup-image";
+    cupImg.src = cupSrc;
+    cupImg.alt = "Trophy";
     cupWrap.appendChild(cupImg);
 
-    // --- Render one side (sideKey: "left" or "right")
-    function renderSide(sideEl, sideKey) {
-      // For each round moving towards center, we need a vertical column
-      let prevCount = EXPECTED_TIES[firstRound] / 2; // per side R1 count
+    centerSide.append(finalCol, cupWrap);
 
-      ROUND_ORDER.forEach((rk, roundIdx) => {
+    // --- Render each side
+    function renderSide(sideEl, sideKey) {
+      rounds.forEach(rk => {
         const col = document.createElement("div");
         col.className = `side-round round-${rk.replace("/", "-")}`;
         const title = document.createElement("h3");
         title.textContent = ROUND_LABELS[rk];
         col.appendChild(title);
 
-        // Extract ties for this round, split them by side
-        const roundTies = tiesFromMatches(byRound.get(rk) || []);
-        const expectedTotal = EXPECTED_TIES[rk] || 0;
-        const { left: leftTies, right: rightTies } = splitLeftRight(roundTies, expectedTotal);
-        const list = sideKey === "left" ? leftTies : rightTies;
-        const expectedOnThisSide = expectedTotal / 2;
+        const allTies = tiesFromMatches(byRound.get(rk) || []);
+        const { left, right } = splitLeftRightAlt(allTies);
+        const list = sideKey === "left" ? left : right;
 
-        // Render real ties first
-        list.forEach((tie, idx) => col.appendChild(renderTieRowCombined(tie, idx, rk)));
+        // Real ties
+        list.forEach((tie) => col.appendChild(renderTieRowOneLine(tie, sideKey, rk)));
 
-        // Then placeholders (only for First Round; for later rounds we show placeholders if you want)
-        const needPlaceholders = expectedOnThisSide - list.length;
-        if (needPlaceholders > 0) {
-          for (let i = list.length; i < expectedOnThisSide; i++) {
+        // Placeholders
+        const expectedOnSide = (EXPECTED_TIES[rk] || 0) / 2;
+        const missing = expectedOnSide - list.length;
+        if (missing > 0) {
+          for (let i = 0; i < missing; i++) {
             if (rk === firstRound) {
-              // placeholder by group pairings, offset i by side to avoid duplicated AB pair ordering issues
-              const ph = placeholderFirstRound((sideKey === "left" ? i : i + expectedOnThisSide));
-              col.appendChild(renderPlaceholderCard(ph));
+              const baseIndex = (sideKey === "left" ? i : i + expectedOnSide);
+              col.appendChild(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
             } else {
               col.appendChild(renderPlaceholderCard({ t1: "TBD", t2: "TBD" }));
             }
@@ -337,17 +314,14 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         }
 
         sideEl.appendChild(col);
-
-        // for spacing/connector proportions you may want prevCount here; kept for future tuning
-        prevCount = expectedOnThisSide / 2;
       });
     }
 
-    // --- Build both sides
     renderSide(leftSide, "left");
     renderSide(rightSide, "right");
 
-    // -------------------- UI RENDERERS --------------------
+    // ------------- UI helpers -------------
+
     function renderPlaceholderCard({ t1, t2 }) {
       const card = document.createElement("div");
       card.className = "ko-card ko-placeholder";
@@ -358,80 +332,80 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       return card;
     }
 
-    // Single-line tie (home+away in one row)
-    function renderTieRowCombined(tie, idx, roundKey) {
+    // One line per tie.
+    // Left:  [U1][T1][H1][H2][A1][A2][T2][U2]
+    // Right: [H1][H2][A1][A2][T1][T2][U1][U2]
+    // Center final uses left order.
+    function renderTieRowOneLine(tie, sideKey, roundKey) {
       const homeLeg = tie.legs.find(l => (l.match_type || "").toLowerCase() === "home");
       const awayLeg = tie.legs.find(l => (l.match_type || "").toLowerCase() === "away");
-      const legA = homeLeg || tie.legs[0] || null;
-      const legB = awayLeg || (tie.legs.length > 1 ? tie.legs[1] : null);
+      const legA = homeLeg || tie.legs[0] || null;                    // home leg if present
+      const legB = awayLeg || (tie.legs.length > 1 ? tie.legs[1] : null); // away leg if present
 
-      const t1Name = (legA && legA.team1_name) || (legB && legB.team1_name) || null;
-      const t2Name = (legA && legA.team2_name) || (legB && legB.team2_name) || null;
+      const t1Name = (legA?.team1_name) || (legB?.team1_name) || null;
+      const t2Name = (legA?.team2_name) || (legB?.team2_name) || null;
       if (!t1Name && !t2Name) return document.createDocumentFragment();
 
       const card = document.createElement("div");
-      card.className = "ko-card";
+      card.className = "ko-card ko-row-2";
 
-      const row = document.createElement("div");
-      row.className = "ko-combined-row";
-
-      // dropdown helpers
-      function fillUserSelect(sel, initialUsername) {
+      function buildUserSelect(initialUsername) {
+        const sel = document.createElement("select");
+        sel.className = "user-dropdown";
+        sel.disabled = !editable;
         const def = document.createElement("option");
-        def.value = "";
-        def.textContent = initialUsername || (translation.selectUser || "Select Player");
+        def.value = ""; def.textContent = initialUsername || (translation.selectUser || "Select Player");
         sel.appendChild(def);
-        players.forEach(p => {
-          const o = document.createElement("option");
-          o.value = p.id;
-          o.textContent = p.username;
-          sel.appendChild(o);
-        });
+        players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
         if (initialUsername) {
           const found = [...sel.options].find(o => o.text.trim() === initialUsername.trim());
           if (found) sel.value = found.value;
         }
+        return sel;
+      }
+      function buildTeam(name) {
+        const d = document.createElement("div");
+        d.className = "team-name"; d.textContent = name || (translation.tbd || "TBD"); return d;
+      }
+      function buildScoreInput(match, which) {
+        const el = document.createElement("input"); el.type = "number"; el.className = "score-input";
+        el.disabled = !editable || !match;
+        el.value = match ? (which === "t1" ? (match.team1_score ?? "") : (match.team2_score ?? "")) : "";
+        el.dataset.matchId = match ? match.id : "";
+        el.dataset.which = which;
+        return el;
       }
 
-      const u1 = document.createElement("select");
-      u1.className = "user-dropdown";
-      u1.name = "team1_user";
-      u1.disabled = !editable;
-      fillUserSelect(u1, (legA && legA.team1_username) || (legB && legB.team1_username) || "");
+      const u1 = buildUserSelect(legA?.team1_username || legB?.team1_username || "");
+      const u2 = buildUserSelect(legA?.team2_username || legB?.team2_username || "");
+      const t1 = buildTeam(t1Name);
+      const t2 = buildTeam(t2Name);
 
-      const u2 = document.createElement("select");
-      u2.className = "user-dropdown";
-      u2.name = "team2_user";
-      u2.disabled = !editable;
-      fillUserSelect(u2, (legA && legA.team2_username) || (legB && legB.team2_username) || "");
+      // Scores (exactly four inputs: two legs x two teams)
+      const H1 = buildScoreInput(legA, "t1");  // Team1 home
+      const H2 = buildScoreInput(legA, "t2");  // Team2 home
+      const A1 = buildScoreInput(legB, "t1");  // Team1 away
+      const A2 = buildScoreInput(legB, "t2");  // Team2 away
 
-      const t1 = document.createElement("div");
-      t1.className = "team-name";
-      t1.textContent = t1Name || (translation.tbd || "TBD");
+      // Row containers
+      const row1 = document.createElement("div");
+      const row2 = document.createElement("div");
+      row1.className = `ko-team-row ${sideKey}`;
+      row2.className = `ko-team-row ${sideKey}`;
 
-      const t2 = document.createElement("div");
-      t2.className = "team-name";
-      t2.textContent = t2Name || (translation.tbd || "TBD");
-
-      function makeScoreInput(match, which) {
-        const input = document.createElement("input");
-        input.type = "number";
-        input.className = "score-input";
-        input.disabled = !editable || !match;
-        input.value = match ? (which === "t1" ? (match.team1_score ?? "") : (match.team2_score ?? "")) : "";
-        input.dataset.matchId = match ? match.id : "";
-        input.dataset.which = which;
-        return input;
+      if (sideKey === "right") {
+        // rotated: scores → team → dropdowns
+        row1.append(H1, A1, t1, u1);
+        row2.append(A2, H2, t2, u2);
+      } else {
+        // desired: dropdowns → team → scores (home then away for T1; away then home for T2)
+        row1.append(u1, t1, H1, A1); // Team1: Home, then Away
+        row2.append(u2, t2, A2, H2); // Team2: Away, then Home
       }
 
-      const h_t1 = makeScoreInput(legA, "t1");
-      const h_t2 = makeScoreInput(legA, "t2");
-      const a_t1 = makeScoreInput(legB, "t1");
-      const a_t2 = makeScoreInput(legB, "t2");
-
-      // save handlers
+      // Save handlers (same logic, just bind once)
       if (editable) {
-        [h_t1, h_t2, a_t1, a_t2].forEach(input => {
+        [H1, H2, A1, A2].forEach(input => {
           input.addEventListener("input", () => {
             if (input.value !== "" && parseInt(input.value, 10) < 0) input.value = "";
           });
@@ -446,60 +420,30 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
             try {
               const res = await apiPost("/update-score", payload, { showLoading: false });
               showToast(res.success ? (translation.score_updated || "Score Updated")
-                                    : (translation.score_update_failed || "Failed to update score"),
-                        res.success ? "success" : "error");
-            } catch (e) { console.error("Score update error:", e); }
+                : (translation.score_update_failed || "Failed to update score"),
+                res.success ? "success" : "error");
+            } catch (e) { console.error(e); }
           });
         });
 
-        async function attachBothLegs(sel, teamKey) {
+        const attach = async (sel, legs, teamKey) => {
           const userId = sel.value ? parseInt(sel.value, 10) : null;
-          const legs = [legA, legB].filter(Boolean);
-          for (const leg of legs) {
-            try {
-              const res = await apiPost("/attach-players", {
-                matchId: leg.id,
-                teamId: teamKey === "team1" ? leg.team1_id : leg.team2_id,
-                userId, leagueId
-              }, { showLoading: false });
-              if (!res.success) { showToast(translation.player_assign_failed || "Failed to attach user", "error"); return; }
-            } catch (e) { console.error("Attach player error:", e); }
+          for (const leg of legs.filter(Boolean)) {
+            const body = { matchId: leg.id, teamId: teamKey === "team1" ? leg.team1_id : leg.team2_id, userId, leagueId };
+            const res = await apiPost("/attach-players", body, { showLoading: false });
+            if (!res.success) { showToast(translation.player_assign_failed || "Failed to attach user", "error"); return; }
           }
           showToast(userId ? (translation.player_success_assigned || "User assigned successfully")
-                           : (translation.player_success_unassigned || "User unassigned successfully"),
-                    "success");
-        }
-        u1.addEventListener("change", () => attachBothLegs(u1, "team1"));
-        u2.addEventListener("change", () => attachBothLegs(u2, "team2"));
+            : (translation.player_success_unassigned || "User unassigned successfully"),
+            "success");
+        };
+        u1.addEventListener("change", () => attach(u1, [homeLeg, awayLeg], "team1"));
+        u2.addEventListener("change", () => attach(u2, [homeLeg, awayLeg], "team2"));
       }
 
-      // layout: [U1][Team1] [H t1][H t2] [A t1][A t2] [Team2][U2]
-      row.appendChild(u1);
-      row.appendChild(t1);
-      row.appendChild(h_t1);
-      row.appendChild(h_t2);
-      row.appendChild(a_t1);
-      row.appendChild(a_t2);
-      row.appendChild(t2);
-      row.appendChild(u2);
-
-      // leg labels below
-      const badges = document.createElement("div");
-      badges.className = "ko-leg-badges";
-      badges.appendChild(document.createElement("div"));
-      badges.appendChild(document.createElement("div"));
-      const homeLbl = document.createElement("div"); homeLbl.className = "span-home"; homeLbl.textContent = "HOME LEG";
-      const awayLbl = document.createElement("div"); awayLbl.className = "span-away"; awayLbl.textContent = "AWAY LEG";
-      badges.appendChild(homeLbl);
-      badges.appendChild(awayLbl);
-      badges.appendChild(document.createElement("div"));
-      badges.appendChild(document.createElement("div"));
-
-      card.appendChild(row);
-      card.appendChild(badges);
+      card.append(row1, row2);
       return card;
     }
-
   } catch (err) {
     console.error("Knockouts fetch/render error:", err);
     root.innerHTML = `<p style="color:#fff">${translation.something_went_wrong || "Something went wrong"}</p>`;
