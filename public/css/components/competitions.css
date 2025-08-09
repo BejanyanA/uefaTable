@@ -46,6 +46,12 @@
     flex-direction: column;
     justify-content: end;
     align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.banner:hover {
+    transform: scale(1.05);
+    /* Slight zoom on hover */
 }
 
 .banner-wrap {

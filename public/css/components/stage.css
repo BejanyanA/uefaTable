@@ -50,6 +50,11 @@
       justify-content: flex-start;
       align-items: flex-end;
       text-align: center;
+      transition: transform 0.3s ease-in-out;
+  }
+
+  .stageBanner:hover {
+      transform: scale(1.05);
   }
 
   .stageBanner-wrap {
@@ -143,11 +148,8 @@
           display: flex;
           justify-content: center;
           gap: 50px;
-          /* Space between stageBanners */
           flex-wrap: wrap;
-          /* Allows wrapping on small screens */
           margin: 3%;
-          /* Optional centering */
       }
 
       #stageBackBtn {
