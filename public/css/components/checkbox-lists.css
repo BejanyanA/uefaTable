@@ -205,15 +205,15 @@
   .club-search {
     position: relative;
     margin-bottom: -18px;
-    width: 100%;
+    width: 90%;
   }
 
   .club-checkbox-list {
-    height: 250px;
+    height: 220px;
   }
 
   .friend-checkbox-list {
-    height: 100px;
+    height: 90px;
   }
 
 
