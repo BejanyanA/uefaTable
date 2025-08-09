@@ -2,6 +2,7 @@ import { showToast } from '../utils/toast.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
+import { renderKnockoutLeagueTable } from './components/renderKnockout.js';
 import { getFriends } from './GetFriends.js';
 import { getClubs } from './GetClubs.js';
 import { apiGet, apiPost } from '../services/api.js';
@@ -251,7 +252,7 @@ export const LeagueManager = {
             if (isGroup) {
               renderLeagueTable(data.data);
             } else {
-              renderLeagueTable(data.data); // Need to be changed when the Knockout is ready
+              renderKnockoutLeagueTable(data.data); // Need to be changed when the Knockout is ready
             }
           } else {
             showToast(translation.not_found || "Not found", "info");

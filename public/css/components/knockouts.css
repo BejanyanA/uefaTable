@@ -1,0 +1,243 @@
+/* ===== Knockouts (Desktop) – Scoped to #leagueType2 ===== */
+#leagueType2 {
+  --ko-card-bg: rgba(255, 255, 255, 0.05);
+  --ko-card-border: rgba(255, 255, 255, 0.10);
+  --ko-card-border-hover: rgba(255, 255, 255, 0.18);
+  --ko-placeholder-bg: rgba(255, 255, 255, 0.03);
+  --ko-placeholder-border: rgba(255, 255, 255, 0.20);
+  --ko-text: #ffffff;
+  --ko-muted: #bfc7d1;
+  --ko-dim: #9aa6b2;
+  --ko-field-bg: rgba(255, 255, 255, 0.06);
+  --ko-field-border: rgba(255, 255, 255, 0.18);
+  --ko-field-focus: #64b5f6;
+  --ko-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --ko-radius: 12px;
+  --ko-gap: 16px;
+  --ko-col-min: 240px;
+  color: var(--ko-text);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Wrapper (your JS sets grid inline; this keeps styling + safety) */
+#leagueType2 .knockout-wrapper {
+  align-items: start;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+  gap: var(--ko-gap);
+  margin-top: 50px;
+}
+
+#leagueType2 .knockout-wrapper > * {
+  scroll-snap-align: start;
+}
+
+/* Each round column */
+#leagueType2 .knockout-round {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: var(--ko-col-min);
+}
+
+/* Round header (sticky for long columns) */
+#leagueType2 .knockout-round > h3 {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 0 6px 0;
+  padding: 10px 12px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--ko-text);
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 19, 43, 0.95),
+    rgba(11, 19, 43, 0.60)
+  );
+  border: 1px solid var(--ko-card-border);
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+/* Tie card */
+#leagueType2 .ko-card {
+  background: var(--ko-card-bg);
+  border: 1px solid var(--ko-card-border);
+  border-radius: var(--ko-radius);
+  padding: 12px;
+  box-shadow: var(--ko-shadow);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+#leagueType2 .ko-card:hover {
+  border-color: var(--ko-card-border-hover);
+  transform: translateY(-1px);
+}
+
+/* Tie title row */
+#leagueType2 .ko-card > div:first-child {
+  color: var(--ko-dim);
+  font-size: 12px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+/* Placeholder card */
+#leagueType2 .ko-card.ko-placeholder {
+  background: var(--ko-placeholder-bg);
+  border: 1px dashed var(--ko-placeholder-border);
+  color: var(--ko-muted);
+}
+
+/* Leg label (the small line above each leg row) */
+#leagueType2 .ko-leg-row ~ div,
+#leagueType2 .ko-card > div > div:first-child {
+  /* no-op safety */
+}
+
+#leagueType2 .ko-card div:has(+ .ko-leg-row) {
+  /* This targets the leg label element you append before the grid row */
+  color: var(--ko-dim) !important;
+  font-size: 11px !important;
+  margin: 2px 0 6px !important;
+}
+
+/* Leg row grid (your JS sets inline grid; we style children) */
+#leagueType2 .ko-leg-row {
+  align-items: center;
+  gap: 8px !important;
+}
+
+/* Team name cells */
+#leagueType2 .ko-leg-row > div {
+  color: var(--ko-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Player dropdowns */
+#leagueType2 .user-dropdown {
+  width: 100%;
+  height: 36px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--ko-field-bg);
+  border: 1px solid var(--ko-field-border);
+  color: var(--ko-text);
+  outline: none;
+  appearance: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+#leagueType2 .user-dropdown:hover {
+  border-color: var(--ko-card-border-hover);
+}
+
+#leagueType2 .user-dropdown:focus {
+  border-color: var(--ko-field-focus);
+  box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.25);
+}
+
+/* Disabled dropdowns */
+#leagueType2 .user-dropdown:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Score inputs */
+#leagueType2 .score-input {
+  width: 100%;
+  height: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border-radius: 10px;
+  background: var(--ko-field-bg);
+  border: 1px solid var(--ko-field-border);
+  color: var(--ko-text);
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+/* Remove number spinners (desktop Chrome/Edge) */
+#leagueType2 .score-input::-webkit-outer-spin-button,
+#leagueType2 .score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#leagueType2 .score-input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+#leagueType2 .score-input:hover {
+  border-color: var(--ko-card-border-hover);
+}
+
+#leagueType2 .score-input:focus {
+  border-color: var(--ko-field-focus);
+  box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.25);
+}
+
+/* “vs” text inside placeholders */
+#leagueType2 .ko-placeholder div {
+  opacity: 0.85;
+}
+
+/* Subtle separators between multiple legs in a tie */
+#leagueType2 .ko-card .ko-leg-row + div,
+#leagueType2 .ko-card .ko-leg-row + .ko-leg-row {
+  margin-top: 8px;
+}
+
+/* Fine-tune spacing of leg wrapper (label + row) */
+#leagueType2 .ko-card > div > .ko-leg-row {
+  margin-bottom: 8px;
+}
+
+/* Scrollbar (desktop) */
+#leagueType2 .knockout-wrapper::-webkit-scrollbar {
+  height: 10px;
+}
+#leagueType2 .knockout-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+#leagueType2 .knockout-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+#leagueType2 .knockout-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.30);
+}
+
+/* Desktop grid sizing tweaks (ensure 4 solid columns) */
+@media (min-width: 1200px) {
+  #leagueType2 .knockout-wrapper {
+    grid-template-columns: repeat(4, minmax(var(--ko-col-min), 1fr)) !important;
+    gap: 20px;
+  }
+}
+
+/* Ultra-wide spacing */
+@media (min-width: 1600px) {
+  #leagueType2 .knockout-wrapper {
+    gap: 24px;
+  }
+}
+
+/* Slight compactness for smaller desktops */
+@media (max-width: 1100px) {
+  #leagueType2 {
+    --ko-col-min: 220px;
+  }
+  #leagueType2 .user-dropdown,
+  #leagueType2 .score-input {
+    height: 34px;
+  }
+}
