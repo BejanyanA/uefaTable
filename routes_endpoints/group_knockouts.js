@@ -27,7 +27,7 @@ export async function handleGroupKnockoutMatches(request, env) {
     // Check access
     const owned = await env.core_data.prepare(`
     SELECT 1 FROM leagues WHERE id = ? AND created_by_user_id = ?
-  `).bind(leagueId, userId).first();
+    `).bind(leagueId, userId).first();
 
     let accessType = "owner";
     if (!owned) {
@@ -40,21 +40,29 @@ export async function handleGroupKnockoutMatches(request, env) {
         accessType = "granted";
     }
 
+    // Get team_count once from leagues
+    const leagueRow = await env.core_data.prepare(`
+    SELECT team_count FROM leagues WHERE id = ?
+    `).bind(leagueId).first();
+
+    const teamCount = leagueRow?.team_count ?? 0;
+
     // Fetch knockout matches
     const knockouts = await env.core_data.prepare(`
-  SELECT lk.*, 
+    SELECT lk.*, 
          ac1.club_name AS team1_name, 
          ac2.club_name AS team2_name
-  FROM league_knockouts lk
-  LEFT JOIN all_clubs ac1 ON ac1.id = lk.team1_id
-  LEFT JOIN all_clubs ac2 ON ac2.id = lk.team2_id
-  WHERE lk.league_id = ?
-  ORDER BY lk.round, lk.match_order
-`).bind(leagueId).all();
+    FROM league_knockouts lk
+    LEFT JOIN all_clubs ac1 ON ac1.id = lk.team1_id
+    LEFT JOIN all_clubs ac2 ON ac2.id = lk.team2_id
+    WHERE lk.league_id = ?
+    ORDER BY lk.match_order, lk.match_type
+    `).bind(leagueId).all();
 
     return jsonResponse({
         success: true,
         data: {
+            teamCount,
             leagueId,
             accessType,
             matches: knockouts.results
