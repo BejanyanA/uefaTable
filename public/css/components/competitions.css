@@ -93,6 +93,12 @@
         width: 100%;
     }
 
+    #bannerContainerWrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
     #competition-types {
         font-size: 25px;
         color: white;
