@@ -335,6 +335,21 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
           col.appendChild(renderTie(tie, sideKey, ph));
         });
 
+        /* ---- ADD THIS: pad up to the expected per-side count ---- */
+        const missing = perSide - list.length;
+        if (missing > 0) {
+          for (let i = 0; i < missing; i++) {
+            if (rk === firstRound) {
+              // keep the A..H / I..P alignment correct
+              const indexOnSide = list.length + i; // continue after real ties
+              const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
+              col.appendChild(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
+            } else {
+              col.appendChild(renderPlaceholderCard({ t1: "TBD", t2: "TBD" }));
+            }
+          }
+        }
+
         sideEl.appendChild(col);
       });
     }
@@ -528,11 +543,17 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
+
       if (sideKey === "right") {
         // RIGHT: [CB][Home(top)][Away(top)][Team][User]
-        row1.append(H_top, A_top, tn1, u1); row1.prepend(cbA);
+        // top row should submit home:t2 and away:t1 → we already have those as H_bottom / A_bottom
+        row1.append(H_bottom, A_bottom, tn1, u1);
+        row1.prepend(cbA);
+
         // RIGHT: [CB][Home(bottom)][Away(bottom)][Team][User]
-        row2.append(H_bottom, A_bottom, tn2, u2); row2.prepend(cbB);
+        // bottom row should submit home:t1 and away:t2 → H_top / A_top
+        row2.append(H_top, A_top, tn2, u2);
+        row2.prepend(cbB);
       } else {
         // LEFT: [User][Team][Home(top)][Away(top)][CB]
         row1.append(u1, tn1, H_top, A_top, cbA);
