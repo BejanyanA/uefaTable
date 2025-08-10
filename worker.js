@@ -12,6 +12,7 @@ import { handleUpdateMatches } from './routes_endpoints/update_matches.js';
 import { handleGetLeaguePlayers } from './routes_endpoints/league_player.js';
 import { handleAttachPlayers } from './routes_endpoints/attach_player.js';
 import { handleGroupKnockoutMatches } from './routes_endpoints/group_knockouts.js';
+import { handleAttachKnockPlayers } from './routes_endpoints/attach_knock_player.js';
 
 // import additional route handlers as needed
 
@@ -34,6 +35,7 @@ const routeRegistry = {
   "/league-players": { POST: handleGetLeaguePlayers },
   "/attach-players": { POST: handleAttachPlayers },
   "/group-knockouts": { POST: handleGroupKnockoutMatches },
+  "/attach-knock-players": { POST: handleAttachKnockPlayers },
 
   // Add more routes here  league_instances
 };

@@ -453,7 +453,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
           const userId = sel.value ? parseInt(sel.value,10) : null;
           for (const leg of legs.filter(Boolean)) {
             const body = { matchId: leg.id, teamId: teamKey==="team1" ? leg.team1_id : leg.team2_id, userId, leagueId };
-            const res = await apiPost("/attach-players", body, { showLoading:false });
+            const res = await apiPost("/attach-knock-players", body, { showLoading:false });
             if (!res.success) { showToast(translation.player_assign_failed || "Failed to attach user","error"); return; }
           }
           showToast(userId ? (translation.player_success_assigned || "User assigned successfully")
