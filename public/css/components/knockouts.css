@@ -49,7 +49,7 @@
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 8px;
   padding: 4px;              /* smaller padding */
-  margin-bottom: 6px;        /* smaller gap */
+  margin-bottom: 20px;        /* smaller gap */
   box-shadow: 0 3px 10px rgba(0,0,0,.24);
   font-size: 13px;
 }
