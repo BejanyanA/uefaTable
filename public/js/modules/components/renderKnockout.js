@@ -246,7 +246,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       card.appendChild(row);
       return card;
     }
-    
+
     function splitForRound(ties, rk, firstRound, expectedPerSide) {
       // Always work on a sorted copy
       const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
@@ -325,28 +325,30 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         const list = sideKey === "left" ? left : right;
 
         // Real ties
-        list.forEach(tie => col.appendChild(renderTie(tie, sideKey)));
-
-        // Pad placeholders up to bracket width
-        const missing = (perSide) - list.length;
-        if (missing > 0) {
-          for (let i = 0; i < missing; i++) {
-            if (rk === firstRound) {
-              // Index so that A..D land on left and E..H (or I..P) on right
-              const baseIndex = (sideKey === "left" ? i : i + perSide);
-              col.appendChild(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
-            } else {
-              col.appendChild(renderPlaceholderCard({ t1: "TBD", t2: "TBD" }));
-            }
+        list.forEach((tie, i) => {
+          let ph = null;
+          if (rk === firstRound) {
+            // baseIndex matches the same logic you use for placeholders
+            const baseIndex = (sideKey === "left" ? i : i + perSide);
+            ph = placeholderFirstRound(baseIndex); // { t1: "Group A 1st", t2: "Group B 2nd" }
           }
-        }
+          col.appendChild(renderTie(tie, sideKey, ph));
+        });
 
         sideEl.appendChild(col);
       });
     }
 
     // ===== Tie card =====
-    function renderTie(tie, sideKey) {
+    function normGroup(g) { return g ? String(g).replace(/\s+/g, '').toUpperCase() : null; }
+    function parsePh(phText) {
+      if (!phText) return { group: null, rank: null };
+      const g = /Group\s+([A-P])/i.exec(phText);
+      const r = /([12])(?:st|nd)/i.exec(phText);
+      return { group: g ? `Group ${g[1].toUpperCase()}` : null, rank: r ? +r[1] : null };
+    }
+
+    function renderTie(tie, sideKey, ph) {
       // Must send the knockout id from /group-knockouts
       const knockoutId = tie.id ?? tie.matchOrder;
 
@@ -364,7 +366,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         card.appendChild(wb);
       }
 
-      // --- builders (unchanged) ---
+      // --- builders ---
       const buildUserSelect = (team, role) => {
         const sel = document.createElement("select");
         sel.className = "user-dropdown";
@@ -395,12 +397,27 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         return sel;
       };
 
-      const buildTeam = (name) => {
+      // NEW: smarter team label (real name -> group fallback -> TBD)
+      function buildTeam(teamObj, position, groupName, phText) {
         const d = document.createElement("div");
         d.className = "team-name";
-        d.textContent = getNameOrNull(name) ?? (t.tbd || "TBD");
+
+        const name = teamObj?.name && String(teamObj.name).trim() ? teamObj.name : null;
+        const grp = (groupName && String(groupName).trim())
+          || (teamObj?.groupName && String(teamObj.groupName).trim())
+          || null;
+
+        if (name) {
+          d.textContent = name;
+        } else if (grp) {
+          d.textContent = `${grp} Team ${position}`;
+          d.classList.add("placeholder-text");
+        } else {
+          d.textContent = t.tbd || "TBD";
+          d.classList.add("placeholder-text");
+        }
         return d;
-      };
+      }
 
       const buildScore = (leg, which) => {
         const el = document.createElement("input"); el.type = "number"; el.className = "score-input";
@@ -439,16 +456,53 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       // Home leg (same matchId for both cells)
       const H_top = buildScore(tie.home, "t1"); // top row: home.team1
       const H_bottom = buildScore(tie.home, "t2"); // bottom row: home.team2
-
       // Away leg (same matchId for both cells) — note the flip
       const A_top = buildScore(tie.away, "t2"); // top row: away.team2
       const A_bottom = buildScore(tie.away, "t1"); // bottom row: away.team1
 
       const u1 = buildUserSelect(teamA, "A");
       const u2 = buildUserSelect(teamB, "B");
-      const tn1 = buildTeam(teamA?.name);
-      const tn2 = buildTeam(teamB?.name);
 
+      // Try multiple common API keys for group labels; harmless if absent
+      const p1 = parsePh(ph?.t1);  // e.g., "Group C 1st"
+      const p2 = parsePh(ph?.t2);  // e.g., "Group D 2nd"
+
+      // Decide fallback group for each slot (A = top row, B = bottom row)
+      let grpA = teamA?.groupName || tie.home?.team1?.groupName || tie.away?.team2?.groupName || null;
+      let grpB = teamB?.groupName || tie.home?.team2?.groupName || tie.away?.team1?.groupName || null;
+
+      if (!grpA || !grpB) {
+        const gA = p1.group, gB = p2.group;
+        const tb = normGroup(teamB?.groupName);
+        const ta = normGroup(teamA?.groupName);
+        const ngA = normGroup(gA), ngB = normGroup(gB);
+
+        // If only one side is known, use the paired placeholder group for the other
+        if (!grpA) {
+          if (tb && ngA && tb === ngA) grpA = gB;
+          else if (tb && ngB && tb === ngB) grpA = gA;
+          else grpA = gA || grpA; // fallback to ph.t1's group if nothing else
+        }
+        if (!grpB) {
+          if (ta && ngA && ta === ngA) grpB = gB;
+          else if (ta && ngB && ta === ngB) grpB = gA;
+          else grpB = gB || grpB; // fallback to ph.t2's group if nothing else
+        }
+      }
+
+      // Build labels (position = 1 for top row, 2 for bottom row)
+      const tn1 = buildTeam(
+        teamA,
+        1,
+        grpA,
+        ph?.t1 || null  // keep hint for rank if you ever want to use it
+      );
+      const tn2 = buildTeam(
+        teamB,
+        2,
+        grpB,
+        ph?.t2 || null
+      );
       // Checkboxes only when both legs have scores AND aggregate draw
       const canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw;
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
