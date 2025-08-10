@@ -1,155 +1,179 @@
-#knockoutTab .bracket-frame{
-  display:grid;
-  grid-template-columns:1fr 200px 1fr;
-  gap:20px;
-  align-items:start;
+#knockoutTab .bracket-frame {
+  display: grid;
+  grid-template-columns: 1fr 200px 1fr;
+  gap: 16px; /* tighter */
+  align-items: start;
 }
 
-#knockoutTab .bracket-side{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px; /* tighter */
+#knockoutTab .bracket-side {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px; /* tighter */
 }
 
-#knockoutTab .left-side{ direction:ltr; }
-#knockoutTab .right-side{ direction:rtl; }
-#knockoutTab .right-side > *{ direction:ltr; }
+#knockoutTab .left-side { direction: ltr; }
+#knockoutTab .right-side { direction: rtl; }
+#knockoutTab .right-side > * { direction: ltr; }
 
 #knockoutTab .side-round > h3,
-#knockoutTab .center-final > h3{
-  color:#fff;
-  text-align:center;
-  margin:0 0 6px; /* tighter */
-  font-weight:700;
-  letter-spacing:.2px;
+#knockoutTab .center-final > h3 {
+  color: #fff;
+  text-align: center;
+  margin: 0 0 4px; /* tighter */
+  font-weight: 700;
+  letter-spacing: .2px;
 }
 
 /* ===== Center (Final + Cup) ===== */
-#knockoutTab .bracket-center{
-  display:grid;
-  grid-template-rows:auto 1fr;
-  gap:12px;
-  justify-items:center;
+#knockoutTab .bracket-center {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  justify-items: center;
 }
 
-#knockoutTab .cup-wrap{
-  display:grid;
-  place-items:center;
+#knockoutTab .cup-wrap {
+  display: grid;
+  place-items: center;
 }
 
-#knockoutTab .cup-image{
-  max-width:120px;   /* balanced desktop size */
-  height:auto;
-  opacity:.95;
+#knockoutTab .cup-image {
+  max-width: 110px;   /* slightly smaller desktop size */
+  height: auto;
+  opacity: .95;
 }
 
 /* ===== Cards ===== */
-#knockoutTab .ko-card{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:10px;
-  padding:6px;              /* compact */
-  margin-bottom:8px;        /* compact */
-  box-shadow:0 4px 12px rgba(0,0,0,.28);
+#knockoutTab .ko-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 8px;
+  padding: 4px;              /* smaller padding */
+  margin-bottom: 6px;        /* smaller gap */
+  box-shadow: 0 3px 10px rgba(0,0,0,.24);
+  font-size: 13px;
 }
 
-#knockoutTab .ko-placeholder{
-  background:rgba(255,255,255,.04);
-  border:1px dashed rgba(255,255,255,.25);
-  color:#cbd5e0;
+#knockoutTab .ko-placeholder {
+  background: rgba(255,255,255,.04);
+  border: 1px dashed rgba(255,255,255,.25);
+  color: #cbd5e0;
 }
 
-#knockoutTab .ko-placeholder-row{
-  padding:8px;
-  text-align:center;
+#knockoutTab .ko-placeholder-row {
+  padding: 6px;
+  text-align: center;
+  font-size: 13px;
 }
 
 /* ===== Two-row compact layout per tie ===== */
-/* Card body that stacks two team rows */
-#knockoutTab .ko-row-2{
-  display:grid;
-  gap:6px;
+#knockoutTab .ko-row-2 {
+  display: grid;
+  gap: 6px;
 }
 
 /* One team per row */
-#knockoutTab .ko-team-row{
-  display:grid;
-  align-items:center;
-  gap:6px;
-  /* [U][Team][Score][Score] */
-  grid-template-columns: 120px minmax(140px,1fr) 44px 44px;
+#knockoutTab .ko-team-row {
+  display: grid;
+  align-items: center;
+  gap: 6px;
+  grid-template-columns: 108px minmax(120px, 1fr) 38px 38px; /* smaller */
 }
 
-#knockoutTab .ko-team-row.right{
-  /* rotated for right side: [Score][Score][Team][U] */
-  grid-template-columns: 44px 44px minmax(140px,1fr) 120px;
+#knockoutTab .ko-team-row.right {
+  grid-template-columns: 38px 38px minmax(120px, 1fr) 108px; /* smaller */
 }
 
 /* ===== Inputs / selects ===== */
-#knockoutTab .user-dropdown,
-#knockoutTab .score-input{
-  height:30px;  /* compact but readable */
-  width:100%;
-  border-radius:8px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.18);
-  color:#fff;
-  padding:2px 8px;
+
+#knockoutTab .score-input {
+  height: 20px;  /* smaller height */
+  width: 50%;
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 13px;
 }
 
-#knockoutTab .user-dropdown:disabled{
-  opacity:.6;
-  cursor:not-allowed;
+#knockoutTab .user-dropdown {
+  height: 28px;  /* smaller height */
+  width: 100%;
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 13px;
 }
 
-#knockoutTab .score-input{
-  text-align:center;
-  font-weight:700;
-  font-variant-numeric:tabular-nums;
+#knockoutTab .user-dropdown:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+#knockoutTab .score-input {
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 #knockoutTab .score-input::-webkit-outer-spin-button,
-#knockoutTab .score-input::-webkit-inner-spin-button{
-  -webkit-appearance:none;
-  margin:0;
+#knockoutTab .score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-#knockoutTab .score-input[type="number"]{
-  -moz-appearance:textfield;
+#knockoutTab .score-input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /* ===== Team name ===== */
-#knockoutTab .team-name{
-  color:#fff;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+#knockoutTab .team-name {
+  color: #fff;
+  text-align: center;      /* centered text */
+  justify-self: center;    /* center in grid cell */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== Mobile ===== */
-@media (max-width: 900px){
-  #knockoutTab .bracket-frame{
-    grid-template-columns:100%;
-    gap:14px;
+@media (max-width: 900px) {
+  #knockoutTab .bracket-frame {
+    grid-template-columns: 100%;
+    gap: 14px;
   }
 
-  #knockoutTab .bracket-center{
-    order:-1; /* show cup/final first on mobile */
+  #knockoutTab .bracket-center {
+    order: -1; /* show cup/final first on mobile */
   }
 
-  #knockoutTab .bracket-side{
-    display:flex;
-    gap:12px;
-    overflow-x:auto;
-    padding-bottom:8px;
+  #knockoutTab .bracket-side {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
   }
 
-  #knockoutTab .side-round{
-    min-width:300px; /* slightly narrower column on mobile */
+  #knockoutTab .side-round {
+    min-width: 280px; /* narrower mobile columns */
   }
 
-  #knockoutTab .cup-image{
-    max-width:88px; /* balanced mobile size */
+  #knockoutTab .ko-team-row {
+    grid-template-columns: 96px minmax(120px, 1fr) 36px 36px;
+  }
+
+  #knockoutTab .ko-team-row.right {
+    grid-template-columns: 36px 36px minmax(120px, 1fr) 96px;
+  }
+
+  #knockoutTab .user-dropdown { height: 26px; font-size: 12px; }
+  #knockoutTab .score-input { height: 24px; font-size: 13px; }
+
+  #knockoutTab .cup-image {
+    max-width: 88px;
   }
 }
