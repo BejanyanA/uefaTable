@@ -248,21 +248,17 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     }
 
     function splitForRound(ties, rk, firstRound, expectedPerSide) {
-      // Always work on a sorted copy
+      // Always work on a sorted copy (by matchOrder) so the split is stable
       const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
 
-      if (rk === firstRound) {
-        // Block split for the opening KO round:
-        // left = first half (A..D or A..H), right = second half (E..H or I..P)
-        const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-        return { left: sorted.slice(0, perSide), right: sorted.slice(perSide), perSide };
-      }
-
-      // Later rounds: keep alternating so both sides fill nicely
-      const left = [], right = [];
-      sorted.forEach((t, i) => (i % 2 === 0 ? left : right).push(t));
+      // For all rounds we do a block split: first half → left, second half → right.
+      // (You already used this for the first round; we standardize it here.)
       const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-      return { left, right, perSide };
+      return {
+        left: sorted.slice(0, perSide),
+        right: sorted.slice(perSide),
+        perSide
+      };
     }
 
     // Bucket ties by round
@@ -305,6 +301,13 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     cupWrap.appendChild(img);
     centerSide.append(finalCol, cupWrap);
 
+    // function getBracketSide(order) {
+    //   const o = Number(order) || 0;
+    //   if (o <= 0) return null;                // fallback to alternating if unknown
+    //   const next = Math.ceil(o / 2);
+    //   return (next % 2 === 1) ? 'left' : 'right';
+    // }
+
     // Sides
     renderSide(leftSide, "left");
     renderSide(rightSide, "right");
@@ -325,6 +328,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         const list = sideKey === "left" ? left : right;
 
         // Real ties
+        const useGroupFallback = (rk === firstRound);   // only Ro16 uses group placeholders
         list.forEach((tie, i) => {
           let ph = null;
           if (rk === firstRound) {
@@ -332,7 +336,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
             const baseIndex = (sideKey === "left" ? i : i + perSide);
             ph = placeholderFirstRound(baseIndex); // { t1: "Group A 1st", t2: "Group B 2nd" }
           }
-          col.appendChild(renderTie(tie, sideKey, ph));
+          col.appendChild(renderTie(tie, sideKey, ph, useGroupFallback));
         });
 
         /* ---- ADD THIS: pad up to the expected per-side count ---- */
@@ -363,7 +367,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       return { group: g ? `Group ${g[1].toUpperCase()}` : null, rank: r ? +r[1] : null };
     }
 
-    function renderTie(tie, sideKey, ph) {
+    function renderTie(tie, sideKey, ph, useGroupFallback = false) {
       // Must send the knockout id from /group-knockouts
       const knockoutId = tie.id ?? tie.matchOrder;
 
@@ -424,7 +428,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
 
         if (name) {
           d.textContent = name;
-        } else if (grp) {
+        } else if (useGroupFallback && grp) {
           d.textContent = `${grp} Team ${position}`;
           d.classList.add("placeholder-text");
         } else {
