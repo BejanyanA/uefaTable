@@ -24,67 +24,95 @@ export async function handleUpdateMatches(request, env) {
     return jsonResponse({ success: false, error: "At least one score must be provided" }, 400);
   }
 
+  // --- helper: map team_count -> initial knockout round label
+  async function getInitialKnockoutRound(env, leagueId) {
+    const row = await env.core_data
+      .prepare(`SELECT team_count FROM leagues WHERE id = ?`)
+      .bind(leagueId)
+      .first();
+
+    if (!row) {
+      return "1/8"; // safe fallback
+    }
+
+    const koTeams = Math.floor(Number(row.team_count) / 2); // e.g., 32->16, 64->32
+
+    const labelMap = {
+      32: "1/16",
+      16: "1/8",
+      8: "1/4",
+      4: "1/2",
+      2: "final",
+    };
+
+    return labelMap[koTeams] || "1/8";
+  }
+
   const match = await env.core_data.prepare(`
-  SELECT lm.*, li.league_id
-  FROM league_matches lm
-  JOIN league_groups lg ON lg.id = lm.group_id
-  JOIN league_instances li ON li.id = lg.league_instance_id
-  WHERE lm.id = ?
-`).bind(matchId).first();
+    SELECT lm.*, li.league_id
+    FROM league_matches lm
+    JOIN league_groups lg ON lg.id = lm.group_id
+    JOIN league_instances li ON li.id = lg.league_instance_id
+    WHERE lm.id = ?
+  `).bind(matchId).first();
 
   if (!match) {
     return jsonResponse({ success: false, error: "match_not_found" }, 404);
   }
 
+  // access check (unchanged)
   const owned = await env.core_data.prepare(`
-  SELECT 1 FROM leagues WHERE id = ? AND created_by_user_id = ?
-`).bind(match.league_id, userId).first();
+    SELECT 1 FROM leagues WHERE id = ? AND created_by_user_id = ?
+  `).bind(match.league_id, userId).first();
 
   if (!owned) {
     const access = await env.core_data.prepare(`
-    SELECT 1 FROM league_access WHERE league_id = ? AND user_id = ?
-  `).bind(match.league_id, userId).first();
+      SELECT 1 FROM league_access WHERE league_id = ? AND user_id = ?
+    `).bind(match.league_id, userId).first();
     if (!access) {
       return jsonResponse({ success: false, error: "access_denied" }, 403);
     }
   }
 
   const currentScores = await env.core_data.prepare(`
-  SELECT team1_score, team2_score, winner_team_id, score_processed FROM league_matches WHERE id = ?
-`).bind(matchId).first();
+    SELECT team1_score, team2_score, winner_team_id, score_processed
+    FROM league_matches
+    WHERE id = ?
+  `).bind(matchId).first();
 
   const updated_team1_score = team1_score !== undefined ? team1_score : currentScores.team1_score;
   const updated_team2_score = team2_score !== undefined ? team2_score : currentScores.team2_score;
 
-  const new_winner_team_id = updated_team1_score > updated_team2_score
-    ? match.team1_id
-    : updated_team1_score < updated_team2_score
-      ? match.team2_id
-      : null;
+  const new_winner_team_id =
+    updated_team1_score > updated_team2_score
+      ? match.team1_id
+      : updated_team1_score < updated_team2_score
+        ? match.team2_id
+        : null;
 
   await env.core_data.prepare(`
-  UPDATE league_matches
-  SET team1_score = ?, team2_score = ?, winner_team_id = ?, updated_user_id = ?
-  WHERE id = ?
-`).bind(updated_team1_score, updated_team2_score, new_winner_team_id, userId, matchId).run();
+    UPDATE league_matches
+    SET team1_score = ?, team2_score = ?, winner_team_id = ?, updated_user_id = ?
+    WHERE id = ?
+  `).bind(updated_team1_score, updated_team2_score, new_winner_team_id, userId, matchId).run();
 
   const scoresNowFilled = updated_team1_score !== null && updated_team2_score !== null;
 
   const updateTeamStats = async (team_id, played, win, win_vs_computer, win_vs_player, draw, loss, gf, ga, points) => {
     await env.core_data.prepare(`
-    UPDATE group_standings
-    SET played = played + ?,
-        wins = wins + ?,
-        wins_vs_computer = wins_vs_computer + ?,
-        wins_vs_player = wins_vs_player + ?,
-        draws = draws + ?,
-        losses = losses + ?,
-        goals_for = goals_for + ?,
-        goals_against = goals_against + ?,
-        goal_difference = goal_difference + ?,
-        points = points + ?
-    WHERE group_id = ? AND team_id = ?
-  `).bind(
+      UPDATE group_standings
+      SET played = played + ?,
+          wins = wins + ?,
+          wins_vs_computer = wins_vs_computer + ?,
+          wins_vs_player = wins_vs_player + ?,
+          draws = draws + ?,
+          losses = losses + ?,
+          goals_for = goals_for + ?,
+          goals_against = goals_against + ?,
+          goal_difference = goal_difference + ?,
+          points = points + ?
+      WHERE group_id = ? AND team_id = ?
+    `).bind(
       played, win, win_vs_computer, win_vs_player, draw, loss, gf, ga, gf - ga, points, match.group_id, team_id
     ).run();
   };
@@ -98,16 +126,17 @@ export async function handleUpdateMatches(request, env) {
     await updateTeamStats(team_id, -1, win, win_vs_computer, win_vs_player, draw, loss, -gf, -ga, win ? -3 : draw ? -1 : 0);
   };
 
-  const getPairedGroupId = (groupId) => groupId % 2 === 0 ? groupId - 1 : groupId + 1;
+  const getPairedGroupId = (groupId) => (groupId % 2 === 0 ? groupId - 1 : groupId + 1);
 
   const updateKnockoutStage = async () => {
     const allTeams = await env.core_data.prepare(`
-    SELECT team_id, points, played, goal_difference, goals_for
-    FROM group_standings
-    WHERE group_id = ?
-  `).bind(match.group_id).all();
+      SELECT team_id, points, played, goal_difference, goals_for
+      FROM group_standings
+      WHERE group_id = ?
+    `).bind(match.group_id).all();
 
-    const groupIsComplete = allTeams.results.length >= 4 && allTeams.results.every(t => t.played === 6);
+    const groupIsComplete =
+      allTeams.results.length >= 4 && allTeams.results.every(t => t.played === 6);
     if (!groupIsComplete) return;
 
     const sorted = allTeams.results.sort((a, b) => {
@@ -120,85 +149,97 @@ export async function handleUpdateMatches(request, env) {
     const top2 = sorted.slice(0, 2);
     const matchOrder = Math.min(match.group_id, getPairedGroupId(match.group_id));
 
+    // NEW: get dynamic round label
+    const initialRound = await getInitialKnockoutRound(env, match.league_id);
+
+    // wipe any previous slots for this pair in the initial round
     await env.core_data.prepare(`
       DELETE FROM league_knockouts
-      WHERE league_id = ? AND match_order = ?
-    `).bind(match.league_id, matchOrder).run();
+      WHERE round = ? AND league_id = ? AND match_order = ?
+    `).bind(initialRound, match.league_id, matchOrder).run();
+
+    // create home leg placeholders (A1 vs B2)
+    await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+        league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, ?, NULL, 'home')
+    `).bind(match.league_id, initialRound, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, NULL, 'home')
-    `).bind(match.league_id, matchOrder, top2[0].team_id).run();
+        league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, NULL, ?, 'home')
+    `).bind(match.league_id, initialRound, matchOrder, top2[1].team_id).run();
+
+    // second leg placeholders (B1 vs A2 flipped)
+    await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+        league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, NULL, ?, 'away')
+    `).bind(match.league_id, initialRound, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-      league_id, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, NULL, ?, 'home')
-    `).bind(match.league_id, matchOrder, top2[1].team_id).run();
+        league_id, round, match_order, team1_id, team2_id, match_type
+      ) VALUES (?, ?, ?, ?, NULL, 'away')
+    `).bind(match.league_id, initialRound, matchOrder, top2[1].team_id).run();
 
-    // Second leg: away matches
-    await env.core_data.prepare(`
-      INSERT INTO league_knockouts (
-      league_id, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, NULL, ?, 'away')
-    `).bind(match.league_id, matchOrder, top2[0].team_id).run();
-
-    await env.core_data.prepare(`
-      INSERT INTO league_knockouts (
-      league_id, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, NULL, 'away')
-    `).bind(match.league_id, matchOrder, top2[1].team_id).run();
-
+    // if the paired group is also complete, fill the placeholders
     const pairedGroupId = getPairedGroupId(match.group_id);
     const pairedComplete = await env.core_data.prepare(`
-      SELECT COUNT(*) as total, SUM(CASE WHEN played = 6 THEN 1 ELSE 0 END) as played_count
+      SELECT COUNT(*) as total,
+             SUM(CASE WHEN played = 6 THEN 1 ELSE 0 END) as played_count
       FROM group_standings
       WHERE group_id = ?
     `).bind(pairedGroupId).first();
 
-    const isPairedReady = pairedComplete && pairedComplete.total >= 4 && pairedComplete.played_count === pairedComplete.total;
+    const isPairedReady =
+      pairedComplete && pairedComplete.total >= 4 && pairedComplete.played_count === pairedComplete.total;
 
     if (isPairedReady) {
       const pairedTeams = await env.core_data.prepare(`
-    SELECT team_id, points, goal_difference, goals_for
-    FROM group_standings
-    WHERE group_id = ?
-    ORDER BY points DESC, goal_difference DESC, goals_for DESC, team_id ASC
-    LIMIT 2
-  `).bind(pairedGroupId).all();
+        SELECT team_id, points, goal_difference, goals_for
+        FROM group_standings
+        WHERE group_id = ?
+        ORDER BY points DESC, goal_difference DESC, goals_for DESC, team_id ASC
+        LIMIT 2
+      `).bind(pairedGroupId).all();
 
       const [p1, p2] = pairedTeams.results;
 
-      // 🔁 Update both match types separately
-      // 👉 In HOME match: Group A team1 vs Group B team2
+      // HOME leg: Group A team1 vs Group B team2
       await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET team2_id = ?
-    WHERE league_id = ? AND match_order = ? AND match_type = 'home' AND team2_id IS NULL
-  `).bind(p2.team_id, match.league_id, matchOrder).run();
+        UPDATE league_knockouts
+        SET team2_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+          AND match_type = 'home' AND team2_id IS NULL
+      `).bind(p2.team_id, match.league_id, initialRound, matchOrder).run();
 
       await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET team1_id = ?
-    WHERE league_id = ? AND match_order = ? AND match_type = 'home' AND team1_id IS NULL
-  `).bind(p1.team_id, match.league_id, matchOrder).run();
+        UPDATE league_knockouts
+        SET team1_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+          AND match_type = 'home' AND team1_id IS NULL
+      `).bind(p1.team_id, match.league_id, initialRound, matchOrder).run();
 
-      // 👉 In AWAY match: Group B team1 vs Group A team2 (⚠️ flipped)
+      // AWAY leg: Group B team1 vs Group A team2 (flipped)
       await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET team1_id = ?
-    WHERE league_id = ? AND match_order = ? AND match_type = 'away' AND team1_id IS NULL
-  `).bind(p2.team_id, match.league_id, matchOrder).run();
+        UPDATE league_knockouts
+        SET team1_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+          AND match_type = 'away' AND team1_id IS NULL
+      `).bind(p2.team_id, match.league_id, initialRound, matchOrder).run();
 
       await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET team2_id = ?
-    WHERE league_id = ? AND match_order = ? AND match_type = 'away' AND team2_id IS NULL
-  `).bind(p1.team_id, match.league_id, matchOrder).run();
+        UPDATE league_knockouts
+        SET team2_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+          AND match_type = 'away' AND team2_id IS NULL
+      `).bind(p1.team_id, match.league_id, initialRound, matchOrder).run();
     }
   };
 
+  // process scores & standings (unchanged)
   if (scoresNowFilled) {
     if (currentScores.score_processed === 1) {
       const oldIsDraw = currentScores.team1_score === currentScores.team2_score;
@@ -234,8 +275,8 @@ export async function handleUpdateMatches(request, env) {
     }
 
     await env.core_data.prepare(`
-    UPDATE league_matches SET score_processed = 1 WHERE id = ?
-  `).bind(matchId).run();
+      UPDATE league_matches SET score_processed = 1 WHERE id = ?
+    `).bind(matchId).run();
   }
 
   await updateKnockoutStage();
