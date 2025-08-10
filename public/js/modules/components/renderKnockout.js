@@ -246,7 +246,24 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       card.appendChild(row);
       return card;
     }
-    // ----------------------------------------------------------------
+    
+    function splitForRound(ties, rk, firstRound, expectedPerSide) {
+      // Always work on a sorted copy
+      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+
+      if (rk === firstRound) {
+        // Block split for the opening KO round:
+        // left = first half (A..D or A..H), right = second half (E..H or I..P)
+        const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+        return { left: sorted.slice(0, perSide), right: sorted.slice(perSide), perSide };
+      }
+
+      // Later rounds: keep alternating so both sides fill nicely
+      const left = [], right = [];
+      sorted.forEach((t, i) => (i % 2 === 0 ? left : right).push(t));
+      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+      return { left, right, perSide };
+    }
 
     // Bucket ties by round
     const byRound = new Map();
@@ -299,19 +316,23 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         const title = document.createElement("h3"); title.textContent = ROUND_LABELS[rk];
         col.appendChild(title);
 
-        const ties = (byRound.get(rk) || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
-        const { left, right } = splitLeftRightAlt(ties);
+        const tiesAll = byRound.get(rk) || [];
+        const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
+        const expectedPerSide = Math.ceil(expected / 2);
+
+        // Use block split for the first round, alternating for later rounds
+        const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
         const list = sideKey === "left" ? left : right;
 
-        // real ties
+        // Real ties
         list.forEach(tie => col.appendChild(renderTie(tie, sideKey)));
 
-        // predefined placeholders (first round) or generic TBD
-        const perSide = Math.ceil((Math.max(ties.length, EXPECTED_TIES[rk] || 0)) / 2);
-        const missing = perSide - list.length;
+        // Pad placeholders up to bracket width
+        const missing = (perSide) - list.length;
         if (missing > 0) {
           for (let i = 0; i < missing; i++) {
             if (rk === firstRound) {
+              // Index so that A..D land on left and E..H (or I..P) on right
               const baseIndex = (sideKey === "left" ? i : i + perSide);
               col.appendChild(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
             } else {
