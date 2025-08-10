@@ -1,179 +1,49 @@
-#knockoutTab .bracket-frame {
-  display: grid;
-  grid-template-columns: 1fr 200px 1fr;
-  gap: 16px; /* tighter */
-  align-items: start;
-}
+#knockoutTab .bracket-frame{display:grid;grid-template-columns:1fr 180px 1fr;gap:14px;align-items:start;}
+#knockoutTab .bracket-side{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+#knockoutTab .left-side{direction:ltr;} #knockoutTab .right-side{direction:rtl;} #knockoutTab .right-side>*{direction:ltr;}
 
-#knockoutTab .bracket-side {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px; /* tighter */
-}
+#knockoutTab .side-round>h3,
+#knockoutTab .center-final>h3{color:#fff;text-align:center;margin:0 0 4px;font-weight:700;letter-spacing:.2px;font-size:15px}
 
-#knockoutTab .left-side { direction: ltr; }
-#knockoutTab .right-side { direction: rtl; }
-#knockoutTab .right-side > * { direction: ltr; }
+/* Center trophy */
+#knockoutTab .bracket-center{display:grid;grid-template-rows:auto 1fr;gap:8px;justify-items:center}
+#knockoutTab .cup-wrap{display:grid;place-items:center}
+#knockoutTab .cup-image{max-width:96px;height:auto;opacity:.95}
 
-#knockoutTab .side-round > h3,
-#knockoutTab .center-final > h3 {
-  color: #fff;
-  text-align: center;
-  margin: 0 0 4px; /* tighter */
-  font-weight: 700;
-  letter-spacing: .2px;
-}
+/* Cards */
+#knockoutTab .ko-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px}
+#knockoutTab .ko-placeholder{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);color:#cbd5e0}
+#knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
-/* ===== Center (Final + Cup) ===== */
-#knockoutTab .bracket-center {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 10px;
-  justify-items: center;
-}
+/* Two-row compact tie */
+#knockoutTab .ko-row-2{display:grid;gap:4px}
 
-#knockoutTab .cup-wrap {
-  display: grid;
-  place-items: center;
-}
+/* LEFT row: [User][Team][Home][Away][CB] */
+#knockoutTab .ko-team-row{display:grid;align-items:center;gap:6px;grid-template-columns:96px minmax(120px,1fr) 34px 34px 18px}
 
-#knockoutTab .cup-image {
-  max-width: 110px;   /* slightly smaller desktop size */
-  height: auto;
-  opacity: .95;
-}
+/* RIGHT row: [CB][Home][Away][Team][User] */
+#knockoutTab .ko-team-row.right{grid-template-columns:18px 34px 34px minmax(120px,1fr) 96px}
 
-/* ===== Cards ===== */
-#knockoutTab .ko-card {
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 8px;
-  padding: 4px;              /* smaller padding */
-  margin-bottom: 20px;        /* smaller gap */
-  box-shadow: 0 3px 10px rgba(0,0,0,.24);
-  font-size: 13px;
-}
+/* Inputs/selects compact */
+#knockoutTab .user-dropdown,#knockoutTab .score-input{height:24px;width:100%;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;padding:0 6px;font-size:12.5px}
+#knockoutTab .user-dropdown:disabled{opacity:.6;cursor:not-allowed}
+#knockoutTab .score-input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;padding:0}
+#knockoutTab .score-input::-webkit-outer-spin-button,#knockoutTab .score-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#knockoutTab .score-input[type="number"]{-moz-appearance:textfield}
 
-#knockoutTab .ko-placeholder {
-  background: rgba(255,255,255,.04);
-  border: 1px dashed rgba(255,255,255,.25);
-  color: #cbd5e0;
-}
+/* Team name centered */
+#knockoutTab .team-name{color:#fff;text-align:center;justify-self:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-#knockoutTab .ko-placeholder-row {
-  padding: 6px;
-  text-align: center;
-  font-size: 13px;
-}
+/* Winner checkbox */
+#knockoutTab .winner-checkbox{width:16px;height:16px;justify-self:center;accent-color:#4ade80}
 
-/* ===== Two-row compact layout per tie ===== */
-#knockoutTab .ko-row-2 {
-  display: grid;
-  gap: 6px;
-}
-
-/* One team per row */
-#knockoutTab .ko-team-row {
-  display: grid;
-  align-items: center;
-  gap: 6px;
-  grid-template-columns: 108px minmax(120px, 1fr) 38px 38px; /* smaller */
-}
-
-#knockoutTab .ko-team-row.right {
-  grid-template-columns: 38px 38px minmax(120px, 1fr) 108px; /* smaller */
-}
-
-/* ===== Inputs / selects ===== */
-
-#knockoutTab .score-input {
-  height: 20px;  /* smaller height */
-  width: 50%;
-  border-radius: 7px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.18);
-  color: #fff;
-  padding: 2px 8px;
-  font-size: 13px;
-}
-
-#knockoutTab .user-dropdown {
-  height: 28px;  /* smaller height */
-  width: 100%;
-  border-radius: 7px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.18);
-  color: #fff;
-  padding: 2px 8px;
-  font-size: 13px;
-}
-
-#knockoutTab .user-dropdown:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
-
-#knockoutTab .score-input {
-  text-align: center;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-#knockoutTab .score-input::-webkit-outer-spin-button,
-#knockoutTab .score-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-#knockoutTab .score-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-/* ===== Team name ===== */
-#knockoutTab .team-name {
-  color: #fff;
-  text-align: center;      /* centered text */
-  justify-self: center;    /* center in grid cell */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ===== Mobile ===== */
-@media (max-width: 900px) {
-  #knockoutTab .bracket-frame {
-    grid-template-columns: 100%;
-    gap: 14px;
-  }
-
-  #knockoutTab .bracket-center {
-    order: -1; /* show cup/final first on mobile */
-  }
-
-  #knockoutTab .bracket-side {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #knockoutTab .side-round {
-    min-width: 280px; /* narrower mobile columns */
-  }
-
-  #knockoutTab .ko-team-row {
-    grid-template-columns: 96px minmax(120px, 1fr) 36px 36px;
-  }
-
-  #knockoutTab .ko-team-row.right {
-    grid-template-columns: 36px 36px minmax(120px, 1fr) 96px;
-  }
-
-  #knockoutTab .user-dropdown { height: 26px; font-size: 12px; }
-  #knockoutTab .score-input { height: 24px; font-size: 13px; }
-
-  #knockoutTab .cup-image {
-    max-width: 88px;
-  }
+/* Mobile */
+@media (max-width:900px){
+  #knockoutTab .bracket-frame{grid-template-columns:100%;gap:12px}
+  #knockoutTab .bracket-center{order:-1}
+  #knockoutTab .bracket-side{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+  #knockoutTab .side-round{min-width:260px}
+  #knockoutTab .ko-team-row{grid-template-columns:88px minmax(120px,1fr) 32px 32px 18px}
+  #knockoutTab .ko-team-row.right{grid-template-columns:18px 32px 32px minmax(120px,1fr) 88px}
+  #knockoutTab .cup-image{max-width:84px}
 }
