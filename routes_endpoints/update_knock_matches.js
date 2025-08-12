@@ -198,7 +198,7 @@ function pairKeyOf(a, b) {
   return (x < y) ? `${x}-${y}` : `${y}-${x}`;
 }
 
-const oppositeField = (f) => (f === "team1_id" ? "team2_id" : "team1_id");
+// const oppositeField = (f) => (f === "team1_id" ? "team2_id" : "team1_id");
 
 /**
  * Decide & upsert the next-round slot for THIS tie (with tie_slot),
@@ -208,13 +208,15 @@ const oppositeField = (f) => (f === "team1_id" ? "team2_id" : "team1_id");
  * tie_slot: 1 => this tie seeds team1 side (home leg)
  *           2 => this tie seeds team2 side (home leg)
  */
+const oppositeField = (f) => (f === "team1_id" ? "team2_id" : "team1_id");
+
 async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, tiePairKey, winnerTeamId, userId }) {
   const nextRound = nextRoundOf(currentRound);
   if (!nextRound) return false;
 
   const nextOrder = Math.ceil(Number(matchOrder) / 2);
 
-  // pairs inside THIS (round, match_order)
+  // decide our slot among pairs inside THIS (round, match_order)
   const rows = await env.core_data.prepare(`
     SELECT team1_id, team2_id
     FROM league_knockouts
@@ -226,26 +228,82 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     .map(r => pairKeyOf(r.team1_id, r.team2_id))
     .filter(Boolean))).sort();
 
-  // default: use pair index if there are 2 pairs under the same order (e.g., 1/8 → 1/4)
+  // default slot by pair index when there are 2 pairs; otherwise by order parity
   let slot = 1;
   if (tiePairKey && pairKeys.length > 1) {
     const idx = pairKeys.indexOf(tiePairKey); // 0 or 1
     slot = (idx <= 0) ? 1 : 2;
+  } else if (pairKeys.length <= 1) {
+    const firstOrder = nextOrder * 2 - 1;
+    const secondOrder = nextOrder * 2;
+    if (Number(matchOrder) === secondOrder) slot = 2; // else 1
+  }
+  const targetField = slot === 1 ? "team1_id" : "team2_id";
+  const otherField = oppositeField(targetField);
+
+  // ---------- FINAL: single leg only ----------
+  if (nextRound === "final") {
+    // Map SF order to slot without relying on nextOrder
+    const slot = (Number(matchOrder) % 2 === 0) ? 1 : 2; // even SF -> team1, odd SF -> team2
+    const targetField = slot === 1 ? "team1_id" : "team2_id";
+
+    // 1) Find a canonical final row (oldest) if any
+    let keep = await env.core_data.prepare(`
+    SELECT id, match_order
+    FROM league_knockouts
+    WHERE league_id = ? AND round = 'final'
+    ORDER BY id ASC
+    LIMIT 1
+  `).bind(leagueId).first();
+
+    // 2) If none exists, create exactly one (home). We don't try to be clever with order; 9 is fine.
+    if (!keep) {
+      await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+        league_id, round, match_order, match_type,
+        team1_id, team2_id,
+        team1_user_id, team2_user_id,
+        team1_score, team2_score, winner_team_id,
+        is_vs_computer, computer_team, tie_slot, updated_user_id
+      ) VALUES (?, 'final', 9, 'home',
+                NULL, NULL, NULL, NULL,
+                NULL, NULL, NULL,
+                0, NULL, NULL, ?)
+    `).bind(leagueId, userId).run();
+
+      keep = await env.core_data.prepare(`
+      SELECT id, match_order
+      FROM league_knockouts
+      WHERE league_id = ? AND round = 'final'
+      ORDER BY id ASC
+      LIMIT 1
+    `).bind(leagueId).first();
+    }
+
+    // 3) Apply this semifinal winner to that single final row
+    if (winnerTeamId == null) {
+      await env.core_data.prepare(`
+      UPDATE league_knockouts
+      SET ${targetField} = NULL, updated_user_id = ?
+      WHERE id = ?
+    `).bind(userId, keep.id).run();
+      return "cleared";
+    }
+
+    // Don't overwrite the other side; fill only our side if empty
+    await env.core_data.prepare(`
+    UPDATE league_knockouts
+    SET ${targetField} = ?, tie_slot = ?, updated_user_id = ?
+    WHERE id = ?
+  `).bind(winnerTeamId, slot, userId, keep.id).run();
+
+    // NOTE: If there are extra final rows (legacy), we ignore them—no deletes, no schema changes.
+    return "updated";
   }
 
-  // 👇 NEW: if there's only ONE pair for this order (e.g., 1/4 → 1/2),
-  // decide slot by order parity within the two orders that map to nextOrder.
-  if (pairKeys.length <= 1) {
-    const firstOrder = nextOrder * 2 - 1; // e.g., 31
-    const secondOrder = nextOrder * 2;     // e.g., 32
-    if (Number(matchOrder) === firstOrder) slot = 1;
-    else if (Number(matchOrder) === secondOrder) slot = 2;
-  }
+  // ---------- NON-FINAL: 2 legs (home/away) with mirroring ----------
 
-  const targetField = (slot === 1) ? "team1_id" : "team2_id";
-  const otherField = (targetField === "team1_id") ? "team2_id" : "team1_id";
-
-  // fetch existing next-round legs
+  // What exists now?
   const existing = await env.core_data.prepare(`
     SELECT id, match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id, tie_slot
     FROM league_knockouts
@@ -255,8 +313,8 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
   const haveHome = existing.results.some(r => r.match_type === "home");
   const haveAway = existing.results.some(r => r.match_type === "away");
 
-  // clear path
   if (winnerTeamId == null) {
+    // clear our side on HOME and opposite on AWAY
     await env.core_data.prepare(`
       UPDATE league_knockouts
       SET ${targetField} = NULL, updated_user_id = ?
@@ -292,9 +350,8 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     return (haveHome || haveAway) ? "cleared" : "none";
   }
 
-  // ensure both legs exist and place winner mirrored:
+  // Winner present → ensure both legs exist; insert missing ones with mirrored sides
   async function insertLeg(matchType, putOnTargetSide) {
-    // home: winner goes to target side; away: to opposite side
     const placeField = putOnTargetSide ? targetField : otherField;
     const t1 = placeField === "team1_id" ? winnerTeamId : null;
     const t2 = placeField === "team2_id" ? winnerTeamId : null;
@@ -313,10 +370,10 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     `).bind(leagueId, nextRound, nextOrder, matchType, t1, t2, slot, userId).run();
   }
 
-  if (!haveHome) await insertLeg("home", true);   // slot side
-  if (!haveAway) await insertLeg("away", false);  // mirrored side
+  // HOME first, then AWAY — deterministic order
+  if (!haveHome) await insertLeg("home", true);
+  if (!haveAway) await insertLeg("away", false);
 
-  // update existing legs to correct side + tie_slot
   await env.core_data.prepare(`
     UPDATE league_knockouts
     SET ${targetField} = ?, tie_slot = ?, updated_user_id = ?
