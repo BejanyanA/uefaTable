@@ -289,7 +289,9 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     finalCol.className = "center-final";
     const finalTitle = document.createElement("h3"); finalTitle.textContent = ROUND_LABELS["Final"];
     finalCol.appendChild(finalTitle);
-    const finals = byRound.get("Final") || [];
+
+    // ⬇️ old: const finals = byRound.get("Final") || [];
+    const finals = byRound.get("Final") || byRound.get("final") || [];
     if (finals.length) finalCol.appendChild(renderTie(finals[0], "center"));
     else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
 
@@ -555,7 +557,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         row1.prepend(cbA);
 
         // Bottom row (Team B): Score1 = HOME (H_bottom), Score2 = AWAY (A_bottom)
-        row2.append( A_bottom, H_bottom, tn2, u2);
+        row2.append(A_bottom, H_bottom, tn2, u2);
         row2.prepend(cbB);
       } else {
         // LEFT side (unchanged): [User][Team][HOME][AWAY][CB]
