@@ -402,7 +402,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
             if (tie.away?.id) legs.push({ matchId: tie.away.id, teamId: role === "A" ? tie.away?.team2?.id : tie.away?.team1?.id });
             try {
               for (const l of legs.filter(x => x.matchId && x.teamId)) {
-                await apiPost("/attach-only-knock-players", { matchId: l.matchId, teamId: l.teamId, userId, leagueId }, { showLoading: false });
+                await apiPost("/attach-round-knock-players", { matchId: l.matchId, teamId: l.teamId, userId, leagueId }, { showLoading: false });
               }
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"),
@@ -546,7 +546,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
         const pick = async (winnerId, otherCb) => {
           try {
             otherCb.checked = false;
-            const res = await apiPost("/update-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
+            const res = await apiPost("/update-round-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
@@ -960,7 +960,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         const pick = async (winnerId, otherCb) => {
           try {
             otherCb.checked = false;
-            const res = await apiPost("/update-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
+            const res = await apiPost("/update-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");

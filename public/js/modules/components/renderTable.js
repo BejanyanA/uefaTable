@@ -334,6 +334,7 @@ export function renderLeagueInstances(instanceData) {
   // Attach handlers only to whatever buttons exist
   tabWrapper.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
+       if (btn.classList.contains(ACTIVE_CLASS)) return;
       // visual
       tabWrapper.querySelectorAll(".tab-btn").forEach(b => {
         b.classList.remove(ACTIVE_CLASS);

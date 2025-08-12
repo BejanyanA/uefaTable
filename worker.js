@@ -12,7 +12,7 @@ import { handleUpdateMatches } from './routes_endpoints/update_group_matches.js'
 import { handleGetLeaguePlayers } from './routes_endpoints/league_player.js';
 import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/attach_player.js';
 import { handleGroupKnockoutMatches } from './routes_endpoints/group_knockouts.js';
-import { handleUpdateKnockoutWinner } from './routes_endpoints/update_group_knock_winner_team.js';
+import { handleUpdateKnockoutWinner, handleUpdateOnlyKnockoutWinner } from './routes_endpoints/update_knock_team_winner.js';
 import { handleUpdateKnockoutMatches } from './routes_endpoints/update_group_knock_matches.js';
 import { handleOnlyKnockoutMatches } from './routes_endpoints/round_knockouts.js';
 import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/update_only_knock_matches.js';
@@ -39,12 +39,13 @@ const routeRegistry = {
   "/attach-players": { POST: handleAttachPlayers },
   "/group-knockouts": { POST: handleGroupKnockoutMatches },
   "/attach-knock-players": { POST: handleAttachKnockPlayers },
-  "/update-winner": { POST: handleUpdateKnockoutWinner },
+  "/update-knock-winner": { POST: handleUpdateKnockoutWinner },
   "/update-knock-matches": { POST: handleUpdateKnockoutMatches },
   "/create-knockouts": { POST: handleCreateRoundKnockouts },
   "/round-knockouts": { POST: handleOnlyKnockoutMatches },
   "/update-round-knock-matches": { POST: handleUpdateOnlyKnockoutMatches },
-  "/attach-only-knock-players": { POST: handleAttachOnlyKnockPlayers },
+  "/attach-round-knock-players": { POST: handleAttachOnlyKnockPlayers },
+  "/update-round-knock-winner": { POST: handleUpdateOnlyKnockoutWinner },
 
   // Add more routes here  league_instances
 };
