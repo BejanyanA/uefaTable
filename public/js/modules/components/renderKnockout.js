@@ -462,7 +462,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
             if (el.dataset.which === "t1") payload.team1_score = n; else payload.team2_score = n;
 
             try {
-              const res = await apiPost("/update-knock-matches", payload, { showLoading: false });
+              const res = await apiPost("/update-round-knock-matches", payload, { showLoading: false });
               if (res.success) el.dataset.initial = String(n);
               showToast(res.success ? (t.score_updated || "Score Updated")
                 : (t.score_update_failed || "Failed to update score"),
