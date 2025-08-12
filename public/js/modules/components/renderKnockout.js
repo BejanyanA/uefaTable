@@ -199,6 +199,10 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     // ---------- Helpers (declare BEFORE anything uses them) ----------
     const getNameOrNull = v => (v && String(v).trim()) || null;   // return null if missing
     const toNum = n => (n == null || isNaN(n)) ? 0 : +n;
+    const appendSafe = (parent, ...nodes) => {
+      nodes.forEach(n => { if (n && n.nodeType) parent.appendChild(n); });
+    };
+
 
     function splitLeftRightAlt(arr) { const L = [], R = []; arr.forEach((x, i) => (i % 2 === 0 ? L : R).push(x)); return { left: L, right: R }; }
 
@@ -365,6 +369,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       // Must send the knockout id from /group-knockouts
       const knockoutId = tie.id ?? tie.matchOrder;
 
+      const isFinal = String(tie.round || "").toLowerCase() === "final";
       const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
 
       const card = document.createElement("div");
@@ -474,11 +479,11 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
 
       // --- score inputs mapped to your vertical/column rules ---
       // Home leg (same matchId for both cells)
-      const H_top = buildScore(tie.home, "t1"); // top row: home.team1
+      const H_top =  buildScore(tie.home, "t1"); // top row: home.team1
       const H_bottom = buildScore(tie.home, "t2"); // bottom row: home.team2
       // Away leg (same matchId for both cells) — note the flip
-      const A_top = buildScore(tie.away, "t2"); // top row: away.team2
-      const A_bottom = buildScore(tie.away, "t1"); // bottom row: away.team1
+      const A_top = isFinal ? null : buildScore(tie.away, "t2"); // top row: away.team2
+      const A_bottom = isFinal ? null : buildScore(tie.away, "t1"); // bottom row: away.team1
 
       const u1 = buildUserSelect(teamA, "A");
       const u2 = buildUserSelect(teamB, "B");
@@ -524,7 +529,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         ph?.t2 || null
       );
       // Checkboxes only when both legs have scores AND aggregate draw
-      const canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw;
+      const canPickWinner = editable && !tie.winnerTeamId && !isFinal && homeDone && awayDone && draw; // ⬅️ CHANGED
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
       const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
 
@@ -551,18 +556,15 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
       if (sideKey === "right") {
-        // RIGHT side visual order: [CB][Score1][Score2][Team][User]
-        // Top row (Team A): Score1 = AWAY (A_top), Score2 = HOME (H_top)
-        row1.append(A_top, H_top, tn1, u1);
+        // RIGHT side
+        appendSafe(row1, isFinal ? null : A_top, H_top, tn1, u1);
         row1.prepend(cbA);
-
-        // Bottom row (Team B): Score1 = HOME (H_bottom), Score2 = AWAY (A_bottom)
-        row2.append(A_bottom, H_bottom, tn2, u2);
+        appendSafe(row2, isFinal ? null : A_bottom, H_bottom, tn2, u2);
         row2.prepend(cbB);
       } else {
-        // LEFT side (unchanged): [User][Team][HOME][AWAY][CB]
-        row1.append(u1, tn1, H_top, A_top, cbA);
-        row2.append(u2, tn2, H_bottom, A_bottom, cbB);
+        // LEFT / center
+        appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
+        appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
       }
 
       card.append(row1, row2);
