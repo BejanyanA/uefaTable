@@ -8,12 +8,12 @@ import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleL
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleLeagueStandings } from './routes_endpoints/standings.js';
 import { handleLeagueMatches } from './routes_endpoints/matches.js';
-import { handleUpdateMatches } from './routes_endpoints/update_matches.js';
+import { handleUpdateMatches } from './routes_endpoints/update_group_matches.js';
 import { handleGetLeaguePlayers } from './routes_endpoints/league_player.js';
 import { handleAttachPlayers, handleAttachKnockPlayers } from './routes_endpoints/attach_player.js';
 import { handleGroupKnockoutMatches } from './routes_endpoints/group_knockouts.js';
-import { handleUpdateKnockoutWinner } from './routes_endpoints/update_winner_team.js';
-import { handleUpdateKnockoutMatches } from './routes_endpoints/update_knock_matches.js';
+import { handleUpdateKnockoutWinner } from './routes_endpoints/update_group_knock_winner_team.js';
+import { handleUpdateKnockoutMatches } from './routes_endpoints/update_group_knock_matches.js';
 import { handleOnlyKnockoutMatches } from './routes_endpoints/round_knockouts.js';
 
 // import additional route handlers as needed

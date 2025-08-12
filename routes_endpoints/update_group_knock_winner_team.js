@@ -1,4 +1,4 @@
-// routes/attach_player.js
+// routes/update_group_knock_winner_team.js
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';

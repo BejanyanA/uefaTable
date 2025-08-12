@@ -1,4 +1,4 @@
-// routes/update_matches.js
+// routes/update_group_matches.js
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
