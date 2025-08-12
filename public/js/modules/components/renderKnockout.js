@@ -366,9 +366,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     }
 
     function renderTie(tie, sideKey, ph, useGroupFallback = false) {
-      // Must send the knockout id from /group-knockouts
       const knockoutId = tie.id ?? tie.matchOrder;
-
       const isFinal = String(tie.round || "").toLowerCase() === "final";
       const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
 
@@ -479,7 +477,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
 
       // --- score inputs mapped to your vertical/column rules ---
       // Home leg (same matchId for both cells)
-      const H_top =  buildScore(tie.home, "t1"); // top row: home.team1
+      const H_top = buildScore(tie.home, "t1"); // top row: home.team1
       const H_bottom = buildScore(tie.home, "t2"); // bottom row: home.team2
       // Away leg (same matchId for both cells) — note the flip
       const A_top = isFinal ? null : buildScore(tie.away, "t2"); // top row: away.team2
@@ -529,7 +527,18 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         ph?.t2 || null
       );
       // Checkboxes only when both legs have scores AND aggregate draw
-      const canPickWinner = editable && !tie.winnerTeamId && !isFinal && homeDone && awayDone && draw; // ⬅️ CHANGED
+      
+      let canPickWinner;
+      if (isFinal) {
+        const h = tie.home?.score || {};
+        const h1ok = typeof h.team1 === "number";
+        const h2ok = typeof h.team2 === "number";
+        const equal = h1ok && h2ok && h.team1 === h.team2;
+        canPickWinner = editable && !tie.winnerTeamId && equal;   // enable on Final draw
+      } else {
+        canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
+      }
+
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
       const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
 
