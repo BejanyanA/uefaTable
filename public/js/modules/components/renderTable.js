@@ -2,7 +2,7 @@ import { apiGet, apiPost } from '../../services/api.js';
 import { renderGroupStandingsPage } from './renderStandings.js'
 import { langMap, currentLang } from '../LanguageManager.js';
 import { LeagueManager } from '../LeagueManager.js';
-import { renderKnockoutsStage } from './renderKnockout.js'
+import { renderKnockoutsStage, renderOnlyKnockouts } from './renderKnockout.js'
 
 export function renderLeagueTable(data) {
   const translation = langMap[currentLang];
@@ -176,9 +176,16 @@ export function renderLeagueInstances(instanceData) {
   wrapper.innerHTML = "";
 
   const instances = instanceData.leagueInstances || [];
-  const hasVisibleGroups = instances.some(i => i.groups && Object.keys(i.groups).length);
 
-  if (!hasVisibleGroups) {
+  // Determine stage type
+  const bannerId = parseInt(localStorage.getItem("currentBannerId"));
+  const stageBannerId = parseInt(localStorage.getItem("selectedStageType"));
+  const isGroup = stageBannerId === 1;
+
+  // If there are no visible groups and this league is "group" type, hide like before.
+  // But if it's knockout-only (isGroup === false), DO NOT early-return; we'll render KO below.
+  const hasVisibleGroups = instances.some(i => i.groups && Object.keys(i.groups).length);
+  if (!hasVisibleGroups && isGroup) {
     wrapper.style.display = "none";
     return;
   }
@@ -187,11 +194,6 @@ export function renderLeagueInstances(instanceData) {
   const backBtn = document.createElement("button");
   backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
-
-  const bannerId = parseInt(localStorage.getItem("currentBannerId"));
-  const stageBannerId = parseInt(localStorage.getItem("selectedStageType"));
-  const isGroup = stageBannerId === 1;
-
   backBtn.addEventListener("click", async () => {
     try {
       const data = await apiPost("/leagues", { bannerId, isGroup });
@@ -207,7 +209,6 @@ export function renderLeagueInstances(instanceData) {
       showToast("Something went wrong", "error");
     }
   });
-
   wrapper.appendChild(backBtn);
   wrapper.style.display = "block";
 
@@ -215,38 +216,43 @@ export function renderLeagueInstances(instanceData) {
   const tabWrapper = document.createElement("div");
   tabWrapper.className = "tab-switcher";
 
-  const groupStageBtn = document.createElement("button");
-  groupStageBtn.textContent = "Group Stage";
-  groupStageBtn.classList.add("active-tab");
+  // Conditionally create Group Stage button
+  let groupStageBtn = null;
+  if (isGroup) {
+    groupStageBtn = document.createElement("button");
+    groupStageBtn.textContent = "Group Stage";
+    groupStageBtn.dataset.tab = "group";
+    groupStageBtn.classList.add("tab-btn", "active-tab"); // default active when group exists
+    tabWrapper.appendChild(groupStageBtn);
+  }
 
+  // Always create Knockouts button
   const knockoutBtn = document.createElement("button");
   knockoutBtn.textContent = "Knockouts";
-
-  tabWrapper.appendChild(groupStageBtn);
+  knockoutBtn.dataset.tab = "knockouts";
+  knockoutBtn.classList.add("tab-btn");
+  if (!isGroup) {
+    // No group stage -> Knockouts is active by default
+    knockoutBtn.classList.add("active-tab");
+  }
   tabWrapper.appendChild(knockoutBtn);
   wrapper.appendChild(tabWrapper);
 
   // ✅ Containers for tab content (both INSIDE wrapper)
-  const groupStageContainer = document.createElement("div");
-  groupStageContainer.className = "tab-content";
-  groupStageContainer.id = "groupStageTab";
+  let groupStageContainer = null;
+  if (isGroup) {
+    groupStageContainer = document.createElement("div");
+    groupStageContainer.className = "tab-content";
+    groupStageContainer.id = "groupStageTab";
+    groupStageContainer.style.display = "block"; // visible by default when group exists
+    wrapper.appendChild(groupStageContainer);
+  }
 
   const knockoutContainer = document.createElement("div");
   knockoutContainer.className = "tab-content";
   knockoutContainer.id = "knockoutTab";
-  knockoutContainer.style.display = "none";
-
-  wrapper.appendChild(groupStageContainer);
+  knockoutContainer.style.display = isGroup ? "none" : "block"; // visible immediately if no group
   wrapper.appendChild(knockoutContainer);
-
-  // keep the "working tabs" selector classes
-  groupStageBtn.dataset.tab = "group";
-  knockoutBtn.dataset.tab = "knockouts";
-  groupStageBtn.classList.add("tab-btn", "active-tab");
-  knockoutBtn.classList.add("tab-btn");
-
-  // Initial visibility under same wrapper
-  groupStageContainer.style.display = "block";
 
   // ---------- helpers ----------
   function renderGroupsInto(container, instancesList) {
@@ -310,18 +316,28 @@ export function renderLeagueInstances(instanceData) {
     }
   }
 
-  // initial fill using provided data (no request)
-  renderGroupsInto(groupStageContainer, instances);
+  // ---- Initial fill
+  if (isGroup) {
+    // Existing behavior (unchanged)
+    renderGroupsInto(groupStageContainer, instances);
+  } else {
+    // NEW: Knockout-only leagues → render bracket immediately
+    const leagueId = parseInt(localStorage.getItem("leagueId"));
+    knockoutContainer.innerHTML = "";
+    // Uses your existing function; no behavior change to the knockout renderer
+    renderOnlyKnockouts(leagueId, knockoutContainer);
+  }
 
-  // ===== Tabs: fix visual state + proper data refresh =====
+  // ===== Tabs: visual state + data refresh =====
   const ACTIVE_CLASS = "active-tab";
 
+  // Attach handlers only to whatever buttons exist
   tabWrapper.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      // visual: use the SAME class consistently
+      // visual
       tabWrapper.querySelectorAll(".tab-btn").forEach(b => {
         b.classList.remove(ACTIVE_CLASS);
-        b.classList.remove("active"); // clean any legacy class usage
+        b.classList.remove("active");
       });
       btn.classList.add(ACTIVE_CLASS);
 
@@ -329,7 +345,8 @@ export function renderLeagueInstances(instanceData) {
       const leagueId = parseInt(localStorage.getItem("leagueId"));
 
       if (tab === "group") {
-        // Show group pane, hide KO pane and REFRESH from API
+        // Guard: only when group exists
+        if (!isGroup) return;
         knockoutContainer.style.display = "none";
         groupStageContainer.style.display = "block";
         try {
@@ -338,11 +355,12 @@ export function renderLeagueInstances(instanceData) {
           console.error("Group refresh error", e);
         }
       } else if (tab === "knockouts") {
-        // Show KO pane and render into it
-        groupStageContainer.style.display = "none";
+        // Always available
+        if (isGroup && groupStageContainer) groupStageContainer.style.display = "none";
         knockoutContainer.style.display = "block";
         try {
-          knockoutContainer.innerHTML = ""; // clear KO pane
+          knockoutContainer.innerHTML = "";
+          // Reuse your existing KO renderer
           await renderKnockoutsStage(leagueId, knockoutContainer);
         } catch (e) {
           console.error("KO render error", e);

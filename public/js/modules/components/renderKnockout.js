@@ -5,7 +5,7 @@ import { LeagueManager } from '../LeagueManager.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 
 
-export function renderKnockoutLeagueTable(data) {
+export function renderOnlyKnockoutLeagues(data) {
   const translation = langMap[currentLang];
   const section = document.getElementById("leagueType1");
   const leagues = data.leagues || [];
@@ -170,6 +170,420 @@ export function renderKnockoutLeagueTable(data) {
   }
 }
 
+export async function renderOnlyKnockouts(leagueId, rootEl) {
+  
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
+  root.innerHTML = "";
+  const t = langMap[currentLang];
+
+  try {
+    const [{ success, data }, playersRes] = await Promise.all([
+      apiPost("/round-knockouts", { leagueId }),
+      apiPost("/league-players", { leagueId }, { showLoading: false }),
+    ]);
+    if (!success || !data) {
+      root.innerHTML = `<p style="color:#fff">${t.not_found || "Knockout data not found"}</p>`;
+      return;
+    }
+
+    const editable = data.accessType === "owner";
+    const teamCount = Number(data.teamCount) || 32;
+    const koTeams = teamCount === 64 ? 32 : 16;
+    const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2", "Final"] : ["1/8", "1/4", "1/2", "Final"];
+    const firstRound = rounds[0];
+
+    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": "Round of 16", "1/4": "Quarter-finals", "1/2": "Semi-finals", "Final": "Final" };
+    const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
+    const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
+
+    // ---------- Helpers (declare BEFORE anything uses them) ----------
+    const getNameOrNull = v => (v && String(v).trim()) || null;   // return null if missing
+    const toNum = n => (n == null || isNaN(n)) ? 0 : +n;
+    const appendSafe = (parent, ...nodes) => {
+      nodes.forEach(n => { if (n && n.nodeType) parent.appendChild(n); });
+    };
+
+
+    function splitLeftRightAlt(arr) { const L = [], R = []; arr.forEach((x, i) => (i % 2 === 0 ? L : R).push(x)); return { left: L, right: R }; }
+
+    function scoresFilled(leg) {
+      return !!(leg && leg.score &&
+        typeof leg.score.team1 === "number" &&
+        typeof leg.score.team2 === "number");
+    }
+
+    function calcAggregate(tie) {
+      const H = tie.home?.score || {};
+      const A = tie.away?.score || {};
+      const teamA = tie.home?.team1 || tie.away?.team2 || {};
+      const teamB = tie.home?.team2 || tie.away?.team1 || {};
+
+      // Aggregate uses: A = home.t1 + away.t2,  B = home.t2 + away.t1
+      const aggA = (typeof H.team1 === "number" ? H.team1 : 0) + (typeof A.team2 === "number" ? A.team2 : 0);
+      const aggB = (typeof H.team2 === "number" ? H.team2 : 0) + (typeof A.team1 === "number" ? A.team1 : 0);
+
+      const homeDone = scoresFilled(tie.home);
+      const awayDone = scoresFilled(tie.away);
+      const draw = homeDone && awayDone && aggA === aggB;
+
+      return { teamA, teamB, aggA, aggB, draw, homeDone, awayDone };
+    }
+
+    // First-round placeholders (A1 vs B2, then B1 vs A2, …)
+    const groupsCnt = Math.max(2, Math.min(16, Math.round(teamCount / 4)));
+    const GROUPS = Array.from({ length: groupsCnt }, (_, i) => String.fromCharCode(65 + i));
+    function placeholderFirstRound(i) {
+      const pair = Math.floor(i / 2);
+      const even = (i % 2) === 0;
+      const g1 = GROUPS[pair * 2], g2 = GROUPS[pair * 2 + 1];
+      if (!g1 || !g2) return { t1: `Qualifier ${i * 2 + 1}`, t2: `Qualifier ${i * 2 + 2}` };
+      return even ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
+        : { t1: `Group ${g2} 1st`, t2: `Group ${g1} 2nd` };
+    }
+
+    function renderPlaceholderCard({ t1, t2 }) {
+      const card = document.createElement("div");
+      card.className = "ko-card ko-placeholder";
+      const row = document.createElement("div");
+      row.className = "ko-placeholder-row";
+      row.textContent = `${t1}   vs   ${t2}`;
+      card.appendChild(row);
+      return card;
+    }
+
+    function splitForRound(ties, rk, firstRound, expectedPerSide) {
+      // Always work on a sorted copy (by matchOrder) so the split is stable
+      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+
+      // For all rounds we do a block split: first half → left, second half → right.
+      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+      return {
+        left: sorted.slice(0, perSide),
+        right: sorted.slice(perSide),
+        perSide
+      };
+    }
+
+    // Bucket ties by round
+    const byRound = new Map();
+    (data.matches || []).forEach(m => {
+      const r = m.round || firstRound;
+      if (!byRound.has(r)) byRound.set(r, []);
+      byRound.get(r).push(m);
+    });
+
+    // Frame
+    const frame = document.createElement("div");
+    frame.className = "bracket-frame";
+    const leftSide = document.createElement("div"); leftSide.className = "bracket-side left-side";
+    const centerSide = document.createElement("div"); centerSide.className = "bracket-center";
+    const rightSide = document.createElement("div"); rightSide.className = "bracket-side right-side";
+    frame.append(leftSide, centerSide, rightSide);
+    root.appendChild(frame);
+
+    // Cup + Final
+    const cupSrc = ({
+      1: "public/assets/images/champ1.png",
+      2: "public/assets/images/eur2.png",
+      3: "public/assets/images/europ3.png",
+      4: "public/assets/images/wrld4.png",
+    })[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
+
+    const finalCol = document.createElement("div");
+    finalCol.className = "center-final";
+    const finalTitle = document.createElement("h3"); finalTitle.textContent = ROUND_LABELS["Final"];
+    finalCol.appendChild(finalTitle);
+
+    // ⬇️ old: const finals = byRound.get("Final") || [];
+    const finals = byRound.get("Final") || byRound.get("final") || [];
+    if (finals.length) finalCol.appendChild(renderTie(finals[0], "center"));
+    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
+
+    const cupWrap = document.createElement("div");
+    cupWrap.className = "cup-wrap";
+    const img = document.createElement("img");
+    img.className = "cup-image"; img.src = cupSrc; img.alt = "Trophy";
+    cupWrap.appendChild(img);
+    centerSide.append(finalCol, cupWrap);
+
+    // Sides
+    renderSide(leftSide, "left");
+    renderSide(rightSide, "right");
+
+    function renderSide(sideEl, sideKey) {
+      rounds.filter(r => r !== "Final").forEach(rk => {
+        const col = document.createElement("div");
+        col.className = `side-round round-${rk.replace("/", "-")}`;
+        const title = document.createElement("h3"); title.textContent = ROUND_LABELS[rk];
+        col.appendChild(title);
+
+        const tiesAll = byRound.get(rk) || [];
+        const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
+        const expectedPerSide = Math.ceil(expected / 2);
+
+        // Use block split for the first round, alternating for later rounds
+        const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
+        const list = sideKey === "left" ? left : right;
+
+        // Real ties
+        const useGroupFallback = (rk === firstRound);   // only Ro16 uses group placeholders
+        list.forEach((tie, i) => {
+          let ph = null;
+          if (rk === firstRound) {
+            // baseIndex matches the same logic you use for placeholders
+            const baseIndex = (sideKey === "left" ? i : i + perSide);
+            ph = placeholderFirstRound(baseIndex); // { t1: "Group A 1st", t2: "Group B 2nd" }
+          }
+          col.appendChild(renderTie(tie, sideKey, ph, useGroupFallback));
+        });
+
+        /* ---- ADD THIS: pad up to the expected per-side count ---- */
+        const missing = perSide - list.length;
+        if (missing > 0) {
+          for (let i = 0; i < missing; i++) {
+            if (rk === firstRound) {
+              // keep the A..H / I..P alignment correct
+              const indexOnSide = list.length + i; // continue after real ties
+              const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
+              col.appendChild(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
+            } else {
+              col.appendChild(renderPlaceholderCard({ t1: "TBD", t2: "TBD" }));
+            }
+          }
+        }
+
+        sideEl.appendChild(col);
+      });
+    }
+
+    // ===== Tie card =====
+    function normGroup(g) { return g ? String(g).replace(/\s+/g, '').toUpperCase() : null; }
+    function parsePh(phText) {
+      if (!phText) return { group: null, rank: null };
+      const g = /Group\s+([A-P])/i.exec(phText);
+      const r = /([12])(?:st|nd)/i.exec(phText);
+      return { group: g ? `Group ${g[1].toUpperCase()}` : null, rank: r ? +r[1] : null };
+    }
+
+    function renderTie(tie, sideKey, ph, useGroupFallback = false) {
+      const knockoutId = tie.id ?? tie.matchOrder;
+      const isFinal = String(tie.round || "").toLowerCase() === "final";
+      const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
+
+      const card = document.createElement("div");
+      card.className = "ko-card ko-row-2";
+
+      if (tie.winnerTeamId && tie.winnerTeamName) {
+        const wb = document.createElement("div");
+        wb.style.textAlign = "center";
+        wb.style.fontWeight = "700";
+        wb.style.marginBottom = "4px";
+        wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
+        card.appendChild(wb);
+      }
+
+      // --- builders ---
+      const buildUserSelect = (team, role) => {
+        const sel = document.createElement("select");
+        sel.className = "user-dropdown";
+        sel.disabled = !editable || !team?.id;
+
+        const def = document.createElement("option");
+        def.value = ""; def.textContent = t.selectUser || "Select Player";
+        sel.appendChild(def);
+        players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
+        if (team?.userId) sel.value = String(team.userId);
+
+        if (editable && team?.id) {
+          sel.addEventListener("change", async () => {
+            const userId = sel.value ? parseInt(sel.value, 10) : null;
+            const legs = [];
+            if (tie.home?.id) legs.push({ matchId: tie.home.id, teamId: role === "A" ? tie.home?.team1?.id : tie.home?.team2?.id });
+            if (tie.away?.id) legs.push({ matchId: tie.away.id, teamId: role === "A" ? tie.away?.team2?.id : tie.away?.team1?.id });
+            try {
+              for (const l of legs.filter(x => x.matchId && x.teamId)) {
+                await apiPost("/attach-knock-players", { matchId: l.matchId, teamId: l.teamId, userId, leagueId }, { showLoading: false });
+              }
+              showToast(userId ? (t.player_success_assigned || "User assigned successfully")
+                : (t.player_success_unassigned || "User unassigned successfully"),
+                "success");
+              // Refresh the page/state after successful request
+              await renderOnlyKnockouts(leagueId, rootEl);
+            } catch (e) {
+              console.error(e);
+              showToast(t.player_assign_failed || "Failed to attach user", "error");
+            }
+          });
+        }
+        return sel;
+      };
+
+      // NEW: smarter team label (real name -> group fallback -> TBD)
+      function buildTeam(teamObj, position, groupName, phText) {
+        const d = document.createElement("div");
+        d.className = "team-name";
+
+        const name = teamObj?.name && String(teamObj.name).trim() ? teamObj.name : null;
+        const grp = (groupName && String(groupName).trim())
+          || (teamObj?.groupName && String(teamObj.groupName).trim())
+          || null;
+
+        if (name) {
+          d.textContent = name;
+        } else if (useGroupFallback && grp) {
+          d.textContent = `${grp} Team ${position}`;
+          d.classList.add("placeholder-text");
+        } else {
+          d.textContent = t.tbd || "TBD";
+          d.classList.add("placeholder-text");
+        }
+        return d;
+      }
+
+      const buildScore = (leg, which) => {
+        const el = document.createElement("input"); el.type = "number"; el.className = "score-input";
+        const initial = leg?.score ? (which === "t1" ? (leg.score.team1 ?? "") : (leg.score.team2 ?? "")) : "";
+        el.value = initial; el.dataset.initial = String(initial);
+        el.disabled = !editable || !leg?.id;
+        el.dataset.matchId = leg?.id || ""; el.dataset.which = which;
+
+        if (editable && leg?.id) {
+          el.addEventListener("input", () => { if (el.value !== "" && +el.value < 0) el.value = ""; });
+          el.addEventListener("blur", async () => {
+            const matchId = Number(el.dataset.matchId);
+            const val = el.value.trim();
+            if (!matchId) return;
+            if (val === "") return;
+            if (val === el.dataset.initial) return;
+            const n = Number(val);
+            if (!Number.isFinite(n) || n < 0) return;
+
+            const payload = { matchId };
+            if (el.dataset.which === "t1") payload.team1_score = n; else payload.team2_score = n;
+
+            try {
+              const res = await apiPost("/update-knock-matches", payload, { showLoading: false });
+              if (res.success) el.dataset.initial = String(n);
+              showToast(res.success ? (t.score_updated || "Score Updated")
+                : (t.score_update_failed || "Failed to update score"),
+                res.success ? "success" : "error");
+              // Refresh the page/state after successful request
+              if (res.success) await renderOnlyKnockouts(leagueId, rootEl);
+            } catch (e) { console.error(e); }
+          });
+        }
+        return el;
+      };
+
+      // --- score inputs mapped to your vertical/column rules ---
+      // Home leg (same matchId for both cells)
+      const H_top = buildScore(tie.home, "t1"); // top row: home.team1
+      const H_bottom = buildScore(tie.home, "t2"); // bottom row: home.team2
+      // Away leg (same matchId for both cells) — note the flip
+      const A_top = isFinal ? null : buildScore(tie.away, "t2"); // top row: away.team2
+      const A_bottom = isFinal ? null : buildScore(tie.away, "t1"); // bottom row: away.team1
+
+      const u1 = buildUserSelect(teamA, "A");
+      const u2 = buildUserSelect(teamB, "B");
+
+      // Try multiple common API keys for group labels; harmless if absent
+      const p1 = parsePh(ph?.t1);  // e.g., "Group C 1st"
+      const p2 = parsePh(ph?.t2);  // e.g., "Group D 2nd"
+
+      // Decide fallback group for each slot (A = top row, B = bottom row)
+      let grpA = teamA?.groupName || tie.home?.team1?.groupName || tie.away?.team2?.groupName || null;
+      let grpB = teamB?.groupName || tie.home?.team2?.groupName || tie.away?.team1?.groupName || null;
+
+      if (!grpA || !grpB) {
+        const gA = p1.group, gB = p2.group;
+        const tb = normGroup(teamB?.groupName);
+        const ta = normGroup(teamA?.groupName);
+        const ngA = normGroup(gA), ngB = normGroup(gB);
+
+        // If only one side is known, use the paired placeholder group for the other
+        if (!grpA) {
+          if (tb && ngA && tb === ngA) grpA = gB;
+          else if (tb && ngB && tb === ngB) grpA = gA;
+          else grpA = gA || grpA; // fallback to ph.t1's group if nothing else
+        }
+        if (!grpB) {
+          if (ta && ngA && ta === ngA) grpB = gB;
+          else if (ta && ngB && ta === ngB) grpB = gA;
+          else grpB = gB || grpB; // fallback to ph.t2's group if nothing else
+        }
+      }
+
+      // Build labels (position = 1 for top row, 2 for bottom row)
+      const tn1 = buildTeam(
+        teamA,
+        1,
+        grpA,
+        ph?.t1 || null  // keep hint for rank if you ever want to use it
+      );
+      const tn2 = buildTeam(
+        teamB,
+        2,
+        grpB,
+        ph?.t2 || null
+      );
+      // Checkboxes only when both legs have scores AND aggregate draw
+      
+      let canPickWinner;
+      if (isFinal) {
+        const h = tie.home?.score || {};
+        const h1ok = typeof h.team1 === "number";
+        const h2ok = typeof h.team2 === "number";
+        const equal = h1ok && h2ok && h.team1 === h.team2;
+        canPickWinner = editable && !tie.winnerTeamId && equal;   // enable on Final draw
+      } else {
+        canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
+      }
+
+      const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
+      const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
+
+      if (canPickWinner) {
+        const pick = async (winnerId, otherCb) => {
+          try {
+            otherCb.checked = false;
+            const res = await apiPost("/update-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
+            showToast(res.success ? (t.score_updated || "Score Updated")
+              : (t.score_update_failed || "Failed to update score"),
+              res.success ? "success" : "error");
+            // Refresh the page/state after successful request
+            if (res.success) await renderOnlyKnockouts(leagueId, rootEl);
+          } catch (e) { console.error(e); }
+        };
+        cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
+        cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
+      }
+
+      // --- rows ---
+      const row1 = document.createElement("div");
+      const row2 = document.createElement("div");
+      row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
+      row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
+
+      if (sideKey === "right") {
+        // RIGHT side
+        appendSafe(row1, isFinal ? null : A_top, H_top, tn1, u1);
+        row1.prepend(cbA);
+        appendSafe(row2, isFinal ? null : A_bottom, H_bottom, tn2, u2);
+        row2.prepend(cbB);
+      } else {
+        // LEFT / center
+        appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
+        appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
+      }
+
+      card.append(row1, row2);
+      return card;
+    }
+  } catch (err) {
+    console.error("Knockouts render error:", err);
+    root.innerHTML = `<p style="color:#fff">${t.something_went_wrong || "Something went wrong"}</p>`;
+  }
+}
 
 export async function renderKnockoutsStage(leagueId, rootEl) {
   const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
