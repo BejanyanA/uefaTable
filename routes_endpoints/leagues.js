@@ -252,10 +252,10 @@ export async function handleCreateRoundKnockouts(request, env) {
 
   const roundLabel = (n) =>
     n === 32 ? "1/16" :
-    n === 16 ? "1/8"  :
-    n === 8  ? "1/4"  :
-    n === 4  ? "1/2"  :
-    n === 2  ? "Final": "Knockout";
+      n === 16 ? "1/8" :
+        n === 8 ? "1/4" :
+          n === 4 ? "1/2" :
+            n === 2 ? "Final" : "Knockout";
 
   const makePairs = (ids) => {
     const base = shuffle ? shuffleArray([...ids]) : [...ids];
@@ -437,6 +437,10 @@ export async function handleLeaguesEdit(request, env) {
   // Step 3: Update league name
   await env.core_data.prepare(`
   UPDATE leagues SET name = ? WHERE id = ?
+`).bind(name, leagueId).run();
+
+  await env.core_data.prepare(`
+  UPDATE league_instances SET name = ? WHERE id = ?
 `).bind(name, leagueId).run();
 
   // Step 4: Update league access (add new)
