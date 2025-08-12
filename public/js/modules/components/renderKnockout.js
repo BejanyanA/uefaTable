@@ -172,7 +172,7 @@ export function renderKnockoutLeagueTable(data) {
 
 
 export async function renderKnockoutsStage(leagueId, rootEl) {
-  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
   root.innerHTML = "";
   const t = langMap[currentLang];
 
