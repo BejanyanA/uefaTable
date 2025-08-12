@@ -161,27 +161,27 @@ export async function handleUpdateMatches(request, env) {
     // create home leg placeholders (A1 vs B2)
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-        league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, ?, NULL, 'home')
+        league_id, round, match_order, team1_id, team2_id, match_type, tie_slot
+      ) VALUES (?, ?, ?, ?, NULL, 'home', 1)
     `).bind(match.league_id, initialRound, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-        league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, NULL, ?, 'home')
+        league_id, round, match_order, team1_id, team2_id, match_type, tie_slot
+      ) VALUES (?, ?, ?, NULL, ?, 'home', 1)
     `).bind(match.league_id, initialRound, matchOrder, top2[1].team_id).run();
 
     // second leg placeholders (B1 vs A2 flipped)
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-        league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, NULL, ?, 'away')
+        league_id, round, match_order, team1_id, team2_id, match_type, tie_slot
+      ) VALUES (?, ?, ?, NULL, ?, 'away', 2)
     `).bind(match.league_id, initialRound, matchOrder, top2[0].team_id).run();
 
     await env.core_data.prepare(`
       INSERT INTO league_knockouts (
-        league_id, round, match_order, team1_id, team2_id, match_type
-      ) VALUES (?, ?, ?, ?, NULL, 'away')
+        league_id, round, match_order, team1_id, team2_id, match_type, tie_slot
+      ) VALUES (?, ?, ?, ?, NULL, 'away', 2)
     `).bind(match.league_id, initialRound, matchOrder, top2[1].team_id).run();
 
     // if the paired group is also complete, fill the placeholders
@@ -212,14 +212,14 @@ export async function handleUpdateMatches(request, env) {
         UPDATE league_knockouts
         SET team2_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
-          AND match_type = 'home' AND team2_id IS NULL
+          AND match_type = 'home' AND tie_slot = 1 AND team2_id IS NULL
       `).bind(p2.team_id, match.league_id, initialRound, matchOrder).run();
 
       await env.core_data.prepare(`
         UPDATE league_knockouts
         SET team1_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
-          AND match_type = 'home' AND team1_id IS NULL
+          AND match_type = 'home' AND tie_slot = 1 AND team1_id IS NULL
       `).bind(p1.team_id, match.league_id, initialRound, matchOrder).run();
 
       // AWAY leg: Group B team1 vs Group A team2 (flipped)
@@ -227,14 +227,14 @@ export async function handleUpdateMatches(request, env) {
         UPDATE league_knockouts
         SET team1_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
-          AND match_type = 'away' AND team1_id IS NULL
+          AND match_type = 'away' AND tie_slot = 2 AND team1_id IS NULL
       `).bind(p2.team_id, match.league_id, initialRound, matchOrder).run();
 
       await env.core_data.prepare(`
         UPDATE league_knockouts
         SET team2_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
-          AND match_type = 'away' AND team2_id IS NULL
+          AND match_type = 'away' AND tie_slot = 2 AND team2_id IS NULL
       `).bind(p1.team_id, match.league_id, initialRound, matchOrder).run();
     }
   };

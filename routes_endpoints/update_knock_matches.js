@@ -31,44 +31,6 @@ export async function handleUpdateKnockoutMatches(request, env) {
     return jsonResponse({ success: false, error: "scores_must_be_number_or_null" }, 400);
   }
 
-  // Helpers
-  const nextRoundOf = (round) => {
-    switch (round) {
-      case "1/16": return "1/8";
-      case "1/8": return "1/4";
-      case "1/4": return "1/2";
-      case "1/2": return "final";
-      default: return null;
-    }
-  };
-
-  const computeAggregate = (legs) => {
-    if (legs.length !== 2) return { complete: false, draw: false, winnerTeamId: null };
-    const allScored = legs.every(l => l.team1_score !== null && l.team2_score !== null);
-    if (!allScored) return { complete: false, draw: false, winnerTeamId: null };
-    const tA = legs[0].team1_id, tB = legs[0].team2_id;
-    if (tA == null || tB == null) return { complete: false, draw: false, winnerTeamId: null };
-
-    let a = 0, b = 0;
-    for (const l of legs) {
-      a += (l.team1_id === tA) ? Number(l.team1_score) : (l.team2_id === tA ? Number(l.team2_score) : 0);
-      b += (l.team1_id === tB) ? Number(l.team1_score) : (l.team2_id === tB ? Number(l.team2_score) : 0);
-    }
-    if (a === b) return { complete: true, draw: true, winnerTeamId: null };
-    return { complete: true, draw: false, winnerTeamId: a > b ? tA : tB };
-  };
-
-  const pairWhereClauseSelect = (alias) => `(
-    (${alias}.team1_id = ? AND ${alias}.team2_id = ?)
-    OR
-    (${alias}.team1_id = ? AND ${alias}.team2_id = ?)
-  )`;
-  const pairWhereClauseNoAlias = () => `(
-    (team1_id = ? AND team2_id = ?)
-    OR
-    (team1_id = ? AND team2_id = ?)
-  )`;
-
   // 1) Load edited leg + access
   const leg = await env.core_data.prepare(`
     SELECT
@@ -156,7 +118,7 @@ export async function handleUpdateKnockoutMatches(request, env) {
     `).bind(agg.winnerTeamId, userId, leg.league_id, leg.round, leg.match_order, ...pairBinds).run();
   }
 
-  // 5) Seed/update next round using tie-aware slotting
+  // 5) Seed/update next round using tie-aware slotting (with tie_slot + mirroring)
   const propagated = await upsertNextRoundSeed(env, {
     leagueId: leg.league_id,
     currentRound: leg.round,
@@ -174,103 +136,6 @@ export async function handleUpdateKnockoutMatches(request, env) {
 
 /* ---------- helpers ---------- */
 
-// stable key for a tie's two teams (order-insensitive)
-function pairKeyOf(a, b) {
-  if (a == null || b == null) return null;
-  const x = Number(a), y = Number(b);
-  return (x < y) ? `${x}-${y}` : `${y}-${x}`;
-}
-
-// Decide & upsert the correct next-round slot for THIS tie,
-// with deletion if both slots are empty after clearing.
-async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, tiePairKey, winnerTeamId, userId }) {
-  const nextRound = nextRoundOf(currentRound);
-  if (!nextRound) return false;
-
-  const nextOrder = Math.ceil(Number(matchOrder) / 2);
-
-  // Find **all distinct pairs** that share this (round, match_order), so we can place THIS tie into team1 or team2
-  const rows = await env.core_data.prepare(`
-    SELECT team1_id, team2_id
-    FROM league_knockouts
-    WHERE league_id = ? AND round = ? AND match_order = ?
-      AND team1_id IS NOT NULL AND team2_id IS NOT NULL
-  `).bind(leagueId, currentRound, matchOrder).all();
-
-  const pairKeys = Array.from(new Set(rows.results.map(r => pairKeyOf(r.team1_id, r.team2_id)).filter(Boolean)))
-    .sort(); // deterministic
-
-  // Determine slot: first pair -> team1, second pair -> team2
-  let seedToTeam1 = true; // default
-  if (tiePairKey && pairKeys.length) {
-    const idx = pairKeys.indexOf(tiePairKey);
-    seedToTeam1 = (idx <= 0); // idx 0 => team1, idx 1 => team2
-  }
-
-  const targetField = seedToTeam1 ? "team1_id" : "team2_id";
-
-  // Update existing next-round legs (set or clear only our side)
-  const updateRes = await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET ${targetField} = ?, updated_user_id = ?
-    WHERE league_id = ? AND round = ? AND match_order = ?
-  `).bind(winnerTeamId, userId, leagueId, nextRound, nextOrder).run();
-
-  // What exists now?
-  const existing = await env.core_data.prepare(`
-    SELECT match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id
-    FROM league_knockouts
-    WHERE league_id = ? AND round = ? AND match_order = ?
-  `).bind(leagueId, nextRound, nextOrder).all();
-
-  const haveHome = existing.results.some(r => r.match_type === "home");
-  const haveAway = existing.results.some(r => r.match_type === "away");
-
-  if (winnerTeamId == null) {
-    // if both slots empty and nothing played/won -> delete both legs
-    const bothEmpty = existing.results.length >= 2 &&
-      existing.results.every(r =>
-        r.team1_id == null && r.team2_id == null &&
-        r.team1_score == null && r.team2_score == null &&
-        r.winner_team_id == null
-      );
-    if (bothEmpty) {
-      await env.core_data.prepare(`
-        DELETE FROM league_knockouts
-        WHERE league_id = ? AND round = ? AND match_order = ?
-      `).bind(leagueId, nextRound, nextOrder).run();
-      return "deleted";
-    }
-    // otherwise we cleared our side only
-    return (haveHome || haveAway) ? "cleared" : "none";
-  }
-
-  // Winner present → ensure both legs exist; insert missing ones with fixed placeholders
-  const t1Val = seedToTeam1 ? winnerTeamId : null;
-  const t2Val = seedToTeam1 ? null : winnerTeamId;
-
-  async function insertLeg(matchType) {
-    await env.core_data.prepare(`
-      INSERT INTO league_knockouts (
-        league_id, round, match_order, match_type,
-        team1_id, team2_id,
-        team1_user_id, team2_user_id,
-        team1_score, team2_score,
-        winner_team_id,
-        is_vs_computer, computer_team,
-        updated_user_id
-      ) VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?)
-    `).bind(leagueId, nextRound, nextOrder, matchType, t1Val, t2Val, userId).run();
-  }
-
-  let inserted = false;
-  if (!haveHome) { await insertLeg("home"); inserted = true; }
-  if (!haveAway) { await insertLeg("away"); inserted = true; }
-
-  return inserted ? "inserted" : (updateRes.meta.changes > 0 ? "updated" : "noop");
-}
-
-// same as above
 function nextRoundOf(round) {
   switch (round) {
     case "1/16": return "1/8";
@@ -279,4 +144,190 @@ function nextRoundOf(round) {
     case "1/2": return "final";
     default: return null;
   }
+}
+
+function computeAggregate(legs) {
+  // Must have exactly 2 legs with both scores present
+  if (!Array.isArray(legs) || legs.length !== 2) {
+    return { complete: false, draw: false, winnerTeamId: null };
+  }
+
+  const scored = legs.every(l =>
+    l != null &&
+    l.team1_id != null && l.team2_id != null &&
+    l.team1_score != null && l.team2_score != null
+  );
+  if (!scored) return { complete: false, draw: false, winnerTeamId: null };
+
+  // Sum per team id, independent of which side they appear on in each leg
+  const totals = new Map(); // teamId -> total goals
+  for (const l of legs) {
+    totals.set(l.team1_id, (totals.get(l.team1_id) || 0) + Number(l.team1_score));
+    totals.set(l.team2_id, (totals.get(l.team2_id) || 0) + Number(l.team2_score));
+  }
+
+  const ids = [...totals.keys()];
+  if (ids.length !== 2) {
+    // data anomaly; refuse to pick a winner
+    return { complete: false, draw: false, winnerTeamId: null };
+  }
+
+  const [A, B] = ids;
+  const a = totals.get(A);
+  const b = totals.get(B);
+
+  if (a === b) return { complete: true, draw: true, winnerTeamId: null };
+  return { complete: true, draw: false, winnerTeamId: a > b ? A : B };
+}
+
+const pairWhereClauseSelect = (alias) => `(
+  (${alias}.team1_id = ? AND ${alias}.team2_id = ?)
+  OR
+  (${alias}.team1_id = ? AND ${alias}.team2_id = ?)
+)`;
+const pairWhereClauseNoAlias = () => `(
+  (team1_id = ? AND team2_id = ?)
+  OR
+  (team1_id = ? AND team2_id = ?)
+)`;
+
+// stable key for a tie's two teams (order-insensitive)
+function pairKeyOf(a, b) {
+  if (a == null || b == null) return null;
+  const x = Number(a), y = Number(b);
+  return (x < y) ? `${x}-${y}` : `${y}-${x}`;
+}
+
+const oppositeField = (f) => (f === "team1_id" ? "team2_id" : "team1_id");
+
+/**
+ * Decide & upsert the next-round slot for THIS tie (with tie_slot),
+ * mirror home/away legs (home uses slot side, away uses opposite),
+ * and delete empty next-round legs when cleared.
+ *
+ * tie_slot: 1 => this tie seeds team1 side (home leg)
+ *           2 => this tie seeds team2 side (home leg)
+ */
+async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, tiePairKey, winnerTeamId, userId }) {
+  const nextRound = nextRoundOf(currentRound);
+  if (!nextRound) return false;
+
+  const nextOrder = Math.ceil(Number(matchOrder) / 2);
+
+  // pairs inside THIS (round, match_order)
+  const rows = await env.core_data.prepare(`
+    SELECT team1_id, team2_id
+    FROM league_knockouts
+    WHERE league_id = ? AND round = ? AND match_order = ?
+      AND team1_id IS NOT NULL AND team2_id IS NOT NULL
+  `).bind(leagueId, currentRound, matchOrder).all();
+
+  const pairKeys = Array.from(new Set(rows.results
+    .map(r => pairKeyOf(r.team1_id, r.team2_id))
+    .filter(Boolean))).sort();
+
+  // default: use pair index if there are 2 pairs under the same order (e.g., 1/8 → 1/4)
+  let slot = 1;
+  if (tiePairKey && pairKeys.length > 1) {
+    const idx = pairKeys.indexOf(tiePairKey); // 0 or 1
+    slot = (idx <= 0) ? 1 : 2;
+  }
+
+  // 👇 NEW: if there's only ONE pair for this order (e.g., 1/4 → 1/2),
+  // decide slot by order parity within the two orders that map to nextOrder.
+  if (pairKeys.length <= 1) {
+    const firstOrder = nextOrder * 2 - 1; // e.g., 31
+    const secondOrder = nextOrder * 2;     // e.g., 32
+    if (Number(matchOrder) === firstOrder) slot = 1;
+    else if (Number(matchOrder) === secondOrder) slot = 2;
+  }
+
+  const targetField = (slot === 1) ? "team1_id" : "team2_id";
+  const otherField = (targetField === "team1_id") ? "team2_id" : "team1_id";
+
+  // fetch existing next-round legs
+  const existing = await env.core_data.prepare(`
+    SELECT id, match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id, tie_slot
+    FROM league_knockouts
+    WHERE league_id = ? AND round = ? AND match_order = ?
+  `).bind(leagueId, nextRound, nextOrder).all();
+
+  const haveHome = existing.results.some(r => r.match_type === "home");
+  const haveAway = existing.results.some(r => r.match_type === "away");
+
+  // clear path
+  if (winnerTeamId == null) {
+    await env.core_data.prepare(`
+      UPDATE league_knockouts
+      SET ${targetField} = NULL, updated_user_id = ?
+      WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'home'
+    `).bind(userId, leagueId, nextRound, nextOrder).run();
+
+    await env.core_data.prepare(`
+      UPDATE league_knockouts
+      SET ${otherField} = NULL, updated_user_id = ?
+      WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'away'
+    `).bind(userId, leagueId, nextRound, nextOrder).run();
+
+    const refreshed = await env.core_data.prepare(`
+      SELECT team1_id, team2_id, team1_score, team2_score, winner_team_id
+      FROM league_knockouts
+      WHERE league_id = ? AND round = ? AND match_order = ?
+    `).bind(leagueId, nextRound, nextOrder).all();
+
+    const bothEmpty = refreshed.results.length >= 2 &&
+      refreshed.results.every(r =>
+        r.team1_id == null && r.team2_id == null &&
+        r.team1_score == null && r.team2_score == null &&
+        r.winner_team_id == null
+      );
+
+    if (bothEmpty) {
+      await env.core_data.prepare(`
+        DELETE FROM league_knockouts
+        WHERE league_id = ? AND round = ? AND match_order = ?
+      `).bind(leagueId, nextRound, nextOrder).run();
+      return "deleted";
+    }
+    return (haveHome || haveAway) ? "cleared" : "none";
+  }
+
+  // ensure both legs exist and place winner mirrored:
+  async function insertLeg(matchType, putOnTargetSide) {
+    // home: winner goes to target side; away: to opposite side
+    const placeField = putOnTargetSide ? targetField : otherField;
+    const t1 = placeField === "team1_id" ? winnerTeamId : null;
+    const t2 = placeField === "team2_id" ? winnerTeamId : null;
+
+    await env.core_data.prepare(`
+      INSERT INTO league_knockouts (
+        league_id, round, match_order, match_type,
+        team1_id, team2_id,
+        team1_user_id, team2_user_id,
+        team1_score, team2_score,
+        winner_team_id,
+        is_vs_computer, computer_team,
+        tie_slot,
+        updated_user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?, ?)
+    `).bind(leagueId, nextRound, nextOrder, matchType, t1, t2, slot, userId).run();
+  }
+
+  if (!haveHome) await insertLeg("home", true);   // slot side
+  if (!haveAway) await insertLeg("away", false);  // mirrored side
+
+  // update existing legs to correct side + tie_slot
+  await env.core_data.prepare(`
+    UPDATE league_knockouts
+    SET ${targetField} = ?, tie_slot = ?, updated_user_id = ?
+    WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'home'
+  `).bind(winnerTeamId, slot, userId, leagueId, nextRound, nextOrder).run();
+
+  await env.core_data.prepare(`
+    UPDATE league_knockouts
+    SET ${otherField} = ?, tie_slot = ?, updated_user_id = ?
+    WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'away'
+  `).bind(winnerTeamId, slot, userId, leagueId, nextRound, nextOrder).run();
+
+  return "updated";
 }

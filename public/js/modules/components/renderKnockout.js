@@ -252,7 +252,6 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
 
       // For all rounds we do a block split: first half → left, second half → right.
-      // (You already used this for the first round; we standardize it here.)
       const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
       return {
         left: sorted.slice(0, perSide),
@@ -300,13 +299,6 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     img.className = "cup-image"; img.src = cupSrc; img.alt = "Trophy";
     cupWrap.appendChild(img);
     centerSide.append(finalCol, cupWrap);
-
-    // function getBracketSide(order) {
-    //   const o = Number(order) || 0;
-    //   if (o <= 0) return null;                // fallback to alternating if unknown
-    //   const next = Math.ceil(o / 2);
-    //   return (next % 2 === 1) ? 'left' : 'right';
-    // }
 
     // Sides
     renderSide(leftSide, "left");
@@ -410,7 +402,12 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"),
                 "success");
-            } catch (e) { console.error(e); showToast(t.player_assign_failed || "Failed to attach user", "error"); }
+              // Refresh the page/state after successful request
+              await renderKnockoutsStage(leagueId, rootEl);
+            } catch (e) {
+              console.error(e);
+              showToast(t.player_assign_failed || "Failed to attach user", "error");
+            }
           });
         }
         return sel;
@@ -465,6 +462,8 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
               showToast(res.success ? (t.score_updated || "Score Updated")
                 : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
+              // Refresh the page/state after successful request
+              if (res.success) await renderKnockoutsStage(leagueId, rootEl);
             } catch (e) { console.error(e); }
           });
         }
@@ -535,6 +534,8 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
+            // Refresh the page/state after successful request
+            if (res.success) await renderKnockoutsStage(leagueId, rootEl);
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
@@ -547,21 +548,18 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
-
       if (sideKey === "right") {
-        // RIGHT: [CB][Home(top)][Away(top)][Team][User]
-        // top row should submit home:t2 and away:t1 → we already have those as H_bottom / A_bottom
-        row1.append(H_bottom, A_bottom, tn1, u1);
+        // RIGHT side visual order: [CB][Score1][Score2][Team][User]
+        // Top row (Team A): Score1 = AWAY (A_top), Score2 = HOME (H_top)
+        row1.append(A_top, H_top, tn1, u1);
         row1.prepend(cbA);
 
-        // RIGHT: [CB][Home(bottom)][Away(bottom)][Team][User]
-        // bottom row should submit home:t1 and away:t2 → H_top / A_top
-        row2.append(H_top, A_top, tn2, u2);
+        // Bottom row (Team B): Score1 = HOME (H_bottom), Score2 = AWAY (A_bottom)
+        row2.append( A_bottom, H_bottom, tn2, u2);
         row2.prepend(cbB);
       } else {
-        // LEFT: [User][Team][Home(top)][Away(top)][CB]
+        // LEFT side (unchanged): [User][Team][HOME][AWAY][CB]
         row1.append(u1, tn1, H_top, A_top, cbA);
-        // LEFT: [User][Team][Home(bottom)][Away(bottom)][CB]
         row2.append(u2, tn2, H_bottom, A_bottom, cbB);
       }
 
