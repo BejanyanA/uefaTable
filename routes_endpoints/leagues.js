@@ -195,6 +195,139 @@ export async function handleLeaguesCreate(request, env) {
   }
 }
 
+export async function handleCreateRoundKnockouts(request, env) {
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+  }
+  const token = authHeader.split(" ")[1];
+  const payload = await verifyToken(token, env.JWT_SECRET);
+  if (!payload) {
+    return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+  }
+
+  const db = env.core_data;
+  const userId = payload.id;
+
+  const {
+    name,
+    bannerId,
+    clubIds,
+    teamCount,
+    friendIds,
+    isGroup,
+    shuffle = false,
+  } = await request.json();
+
+  // --- validations (kept tight and familiar) ---
+  const errors = {};
+  if (!bannerId) errors.bannerId = "Banner ID is required";
+  if (typeof bannerId !== "number") errors.bannerId = "Banner ID must be a number";
+
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    errors.name = "League name is required";
+  } else if (name.length > 30) {
+    errors.name = "League Name must not exceed 30 characters";
+  }
+
+  if (!Array.isArray(clubIds) || clubIds.length === 0 || !clubIds.every(id => typeof id === "number")) {
+    errors.clubIds = "Club IDs must be a non-empty array of numbers";
+  }
+
+  if (typeof isGroup !== "boolean") {
+    errors.isGroup = "Stage is required";
+  }
+
+  if (!teamCount) {
+    errors.teamCount = "Team count is required";
+  } else if (typeof teamCount !== "number" || teamCount <= 0) {
+    errors.teamCount = "Team count must be a positive number";
+  } else if (clubIds && clubIds.length !== teamCount) {
+    errors.teamCountMatch = "Team count must match the number of provided club IDs";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return jsonResponse({ success: false, errors }, 400);
+  }
+
+  const roundLabel = (n) =>
+    n === 32 ? "1/16" :
+      n === 16 ? "1/8" :
+        n === 8 ? "1/4" :
+          n === 4 ? "1/2" :
+            n === 2 ? "Final" : "Knockout";
+
+  const makePairs = (ids) => {
+    const base = shuffle ? shuffleArray([...ids]) : [...ids];
+    const out = [];
+    for (let i = 0; i < base.length; i += 2) out.push([base[i], base[i + 1]]);
+    return out;
+  };
+
+  try {
+    // 1) leagues (preserve is_group for FE)
+    const league = await db.prepare(`
+      INSERT INTO leagues (name, banner_id, created_by_user_id, is_group, team_count)
+      VALUES (?, ?, ?, ?, ?)
+      RETURNING id
+    `).bind(name, bannerId, userId, isGroup, teamCount).first();
+    const leagueId = league.id;
+
+    // 2) league_access (unchanged)
+    let friendResponse = [];
+    if (Array.isArray(friendIds) && friendIds.length > 0) {
+      const accessValues = friendIds.map(id => {
+        friendResponse.push({ id });
+        return `(${leagueId}, ${id}, ${userId})`;
+      }).join(', ');
+      await db.exec(`INSERT INTO league_access (league_id, user_id, granted_by_user_id) VALUES ${accessValues} ON CONFLICT DO NOTHING`);
+    }
+
+    // 3) knockout seeding only when isGroup === false
+    let insertedTies = 0;
+    let firstRoundOut = null;
+
+    if (isGroup === false) {
+      const firstRound = roundLabel(teamCount);
+      firstRoundOut = firstRound;
+      const pairs = makePairs(clubIds);
+
+      // Reuse one stmt; 7 params in the exact order you requested.
+      const insertStmt = db.prepare(`
+        INSERT INTO round_knockouts
+          (league_id, "round", match_order, team1_id, team2_id, match_type, tie_slot)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      let order = 1;
+      for (const [t1, t2] of pairs) {
+        // 1) (leagueId, round, order, t1, t2, 'home', 1)
+        await insertStmt.bind(leagueId, firstRound, order, t1, t2, 'home', 1).run();
+
+        // 2) (leagueId, round, order, t2, NULL, 'away', 2)
+        await insertStmt.bind(leagueId, firstRound, order, t2, t1, 'away', 2).run();
+
+        order++;
+      }
+
+      insertedTies = pairs.length;
+    }
+
+    return jsonResponse({
+      success: true,
+      data: {
+        leagueId,
+        isGroup,
+        stage: isGroup ? "group" : "knockout",
+        ...(isGroup === false ? { round: firstRoundOut, ties: insertedTies } : {}),
+        friendIds: friendResponse
+      }
+    }, 201);
+
+  } catch (err) {
+    return jsonResponse({ success: false, error: "creation_failed", details: err.message }, 500);
+  }
+}
 
 export async function handleLeaguesEdit(request, env) {
   const authHeader = request.headers.get("Authorization");

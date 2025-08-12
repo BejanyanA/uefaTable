@@ -139,6 +139,40 @@ export const LeagueManager = {
         stageError.textContent = "";
 
         try {
+
+          if (!isGroup) {
+            // Knockout-only flow (mirror createLeague handling)
+            const createKnockout = await apiPost("/create-knockouts", {
+              bannerId, name, teamCount, friendIds, clubIds, isGroup
+            });
+
+            if (createKnockout.success && createKnockout.data) {
+              try {
+                const data = await apiPost("/leagues", { bannerId, isGroup });
+
+                if (data.success && data.data) {
+                  window.closeModal("tableModal");
+                  showToast(translation.league_create_success || "League Successfully Created", "success");
+                  document.getElementById("bannerContainer").style.display = "none";
+                  renderLeagueTable(data.data);
+                } else {
+                  showToast(translation.not_found || "Not found", "info");
+                }
+              } catch (err) {
+                showToast(translation.something_went_wrong || "Something went wrong", "error");
+                console.error("Error opening table:", err);
+              }
+            } else {
+              const error = createKnockout.error;
+              if (error === "creation_failed") {
+                showToast(translation.league_creation_failed || "League Creation failed", "error");
+              } else {
+                showToast(translation.something_went_wrong || "Something went wrong", "error");
+              }
+            }
+            return; // stop here; skip /create-leagues
+          }
+
           const createLeague = await apiPost("/create-leagues", { bannerId, name, teamCount, friendIds, clubIds, isGroup });
 
           if (createLeague.success && createLeague.data) {
