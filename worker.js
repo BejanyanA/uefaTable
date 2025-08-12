@@ -14,6 +14,7 @@ import { handleAttachPlayers, handleAttachKnockPlayers } from './routes_endpoint
 import { handleGroupKnockoutMatches } from './routes_endpoints/group_knockouts.js';
 import { handleUpdateKnockoutWinner } from './routes_endpoints/update_winner_team.js';
 import { handleUpdateKnockoutMatches } from './routes_endpoints/update_knock_matches.js';
+import { handleOnlyKnockoutMatches } from './routes_endpoints/round_knockouts.js';
 
 // import additional route handlers as needed
 
@@ -40,6 +41,7 @@ const routeRegistry = {
   "/update-winner": { POST: handleUpdateKnockoutWinner },
   "/update-knock-matches": { POST: handleUpdateKnockoutMatches },
   "/create-knockouts": { POST: handleCreateRoundKnockouts },
+  "/round-knockouts": { POST: handleOnlyKnockoutMatches },
 
   // Add more routes here  league_instances
 };
