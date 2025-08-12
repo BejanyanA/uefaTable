@@ -171,7 +171,7 @@ export function renderOnlyKnockoutLeagues(data) {
 }
 
 export async function renderOnlyKnockouts(leagueId, rootEl) {
-  
+
   const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
   root.innerHTML = "";
   const t = langMap[currentLang];
@@ -282,12 +282,12 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
     root.appendChild(frame);
 
     // Cup + Final
-    const cupSrc = ({
-      1: "public/assets/images/champ1.png",
-      2: "public/assets/images/eur2.png",
-      3: "public/assets/images/europ3.png",
-      4: "public/assets/images/wrld4.png",
-    })[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
+    const cupSrc = {
+      1: "assets/images/champ1.png",
+      2: "assets/images/eur2.png",
+      3: "assets/images/europ3.png",
+      4: "assets/images/wrld4.png",
+    }[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
 
     const finalCol = document.createElement("div");
     finalCol.className = "center-final";
@@ -527,7 +527,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
         ph?.t2 || null
       );
       // Checkboxes only when both legs have scores AND aggregate draw
-      
+
       let canPickWinner;
       if (isFinal) {
         const h = tie.home?.score || {};
@@ -696,12 +696,12 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     root.appendChild(frame);
 
     // Cup + Final
-    const cupSrc = ({
-      1: "public/assets/images/champ1.png",
-      2: "public/assets/images/eur2.png",
-      3: "public/assets/images/europ3.png",
-      4: "public/assets/images/wrld4.png",
-    })[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
+    const cupSrc = {
+      1: "assets/images/champ1.png",
+      2: "assets/images/eur2.png",
+      3: "assets/images/europ3.png",
+      4: "assets/images/wrld4.png",
+    }[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
 
     const finalCol = document.createElement("div");
     finalCol.className = "center-final";
@@ -941,7 +941,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         ph?.t2 || null
       );
       // Checkboxes only when both legs have scores AND aggregate draw
-      
+
       let canPickWinner;
       if (isFinal) {
         const h = tie.home?.score || {};

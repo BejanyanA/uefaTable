@@ -388,7 +388,7 @@ export async function handleLeaguesEdit(request, env) {
   // Step 1: Verify league ownership
   const league = await env.core_data.prepare(`
   SELECT created_by_user_id FROM leagues WHERE id = ?
-`).bind(leagueId).first();
+  `).bind(leagueId).first();
 
   if (!league) {
     return jsonResponse({ success: false, error: "league_not_found" }, 404);
@@ -402,7 +402,7 @@ export async function handleLeaguesEdit(request, env) {
   SELECT friend_id AS id FROM friends WHERE user_id = ? AND status = 'approved'
   UNION
   SELECT user_id AS id FROM friends WHERE friend_id = ? AND status = 'approved'
-`).bind(loggedInUserId, loggedInUserId).all();
+  `).bind(loggedInUserId, loggedInUserId).all();
   const approvedIds = approvedFriends.results.map(row => row.id);
 
   // Step 2.1: Validate friendIds
@@ -437,11 +437,11 @@ export async function handleLeaguesEdit(request, env) {
   // Step 3: Update league name
   await env.core_data.prepare(`
   UPDATE leagues SET name = ? WHERE id = ?
-`).bind(name, leagueId).run();
+  `).bind(name, leagueId).run();
 
   await env.core_data.prepare(`
   UPDATE league_instances SET name = ? WHERE id = ?
-`).bind(name, leagueId).run();
+  `).bind(name, leagueId).run();
 
   // Step 4: Update league access (add new)
   if (flatFriendIds.length > 0) {
@@ -503,7 +503,7 @@ export async function handleLeaguesDelete(request, env) {
   // Step 1: Check if user is owner or granted access
   const league = await env.core_data.prepare(`
   SELECT created_by_user_id FROM leagues WHERE id = ?
-`).bind(leagueId).first();
+  `).bind(leagueId).first();
 
   if (!league) {
     return jsonResponse({ success: false, error: "league_not_found" }, 404);

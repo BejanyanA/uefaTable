@@ -8,7 +8,7 @@
 /* Center trophy */
 #knockoutTab .bracket-center{display:grid;grid-template-rows:auto 1fr;gap:8px;justify-items:center}
 #knockoutTab .cup-wrap{display:grid;place-items:center}
-#knockoutTab .cup-image{max-width:96px;height:auto;opacity:.95}
+#knockoutTab .cup-image{max-width:150px;height:auto;opacity:.95}
 
 /* Cards */
 #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px}
