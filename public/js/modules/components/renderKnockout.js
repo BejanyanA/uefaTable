@@ -666,16 +666,90 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     }
 
     function splitForRound(ties, rk, firstRound, expectedPerSide) {
-      // Always work on a sorted copy (by matchOrder) so the split is stable
-      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+      const all = (ties || []).slice();
+      const groupsCnt = Math.max(2, GROUPS.length); // A..?
+      const expected = expectedPerSide ?? Math.ceil((EXPECTED_TIES[rk] || all.length) / 2);
+      const perSide = expected;
 
-      // For all rounds we do a block split: first half → left, second half → right.
-      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-      return {
-        left: sorted.slice(0, perSide),
-        right: sorted.slice(perSide),
-        perSide
+      // Round depth from the first knockout round (0 = Ro16/Ro32, 1 = QF, 2 = SF, ...)
+      const firstIdx = rounds.indexOf(firstRound);
+      const rkIdx = rounds.indexOf(rk);
+      const depth = Math.max(0, rkIdx - firstIdx);
+
+      // cluster size used to order ties within a side:
+      // Ro16/Ro32 -> 2 (AB, CD, ...)
+      // QF        -> 4 (AB vs CD, EF vs GH)
+      // SF        -> 8 (A-D vs E-H)
+      const clusterSize = Math.pow(2, depth + 1); // 2, 4, 8, ...
+
+      const groupLetterToIndex = (g) => {
+        if (!g) return null;
+        const m = /group\s*([A-P])/i.exec(g);
+        if (!m) return null;
+        return m[1].toUpperCase().charCodeAt(0) - 65; // 'A'->0
       };
+
+      // Priority: home->team1, home->team2, away->team1, away->team2
+      const primaryGroupIndex = (tie) =>
+        groupLetterToIndex(tie?.home?.team1?.groupName) ??
+        groupLetterToIndex(tie?.home?.team2?.groupName) ??
+        groupLetterToIndex(tie?.away?.team1?.groupName) ??
+        groupLetterToIndex(tie?.away?.team2?.groupName) ??
+        null;
+
+      // Collect *all* group indices present on the tie (for a stable secondary key)
+      const allGroupIdxs = (tie) => {
+        const idxs = [];
+        const push = (v) => { const i = groupLetterToIndex(v); if (i !== null) idxs.push(i); };
+        push(tie?.home?.team1?.groupName);
+        push(tie?.home?.team2?.groupName);
+        push(tie?.away?.team1?.groupName);
+        push(tie?.away?.team2?.groupName);
+        idxs.sort((a, b) => a - b);
+        return idxs;
+      };
+
+      const enriched = all.map(t => {
+        const primary = primaryGroupIndex(t);
+        const idxs = allGroupIdxs(t);
+        const partner = idxs.length > 1 ? idxs[1] : Number.MAX_SAFE_INTEGER;
+        const sortBucket = (primary !== null) ? Math.floor(primary / clusterSize) : Number.MAX_SAFE_INTEGER;
+        const sideByGroup = (primary !== null) ? (primary < (groupsCnt / 2) ? 'L' : 'R') : null;
+        const mo = +t.matchOrder || Number.MAX_SAFE_INTEGER;
+        const hId = +(t.home?.id || 0);
+        const aId = +(t.away?.id || 0);
+        return { t, primary, partner, sortBucket, sideByGroup, mo, hId, aId };
+      });
+
+      const left = [], right = [];
+
+      for (const e of enriched) {
+        if (e.sideByGroup) {
+          (e.sideByGroup === 'L' ? left : right).push(e);
+        } else {
+          // No group info anywhere -> fallback to previous behavior using matchOrder threshold
+          (e.mo >= 1 && e.mo <= perSide ? left : right).push(e);
+        }
+      }
+
+      // Order inside each side:
+      // 1) by sortBucket (AB before CD, EF before GH, etc.)
+      // 2) by primary index,
+      // 3) by partner index (stable),
+      // 4) fallbacks by ids, then matchOrder
+      const sortSide = (a, b) => {
+        if (a.sortBucket !== b.sortBucket) return a.sortBucket - b.sortBucket;
+        if (a.primary !== b.primary) return a.primary - b.primary;
+        if (a.partner !== b.partner) return a.partner - b.partner;
+        if (a.hId !== b.hId) return a.hId - b.hId;
+        if (a.aId !== b.aId) return a.aId - b.aId;
+        return a.mo - b.mo;
+      };
+
+      left.sort(sortSide);
+      right.sort(sortSide);
+
+      return { left: left.map(x => x.t), right: right.map(x => x.t), perSide };
     }
 
     // Bucket ties by round

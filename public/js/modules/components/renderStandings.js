@@ -246,33 +246,57 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
 
     // === Shared logic for dropdowns & scores ===
     if (editable) {
+      // --- SCORE INPUTS ---
       section.querySelectorAll(".score-input").forEach(input => {
-        // Prevent typing negative numbers
-        input.addEventListener("input", () => {
-          if (parseInt(input.value) < 0) {
-            input.value = "";
-          }
+        // set the initial baseline once (use current value)
+        if (input.dataset.initial === undefined) {
+          input.dataset.initial = (input.value ?? "").trim();
+        }
+
+        // also track value at focus time (covers quick edits & reverts)
+        input.addEventListener("focus", () => {
+          input.dataset.focusInitial = (input.value ?? "").trim();
         });
 
-        // Save on blur if valid
+        // Prevent typing negative numbers
+        input.addEventListener("input", () => {
+          if (input.value !== "" && Number(input.value) < 0) input.value = "";
+        });
+
+        // Save on blur if valid AND changed
         input.addEventListener("blur", async () => {
           const row = input.closest("[data-match-id]");
-          const matchId = parseInt(row.dataset.matchId);
-          const scoreValue = input.value;
+          const matchId = parseInt(row?.dataset.matchId);
+          const raw = (input.value ?? "").trim();
 
-          if (scoreValue === "" || isNaN(scoreValue) || parseInt(scoreValue) < 0) {
-            input.value = ""; // Clear invalid values
+          // invalid => clear & bail
+          if (raw === "" || Number.isNaN(Number(raw)) || Number(raw) < 0) {
+            input.value = "";
             return;
           }
 
+          const newVal = String(Number(raw)); // normalize "02" -> "2"
+          const base = input.dataset.initial ?? "";         // baseline since last success
+          const baseAtFocus = input.dataset.focusInitial ?? base;
+
+          // if not changed vs baseline (or the value you had on focus), skip
+          if (newVal === base || newVal === baseAtFocus) return;
+
           const payload = { matchId };
-          if (input.name === "team1") payload.team1_score = parseInt(scoreValue);
-          if (input.name === "team2") payload.team2_score = parseInt(scoreValue);
+          if (input.name === "team1") payload.team1_score = Number(newVal);
+          if (input.name === "team2") payload.team2_score = Number(newVal);
+
+          if (!matchId || (!payload.team1_score && payload.team1_score !== 0) &&
+            (!payload.team2_score && payload.team2_score !== 0)) {
+            return;
+          }
 
           try {
             const translation = langMap[currentLang];
-            const updateResponse = await apiPost("/update-score", payload);
-            if (updateResponse.success) {
+            const res = await apiPost("/update-score", payload);
+            if (res.success) {
+              // update baseline so future blurs don't re-send the same value
+              input.dataset.initial = newVal;
               showToast(translation.score_updated || "Score Updated", "success");
             } else {
               showToast(translation.score_update_failed || `Failed to update score for match ${matchId}`, "error");
@@ -283,38 +307,48 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         });
       });
 
+      // --- PLAYER DROPDOWNS ---
       section.querySelectorAll(".user-dropdown").forEach(dropdown => {
         const translation = langMap[currentLang];
-        const defaultOption = `<option value="" id="selectUserDesk">${translation.selectUser || "Select Player"}</option>`;
-        const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
-        dropdown.innerHTML = defaultOption + options;
 
-        const currentUsername = dropdown.dataset.initialUsername?.trim();
-        if (currentUsername) {
-          const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
-          if (found) dropdown.value = found.value;
+        // build options once
+        if (!dropdown.dataset.optionsBuilt) {
+          const defaultOption = `<option value="" id="selectUserDesk">${translation.selectUser || "Select Player"}</option>`;
+          const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
+          dropdown.innerHTML = defaultOption + options;
+          dropdown.dataset.optionsBuilt = "1";
+        }
+
+        // set initial selected by username (if provided) or keep existing value
+        if (dropdown.dataset.initial === undefined) {
+          const currentUsername = dropdown.dataset.initialUsername?.trim();
+          if (currentUsername) {
+            const found = [...dropdown.options].find(opt => opt.text.trim() === currentUsername);
+            if (found) dropdown.value = found.value;
+          }
+          dropdown.dataset.initial = dropdown.value ?? ""; // baseline userId ('' = unassigned)
         }
 
         dropdown.addEventListener("change", async () => {
           const row = dropdown.closest("[data-match-id]");
-          const matchId = parseInt(row.dataset.matchId);
+          const matchId = parseInt(row?.dataset.matchId);
           const teamId = parseInt(dropdown.dataset.teamId);
-          const userId = parseInt(dropdown.value);
+          const newVal = dropdown.value ?? "";        // '' means unassign
+          const base = dropdown.dataset.initial ?? ""; // previous committed value
+
+          // unchanged -> skip
+          if (newVal === base) return;
 
           if (!matchId || !teamId || leagueId === undefined) {
             console.warn("⚠️ Missing values, cannot attach player");
+            // revert visual selection to baseline to avoid confusion
+            dropdown.value = base;
             return;
           }
 
-          const payload = {
-            matchId,
-            teamId,
-            userId: dropdown.value ? parseInt(dropdown.value) : null,
-            leagueId
-          };
+          const userId = newVal === "" ? null : parseInt(newVal, 10);
 
           try {
-            const translation = langMap[currentLang];
             const res = await apiPost("/attach-players", {
               matchId,
               teamId,
@@ -323,15 +357,21 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
             }, { showLoading: false });
 
             if (res.success) {
-              if (!dropdown.value) {
+              // commit new baseline
+              dropdown.dataset.initial = newVal;
+              if (newVal === "") {
                 showToast(translation.player_success_unassigned || "User unassigned successfully", "success");
               } else {
                 showToast(translation.player_success_assigned || "User assigned successfully", "success");
               }
             } else {
+              // revert UI to baseline
+              dropdown.value = base;
               showToast(translation.player_assign_failed || "Failed to attach user", "error");
             }
           } catch (err) {
+            // revert UI to baseline on error
+            dropdown.value = base;
             console.error("⚠️ Error while attaching user:", err);
           }
         });
