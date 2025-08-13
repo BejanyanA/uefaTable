@@ -290,7 +290,7 @@ export function renderLeagueInstances(instanceData) {
         `;
 
         groupDiv.addEventListener("click", () => {
-          const leagueId = parseInt(groupDiv.dataset.leagueId);
+          const leagueId = parseInt(localStorage.getItem("leagueId"));
           const groupId = parseInt(groupDiv.dataset.groupId);
           const gName = groupDiv.dataset.groupName;
           renderGroupStandingsPage(leagueId, groupId, gName);
