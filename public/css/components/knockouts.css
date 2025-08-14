@@ -2,6 +2,7 @@
   max-height: 100vh; /* fit to screen height */
   overflow-y: auto;  /* enable vertical scroll */
   padding-right: 6px; /* little space so scrollbar doesn't overlap */
+   margin-top: 80px;
 }
 
 /* Optional: make scrollbar look nicer */
@@ -17,7 +18,7 @@
 }
 
 #knockoutTab .bracket-frame{display:grid;grid-template-columns:1fr 350px 1fr;gap:14px;align-items:start;}
-#knockoutTab .bracket-side{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+#knockoutTab .bracket-side{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;}
 #knockoutTab .left-side{direction:ltr;} #knockoutTab .right-side{direction:rtl;} #knockoutTab .right-side>*{direction:ltr;}
 
 #knockoutTab .side-round>h3,
@@ -84,6 +85,112 @@
   display:grid;
   align-content:center;
 }
+
+#knockoutTab .ko-card { position: relative; }             /* anchor for the pseudo-element */
+#knockoutTab .side-round .round-body { --rowH: 18px; }    /* keep in sync with your JS ROW_H_PX */
+
+/* tune link length (how far the line reaches into the gap toward the adjacent column) */
+:root { --linkLen: 18px; }  /* feel free to bump to 20–24px if you widen column gaps */
+
+/* A helper that draws a vertical line + two horizontal ticks in one pseudo-element */
+@supports (background: linear-gradient(#fff, #fff)) {
+  /* ---- Quarter-finals connectors: connect to two R16 ties ---- */
+  /* LEFT side: draw to the LEFT of the QF card */
+  #knockoutTab .left-side .round-1-4 .round-body .ko-card::before,
+  /* When first round is 1/16 (R32), the next round is 1/8; connect those too */
+  #knockoutTab .left-side .round-1-8:first-child .round-body .ko-card.has-r32::before {
+    content: "";
+    position: absolute;
+    /* place the connector box to the left of the card */
+    right: 100%;
+    width: var(--linkLen);
+    height: calc(var(--rowH) * 4);              /* BASE_SPAN (4 rows) */
+    top: calc(50% - (var(--rowH) * 2));         /* center vertically */
+    /* three lines using multiple backgrounds:
+       1) vertical at the box's right edge
+       2) top horizontal at the top edge
+       3) bottom horizontal at the bottom edge
+    */
+    background:
+      linear-gradient(to bottom, rgb(250, 249, 249), rgb(250, 249, 249)) right center / 2px 100% no-repeat,
+      linear-gradient(to right,  rgb(250, 249, 249), rgb(250, 249, 249)) left top    / 100% 2px  no-repeat,
+      linear-gradient(to right,  rgb(250, 249, 249), rgb(250, 249, 249)) left bottom / 100% 2px  no-repeat;
+    pointer-events: none;
+  }
+
+  /* RIGHT side: mirror to the RIGHT of the QF card */
+  #knockoutTab .right-side .round-1-4 .round-body .ko-card::before,
+  #knockoutTab .right-side .round-1-8:first-child .round-body .ko-card.has-r32::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    width: var(--linkLen);
+    height: calc(var(--rowH) * 4);
+    top: calc(50% - (var(--rowH) * 2));
+    background:
+      linear-gradient(to bottom, rgb(250, 249, 249), rgb(250, 249, 249)) left center / 2px 100% no-repeat,
+      linear-gradient(to left,   rgb(250, 249, 249), rgb(250, 249, 249)) right top    / 100% 2px  no-repeat,
+      linear-gradient(to left,   rgb(250, 249, 249), rgb(250, 249, 249)) right bottom / 100% 2px  no-repeat;
+    pointer-events: none;
+  }
+
+  /* ---- Semi-finals connectors: connect to two QF ties (spans 8 rows total) ---- */
+  #knockoutTab .left-side .round-1-2 .round-body .ko-card::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    width: var(--linkLen);
+    height: calc(var(--rowH) * 8);              /* span for two QFs = 8 rows */
+    top: calc(50% - (var(--rowH) * 4));
+    background:
+      linear-gradient(to bottom, rgb(250, 249, 249), rgb(250, 249, 249)) right center / 2px 100% no-repeat,
+      linear-gradient(to right,  rgb(250, 249, 249), rgb(250, 249, 249)) left top    / 100% 2px  no-repeat,
+      linear-gradient(to right,  rgb(250, 249, 249), rgb(250, 249, 249)) left bottom / 100% 2px  no-repeat;
+    pointer-events: none;
+  }
+  #knockoutTab .right-side .round-1-2 .round-body .ko-card::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    width: var(--linkLen);
+    height: calc(var(--rowH) * 8);
+    top: calc(50% - (var(--rowH) * 4));
+    background:
+      linear-gradient(to bottom, rgb(250, 249, 249), rgb(250, 249, 249)) left center / 2px 100% no-repeat,
+      linear-gradient(to left,   rgb(250, 249, 249), rgb(250, 249, 249)) right top    / 100% 2px  no-repeat,
+      linear-gradient(to left,   rgb(250, 249, 249), rgb(250, 249, 249)) right bottom / 100% 2px  no-repeat;
+    pointer-events: none;
+  }
+
+  /* Optional: soften the line color a bit for dark backgrounds */
+  #knockoutTab .ko-card::before {
+    filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
+  }
+}
+
+:root { --finalLink: 18px; }  /* tweak 24–36px to taste */ 
+
+/* draw short lines out of the FINAL card to left & right */
+#knockoutTab .center-final .ko-card::before,
+#knockoutTab .center-final .ko-card::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  height:2px;
+  width:var(--finalLink);
+  background:rgb(250, 249, 249);
+  transform:translateY(-50%);
+  pointer-events:none;
+  filter:drop-shadow(0 0 1px rgba(0,0,0,.35));
+}
+#knockoutTab .center-final .ko-card::before{ /* to the LEFT */
+  left:calc(0px - var(--finalLink));
+}
+#knockoutTab .center-final .ko-card::after{  /* to the RIGHT */
+  right:calc(0px - var(--finalLink));
+}
+
+
 
 
 /* Mobile */
