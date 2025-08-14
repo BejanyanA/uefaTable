@@ -37,6 +37,8 @@
 /* Winner checkbox */
 #knockoutTab .winner-checkbox{width:16px;height:16px;justify-self:center;accent-color:#4ade80}
 
+.ko-team-row.winner-row {background-color: rgba(0, 128, 0, 0.664); border-radius:8px; }
+
 /* Mobile */
 @media (max-width:900px){
   #knockoutTab .bracket-frame{grid-template-columns:100%;gap:12px}

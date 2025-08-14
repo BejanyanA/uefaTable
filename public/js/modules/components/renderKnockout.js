@@ -854,7 +854,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     }
 
     function renderTie(tie, sideKey, ph, useGroupFallback = false) {
-      const knockoutId = tie.id ?? tie.matchOrder;
+      const knockoutId = tie?.home?.id ?? tie?.away?.id ?? tie?.id ?? tie?.matchOrder;
       const isFinal = String(tie.round || "").toLowerCase() === "final";
       const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
 
@@ -866,7 +866,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         wb.style.textAlign = "center";
         wb.style.fontWeight = "700";
         wb.style.marginBottom = "4px";
-        wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
+        // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
         card.appendChild(wb);
       }
 
@@ -929,33 +929,48 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       }
 
       const buildScore = (leg, which) => {
-        const el = document.createElement("input"); el.type = "number"; el.className = "score-input";
-        const initial = leg?.score ? (which === "t1" ? (leg.score.team1 ?? "") : (leg.score.team2 ?? "")) : "";
-        el.value = initial; el.dataset.initial = String(initial);
-        el.disabled = !editable || !leg?.id;
-        el.dataset.matchId = leg?.id || ""; el.dataset.which = which;
+        const el = document.createElement("input");
+        el.type = "number";
+        el.className = "score-input";
 
-        if (editable && leg?.id) {
-          el.addEventListener("input", () => { if (el.value !== "" && +el.value < 0) el.value = ""; });
+        const initial = leg?.score ?
+          (which === "t1" ? (leg.score.team1 ?? "") : (leg.score.team2 ?? ""))
+          : "";
+        el.value = initial;
+        el.dataset.initial = String(initial);
+
+        // ✅ require BOTH teams to exist
+        const hasBothTeams = !!(
+          leg?.team1 && (leg.team1.id || (leg.team1.name && leg.team1.name.trim())) &&
+          leg?.team2 && (leg.team2.id || (leg.team2.name && leg.team2.name.trim()))
+        );
+
+        el.disabled = !editable || !leg?.id || !hasBothTeams;   // ✅ updated
+        el.dataset.matchId = leg?.id || "";
+        el.dataset.which = which;
+
+        if (editable && leg?.id && hasBothTeams) {              // ✅ updated
+          el.addEventListener("input", () => {
+            if (el.value !== "" && +el.value < 0) el.value = "";
+          });
           el.addEventListener("blur", async () => {
             const matchId = Number(el.dataset.matchId);
             const val = el.value.trim();
-            if (!matchId) return;
-            if (val === "") return;
-            if (val === el.dataset.initial) return;
+            if (!matchId || val === "" || val === el.dataset.initial) return;
             const n = Number(val);
             if (!Number.isFinite(n) || n < 0) return;
 
             const payload = { matchId };
-            if (el.dataset.which === "t1") payload.team1_score = n; else payload.team2_score = n;
+            if (el.dataset.which === "t1") payload.team1_score = n;
+            else payload.team2_score = n;
 
             try {
               const res = await apiPost("/update-knock-matches", payload, { showLoading: false });
               if (res.success) el.dataset.initial = String(n);
-              showToast(res.success ? (t.score_updated || "Score Updated")
-                : (t.score_update_failed || "Failed to update score"),
-                res.success ? "success" : "error");
-              // Refresh the page/state after successful request
+              showToast(
+                res.success ? (t.score_updated || "Score Updated") : (t.score_update_failed || "Failed to update score"),
+                res.success ? "success" : "error"
+              );
               if (res.success) await renderKnockoutsStage(leagueId, rootEl);
             } catch (e) { console.error(e); }
           });
@@ -1022,9 +1037,9 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         const h1ok = typeof h.team1 === "number";
         const h2ok = typeof h.team2 === "number";
         const equal = h1ok && h2ok && h.team1 === h.team2;
-        canPickWinner = editable && !tie.winnerTeamId && equal;   // enable on Final draw
+        canPickWinner = editable && tie.winnerTeamId && equal;   // enable on Final draw
       } else {
-        canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
+        canPickWinner = editable && tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
       }
 
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
@@ -1062,6 +1077,11 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         // LEFT / center
         appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
         appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
+      }
+
+      if (tie.winnerTeamId) {
+        if (tie.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
+        if (tie.winnerTeamId === teamB?.id) row2.classList.add("winner-row");
       }
 
       card.append(row1, row2);
