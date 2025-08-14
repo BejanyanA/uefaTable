@@ -60,6 +60,39 @@ export async function handleUpdateOnlyKnockoutMatches(request, env) {
     WHERE id = ?
   `).bind(newS1, newS2, userId, matchId).run();
 
+
+  // ---------- FINAL: single match (no propagation) ----------
+  if (String(leg.round).toLowerCase() === "final") {
+    // If either score is null/undefined after the update, we can't decide yet.
+    if (newS1 == null || newS2 == null) {
+      return jsonResponse({
+        success: true,
+        data: { updated: true, winnerUpdated: false, propagated: false, needsTiebreak: false }
+      }, 200);
+    }
+
+    let finalWinner = null;
+    if (Number(newS1) > Number(newS2)) finalWinner = leg.team1_id ?? null;
+    else if (Number(newS2) > Number(newS1)) finalWinner = leg.team2_id ?? null;
+    else finalWinner = null; // draw → keep winner null; UI can handle ET/Pens
+
+    await env.core_data.prepare(`
+      UPDATE round_knockouts
+      SET winner_team_id = ?, updated_user_id = ?
+      WHERE id = ?
+    `).bind(finalWinner, userId, matchId).run();
+
+    return jsonResponse({
+      success: true,
+      data: {
+        updated: true,
+        winnerUpdated: finalWinner != null,
+        propagated: false,          // final doesn't seed a next round
+        needsTiebreak: finalWinner == null // equal scores
+      }
+    }, 200);
+  }
+
   // 3) Load BOTH legs for THIS tie (same two teams)
   const pairBinds = [leg.team1_id, leg.team2_id, leg.team2_id, leg.team1_id];
   const tieLegs = await env.core_data.prepare(`
