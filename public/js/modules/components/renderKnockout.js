@@ -366,7 +366,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
     }
 
     function renderTie(tie, sideKey, ph, useGroupFallback = false) {
-      const knockoutId = tie.id ?? tie.matchOrder;
+      const knockoutId = tie?.home?.id ?? tie?.away?.id ?? tie?.id ?? tie?.matchOrder;
       const isFinal = String(tie.round || "").toLowerCase() === "final";
       const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
 
@@ -574,6 +574,11 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
         // LEFT / center
         appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
         appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
+      }
+
+      if (tie.winnerTeamId) {
+        if (tie.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
+        if (tie.winnerTeamId === teamB?.id) row2.classList.add("winner-row");
       }
 
       card.append(row1, row2);
