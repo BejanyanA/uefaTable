@@ -378,7 +378,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
         wb.style.textAlign = "center";
         wb.style.fontWeight = "700";
         wb.style.marginBottom = "4px";
-        wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
+        // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
         card.appendChild(wb);
       }
 
@@ -1037,7 +1037,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         grpB,
         ph?.t2 || null
       );
-      
+
       // Checkboxes only when both legs have scores AND aggregate draw
       const isNum = v => Number.isFinite(v);
       const h = tie.home?.score || {};
