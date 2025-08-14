@@ -526,17 +526,20 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
         grpB,
         ph?.t2 || null
       );
+
       // Checkboxes only when both legs have scores AND aggregate draw
+      const isNum = v => Number.isFinite(v);
+      const h = tie.home?.score || {};
+      const a = tie.away?.score || {};
 
       let canPickWinner;
       if (isFinal) {
-        const h = tie.home?.score || {};
-        const h1ok = typeof h.team1 === "number";
-        const h2ok = typeof h.team2 === "number";
-        const equal = h1ok && h2ok && h.team1 === h.team2;
-        canPickWinner = editable && !tie.winnerTeamId && equal;   // enable on Final draw
+        const drawFinal = isNum(h.team1) && isNum(h.team2) && h.team1 === h.team2;
+        canPickWinner = editable && drawFinal;
       } else {
-        canPickWinner = editable && !tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
+        const haveAll = isNum(h.team1) && isNum(h.team2) && isNum(a.team1) && isNum(a.team2);
+        const drawAgg = haveAll && (h.team1 + a.team2 === h.team2 + a.team1);
+        canPickWinner = editable && drawAgg;
       }
 
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
@@ -1034,17 +1037,20 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
         grpB,
         ph?.t2 || null
       );
+      
       // Checkboxes only when both legs have scores AND aggregate draw
+      const isNum = v => Number.isFinite(v);
+      const h = tie.home?.score || {};
+      const a = tie.away?.score || {};
 
       let canPickWinner;
       if (isFinal) {
-        const h = tie.home?.score || {};
-        const h1ok = typeof h.team1 === "number";
-        const h2ok = typeof h.team2 === "number";
-        const equal = h1ok && h2ok && h.team1 === h.team2;
-        canPickWinner = editable && tie.winnerTeamId && equal;   // enable on Final draw
+        const drawFinal = isNum(h.team1) && isNum(h.team2) && h.team1 === h.team2;
+        canPickWinner = editable && drawFinal;
       } else {
-        canPickWinner = editable && tie.winnerTeamId && homeDone && awayDone && draw; // two-leg draw
+        const haveAll = isNum(h.team1) && isNum(h.team2) && isNum(a.team1) && isNum(a.team2);
+        const drawAgg = haveAll && (h.team1 + a.team2 === h.team2 + a.team1);
+        canPickWinner = editable && drawAgg;
       }
 
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
@@ -1058,7 +1064,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
-            // Refresh the page/state after successful request
+            // Re-render won't disable the boxes as long as scores remain a draw.
             if (res.success) await renderKnockoutsStage(leagueId, rootEl);
           } catch (e) { console.error(e); }
         };
