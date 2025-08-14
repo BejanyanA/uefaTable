@@ -122,6 +122,7 @@ export async function handleGroupKnockoutMatches(request, env) {
         away: null,
         winnerTeamId: r.winner_team_id ?? null,
         winnerTeamName: null,
+        winnerUserId: null, // <-- new field
         _slotSeed: nonNullIds.length ? nonNullIds[0] : Number.MAX_SAFE_INTEGER
       });
     }
@@ -136,6 +137,7 @@ export async function handleGroupKnockoutMatches(request, env) {
     if (tie.winnerTeamId != null) {
       const hit = candidates.find(c => c.id === tie.winnerTeamId);
       tie.winnerTeamName = hit ? hit.name : null;
+      tie.winnerUserId = hit ? hit.userId : null; // <-- assign userId if exists
     }
   }
 
