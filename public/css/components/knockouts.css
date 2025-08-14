@@ -1,3 +1,21 @@
+#knockoutTab {
+  max-height: 100vh; /* fit to screen height */
+  overflow-y: auto;  /* enable vertical scroll */
+  padding-right: 6px; /* little space so scrollbar doesn't overlap */
+}
+
+/* Optional: make scrollbar look nicer */
+#knockoutTab::-webkit-scrollbar {
+  width: 8px;
+}
+#knockoutTab::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+#knockoutTab::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 #knockoutTab .bracket-frame{display:grid;grid-template-columns:1fr 350px 1fr;gap:14px;align-items:start;}
 #knockoutTab .bracket-side{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 #knockoutTab .left-side{direction:ltr;} #knockoutTab .right-side{direction:rtl;} #knockoutTab .right-side>*{direction:ltr;}
@@ -6,9 +24,21 @@
 #knockoutTab .center-final>h3{color:#fff;text-align:center;margin:0 0 4px;font-weight:700;letter-spacing:.2px;font-size:15px}
 
 /* Center trophy */
-#knockoutTab .bracket-center{display:grid;grid-template-rows:auto 1fr;gap:8px;justify-items:center}
-#knockoutTab .cup-wrap{display:grid;place-items:center}
-#knockoutTab .cup-image{max-width:150px;height:auto;opacity:.95}
+#knockoutTab .bracket-center {
+  display: grid;
+  grid-template-rows: auto auto; /* cup first, then final */
+  gap: 8px;
+  justify-items: center;
+}
+
+#knockoutTab .cup-wrap {
+  grid-row: 1; /* cup goes to the first row */
+}
+
+#knockoutTab .center-final {
+  grid-row: 2; /* final match goes to the second row */
+}
+#knockoutTab .cup-image{max-width:138px;height:auto;opacity:.95}
 
 /* Cards */
 #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px}
@@ -39,13 +69,29 @@
 
 .ko-team-row.winner-row {background-color: rgba(0, 128, 0, 0.664); border-radius:8px; }
 
+#knockoutTab .side-round .round-body{
+  display:grid;            /* also set in JS */
+  align-content:start;
+  gap:6px;                 /* grid gap controls spacing; cards have margin:0 */
+}
+
+/* Cards inside the positioning grid must not add external margin */
+#knockoutTab .side-round .round-body .ko-card{ margin:0; }
+
+/* Let the stretched card center its own inner content nicely */
+#knockoutTab .side-round .round-body .ko-card,
+#knockoutTab .side-round .round-body .ko-placeholder{
+  display:grid;
+  align-content:center;
+}
+
+
 /* Mobile */
 @media (max-width:900px){
-  #knockoutTab .bracket-frame{grid-template-columns:100%;gap:12px}
-  #knockoutTab .bracket-center{order:-1}
-  #knockoutTab .bracket-side{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-  #knockoutTab .side-round{min-width:260px}
-  #knockoutTab .ko-team-row{grid-template-columns:88px minmax(120px,1fr) 32px 32px 18px}
-  #knockoutTab .ko-team-row.right{grid-template-columns:18px 32px 32px minmax(120px,1fr) 88px}
-  #knockoutTab .cup-image{max-width:84px}
+
+  #knockoutTab{
+
+    margin-top: 130px;
+  }
+
 }

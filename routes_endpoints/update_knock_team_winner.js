@@ -5,22 +5,19 @@ import { verifyToken } from '../utils/jwt.js';
 
 export async function handleUpdateKnockoutWinner(request, env) {
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
 
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
-
     if (!payload) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
 
     const userId = payload.id;
-
-    // ---- input ----
     const { knockoutId, winner_team_id } = await parseBody(request);
+
     if (!knockoutId || typeof knockoutId !== "number") {
         return jsonResponse({ success: false, error: "knockout_id_required" }, 400);
     }
@@ -28,133 +25,104 @@ export async function handleUpdateKnockoutWinner(request, env) {
         return jsonResponse({ success: false, error: "winner_team_id_must_be_number_or_null" }, 400);
     }
 
-    // ---- load row + access ----
-    const row = await env.core_data.prepare(`
-    SELECT lk.id, lk.league_id, lk.round, lk.match_order, lk.match_type,
-           lk.team1_id, lk.team2_id, lk.team1_score, lk.team2_score, lk.winner_team_id,
-           l.created_by_user_id
+    // 1) Load the edited leg + access (same as in score update)
+    const leg = await env.core_data.prepare(`
+    SELECT
+      lk.id, lk.league_id, lk.round, lk.match_order, lk.match_type,
+      lk.team1_id, lk.team2_id, lk.team1_score, lk.team2_score, lk.winner_team_id,
+      l.created_by_user_id
     FROM league_knockouts lk
     JOIN leagues l ON l.id = lk.league_id
     WHERE lk.id = ?
   `).bind(knockoutId).first();
-    if (!row) return jsonResponse({ success: false, error: "knockout_not_found" }, 404);
 
-    if (row.created_by_user_id !== userId) {
+    if (!leg) return jsonResponse({ success: false, error: "knockout_not_found" }, 404);
+
+    if (leg.created_by_user_id !== userId) {
         const access = await env.core_data.prepare(`
       SELECT 1 FROM league_access WHERE league_id = ? AND user_id = ?
-    `).bind(row.league_id, userId).first();
+    `).bind(leg.league_id, userId).first();
         if (!access) return jsonResponse({ success: false, error: "access_denied" }, 403);
     }
 
-    // ---- load BOTH legs for THIS tie (same (league, round, match_order)) ----
-    const legsRes = await env.core_data.prepare(`
+    // 2) Load BOTH legs for THIS tie (same two teams) – identical filter style
+    const pairBinds = [leg.team1_id, leg.team2_id, leg.team2_id, leg.team1_id];
+    const tieLegsRes = await env.core_data.prepare(`
     SELECT id, match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id
-    FROM league_knockouts
-    WHERE league_id = ? AND round = ? AND match_order = ?
+    FROM league_knockouts lk
+    WHERE lk.league_id = ? AND lk.round = ? AND lk.match_order = ?
+      AND ${pairWhereClauseSelect('lk')}
     ORDER BY CASE match_type WHEN 'home' THEN 0 ELSE 1 END, id ASC
-  `).bind(row.league_id, row.round, row.match_order).all();
+  `).bind(leg.league_id, leg.round, leg.match_order, ...pairBinds).all();
 
-    const legs = legsRes.results || [];
-    if (legs.length !== 2) {
-        return jsonResponse({ success: false, error: "tie_legs_incomplete" }, 409);
-    }
+    const tieLegs = tieLegsRes.results || [];
 
-    // ---- identify teams in this tie (must be exactly 2) ----
-    const collectIds = new Set();
-    for (const l of legs) {
-        if (l.team1_id != null) collectIds.add(Number(l.team1_id));
-        if (l.team2_id != null) collectIds.add(Number(l.team2_id));
-    }
-    if (collectIds.size !== 2) {
-        // tie not fully slotted yet
-        if (winner_team_id == null) {
-            return jsonResponse({ success: false, error: "teams_not_finalized" }, 409);
-        }
-    }
-    const ids = [...collectIds];
-    const tA = ids[0] ?? null;
-    const tB = ids[1] ?? null;
-
-    // ---- aggregate if possible; otherwise respect manual winner ----
-    const fullyScored = legs.every(l =>
-        l.team1_id != null && l.team2_id != null &&
-        l.team1_score != null && l.team2_score != null
-    );
-
-    let decidedWinner = null;
-    if (fullyScored && tA != null && tB != null) {
-        const totals = new Map();
-        totals.set(tA, 0);
-        totals.set(tB, 0);
-        for (const l of legs) {
-            totals.set(l.team1_id, (totals.get(l.team1_id) || 0) + Number(l.team1_score));
-            totals.set(l.team2_id, (totals.get(l.team2_id) || 0) + Number(l.team2_score));
-        }
-        const a = totals.get(tA) ?? 0;
-        const b = totals.get(tB) ?? 0;
-        if (a > b) decidedWinner = tA;
-        else if (b > a) decidedWinner = tB;
-        // if a === b → draw; require manual winner_team_id or allow clearing
-    }
-
-    // winner resolution:
-    // - if aggregate decided → use decidedWinner
-    // - else if manual provided → use manual (may be null to CLEAR)
-    // - else → cannot decide
-    let finalWinner = null;
-    if (decidedWinner != null) {
-        finalWinner = decidedWinner;
-    } else if (winner_team_id !== undefined) {
-        finalWinner = winner_team_id; // may be number or null (clear)
+    // 3) Resolve final winner:
+    //    - If client provided winner_team_id, use it (authoritative; may be null to clear)
+    //    - Else compute aggregate like your score handler
+    let finalWinner;
+    if (winner_team_id !== undefined) {
+        finalWinner = winner_team_id; // number or null
     } else {
-        return jsonResponse({ success: false, error: "scores_incomplete_or_draw_needs_manual" }, 409);
+        const agg = computeAggregate(tieLegs);
+        if (!agg.complete || agg.draw) {
+            // same behavior as score handler: clear winners + clear next round and signal tiebreak if draw
+            await env.core_data.prepare(`
+        UPDATE league_knockouts
+        SET winner_team_id = NULL, updated_user_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+          AND ${pairWhereClauseNoAlias()}
+      `).bind(userId, leg.league_id, leg.round, leg.match_order, ...pairBinds).run();
+
+            await upsertNextRoundSeed(env, {
+                leagueId: leg.league_id,
+                currentRound: leg.round,
+                matchOrder: leg.match_order,
+                tiePairKey: pairKeyOf(leg.team1_id, leg.team2_id),
+                winnerTeamId: null,
+                userId
+            });
+
+            return jsonResponse({
+                success: true,
+                data: { updated: true, winnerUpdated: false, propagated: "cleared", needsTiebreak: agg.draw }
+            }, 200);
+        }
+        finalWinner = agg.winnerTeamId;
     }
 
-    // If finalWinner is a number, ensure it matches one of the two teams (when known)
-    if (finalWinner != null && tA != null && tB != null && finalWinner !== tA && finalWinner !== tB) {
-        return jsonResponse({ success: false, error: "invalid_winner_for_tie" }, 422);
+    // 4) Persist same winner on BOTH legs for consistency (or clear if null)
+    // If we only found one leg (unusual but possible), still update it; else update both.
+    if (tieLegs.length > 0) {
+        const ids = tieLegs.map(l => l.id);
+        const qs = ids.map(() => "?").join(",");
+        await env.core_data.prepare(`
+      UPDATE league_knockouts
+      SET winner_team_id = ?, updated_user_id = ?
+      WHERE id IN (${qs})
+    `).bind(finalWinner, userId, ...ids).run();
+    } else {
+        // Fallback: ensure at least current leg is updated
+        await env.core_data.prepare(`
+      UPDATE league_knockouts
+      SET winner_team_id = ?, updated_user_id = ?
+      WHERE id = ?
+    `).bind(finalWinner, userId, leg.id).run();
     }
 
-    // ---- persist winner on BOTH legs (or clear) ----
-    // Use team-pair WHERE to avoid big IN (...) and be stable across edits
-    const pairBinds = (tA != null && tB != null)
-        ? [tA, tB, tB, tA]
-        : [row.team1_id, row.team2_id, row.team2_id, row.team1_id]; // fallback if ids were partially null
-
-    await env.core_data.prepare(`
-    UPDATE league_knockouts
-    SET winner_team_id = ?, updated_user_id = ?
-    WHERE league_id = ? AND round = ? AND match_order = ?
-      AND (
-        (team1_id = ? AND team2_id = ?) OR
-        (team1_id = ? AND team2_id = ?)
-      )
-  `).bind(finalWinner, userId, row.league_id, row.round, row.match_order, ...pairBinds).run();
-
-    // ---- propagate to next round using your existing helper ----
-    // tiePairKey is stable and order-insensitive
-    const tiePairKey =
-        (tA != null && tB != null) ? pairKeyOf(tA, tB)
-            : pairKeyOf(row.team1_id, row.team2_id); // fallback
-
+    // 5) Propagate to next round using the SAME helper/logic as score update
     const propagated = await upsertNextRoundSeed(env, {
-        leagueId: row.league_id,
-        currentRound: row.round,
-        matchOrder: row.match_order,
-        tiePairKey,
-        winnerTeamId: finalWinner,  // may be null → will clear/delete as needed
+        leagueId: leg.league_id,
+        currentRound: leg.round,
+        matchOrder: leg.match_order,
+        tiePairKey: pairKeyOf(leg.team1_id, leg.team2_id),
+        winnerTeamId: finalWinner, // number → seed; null → clear/delete if empty
         userId
     });
 
     return jsonResponse({
         success: true,
-        data: {
-            league_id: row.league_id,
-            round: row.round,
-            match_order: row.match_order,
-            winner_team_id: finalWinner,
-            propagated
-        }
+        data: { updated: true, winnerUpdated: true, propagated }
     }, 200);
 }
 
