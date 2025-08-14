@@ -311,13 +311,15 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
     renderSide(rightSide, "right");
 
     function renderSide(sideEl, sideKey) {
-      // how many first‑round ties per SIDE (4 for R16, 8 for R32)
-      const firstRoundTiesTotal = EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
+      // how many first-round ties per SIDE (4 for R16, 8 for R32)
+      const firstRoundTiesTotal =
+        EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
       const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
 
-      // vertical density controls (must match CSS expectation)
-      const BASE_SPAN = 4;                 // each card spans 4 grid rows
-      const TOTAL_ROWS = lanes * BASE_SPAN; // rows available for cards (per round col)
+      // visual grid config
+      const BASE_SPAN = 4;                    // each card spans 4 grid rows
+      const ROW_H_PX = 18;                   // height of ONE grid row (tweak to taste)
+      const TOTAL_ROWS = lanes * BASE_SPAN;   // total rows in each round column
 
       rounds
         .filter(r => r !== "Final")
@@ -325,26 +327,29 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
           const col = document.createElement("div");
           col.className = `side-round round-${rk.replace("/", "-")}`;
 
-          // Make the ROUND column itself a grid:
-          // row 1 = title (auto), rows 2.. = card rows we target
-          col.style.display = "grid";
-          col.style.alignContent = "start";
-          col.style.gap = "6px";
-          col.style.gridTemplateRows = `auto repeat(${TOTAL_ROWS}, minmax(0, auto))`;
-
+          // Title OUTSIDE the cards grid
           const title = document.createElement("h3");
           title.textContent = ROUND_LABELS[rk];
           col.appendChild(title);
+
+          // Cards grid with FIXED row height & EXACT row count
+          const body = document.createElement("div");
+          body.className = "round-body";
+          body.style.display = "grid";
+          body.style.alignContent = "start";
+          body.style.gap = "6px";
+          body.style.setProperty("--rowH", `${ROW_H_PX}px`);
+          body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
+          col.appendChild(body);
 
           const tiesAll = byRound.get(rk) || [];
           const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
           const expectedPerSide = Math.ceil(expected / 2);
 
-          // Your existing splitting: block for first round, alternating later
           const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
           const list = sideKey === "left" ? left : right;
 
-          // Build cards
+          // Build cards (real ties)
           const cards = [];
           const useGroupFallback = (rk === firstRound);
 
@@ -354,37 +359,37 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
               const baseIndex = (sideKey === "left" ? i : i + perSide);
               ph = placeholderFirstRound(baseIndex);
             }
-            cards.push(renderTie(tie, sideKey, ph, useGroupFallback));
+            const card = renderTie(tie, sideKey, ph, useGroupFallback);
+            card.style.margin = "0";                 // grid controls spacing
+            cards.push(card);
           });
 
           // Pad placeholders
           const missing = perSide - list.length;
           if (missing > 0) {
             for (let i = 0; i < missing; i++) {
+              let phCard;
               if (rk === firstRound) {
                 const indexOnSide = list.length + i;
                 const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
-                cards.push(renderPlaceholderCard(placeholderFirstRound(baseIndex)));
+                phCard = renderPlaceholderCard(placeholderFirstRound(baseIndex));
               } else {
-                cards.push(renderPlaceholderCard({ t1: "TBD", t2: "TBD" }));
+                phCard = renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
               }
+              phCard.style.margin = "0";
+              cards.push(phCard);
             }
           }
 
-          // Place cards at exact rows.
-          // Add +1 because the title occupies the first grid row.
-          const TITLE_OFFSET = 1;
+          // Precise placement inside FIXED-ROW grid (no title offset needed)
+          // startRow = j * (BASE_SPAN * 2^rIdx) + (2^(rIdx+1) - 1)
           cards.forEach((card, j) => {
             const start =
-              j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1) + TITLE_OFFSET;
-
-            // Ensure visual consistency so centering is exact
+              j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
             card.style.gridRow = `${start} / span ${BASE_SPAN}`;
-            card.style.margin = "0";                  // kill outside margins that break math
-            card.style.setProperty("--rowH", "16px"); // tweak 16→17/18 if your content needs
+            // Let the grid define height; card stretches to its spanned rows
             card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
-
-            col.appendChild(card);
+            body.appendChild(card);
           });
 
           sideEl.appendChild(col);
@@ -841,91 +846,91 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
     renderSide(leftSide, "left");
     renderSide(rightSide, "right");
 
-function renderSide(sideEl, sideKey) {
-  // how many first-round ties per SIDE (4 for R16, 8 for R32)
-  const firstRoundTiesTotal =
-    EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
-  const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
+    function renderSide(sideEl, sideKey) {
+      // how many first-round ties per SIDE (4 for R16, 8 for R32)
+      const firstRoundTiesTotal =
+        EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
+      const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
 
-  // visual grid config
-  const BASE_SPAN = 4;                    // each card spans 4 grid rows
-  const ROW_H_PX  = 18;                   // height of ONE grid row (tweak to taste)
-  const TOTAL_ROWS = lanes * BASE_SPAN;   // total rows in each round column
+      // visual grid config
+      const BASE_SPAN = 4;                    // each card spans 4 grid rows
+      const ROW_H_PX = 18;                   // height of ONE grid row (tweak to taste)
+      const TOTAL_ROWS = lanes * BASE_SPAN;   // total rows in each round column
 
-  rounds
-    .filter(r => r !== "Final")
-    .forEach((rk, rIdx) => {
-      const col = document.createElement("div");
-      col.className = `side-round round-${rk.replace("/", "-")}`;
+      rounds
+        .filter(r => r !== "Final")
+        .forEach((rk, rIdx) => {
+          const col = document.createElement("div");
+          col.className = `side-round round-${rk.replace("/", "-")}`;
 
-      // Title OUTSIDE the cards grid
-      const title = document.createElement("h3");
-      title.textContent = ROUND_LABELS[rk];
-      col.appendChild(title);
+          // Title OUTSIDE the cards grid
+          const title = document.createElement("h3");
+          title.textContent = ROUND_LABELS[rk];
+          col.appendChild(title);
 
-      // Cards grid with FIXED row height & EXACT row count
-      const body = document.createElement("div");
-      body.className = "round-body";
-      body.style.display = "grid";
-      body.style.alignContent = "start";
-      body.style.gap = "6px";
-      body.style.setProperty("--rowH", `${ROW_H_PX}px`);
-      body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
-      col.appendChild(body);
+          // Cards grid with FIXED row height & EXACT row count
+          const body = document.createElement("div");
+          body.className = "round-body";
+          body.style.display = "grid";
+          body.style.alignContent = "start";
+          body.style.gap = "6px";
+          body.style.setProperty("--rowH", `${ROW_H_PX}px`);
+          body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
+          col.appendChild(body);
 
-      const tiesAll = byRound.get(rk) || [];
-      const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
-      const expectedPerSide = Math.ceil(expected / 2);
+          const tiesAll = byRound.get(rk) || [];
+          const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
+          const expectedPerSide = Math.ceil(expected / 2);
 
-      const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
-      const list = sideKey === "left" ? left : right;
+          const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
+          const list = sideKey === "left" ? left : right;
 
-      // Build cards (real ties)
-      const cards = [];
-      const useGroupFallback = (rk === firstRound);
+          // Build cards (real ties)
+          const cards = [];
+          const useGroupFallback = (rk === firstRound);
 
-      list.forEach((tie, i) => {
-        let ph = null;
-        if (rk === firstRound) {
-          const baseIndex = (sideKey === "left" ? i : i + perSide);
-          ph = placeholderFirstRound(baseIndex);
-        }
-        const card = renderTie(tie, sideKey, ph, useGroupFallback);
-        card.style.margin = "0";                 // grid controls spacing
-        cards.push(card);
-      });
+          list.forEach((tie, i) => {
+            let ph = null;
+            if (rk === firstRound) {
+              const baseIndex = (sideKey === "left" ? i : i + perSide);
+              ph = placeholderFirstRound(baseIndex);
+            }
+            const card = renderTie(tie, sideKey, ph, useGroupFallback);
+            card.style.margin = "0";                 // grid controls spacing
+            cards.push(card);
+          });
 
-      // Pad placeholders
-      const missing = perSide - list.length;
-      if (missing > 0) {
-        for (let i = 0; i < missing; i++) {
-          let phCard;
-          if (rk === firstRound) {
-            const indexOnSide = list.length + i;
-            const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
-            phCard = renderPlaceholderCard(placeholderFirstRound(baseIndex));
-          } else {
-            phCard = renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
+          // Pad placeholders
+          const missing = perSide - list.length;
+          if (missing > 0) {
+            for (let i = 0; i < missing; i++) {
+              let phCard;
+              if (rk === firstRound) {
+                const indexOnSide = list.length + i;
+                const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
+                phCard = renderPlaceholderCard(placeholderFirstRound(baseIndex));
+              } else {
+                phCard = renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
+              }
+              phCard.style.margin = "0";
+              cards.push(phCard);
+            }
           }
-          phCard.style.margin = "0";
-          cards.push(phCard);
-        }
-      }
 
-      // Precise placement inside FIXED-ROW grid (no title offset needed)
-      // startRow = j * (BASE_SPAN * 2^rIdx) + (2^(rIdx+1) - 1)
-      cards.forEach((card, j) => {
-        const start =
-          j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
-        card.style.gridRow = `${start} / span ${BASE_SPAN}`;
-        // Let the grid define height; card stretches to its spanned rows
-        card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
-        body.appendChild(card);
-      });
+          // Precise placement inside FIXED-ROW grid (no title offset needed)
+          // startRow = j * (BASE_SPAN * 2^rIdx) + (2^(rIdx+1) - 1)
+          cards.forEach((card, j) => {
+            const start =
+              j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
+            card.style.gridRow = `${start} / span ${BASE_SPAN}`;
+            // Let the grid define height; card stretches to its spanned rows
+            card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
+            body.appendChild(card);
+          });
 
-      sideEl.appendChild(col);
-    });
-}
+          sideEl.appendChild(col);
+        });
+    }
 
     // ===== Tie card =====
     function normGroup(g) { return g ? String(g).replace(/\s+/g, '').toUpperCase() : null; }
