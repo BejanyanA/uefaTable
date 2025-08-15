@@ -43,7 +43,7 @@
 
 /* Cards */
 #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px}
-#knockoutTab .ko-placeholder{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);color:#cbd5e0}
+#knockoutTab .ko-placeholder{background:rgb(83 82 82 / 50%);border:1px dashed rgba(255,255,255,.22);color:#f8f8f8}
 #knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
 /* Two-row compact tie */
