@@ -440,7 +440,7 @@ export async function handleLeaguesEdit(request, env) {
   `).bind(name, leagueId).run();
 
   await env.core_data.prepare(`
-  UPDATE league_instances SET name = ? WHERE id = ?
+  UPDATE league_instances SET name = ? WHERE league_id = ?
   `).bind(name, leagueId).run();
 
   // Step 4: Update league access (add new)
