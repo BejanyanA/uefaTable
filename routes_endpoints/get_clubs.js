@@ -68,7 +68,7 @@ export async function handleSearchClubs(request, env) {
         success: true,
         data: {
             clubs: searchResult.results
-                .sort((a, b) => b.id - a.id)
+                .sort((a, b) => b.club_name - a.club_name)
                 .map(({ id, club_name }) => ({
                     id,
                     club_name

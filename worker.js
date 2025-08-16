@@ -4,6 +4,7 @@ import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
+import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/get_countries.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
 import { handleLeagueStandings } from './routes_endpoints/standings.js';
@@ -26,8 +27,14 @@ const routeRegistry = {
   "/login": { POST: handleLogin },
   "/me": { GET: handleMe },
   "/friends": { POST: handleGetApprovedFriends },
+
   "/clubs": { GET: handleGetAllClubs },
   "/search-clubs": { POST: handleSearchClubs },
+  "/world-countries": { GET: handleGetAllWorldCountries },
+  "/search-world-countries": { POST: handleSearchWorldCountries },
+  "/europe-countries": { GET: handleGetAllEuropeCountries },
+  "/search-europe-countries": { POST: handleSearchEuropeCountries },
+
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
   "/update-leagues": { POST: handleLeaguesEdit },

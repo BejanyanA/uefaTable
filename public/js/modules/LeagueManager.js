@@ -4,6 +4,8 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { renderLeagueTable } from './components/renderTable.js';
 import { getFriends } from './GetFriends.js';
 import { getClubs } from './GetClubs.js';
+import { getCountries } from './GetWorldCountries.js';
+import { getEuropeCountries } from './GetEuropeCountries.js';
 import { apiGet, apiPost } from '../services/api.js';
 
 export const LeagueManager = {
@@ -41,11 +43,33 @@ export const LeagueManager = {
       const modal = document.getElementById("tableModal");
       const bannerId = parseInt(modal.dataset.bannerId);
 
-      if (bannerId === 1 || bannerId === 2) {
-        getFriends.initGetAllFriends();
-        getClubs.initGetAllClubs();
-      } // TO DO EUROPE AND WORLD 
+      getFriends.initGetAllFriends();
 
+      if (bannerId === 1 || bannerId === 2) {
+        // ensure club search is off
+        if (typeof getClubs?.teardownSearch === "function") getClubs.teardownSearch();
+
+        // getClubs.initGetAllClubs(); - no need to keep this as the below is already gets all
+        getClubs.initSearchClubs(modal);
+      }
+
+      if (bannerId === 3) {
+        // ensure country search is off
+        if (typeof getEuropeCountries?.teardownSearch === "function") getEuropeCountries.teardownSearch();
+
+        // getCountries.initGetAllCountries(); - no need to keep this as the below is already gets all
+        getEuropeCountries.initSearchEuropeCountries(modal);
+      }
+
+      if (bannerId === 4) {
+        // ensure country search is off
+        if (typeof getCountries?.teardownSearch === "function") getCountries.teardownSearch();
+
+        // getCountries.initGetAllCountries(); - no need to keep this as the below is already gets all
+        getCountries.initSearchWorldCountries(modal);
+      }
+
+      // show/hide UI as you already do...
       document.getElementById("actionTitle").style.display = "none";
       document.getElementById("createCompetition").style.display = "block";
       document.getElementById("actionButtons").style.display = "none";
@@ -285,7 +309,7 @@ export const LeagueManager = {
             if (isGroup) {
               renderLeagueTable(data.data);
             } else {
-              renderLeagueTable(data.data); 
+              renderLeagueTable(data.data);
             }
           } else {
             showToast(translation.not_found || "Not found", "info");
