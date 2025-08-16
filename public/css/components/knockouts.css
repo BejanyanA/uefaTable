@@ -2,7 +2,7 @@
   max-height: 100vh; /* fit to screen height */
   overflow-y: auto;  /* enable vertical scroll */
   padding-right: 6px; /* little space so scrollbar doesn't overlap */
-   margin-top: 80px;
+  margin-top: 80px;
 }
 
 /* Optional: make scrollbar look nicer */
@@ -190,7 +190,37 @@
   right:calc(0px - var(--finalLink));
 }
 
+#knockoutTab .center-final .ko-team-row {
+  grid-template-columns: var(--userW) minmax(140px, max-content) 24px 24px;
+  /* removes the "away" score column */
+}
 
+#knockoutTab .ko-card {
+  overflow: visible;
+}
+
+/* 3) standardise the width we reserve for the player dropdown */
+:root { --userW: 120px; }   /* adjust if you want a wider select */
+
+/* Left rows: [User][Team][Home][Away][CB] */
+#knockoutTab .ko-team-row {
+  grid-template-columns: var(--userW) minmax(120px,1fr) 34px 34px 18px;
+}
+
+/* Right rows: [CB][Home][Away][Team][User] */
+#knockoutTab .ko-team-row.right {
+  grid-template-columns: 18px 34px 34px minmax(120px,1fr) var(--userW);
+}
+
+/* Make the select respect the column width and not grow */
+#knockoutTab .user-dropdown {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;            /* cooperate with the grid */
+  white-space: nowrap;
+  overflow: hidden;
+}
 
 
 /* Mobile */

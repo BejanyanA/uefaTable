@@ -106,7 +106,7 @@ export const AuthManager = {
       } else if (regUsernameInput.value.trim().length < 3) {
         setError("regUsernameError", translation.shortUsername);
         hasError = true;
-      } else if (regUsernameInput.value.trim().length > 20) {
+      } else if (regUsernameInput.value.trim().length > 15) {
         setError("regUsernameError", translation.longUsername);
         hasError = true;
       } else if (detectSpace(regUsernameInput.value.trim())) {
