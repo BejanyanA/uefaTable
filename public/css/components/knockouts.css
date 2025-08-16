@@ -28,7 +28,7 @@
 #knockoutTab .bracket-center {
   display: grid;
   grid-template-rows: auto auto; /* cup first, then final */
-  gap: 3px;
+  gap: 7px;
   justify-items: center;
 }
 
@@ -47,10 +47,10 @@
 #knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
 /* Two-row compact tie */
-#knockoutTab .ko-row-2{display:grid;gap:4px}
+#knockoutTab .ko-row-2{display:grid;gap:10px}
 
 /* LEFT row: [User][Team][Home][Away][CB] */
-#knockoutTab .ko-team-row{display:grid;align-items:center;gap:6px;grid-template-columns:96px minmax(120px,1fr) 34px 34px 18px}
+#knockoutTab .ko-team-row{display:grid;align-items:center;gap:6px;grid-template-columns:96px minmax(120px,1fr) 34px 34px 18px; justify-content: center; margin: 0px;}
 
 /* RIGHT row: [CB][Home][Away][Team][User] */
 #knockoutTab .ko-team-row.right{grid-template-columns:18px 34px 34px minmax(120px,1fr) 96px}
@@ -58,7 +58,7 @@
 /* Inputs/selects compact */
 #knockoutTab .user-dropdown,#knockoutTab .score-input{height:24px;width:100%;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;padding:0 6px;font-size:12.5px}
 #knockoutTab .user-dropdown:disabled{opacity:.6;cursor:not-allowed}
-#knockoutTab .score-input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;padding:0}
+#knockoutTab .score-input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;padding:0;height: 20px; width: 30px;font-size: 12px;}
 #knockoutTab .score-input::-webkit-outer-spin-button,#knockoutTab .score-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 #knockoutTab .score-input[type="number"]{-moz-appearance:textfield}
 
@@ -66,7 +66,7 @@
 #knockoutTab .team-name{color:#fff;text-align:center;justify-self:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Winner checkbox */
-#knockoutTab .winner-checkbox{width:16px;height:16px;justify-self:center;accent-color:#4ade80}
+#knockoutTab .winner-checkbox{width:16px;height:16px;justify-self:center;accent-color:#4ade80; margin-left: 10px;}
 
 .ko-team-row.winner-row {background-color: rgba(0, 128, 0, 0.664); border-radius:8px; }
 
@@ -230,5 +230,8 @@
 
     margin-top: 130px;
   }
+
+  #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12px}
+  #knockoutTab .ko-row-2{display:grid;gap:8px}
 
 }

@@ -413,14 +413,14 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
       const card = document.createElement("div");
       card.className = "ko-card ko-row-2";
 
-      if (tie.winnerTeamId && tie.winnerTeamName) {
-        const wb = document.createElement("div");
-        wb.style.textAlign = "center";
-        wb.style.fontWeight = "700";
-        wb.style.marginBottom = "4px";
-        // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
-        card.appendChild(wb);
-      }
+      // if (tie.winnerTeamId && tie.winnerTeamName) {
+      //   const wb = document.createElement("div");
+      //   wb.style.textAlign = "center";
+      //   wb.style.fontWeight = "700";
+      //   wb.style.marginBottom = "4px";
+      //   // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
+      //   card.appendChild(wb);
+      // }
 
       // --- builders ---
       const buildUserSelect = (team, role) => {
@@ -949,14 +949,14 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
       const card = document.createElement("div");
       card.className = "ko-card ko-row-2";
 
-      if (tie.winnerTeamId && tie.winnerTeamName) {
-        const wb = document.createElement("div");
-        wb.style.textAlign = "center";
-        wb.style.fontWeight = "700";
-        wb.style.marginBottom = "4px";
-        // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
-        card.appendChild(wb);
-      }
+      // if (tie.winnerTeamId && tie.winnerTeamName) {
+      //   const wb = document.createElement("div");
+      //   wb.style.textAlign = "center";
+      //   wb.style.fontWeight = "700";
+      //   wb.style.marginBottom = "4px";
+      //   // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
+      //   card.appendChild(wb);
+      // }
 
       // --- builders ---
       const buildUserSelect = (team, role) => {
