@@ -2,7 +2,7 @@
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
-import { shuffleArray, chunkArray, generateAllPairs } from '../utils/shuffle.js';
+// import { shuffleArray, chunkArray, generateAllPairs } from '../utils/shuffle.js';
 
 export async function handleLeagues(request, env) {
   const authHeader = request.headers.get("Authorization");
@@ -65,6 +65,38 @@ export async function handleLeagues(request, env) {
   }, 200);
 }
 
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function chunkArray(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+function generateAllPairs(arr) {
+  const out = [];
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) out.push([arr[i], arr[j]]);
+  }
+  return out;
+}
+const toInt = v => (Number.isFinite(v) ? Math.trunc(v) : 0);
+
+// Build and exec INSERT ... VALUES (...) in small literal chunks (no placeholders)
+async function execInsertValuesChunks(db, { table, columns, tuples, chunkSize = 80, suffix = "" }) {
+  if (!tuples || tuples.length === 0) return;
+  for (let i = 0; i < tuples.length; i += chunkSize) {
+    const part = tuples.slice(i, i + chunkSize);
+    if (part.length === 0) continue; // guard
+    const sql = `INSERT INTO ${table} (${columns.join(", ")}) VALUES ${part.join(", ")}${suffix}`;
+    await db.exec(sql);
+  }
+}
 
 export async function handleLeaguesCreate(request, env) {
   const authHeader = request.headers.get("Authorization");
@@ -79,7 +111,6 @@ export async function handleLeaguesCreate(request, env) {
   if (!payload) {
     return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
   }
-
 
   const { name, bannerId, clubIds, teamCount, friendIds, isGroup } = await request.json();
 
@@ -123,62 +154,140 @@ export async function handleLeaguesCreate(request, env) {
     return jsonResponse({ success: false, errors }, 400);
   }
 
-  const userId = payload.id;
   const db = env.core_data;
+  const userId = payload.id;
+
+  // National-team tournaments: single-leg neutral matches
+  const isNational = bannerId === 3 || bannerId === 4;
+
+  // groups of 4 (last group may be <4 if not divisible)
   const groupSize = 4;
-  const shuffled = shuffleArray(clubIds);
+  const shuffled = shuffleArray(clubIds.map(toInt));
   const groups = chunkArray(shuffled, groupSize);
 
   try {
-    const league = await db.prepare(`
-      INSERT INTO leagues (name, banner_id, created_by_user_id, is_group, team_count)
-      VALUES (?, ?, ?, ?, ?)
-      RETURNING id
-    `).bind(name, bannerId, userId, isGroup, teamCount).first();
+    // 1) Create league
+    const league = await db.prepare(
+      `INSERT INTO leagues (name, banner_id, created_by_user_id, is_group, team_count)
+       VALUES (?, ?, ?, ?, ?)
+       RETURNING id`
+    ).bind(name, bannerId, userId, isGroup, teamCount).first();
     const leagueId = league.id;
 
-    const instance = await db.prepare(`
-      INSERT INTO league_instances (league_id, name, created_by_user_id)
-      VALUES (?, ?, ?)
-      RETURNING id
-    `).bind(leagueId, name, userId).first();
+    // 2) Create league instance
+    const instance = await db.prepare(
+      `INSERT INTO league_instances (league_id, name, created_by_user_id)
+       VALUES (?, ?, ?)
+       RETURNING id`
+    ).bind(leagueId, name, userId).first();
     const instanceId = instance.id;
 
-    const groupInsertValues = groups.map((_, i) => `('${instanceId}', 'Group ${String.fromCharCode(65 + i)}')`).join(', ');
-    await db.exec(`INSERT INTO league_groups (league_instance_id, group_name) VALUES ${groupInsertValues}`);
+    // 3) Create groups (RETURNING to preserve order A,B,C,...)
+    const groupNames = groups.map((_, i) => `Group ${String.fromCharCode(65 + i)}`);
+    let groupIds = [];
+    if (groupNames.length > 0) {
+      const placeholders = groupNames.map(() => `(?, ?)`).join(", ");
+      const res = await db.prepare(
+        `INSERT INTO league_groups (league_instance_id, group_name)
+         VALUES ${placeholders}
+         RETURNING id, group_name`
+      ).bind(...groupNames.flatMap(n => [instanceId, n])).all();
+      const byName = new Map(res.results.map(r => [r.group_name, r.id]));
+      groupIds = groupNames.map(n => byName.get(n));
+    }
 
-    const groupQuery = await db.prepare(`SELECT id, group_name FROM league_groups WHERE league_instance_id = ?`).bind(instanceId).all();
-    const groupIds = groupQuery.results.map(r => r.id);
+    // ===== Build ALL STANDINGS tuples (literals) and insert in small chunks =====
+    const standingsColumns = [
+      "group_id", "team_id", "user_id", "played", "wins", "wins_vs_computer", "wins_vs_player",
+      "draws", "losses", "goals_for", "goals_against", "goal_difference", "points"
+    ];
+    const standingsTuples = [];
+    for (let i = 0; i < groups.length; i++) {
+      const gid = toInt(groupIds[i]);
+      const teams = groups[i] || [];
+      if (!gid || teams.length === 0) continue;
+      for (const t of teams) {
+        standingsTuples.push(`(${gid}, ${toInt(t)}, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)`);
+      }
+    }
+    if (standingsTuples.length > 0) {
+      await execInsertValuesChunks(db, {
+        table: isNational ? "country_group_standings" : "group_standings",
+        columns: standingsColumns,
+        tuples: standingsTuples,
+        chunkSize: 80, // keep SQL short to avoid parser stress
+      });
+    }
 
-    const standingValues = [];
-    const matchValues = [];
-
-    groups.forEach((group, i) => {
-      const groupId = groupIds[i];
-      standingValues.push(...group.map(teamId => `(${groupId}, ${teamId}, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)`));
-      const pairs = generateAllPairs(group);
-      for (const [team1, team2] of pairs) {
-        for (const matchType of ['home', 'away']) {
-          const [t1, t2] = matchType === 'home' ? [team1, team2] : [team2, team1];
-          matchValues.push(`(${groupId}, ${t1}, ${t2}, null, null, 0, null, null, null, null, null, '${matchType}')`);
+    // ===== Build ALL MATCHES tuples (literals) and insert in small chunks =====
+    if (isNational) {
+      // Single leg neutral
+      const matchColumns = [
+        "group_id", "team1_id", "team2_id",
+        "team1_user_id", "team2_user_id", "is_vs_computer", "computer_team",
+        "team1_score", "team2_score", "winner_team_id", "updated_user_id", "match_type"
+      ];
+      const matchTuples = [];
+      for (let i = 0; i < groups.length; i++) {
+        const gid = toInt(groupIds[i]);
+        const teams = groups[i] || [];
+        if (!gid || teams.length < 2) continue;
+        for (const [t1, t2] of generateAllPairs(teams)) {
+          matchTuples.push(
+            `(${gid}, ${toInt(t1)}, ${toInt(t2)}, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, 'neutral')`
+          );
         }
       }
-    });
-
-    if (standingValues.length > 0) {
-      await db.exec(`INSERT INTO group_standings (group_id, team_id, user_id, played, wins, wins_vs_computer, wins_vs_player, draws, losses, goals_for, goals_against, goal_difference, points) VALUES ${standingValues.join(', ')}`);
+      if (matchTuples.length > 0) {
+        await execInsertValuesChunks(db, {
+          table: "country_matches",
+          columns: matchColumns,
+          tuples: matchTuples,
+          chunkSize: 80,
+        });
+      }
+    } else {
+      // Clubs: two legs (home/away)
+      const matchColumns = [
+        "group_id", "team1_id", "team2_id",
+        "team1_user_id", "team2_user_id", "is_vs_computer", "computer_team",
+        "team1_score", "team2_score", "winner_team_id", "updated_user_id", "match_type"
+      ];
+      const matchTuples = [];
+      for (let i = 0; i < groups.length; i++) {
+        const gid = toInt(groupIds[i]);
+        const teams = groups[i] || [];
+        if (!gid || teams.length < 2) continue;
+        for (const [t1, t2] of generateAllPairs(teams)) {
+          matchTuples.push(
+            `(${gid}, ${toInt(t1)}, ${toInt(t2)}, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, 'home')`,
+            `(${gid}, ${toInt(t2)}, ${toInt(t1)}, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, 'away')`
+          );
+        }
+      }
+      if (matchTuples.length > 0) {
+        await execInsertValuesChunks(db, {
+          table: "league_matches",
+          columns: matchColumns,
+          tuples: matchTuples,
+          chunkSize: 80,
+        });
+      }
     }
-    if (matchValues.length > 0) {
-      await db.exec(`INSERT INTO league_matches (group_id, team1_id, team2_id, team1_user_id, team2_user_id, is_vs_computer, computer_team, team1_score, team2_score, winner_team_id, updated_user_id, match_type) VALUES ${matchValues.join(', ')}`);
-    }
 
+    // ===== league_access in small literal chunks =====
     let friendResponse = [];
     if (Array.isArray(friendIds) && friendIds.length > 0) {
-      const accessValues = friendIds.map(id => {
-        friendResponse.push({ id });
-        return `(${leagueId}, ${id}, ${userId})`;
-      }).join(', ');
-      await db.exec(`INSERT INTO league_access (league_id, user_id, granted_by_user_id) VALUES ${accessValues} ON CONFLICT DO NOTHING`);
+      friendResponse = friendIds.map(id => ({ id: toInt(id) }));
+      const accessColumns = ["league_id", "user_id", "granted_by_user_id"];
+      const accessTuples = friendIds.map(fid => `(${leagueId}, ${toInt(fid)}, ${userId})`);
+      await execInsertValuesChunks(db, {
+        table: "league_access",
+        columns: accessColumns,
+        tuples: accessTuples,
+        chunkSize: 120,
+        suffix: " ON CONFLICT DO NOTHING"
+      });
     }
 
     return jsonResponse({
@@ -188,8 +297,9 @@ export async function handleLeaguesCreate(request, env) {
         instanceId,
         groupCount: groups.length,
         friendIds: friendResponse
-      }
+      },
     }, 201);
+
   } catch (err) {
     return jsonResponse({ success: false, error: "creation_failed", details: err.message }, 500);
   }
