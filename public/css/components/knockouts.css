@@ -28,7 +28,7 @@
 #knockoutTab .bracket-center {
   display: grid;
   grid-template-rows: auto auto; /* cup first, then final */
-  gap: 8px;
+  gap: 3px;
   justify-items: center;
 }
 
