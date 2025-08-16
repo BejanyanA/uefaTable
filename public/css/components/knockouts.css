@@ -47,7 +47,7 @@
 #knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
 /* Two-row compact tie */
-#knockoutTab .ko-row-2{display:grid;gap:10px}
+#knockoutTab .ko-row-2{display:grid;gap:15px}
 
 /* LEFT row: [User][Team][Home][Away][CB] */
 #knockoutTab .ko-team-row{display:grid;align-items:center;gap:6px;grid-template-columns:96px minmax(120px,1fr) 34px 34px 18px; justify-content: center; margin: 0px;}
@@ -232,6 +232,6 @@
   }
 
   #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12px}
-  #knockoutTab .ko-row-2{display:grid;gap:8px}
+  #knockoutTab .ko-row-2{display:grid;gap:10px}
 
 }
