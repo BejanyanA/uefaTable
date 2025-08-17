@@ -179,7 +179,11 @@ export const LeagueManager = {
                   window.closeModal("tableModal");
                   showToast(translation.league_create_success || "League Successfully Created", "success");
                   document.getElementById("bannerContainer").style.display = "none";
-                  renderLeagueTable(data.data);
+                  if (bannerId === 1 || bannerId === 2) {
+                    renderLeagueTable(data.data);
+                  } else {
+                    renderNationalTable(data.data);
+                  }
                 } else {
                   showToast(translation.not_found || "Not found", "info");
                 }
@@ -208,7 +212,11 @@ export const LeagueManager = {
                 window.closeModal("tableModal");
                 showToast(translation.league_create_success || "League Successfully Created", "success");
                 document.getElementById("bannerContainer").style.display = "none";
-                renderLeagueTable(data.data);
+                if (bannerId === 1 || bannerId === 2) {
+                  renderLeagueTable(data.data);
+                } else {
+                  renderNationalTable(data.data);
+                }
               } else {
                 showToast(translation.not_found || "Not found", "info");
               }
@@ -513,7 +521,11 @@ export const LeagueManager = {
           if (data.success && data.data) {
             window.closeModal("tableModal");
             document.getElementById("bannerContainer").style.display = "none";
-            renderLeagueTable(data.data);
+            if (bannerId === 1 || bannerId === 2) {
+              renderLeagueTable(data.data);
+            } else {
+              renderNationalTable(data.data);
+            }
           }
         } else {
           showToast(translation.league_update_failed || "Update failed", "error");
@@ -568,7 +580,11 @@ export const LeagueManager = {
           if (data.success && data.data) {
             window.closeModal("tableModal");
             document.getElementById("bannerContainer").style.display = "none";
-            renderLeagueTable(data.data);
+            if (bannerId === 1 || bannerId === 2) {
+              renderLeagueTable(data.data);
+            } else {
+              renderNationalTable(data.data);
+            }
           }
         } else {
           showToast(translation.league_delete_failed || "Failed to delete league", "error");
