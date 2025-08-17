@@ -179,7 +179,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
   try {
     const [{ success, data }, playersRes] = await Promise.all([
       apiPost("/round-knockouts", { leagueId }),
-      apiPost("/league-players", { leagueId }, { showLoading: false }),
+      apiPost("/national-players", { leagueId }, { showLoading: false }),
     ]);
     if (!success || !data) {
       root.innerHTML = `<p style="color:#fff">${t.not_found || "Knockout data not found"}</p>`;
@@ -641,7 +641,7 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
   try {
     const [{ success, data }, playersRes] = await Promise.all([
       apiPost("/group-knockouts", { leagueId }),
-      apiPost("/league-players", { leagueId }, { showLoading: false }),
+      apiPost("/national-players", { leagueId }, { showLoading: false }),
     ]);
     if (!success || !data) {
       root.innerHTML = `<p style="color:#fff">${t.not_found || "Knockout data not found"}</p>`;

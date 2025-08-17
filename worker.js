@@ -23,6 +23,7 @@ import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEur
 import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
 import { handleNationalStandings } from './routes_endpoints/national/national_standings.js';
 import { handleNationalMatches } from './routes_endpoints/national/national_matches.js';
+import { handleGetNationalPlayers } from './routes_endpoints/national/national_player.js';
 
 
 // Route registry with path as key and allowed methods as subkeys
@@ -64,6 +65,7 @@ const routeRegistry = {
   "/national-instances": { POST: handleNationalInstances },
   "/national-standings": { POST: handleNationalStandings },
   "/national-matches": { POST: handleNationalMatches },
+  "/national-players": { POST: handleGetNationalPlayers },
 
 };
 

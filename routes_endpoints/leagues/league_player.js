@@ -26,8 +26,8 @@ export async function handleGetLeaguePlayers(request, env) {
 
     // Check if user is league owner or has access
     const leagueOwner = await env.core_data.prepare(`
-  SELECT created_by_user_id FROM leagues WHERE id = ?
-`).bind(leagueId).first();
+    SELECT created_by_user_id FROM leagues WHERE id = ?
+    `).bind(leagueId).first();
 
     if (!leagueOwner) {
         return jsonResponse({ success: false, error: "league_not_found" }, 404);
@@ -45,17 +45,17 @@ export async function handleGetLeaguePlayers(request, env) {
 
     // Get user_ids from league_access
     const grantedUsers = await env.core_data.prepare(`
-  SELECT user_id FROM league_access WHERE league_id = ?
-`).bind(leagueId).all();
+    SELECT user_id FROM league_access WHERE league_id = ?
+    `).bind(leagueId).all();
 
     // Get user_ids from group_standings of teams in this league
     const participants = await env.core_data.prepare(`
-  SELECT DISTINCT gs.user_id
-  FROM group_standings gs
-  JOIN league_groups lg ON gs.group_id = lg.id
-  JOIN league_instances li ON li.id = lg.league_instance_id
-  WHERE li.league_id = ? AND gs.user_id IS NOT NULL
-`).bind(leagueId).all();
+    SELECT DISTINCT gs.user_id
+    FROM group_standings gs
+    JOIN league_groups lg ON gs.group_id = lg.id
+    JOIN league_instances li ON li.id = lg.league_instance_id
+    WHERE li.league_id = ? AND gs.user_id IS NOT NULL
+    `).bind(leagueId).all();
 
     const userIdsSet = new Set([
         ...participants.results.map(p => p.user_id),
@@ -72,8 +72,8 @@ export async function handleGetLeaguePlayers(request, env) {
     // Get usernames for those userIds
     const placeholders = userIds.map(() => '?').join(',');
     const userRows = await env.core_data.prepare(`
-  SELECT id, username FROM users WHERE id IN (${placeholders})
-`).bind(...userIds).all();
+    SELECT id, username FROM users WHERE id IN (${placeholders})
+    `).bind(...userIds).all();
 
     return jsonResponse({
         success: true,

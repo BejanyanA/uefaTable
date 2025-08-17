@@ -66,7 +66,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
 
         const [matchesResponse, playersResponse] = await Promise.all([
           apiPost("/national-matches", { leagueId, groupId }),
-          apiPost("/league-players", { leagueId }, { showLoading: false })
+          apiPost("/national-players", { leagueId }, { showLoading: false })
         ]);
 
         if (matchesResponse.success && playersResponse.success) {
