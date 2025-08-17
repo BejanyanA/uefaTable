@@ -53,7 +53,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
 
     try {
       if (tab === "standings") {
-        const response = await apiPost("/standings", { leagueId, groupId });
+        const response = await apiPost("/national-standings", { leagueId, groupId });
 
         if (response.success) {
           contentDiv.innerHTML = renderNationalGroupStandingsTable(response.data.standings);
@@ -105,7 +105,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
         <tbody>
           ${standings.map((team, index) => `
             <tr>
-              <td>${index + 1}. ${team.club_name}</td>
+              <td>${index + 1}. ${team.country_name}</td>
               <td>${team.played ?? 0}</td>
               <td>${team.wins ?? 0}</td>
               <td>${team.draws ?? 0}</td>
@@ -125,7 +125,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
     <div class="fixed-clubs">
       <div class="club-header" id="teamMobile">${translation.teams || "Teams"}</div>
       ${standings.map((team, index) => `
-        <div class="club-name">${index + 1}. ${team.club_name}</div>
+        <div class="club-name">${index + 1}. ${team.country_name}</div>
       `).join("")}
     </div>
 

@@ -21,6 +21,7 @@ import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/leagues/updat
 
 import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/national/get_countries.js';
 import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
+import { handleNationalStandings } from './routes_endpoints/national/national_standings.js';
 
 
 // Route registry with path as key and allowed methods as subkeys
@@ -60,6 +61,7 @@ const routeRegistry = {
   "/europe-countries": { GET: handleGetAllEuropeCountries },
   "/search-europe-countries": { POST: handleSearchEuropeCountries },
   "/national-instances": { POST: handleNationalInstances },
+  "/national-standings": { POST: handleNationalStandings },
 
 };
 
