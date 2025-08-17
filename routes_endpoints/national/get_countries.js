@@ -1,7 +1,7 @@
 // routes/get_countries.js
 
-import { jsonResponse } from '../utils/helper.js';
-import { verifyToken } from '../utils/jwt.js';
+import { jsonResponse } from '../../utils/helper.js';
+import { verifyToken } from '../../utils/jwt.js';
 
 export async function handleGetAllWorldCountries(request, env) {
     const authHeader = request.headers.get("Authorization");

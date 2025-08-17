@@ -19,7 +19,7 @@ import { handleUpdateKnockoutWinner } from './routes_endpoints/leagues/update_kn
 import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/leagues/update_only_knock_matches.js';
 import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/leagues/update_only_knock_team_winner.js';
 
-import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/get_countries.js';
+import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/national/get_countries.js';
 
 // import additional route handlers as needed
 
