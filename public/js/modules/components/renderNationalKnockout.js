@@ -178,7 +178,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
 
   try {
     const [{ success, data }, playersRes] = await Promise.all([
-      apiPost("/round-knockouts", { leagueId }),
+      apiPost("/national-round-knockouts", { leagueId }),
       apiPost("/national-players", { leagueId }, { showLoading: false }),
     ]);
     if (!success || !data) {

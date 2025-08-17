@@ -24,6 +24,7 @@ import { handleNationalInstances } from './routes_endpoints/national/national_in
 import { handleNationalStandings } from './routes_endpoints/national/national_standings.js';
 import { handleNationalMatches } from './routes_endpoints/national/national_matches.js';
 import { handleNationalGroupKnockoutMatches } from './routes_endpoints/national/national_group_knockouts.js';
+import { handleNationalOnlyKnockoutMatches } from './routes_endpoints/national/national_round_knockouts.js';
 
 import { handleGetNationalPlayers } from './routes_endpoints/national/national_player.js';
 import { handleAttachNationalPlayers, handleAttachNationalKnockPlayers, handleAttachNationalOnlyKnockPlayers } from './routes_endpoints/national/attach_national_player.js';
@@ -69,6 +70,8 @@ const routeRegistry = {
   "/national-standings": { POST: handleNationalStandings },
   "/national-matches": { POST: handleNationalMatches },
   "/national-group-knockouts": { POST: handleNationalGroupKnockoutMatches },
+  "/national-round-knockouts": { POST: handleNationalOnlyKnockoutMatches },
+
 
   "/national-players": { POST: handleGetNationalPlayers },
   "/attach-national-players": { POST: handleAttachNationalPlayers },
