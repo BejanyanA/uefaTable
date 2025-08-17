@@ -360,12 +360,23 @@ export async function handleCreateRoundKnockouts(request, env) {
     return jsonResponse({ success: false, errors }, 400);
   }
 
+  const isNational = bannerId === 3 || bannerId === 4;
+
   const roundLabel = (n) =>
     n === 32 ? "1/16" :
       n === 16 ? "1/8" :
         n === 8 ? "1/4" :
           n === 4 ? "1/2" :
             n === 2 ? "Final" : "Knockout";
+
+  const shuffleArray = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
 
   const makePairs = (ids) => {
     const base = shuffle ? shuffleArray([...ids]) : [...ids];
@@ -375,8 +386,7 @@ export async function handleCreateRoundKnockouts(request, env) {
   };
 
   // ---- helper: chunking with very low var count ----
-  // Be conservative; some D1 plans show errors far below 999.
-  const MAX_VARS = 500;
+  const MAX_VARS = 500; // conservative for D1
 
   function* chunk(arr, size) {
     for (let i = 0; i < arr.length; i += size) yield arr.slice(i, i + size);
@@ -410,43 +420,69 @@ export async function handleCreateRoundKnockouts(request, env) {
       }
     }
 
-    // 3) round_knockouts — inline constants, bind only team ids (2 vars/row)
+    // 3) knockouts (clubs vs national)
     let insertedTies = 0;
     let firstRoundOut = null;
 
     if (isGroup === false) {
-      const firstRound = roundLabel(teamCount); // limited to known literals
+      const firstRound = roundLabel(teamCount);
       firstRoundOut = firstRound;
 
       const pairs = makePairs(clubIds);
       insertedTies = pairs.length;
 
       if (pairs.length > 0) {
-        // two rows per pair; each row binds (team1_id, team2_id) only
-        // → 2 vars/row, 4 vars/pair
-        const varsPerPair = 4;
-        const maxPairs = Math.max(1, Math.floor(MAX_VARS / varsPerPair));
+        if (isNational) {
+          // NATIONAL TEAMS: single neutral match, table: national_round_knockouts
+          // Columns: (league_id, "round", match_order, team1_id, team2_id, match_type)
+          // Bind only (team1_id, team2_id) → 2 vars/row
+          const varsPerRow = 2;
+          const maxRows = Math.max(1, Math.floor(MAX_VARS / varsPerRow));
 
-        let order = 1;
-        for (const batch of chunk(pairs, maxPairs)) {
-          const valuesSql = [];
-          const binds = [];
-          for (const [t1, t2] of batch) {
-            // home leg (bind t1, t2)
-            valuesSql.push(`(${leagueId}, '${firstRound}', ${order}, ?, ?, 'home', 1)`);
-            binds.push(t1, t2);
-            // away leg (bind t2, t1)
-            valuesSql.push(`(${leagueId}, '${firstRound}', ${order}, ?, ?, 'away', 2)`);
-            binds.push(t2, t1);
-            order++;
+          let order = 1;
+          for (const batch of chunk(pairs, maxRows)) {
+            const valuesSql = [];
+            const binds = [];
+            for (const [t1, t2] of batch) {
+              valuesSql.push(`(${leagueId}, '${firstRound}', ${order}, ?, ?, 'neutral')`);
+              binds.push(t1, t2);
+              order++;
+            }
+
+            const sql = `
+              INSERT INTO national_round_knockouts
+                (league_id, "round", match_order, team1_id, team2_id, match_type)
+              VALUES ${valuesSql.join(", ")}
+            `;
+            await db.prepare(sql).bind(...binds).run();
           }
+        } else {
+          // CLUBS: two legs (home/away), table: round_knockouts (with tie_slot)
+          // Bind only team ids → 2 vars/row; 2 rows per pair (4 vars/pair)
+          const varsPerPair = 4;
+          const maxPairs = Math.max(1, Math.floor(MAX_VARS / varsPerPair));
 
-          const sql = `
-            INSERT INTO round_knockouts
-              (league_id, "round", match_order, team1_id, team2_id, match_type, tie_slot)
-            VALUES ${valuesSql.join(", ")}
-          `;
-          await db.prepare(sql).bind(...binds).run();
+          let order = 1;
+          for (const batch of chunk(pairs, maxPairs)) {
+            const valuesSql = [];
+            const binds = [];
+            for (const [t1, t2] of batch) {
+              // home leg
+              valuesSql.push(`(${leagueId}, '${firstRound}', ${order}, ?, ?, 'home', 1)`);
+              binds.push(t1, t2);
+              // away leg
+              valuesSql.push(`(${leagueId}, '${firstRound}', ${order}, ?, ?, 'away', 2)`);
+              binds.push(t2, t1);
+              order++;
+            }
+
+            const sql = `
+              INSERT INTO round_knockouts
+                (league_id, "round", match_order, team1_id, team2_id, match_type, tie_slot)
+              VALUES ${valuesSql.join(", ")}
+            `;
+            await db.prepare(sql).bind(...binds).run();
+          }
         }
       }
     }
