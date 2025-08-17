@@ -23,8 +23,6 @@ import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEur
 import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
 
 
-// import additional route handlers as needed
-
 // Route registry with path as key and allowed methods as subkeys
 const routeRegistry = {
   "/register": { POST: handleRegister },
@@ -32,36 +30,37 @@ const routeRegistry = {
   "/me": { GET: handleMe },
   "/friends": { POST: handleGetApprovedFriends },
 
-  "/clubs": { GET: handleGetAllClubs },
-  "/search-clubs": { POST: handleSearchClubs },
-  "/world-countries": { GET: handleGetAllWorldCountries },
-  "/search-world-countries": { POST: handleSearchWorldCountries },
-  "/europe-countries": { GET: handleGetAllEuropeCountries },
-  "/search-europe-countries": { POST: handleSearchEuropeCountries },
-
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
   "/update-leagues": { POST: handleLeaguesEdit },
   "/delete-league": { POST: handleLeaguesDelete },
+
+  // Clubs
+  "/clubs": { GET: handleGetAllClubs },
+  "/search-clubs": { POST: handleSearchClubs },
   "/league-instances": { POST: handleLeagueInstances },
   "/standings": { POST: handleLeagueStandings },
   "/matches": { POST: handleLeagueMatches },
   "/update-score": { POST: handleUpdateMatches },
   "/league-players": { POST: handleGetLeaguePlayers },
   "/attach-players": { POST: handleAttachPlayers },
-  "/group-knockouts": { POST: handleGroupKnockoutMatches },
-  "/attach-knock-players": { POST: handleAttachKnockPlayers },
-  "/update-knock-winner": { POST: handleUpdateKnockoutWinner },
-  "/update-knock-matches": { POST: handleUpdateKnockoutMatches },
   "/create-knockouts": { POST: handleCreateRoundKnockouts },
+  "/group-knockouts": { POST: handleGroupKnockoutMatches },
   "/round-knockouts": { POST: handleOnlyKnockoutMatches },
+  "/update-knock-matches": { POST: handleUpdateKnockoutMatches },
   "/update-round-knock-matches": { POST: handleUpdateOnlyKnockoutMatches },
+  "/attach-knock-players": { POST: handleAttachKnockPlayers },
   "/attach-round-knock-players": { POST: handleAttachOnlyKnockPlayers },
+  "/update-knock-winner": { POST: handleUpdateKnockoutWinner },
   "/update-round-knock-winner": { POST: handleUpdateOnlyKnockoutWinner },
 
+  // National  
+  "/world-countries": { GET: handleGetAllWorldCountries },
+  "/search-world-countries": { POST: handleSearchWorldCountries },
+  "/europe-countries": { GET: handleGetAllEuropeCountries },
+  "/search-europe-countries": { POST: handleSearchEuropeCountries },
   "/national-instances": { POST: handleNationalInstances },
 
-  // Add more routes here  league_instances
 };
 
 export async function onRequest(context) {
