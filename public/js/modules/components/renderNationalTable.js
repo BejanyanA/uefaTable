@@ -200,7 +200,7 @@ export function renderNationalInstances(instanceData) {
       if (data.success && data.data) {
         wrapper.style.display = "none";
         document.getElementById("bannerContainer").style.display = "none";
-        renderLeagueTable(data.data);
+        renderNationalTable(data.data);
       } else {
         showToast("Table not found.");
       }

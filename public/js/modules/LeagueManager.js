@@ -308,11 +308,22 @@ export const LeagueManager = {
             document.getElementById("tableModal").style.display = "none";
             document.getElementById("bannerContainer").style.display = "none";
 
-            if (isGroup) {
-              renderLeagueTable(data.data);
+            if (bannerId === 1 || bannerId === 2) {
+              if (isGroup) {
+                renderLeagueTable(data.data);
+              } else {
+                renderLeagueTable(data.data);
+              }
             } else {
-              renderLeagueTable(data.data);
+
+              if (isGroup) {
+                renderNationalTable(data.data);
+              } else {
+                renderNationalTable(data.data);
+              }
             }
+
+
           } else {
             showToast(translation.not_found || "Not found", "info");
             console.warn("⛔ Response data:", data);
