@@ -1,18 +1,16 @@
-// routes/update_only_knock_winner_team.js
+// routes/update_group_knock_winner_team.js
 
-import { jsonResponse, parseBody } from '../utils/helper.js';
-import { verifyToken } from '../utils/jwt.js';
+import { jsonResponse, parseBody } from '../../utils/helper.js';
+import { verifyToken } from '../../utils/jwt.js';
 
-export async function handleUpdateOnlyKnockoutWinner(request, env) {
+export async function handleUpdateKnockoutWinner(request, env) {
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
 
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
-
     if (!payload) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
@@ -33,7 +31,7 @@ export async function handleUpdateOnlyKnockoutWinner(request, env) {
       lk.id, lk.league_id, lk.round, lk.match_order, lk.match_type,
       lk.team1_id, lk.team2_id, lk.team1_score, lk.team2_score, lk.winner_team_id,
       l.created_by_user_id
-    FROM round_knockouts lk
+    FROM league_knockouts lk
     JOIN leagues l ON l.id = lk.league_id
     WHERE lk.id = ?
   `).bind(knockoutId).first();
@@ -51,7 +49,7 @@ export async function handleUpdateOnlyKnockoutWinner(request, env) {
     const pairBinds = [leg.team1_id, leg.team2_id, leg.team2_id, leg.team1_id];
     const tieLegsRes = await env.core_data.prepare(`
     SELECT id, match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id
-    FROM round_knockouts lk
+    FROM league_knockouts lk
     WHERE lk.league_id = ? AND lk.round = ? AND lk.match_order = ?
       AND ${pairWhereClauseSelect('lk')}
     ORDER BY CASE match_type WHEN 'home' THEN 0 ELSE 1 END, id ASC
@@ -70,7 +68,7 @@ export async function handleUpdateOnlyKnockoutWinner(request, env) {
         if (!agg.complete || agg.draw) {
             // same behavior as score handler: clear winners + clear next round and signal tiebreak if draw
             await env.core_data.prepare(`
-        UPDATE round_knockouts
+        UPDATE league_knockouts
         SET winner_team_id = NULL, updated_user_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
           AND ${pairWhereClauseNoAlias()}
@@ -99,14 +97,14 @@ export async function handleUpdateOnlyKnockoutWinner(request, env) {
         const ids = tieLegs.map(l => l.id);
         const qs = ids.map(() => "?").join(",");
         await env.core_data.prepare(`
-      UPDATE round_knockouts
+      UPDATE league_knockouts
       SET winner_team_id = ?, updated_user_id = ?
       WHERE id IN (${qs})
     `).bind(finalWinner, userId, ...ids).run();
     } else {
         // Fallback: ensure at least current leg is updated
         await env.core_data.prepare(`
-      UPDATE round_knockouts
+      UPDATE league_knockouts
       SET winner_team_id = ?, updated_user_id = ?
       WHERE id = ?
     `).bind(finalWinner, userId, leg.id).run();
@@ -127,7 +125,6 @@ export async function handleUpdateOnlyKnockoutWinner(request, env) {
         data: { updated: true, winnerUpdated: true, propagated }
     }, 200);
 }
-
 
 
 
@@ -217,7 +214,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     // decide our slot among pairs inside THIS (round, match_order)
     const rows = await env.core_data.prepare(`
     SELECT team1_id, team2_id
-    FROM round_knockouts
+    FROM league_knockouts
     WHERE league_id = ? AND round = ? AND match_order = ?
       AND team1_id IS NOT NULL AND team2_id IS NOT NULL
   `).bind(leagueId, currentRound, matchOrder).all();
@@ -248,7 +245,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
         // 1) Find a canonical final row (oldest) if any
         let keep = await env.core_data.prepare(`
     SELECT id, match_order
-    FROM round_knockouts
+    FROM league_knockouts
     WHERE league_id = ? AND round = 'final'
     ORDER BY id ASC
     LIMIT 1
@@ -257,7 +254,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
         // 2) If none exists, create exactly one (home). We don't try to be clever with order; 9 is fine.
         if (!keep) {
             await env.core_data.prepare(`
-      INSERT INTO round_knockouts (
+      INSERT INTO league_knockouts (
         league_id, round, match_order, match_type,
         team1_id, team2_id,
         team1_user_id, team2_user_id,
@@ -271,7 +268,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
 
             keep = await env.core_data.prepare(`
       SELECT id, match_order
-      FROM round_knockouts
+      FROM league_knockouts
       WHERE league_id = ? AND round = 'final'
       ORDER BY id ASC
       LIMIT 1
@@ -281,7 +278,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
         // 3) Apply this semifinal winner to that single final row
         if (winnerTeamId == null) {
             await env.core_data.prepare(`
-      UPDATE round_knockouts
+      UPDATE league_knockouts
       SET ${targetField} = NULL, updated_user_id = ?
       WHERE id = ?
     `).bind(userId, keep.id).run();
@@ -290,7 +287,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
 
         // Don't overwrite the other side; fill only our side if empty
         await env.core_data.prepare(`
-    UPDATE round_knockouts
+    UPDATE league_knockouts
     SET ${targetField} = ?, tie_slot = ?, updated_user_id = ?
     WHERE id = ?
   `).bind(winnerTeamId, slot, userId, keep.id).run();
@@ -304,7 +301,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     // What exists now?
     const existing = await env.core_data.prepare(`
     SELECT id, match_type, team1_id, team2_id, team1_score, team2_score, winner_team_id, tie_slot
-    FROM round_knockouts
+    FROM league_knockouts
     WHERE league_id = ? AND round = ? AND match_order = ?
   `).bind(leagueId, nextRound, nextOrder).all();
 
@@ -314,20 +311,20 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     if (winnerTeamId == null) {
         // clear our side on HOME and opposite on AWAY
         await env.core_data.prepare(`
-      UPDATE round_knockouts
+      UPDATE league_knockouts
       SET ${targetField} = NULL, updated_user_id = ?
       WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'home'
     `).bind(userId, leagueId, nextRound, nextOrder).run();
 
         await env.core_data.prepare(`
-      UPDATE round_knockouts
+      UPDATE league_knockouts
       SET ${otherField} = NULL, updated_user_id = ?
       WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'away'
     `).bind(userId, leagueId, nextRound, nextOrder).run();
 
         const refreshed = await env.core_data.prepare(`
       SELECT team1_id, team2_id, team1_score, team2_score, winner_team_id
-      FROM round_knockouts
+      FROM league_knockouts
       WHERE league_id = ? AND round = ? AND match_order = ?
     `).bind(leagueId, nextRound, nextOrder).all();
 
@@ -340,7 +337,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
 
         if (bothEmpty) {
             await env.core_data.prepare(`
-        DELETE FROM round_knockouts
+        DELETE FROM league_knockouts
         WHERE league_id = ? AND round = ? AND match_order = ?
       `).bind(leagueId, nextRound, nextOrder).run();
             return "deleted";
@@ -355,7 +352,7 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
         const t2 = placeField === "team2_id" ? winnerTeamId : null;
 
         await env.core_data.prepare(`
-      INSERT INTO round_knockouts (
+      INSERT INTO league_knockouts (
         league_id, round, match_order, match_type,
         team1_id, team2_id,
         team1_user_id, team2_user_id,
@@ -373,13 +370,13 @@ async function upsertNextRoundSeed(env, { leagueId, currentRound, matchOrder, ti
     if (!haveAway) await insertLeg("away", false);
 
     await env.core_data.prepare(`
-    UPDATE round_knockouts
+    UPDATE league_knockouts
     SET ${targetField} = ?, tie_slot = ?, updated_user_id = ?
     WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'home'
   `).bind(winnerTeamId, slot, userId, leagueId, nextRound, nextOrder).run();
 
     await env.core_data.prepare(`
-    UPDATE round_knockouts
+    UPDATE league_knockouts
     SET ${otherField} = ?, tie_slot = ?, updated_user_id = ?
     WHERE league_id = ? AND round = ? AND match_order = ? AND match_type = 'away'
   `).bind(winnerTeamId, slot, userId, leagueId, nextRound, nextOrder).run();

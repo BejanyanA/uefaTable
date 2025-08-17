@@ -3,21 +3,23 @@ import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
-import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/get_clubs.js';
-import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/get_countries.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
-import { handleLeagueInstances } from './routes_endpoints/league_instances.js';
-import { handleLeagueStandings } from './routes_endpoints/standings.js';
-import { handleLeagueMatches } from './routes_endpoints/matches.js';
-import { handleUpdateMatches } from './routes_endpoints/update_group_matches.js';
-import { handleGetLeaguePlayers } from './routes_endpoints/league_player.js';
-import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/attach_player.js';
-import { handleGroupKnockoutMatches } from './routes_endpoints/group_knockouts.js';
-import { handleUpdateKnockoutWinner } from './routes_endpoints/update_knock_team_winner.js';
-import { handleUpdateKnockoutMatches } from './routes_endpoints/update_group_knock_matches.js';
-import { handleOnlyKnockoutMatches } from './routes_endpoints/round_knockouts.js';
-import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/update_only_knock_matches.js';
-import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/update_only_knock_team_winner.js';
+
+import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/leagues/attach_player.js';
+import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/leagues/get_clubs.js';
+import { handleGroupKnockoutMatches } from './routes_endpoints/leagues/group_knockouts.js';
+import { handleLeagueInstances } from './routes_endpoints/leagues/league_instances.js';
+import { handleLeagueMatches } from './routes_endpoints/leagues/league_matches.js';
+import { handleGetLeaguePlayers } from './routes_endpoints/leagues/league_player.js';
+import { handleLeagueStandings } from './routes_endpoints/leagues/league_standings.js';
+import { handleOnlyKnockoutMatches } from './routes_endpoints/leagues/round_knockouts.js';
+import { handleUpdateKnockoutMatches } from './routes_endpoints/leagues/update_group_knock_matches.js';
+import { handleUpdateMatches } from './routes_endpoints/leagues/update_group_matches.js';
+import { handleUpdateKnockoutWinner } from './routes_endpoints/leagues/update_knock_team_winner.js';
+import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/leagues/update_only_knock_matches.js';
+import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/leagues/update_only_knock_team_winner.js';
+
+import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/get_countries.js';
 
 // import additional route handlers as needed
 

@@ -1,9 +1,9 @@
-// routes/standings.js
+// routes/matches.js
 
-import { jsonResponse, parseBody } from '../utils/helper.js';
-import { verifyToken } from '../utils/jwt.js';
+import { jsonResponse, parseBody } from '../../utils/helper.js';
+import { verifyToken } from '../../utils/jwt.js';
 
-export async function handleLeagueStandings(request, env) {
+export async function handleLeagueMatches(request, env) {
     const authHeader = request.headers.get("Authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -59,13 +59,22 @@ export async function handleLeagueStandings(request, env) {
         return jsonResponse({ success: false, error: "invalid_group" }, 404);
     }
 
-    // Step 3: Fetch standings for the group
-    const standings = await env.core_data.prepare(`
-  SELECT gs.*, ac.club_name
-  FROM group_standings gs
-  JOIN all_clubs ac ON ac.id = gs.team_id
-  WHERE gs.group_id = ?
-  ORDER BY gs.points DESC, gs.goal_difference DESC, gs.goals_for DESC, team_id ASC
+    // Step 3: Fetch matches for the group with user names
+    const matches = await env.core_data.prepare(`
+  SELECT lm.*, 
+         ac1.club_name AS team1_name, 
+         ac2.club_name AS team2_name, 
+         ac1.logo_url AS team1_logo, 
+         ac2.logo_url AS team2_logo,
+         u1.username AS team1_username,
+         u2.username AS team2_username
+  FROM league_matches lm
+  JOIN all_clubs ac1 ON ac1.id = lm.team1_id
+  JOIN all_clubs ac2 ON ac2.id = lm.team2_id
+  LEFT JOIN users u1 ON u1.id = lm.team1_user_id
+  LEFT JOIN users u2 ON u2.id = lm.team2_user_id
+  WHERE lm.group_id = ?
+  ORDER BY lm.id ASC
 `).bind(groupId).all();
 
     return jsonResponse({
@@ -73,7 +82,8 @@ export async function handleLeagueStandings(request, env) {
         data: {
             groupId,
             accessType,
-            standings: standings.results
+            userId: userId,
+            matches: matches.results
         }
     }, 200);
 }

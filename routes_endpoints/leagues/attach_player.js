@@ -1,7 +1,7 @@
 // routes/attach_player.js
 
-import { jsonResponse, parseBody } from '../utils/helper.js';
-import { verifyToken } from '../utils/jwt.js';
+import { jsonResponse, parseBody } from '../../utils/helper.js';
+import { verifyToken } from '../../utils/jwt.js';
 
 export async function handleAttachPlayers(request, env) {
     const authHeader = request.headers.get("Authorization");
