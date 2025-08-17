@@ -23,6 +23,8 @@ import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEur
 import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
 import { handleNationalStandings } from './routes_endpoints/national/national_standings.js';
 import { handleNationalMatches } from './routes_endpoints/national/national_matches.js';
+import { handleNationalGroupKnockoutMatches } from './routes_endpoints/national/national_group_knockouts.js';
+
 import { handleGetNationalPlayers } from './routes_endpoints/national/national_player.js';
 import { handleAttachNationalPlayers, handleAttachNationalKnockPlayers, handleAttachNationalOnlyKnockPlayers } from './routes_endpoints/national/attach_national_player.js';
 
@@ -36,6 +38,7 @@ const routeRegistry = {
 
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
+  "/create-knockouts": { POST: handleCreateRoundKnockouts },
   "/update-leagues": { POST: handleLeaguesEdit },
   "/delete-league": { POST: handleLeaguesDelete },
 
@@ -48,7 +51,6 @@ const routeRegistry = {
   "/update-score": { POST: handleUpdateMatches },
   "/league-players": { POST: handleGetLeaguePlayers },
   "/attach-players": { POST: handleAttachPlayers },
-  "/create-knockouts": { POST: handleCreateRoundKnockouts },
   "/group-knockouts": { POST: handleGroupKnockoutMatches },
   "/round-knockouts": { POST: handleOnlyKnockoutMatches },
   "/update-knock-matches": { POST: handleUpdateKnockoutMatches },
@@ -66,6 +68,8 @@ const routeRegistry = {
   "/national-instances": { POST: handleNationalInstances },
   "/national-standings": { POST: handleNationalStandings },
   "/national-matches": { POST: handleNationalMatches },
+  "/national-group-knockouts": { POST: handleNationalGroupKnockoutMatches },
+
   "/national-players": { POST: handleGetNationalPlayers },
   "/attach-national-players": { POST: handleAttachNationalPlayers },
   "/attach-national-knock-players": { POST: handleAttachNationalKnockPlayers },

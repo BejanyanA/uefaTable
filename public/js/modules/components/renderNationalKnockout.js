@@ -640,7 +640,7 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
 
   try {
     const [{ success, data }, playersRes] = await Promise.all([
-      apiPost("/group-knockouts", { leagueId }),
+      apiPost("/national-group-knockouts", { leagueId }),
       apiPost("/national-players", { leagueId }, { showLoading: false }),
     ]);
     if (!success || !data) {
