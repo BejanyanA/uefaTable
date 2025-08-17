@@ -179,6 +179,7 @@ export const LeagueManager = {
                   window.closeModal("tableModal");
                   showToast(translation.league_create_success || "League Successfully Created", "success");
                   document.getElementById("bannerContainer").style.display = "none";
+
                   if (bannerId === 1 || bannerId === 2) {
                     renderLeagueTable(data.data);
                   } else {
@@ -212,6 +213,7 @@ export const LeagueManager = {
                 window.closeModal("tableModal");
                 showToast(translation.league_create_success || "League Successfully Created", "success");
                 document.getElementById("bannerContainer").style.display = "none";
+                
                 if (bannerId === 1 || bannerId === 2) {
                   renderLeagueTable(data.data);
                 } else {

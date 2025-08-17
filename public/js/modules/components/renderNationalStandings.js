@@ -349,7 +349,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
           const userId = newVal === "" ? null : parseInt(newVal, 10);
 
           try {
-            const res = await apiPost("/attach-players", {
+            const res = await apiPost("/attach-national-players", {
               matchId,
               teamId,
               userId,
