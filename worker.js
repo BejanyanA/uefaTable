@@ -20,6 +20,8 @@ import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/leagues/upda
 import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/leagues/update_only_knock_team_winner.js';
 
 import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/national/get_countries.js';
+import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
+
 
 // import additional route handlers as needed
 
@@ -56,6 +58,8 @@ const routeRegistry = {
   "/update-round-knock-matches": { POST: handleUpdateOnlyKnockoutMatches },
   "/attach-round-knock-players": { POST: handleAttachOnlyKnockPlayers },
   "/update-round-knock-winner": { POST: handleUpdateOnlyKnockoutWinner },
+
+  "/national-instances": { POST: handleNationalInstances },
 
   // Add more routes here  league_instances
 };

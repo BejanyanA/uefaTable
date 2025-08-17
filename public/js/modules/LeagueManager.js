@@ -7,6 +7,8 @@ import { getClubs } from './GetClubs.js';
 import { getCountries } from './GetWorldCountries.js';
 import { getEuropeCountries } from './GetEuropeCountries.js';
 import { apiGet, apiPost } from '../services/api.js';
+import { renderNationalTable } from './components/renderNationalTable.js';
+
 
 export const LeagueManager = {
   initCreate: function () {

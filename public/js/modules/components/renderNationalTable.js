@@ -4,7 +4,7 @@ import { langMap, currentLang } from '../LanguageManager.js';
 import { LeagueManager } from '../LeagueManager.js';
 import { renderKnockoutsStage, renderOnlyKnockouts } from './renderKnockout.js'
 
-export function renderLeagueTable(data) {
+export function renderNationalTable(data) {
   const translation = langMap[currentLang];
   const section = document.getElementById("leagueType1");
   const leagues = data.leagues || [];
@@ -65,10 +65,10 @@ export function renderLeagueTable(data) {
 
     leagueBox.addEventListener("click", async () => {
       try {
-        const response = await apiPost("/league-instances", { leagueId: league.id });
+        const response = await apiPost("/national-instances", { leagueId: league.id });
         if (response.success) {
           localStorage.setItem("leagueId", league.id);
-          renderLeagueInstances(response.data);
+          renderNationalInstances(response.data);
         } else {
           section.innerHTML = `<p>Error loading instances</p>`;
         }
@@ -170,7 +170,7 @@ export function renderLeagueTable(data) {
 }
 
 
-export function renderLeagueInstances(instanceData) {
+export function renderNationalInstances(instanceData) {
   const translation = langMap[currentLang];
   const wrapper = document.getElementById("leagueType1");
   wrapper.innerHTML = "";
@@ -285,7 +285,7 @@ export function renderLeagueInstances(instanceData) {
         groupDiv.innerHTML = `
           <h3>${groupName}</h3>
           <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
-            ${groupData.clubs.map((club, index) => `<li>${index + 1}.&nbsp;&nbsp;${club.name}</li>`).join("")}
+            ${groupData.countries.map((country, index) => `<li>${index + 1}.&nbsp;&nbsp;${country.name}</li>`).join("")}
           </ul>
         `;
 
@@ -308,7 +308,7 @@ export function renderLeagueInstances(instanceData) {
   async function refreshGroupPane() {
     const leagueId = parseInt(localStorage.getItem("leagueId"));
     groupStageContainer.innerHTML = `<div style="padding:20px;font-size:16px;"></div>`;
-    const res = await apiPost("/league-instances", { leagueId });
+    const res = await apiPost("/national-instances", { leagueId });
     if (res.success && res.data && Array.isArray(res.data.leagueInstances)) {
       renderGroupsInto(groupStageContainer, res.data.leagueInstances);
     } else {
