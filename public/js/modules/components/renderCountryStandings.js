@@ -4,7 +4,7 @@ import { renderLeagueInstances } from './renderTable.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 
 export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
-  const wrapper = document.getElementById("leagueType1");
+  const wrapper = document.getElementById("leagueType2");
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
   <button id="backBtn">⬅ Back</button>

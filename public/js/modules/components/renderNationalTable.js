@@ -6,7 +6,7 @@ import { renderKnockoutsStage, renderOnlyKnockouts } from './renderKnockout.js'
 
 export function renderNationalTable(data) {
   const translation = langMap[currentLang];
-  const section = document.getElementById("leagueType1");
+  const section = document.getElementById("leagueType2");
   const leagues = data.leagues || [];
 
   section.innerHTML = ""; // Clear previous content
@@ -25,7 +25,7 @@ export function renderNationalTable(data) {
       if (response.success && response.user) {
         document.getElementById("logoutButtn").style.display = "block";
         document.getElementById("stageContainer").style.display = "block";
-        document.getElementById("leagueType1").style.display = "none";
+        document.getElementById("leagueType2").style.display = "none";
       } else {
         localStorage.removeItem("authToken");
         if (authButtons) authButtons.style.display = "flex";
@@ -172,7 +172,7 @@ export function renderNationalTable(data) {
 
 export function renderNationalInstances(instanceData) {
   const translation = langMap[currentLang];
-  const wrapper = document.getElementById("leagueType1");
+  const wrapper = document.getElementById("leagueType2");
   wrapper.innerHTML = "";
 
   const instances = instanceData.leagueInstances || [];

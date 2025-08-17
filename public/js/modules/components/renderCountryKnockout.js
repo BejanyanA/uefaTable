@@ -7,7 +7,7 @@ import { langMap, currentLang } from '../LanguageManager.js';
 
 export function renderOnlyKnockoutLeagues(data) {
   const translation = langMap[currentLang];
-  const section = document.getElementById("leagueType1");
+  const section = document.getElementById("leagueType2");
   const leagues = data.leagues || [];
 
   section.innerHTML = ""; // Clear previous content
@@ -26,7 +26,7 @@ export function renderOnlyKnockoutLeagues(data) {
       if (response.success && response.user) {
         document.getElementById("logoutButtn").style.display = "block";
         document.getElementById("stageContainer").style.display = "block";
-        document.getElementById("leagueType1").style.display = "none";
+        document.getElementById("leagueType2").style.display = "none";
       } else {
         localStorage.removeItem("authToken");
         if (authButtons) authButtons.style.display = "flex";
@@ -172,7 +172,7 @@ export function renderOnlyKnockoutLeagues(data) {
 
 export async function renderOnlyKnockouts(leagueId, rootEl) {
 
-  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
   root.innerHTML = "";
   const t = langMap[currentLang];
 
@@ -634,7 +634,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
 }
 
 export async function renderKnockoutsStage(leagueId, rootEl) {
-  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
   root.innerHTML = "";
   const t = langMap[currentLang];
 

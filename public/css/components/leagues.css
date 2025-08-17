@@ -3,6 +3,10 @@
   padding: 24px;
 }
 
+#leagueType2 {
+  padding: 24px;
+}
+
 /* League name row (horizontal layout) */
 .league-names-row {
   display: flex;
@@ -81,6 +85,11 @@
   #leagueType1 {
     padding: 15px;
   }
+
+    #leagueType2 {
+    padding: 15px;
+  }
+
 
   /* League name row (horizontal layout) */
   .league-names-row {
