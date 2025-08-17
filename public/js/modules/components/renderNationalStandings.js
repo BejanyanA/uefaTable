@@ -1,10 +1,10 @@
 import { showToast } from '../../utils/toast.js';
 import { apiPost } from '../../services/api.js';
-import { renderLeagueInstances } from './renderTable.js';
+import { renderNationalInstances } from './renderNationalTable.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 
-export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
-  const wrapper = document.getElementById("leagueType1");
+export async function renderNationalGroupStandingsPage(leagueId, groupId, groupName) {
+  const wrapper = document.getElementById("leagueType2");
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
   <button id="backBtn">⬅ Back</button>
@@ -28,7 +28,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     try {
       const response = await apiPost("/league-instances", { leagueId });
       if (response.success) {
-        renderLeagueInstances(response.data);
+        renderNationalInstances(response.data);
       } else {
         wrapper.innerHTML = `<p>Error loading instances</p>`;
       }
@@ -56,7 +56,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
         const response = await apiPost("/standings", { leagueId, groupId });
 
         if (response.success) {
-          contentDiv.innerHTML = renderStandingsTable(response.data.standings);
+          contentDiv.innerHTML = renderNationalGroupStandingsTable(response.data.standings);
         } else {
           contentDiv.innerHTML = "Failed to load standings.";
         }
@@ -74,7 +74,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
           await new Promise(resolve => requestAnimationFrame(resolve));
 
           contentDiv.innerHTML = ""; // Now clear and render
-          await renderMatchesTable(matchesResponse.data, contentDiv, leagueId, playersResponse.data.players);
+          await renderNationalMatchesTable(matchesResponse.data, contentDiv, leagueId, playersResponse.data.players);
         } else {
           contentDiv.innerHTML = "Failed to load matches.";
         }
@@ -84,7 +84,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
     }
   }
 
-  function renderStandingsTable(standings) {
+  function renderNationalGroupStandingsTable(standings) {
     const translation = langMap[currentLang];
     return `
   <div class="standings-wrapper">
@@ -161,7 +161,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupName) {
   `;
   }
 
-  async function renderMatchesTable(matchesData, section, leagueId, players = []) {
+  async function renderNationalMatchesTable(matchesData, section, leagueId, players = []) {
     section.innerHTML = "";
 
     const { matches, accessType } = matchesData;

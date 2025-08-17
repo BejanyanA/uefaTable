@@ -1,8 +1,8 @@
 import { apiGet, apiPost } from '../../services/api.js';
-import { renderGroupStandingsPage } from './renderStandings.js'
+import { renderLeagueGroupStandingsPage } from './renderLeagueStandings.js'
 import { langMap, currentLang } from '../LanguageManager.js';
 import { LeagueManager } from '../LeagueManager.js';
-import { renderKnockoutsStage, renderOnlyKnockouts } from './renderKnockout.js'
+import { renderLeagueKnockoutsStage, renderLeagueOnlyKnockouts } from './renderLeagueKnockout.js'
 
 export function renderLeagueTable(data) {
   const translation = langMap[currentLang];
@@ -293,7 +293,7 @@ export function renderLeagueInstances(instanceData) {
           const leagueId = parseInt(localStorage.getItem("leagueId"));
           const groupId = parseInt(groupDiv.dataset.groupId);
           const gName = groupDiv.dataset.groupName;
-          renderGroupStandingsPage(leagueId, groupId, gName);
+          renderLeagueGroupStandingsPage(leagueId, groupId, gName);
         });
 
         groupsRow.appendChild(groupDiv);
@@ -325,7 +325,7 @@ export function renderLeagueInstances(instanceData) {
     const leagueId = parseInt(localStorage.getItem("leagueId"));
     knockoutContainer.innerHTML = "";
     // Uses your existing function; no behavior change to the knockout renderer
-    renderOnlyKnockouts(leagueId, knockoutContainer);
+    renderLeagueOnlyKnockouts(leagueId, knockoutContainer);
   }
 
   // ===== Tabs: visual state + data refresh =====
@@ -334,7 +334,7 @@ export function renderLeagueInstances(instanceData) {
   // Attach handlers only to whatever buttons exist
   tabWrapper.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
-       if (btn.classList.contains(ACTIVE_CLASS)) return;
+      if (btn.classList.contains(ACTIVE_CLASS)) return;
       // visual
       tabWrapper.querySelectorAll(".tab-btn").forEach(b => {
         b.classList.remove(ACTIVE_CLASS);
@@ -362,7 +362,7 @@ export function renderLeagueInstances(instanceData) {
         try {
           knockoutContainer.innerHTML = "";
           // Reuse your existing KO renderer
-          await renderKnockoutsStage(leagueId, knockoutContainer);
+          await renderLeagueKnockoutsStage(leagueId, knockoutContainer);
         } catch (e) {
           console.error("KO render error", e);
         }

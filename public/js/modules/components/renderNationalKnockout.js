@@ -1,13 +1,13 @@
 import { showToast } from '../../utils/toast.js';
 import { apiPost } from '../../services/api.js';
-import { renderLeagueInstances } from './renderTable.js';
+import { renderNationalInstances } from './renderNationalTable.js';
 import { LeagueManager } from '../LeagueManager.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 
 
-export function renderOnlyKnockoutLeagues(data) {
+export function renderNationalOnlyKnockoutLeagues(data) {
   const translation = langMap[currentLang];
-  const section = document.getElementById("leagueType1");
+  const section = document.getElementById("leagueType2");
   const leagues = data.leagues || [];
 
   section.innerHTML = ""; // Clear previous content
@@ -26,7 +26,7 @@ export function renderOnlyKnockoutLeagues(data) {
       if (response.success && response.user) {
         document.getElementById("logoutButtn").style.display = "block";
         document.getElementById("stageContainer").style.display = "block";
-        document.getElementById("leagueType1").style.display = "none";
+        document.getElementById("leagueType2").style.display = "none";
       } else {
         localStorage.removeItem("authToken");
         if (authButtons) authButtons.style.display = "flex";
@@ -69,7 +69,7 @@ export function renderOnlyKnockoutLeagues(data) {
         const response = await apiPost("/league-instances", { leagueId: league.id });
         if (response.success) {
           localStorage.setItem("leagueId", league.id);
-          renderLeagueInstances(response.data); // Need to change from renderLeagueInstances to another for only knockout 
+          renderNationalInstances(response.data); 
         } else {
           section.innerHTML = `<p>Error loading instances</p>`;
         }
@@ -170,9 +170,9 @@ export function renderOnlyKnockoutLeagues(data) {
   }
 }
 
-export async function renderOnlyKnockouts(leagueId, rootEl) {
+export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
 
-  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
   root.innerHTML = "";
   const t = langMap[currentLang];
 
@@ -448,7 +448,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
                 : (t.player_success_unassigned || "User unassigned successfully"),
                 "success");
               // Refresh the page/state after successful request
-              await renderOnlyKnockouts(leagueId, rootEl);
+              await renderNationalOnlyKnockouts(leagueId, rootEl);
             } catch (e) {
               console.error(e);
               showToast(t.player_assign_failed || "Failed to attach user", "error");
@@ -508,7 +508,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
                 : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
               // Refresh the page/state after successful request
-              if (res.success) await renderOnlyKnockouts(leagueId, rootEl);
+              if (res.success) await renderNationalOnlyKnockouts(leagueId, rootEl);
             } catch (e) { console.error(e); }
           });
         }
@@ -594,7 +594,7 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
             // Refresh the page/state after successful request
-            if (res.success) await renderOnlyKnockouts(leagueId, rootEl);
+            if (res.success) await renderNationalOnlyKnockouts(leagueId, rootEl);
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
@@ -633,8 +633,8 @@ export async function renderOnlyKnockouts(leagueId, rootEl) {
   }
 }
 
-export async function renderKnockoutsStage(leagueId, rootEl) {
-  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
+export async function renderNationalKnockoutsStage(leagueId, rootEl) {
+  const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
   root.innerHTML = "";
   const t = langMap[currentLang];
 
@@ -984,7 +984,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
                 : (t.player_success_unassigned || "User unassigned successfully"),
                 "success");
               // Refresh the page/state after successful request
-              await renderKnockoutsStage(leagueId, rootEl);
+              await renderNationalKnockoutsStage(leagueId, rootEl);
             } catch (e) {
               console.error(e);
               showToast(t.player_assign_failed || "Failed to attach user", "error");
@@ -1059,7 +1059,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
                 res.success ? (t.score_updated || "Score Updated") : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error"
               );
-              if (res.success) await renderKnockoutsStage(leagueId, rootEl);
+              if (res.success) await renderNationalKnockoutsStage(leagueId, rootEl);
             } catch (e) { console.error(e); }
           });
         }
@@ -1145,7 +1145,7 @@ export async function renderKnockoutsStage(leagueId, rootEl) {
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
             // Re-render won't disable the boxes as long as scores remain a draw.
-            if (res.success) await renderKnockoutsStage(leagueId, rootEl);
+            if (res.success) await renderNationalKnockoutsStage(leagueId, rootEl);
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
