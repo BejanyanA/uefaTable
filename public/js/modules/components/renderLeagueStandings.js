@@ -7,7 +7,7 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
   const wrapper = document.getElementById("leagueType1");
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
-  <button id="backBtn">⬅ Back</button>
+  <button class="backButtn" id="backBtn">⬅ Back</button>
     <div class="group-tabs">
       <button class="tab-btn active" data-tab="standings" id="standingsTabBtn"></button>
       <button class="tab-btn" data-tab="matches" id="matchesTabBtn"></button>

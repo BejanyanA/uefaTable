@@ -7,7 +7,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
   const wrapper = document.getElementById("leagueType2");
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
-  <button id="backBtn">⬅ Back</button>
+  <button class="backButtn" id="nationalBackBtn">⬅ Back</button>
     <div class="group-tabs">
       <button class="tab-btn active" data-tab="standings" id="standingsTabBtn"></button>
       <button class="tab-btn" data-tab="matches" id="matchesTabBtn"></button>
@@ -22,11 +22,11 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
   document.getElementById("standingsTabBtn").innerText = translation.standings || "Standings";
   document.getElementById("matchesTabBtn").innerText = translation.matches || "Matches";
 
-  const backBtn = document.getElementById("backBtn");
+  const backBtn = document.getElementById("nationalBackBtn");
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
     try {
-      const response = await apiPost("/league-instances", { leagueId });
+      const response = await apiPost("/national-instances", { leagueId });
       if (response.success) {
         renderNationalInstances(response.data);
       } else {
@@ -56,7 +56,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
         const response = await apiPost("/national-standings", { leagueId, groupId });
 
         if (response.success) {
-          contentDiv.innerHTML = renderNationalGroupStandingsTable(response.data.standings);
+          contentDiv.innerHTML = renderNationalStandingsTable(response.data.standings);
         } else {
           contentDiv.innerHTML = "Failed to load standings.";
         }
@@ -65,7 +65,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
         contentDiv.innerHTML = `<div style="padding: 20px; font-size: 16px;"></div>`;
 
         const [matchesResponse, playersResponse] = await Promise.all([
-          apiPost("/matches", { leagueId, groupId }),
+          apiPost("/national-matches", { leagueId, groupId }),
           apiPost("/league-players", { leagueId }, { showLoading: false })
         ]);
 
@@ -84,7 +84,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
     }
   }
 
-  function renderNationalGroupStandingsTable(standings) {
+  function renderNationalStandingsTable(standings) {
     const translation = langMap[currentLang];
     return `
   <div class="standings-wrapper">

@@ -346,6 +346,8 @@ function changeLang(lang) {
   document.getElementById("createCompetition").innerText = t.createCompetition;
   document.getElementById("clubCount").innerText = t.selectedCount;
   document.getElementById("backBtn").innerText = t.backButton;
+  document.getElementById("stageBackBtn").innerText = t.backButton;
+  document.getElementById("nationalBackBtn").innerText = t.backButton;
   document.getElementById("cancelBtn").innerText = t.cancel;
   document.getElementById("groupStage").innerText = t.groupStage;
   document.getElementById("knockoutStage").innerText = t.knockoutStage;

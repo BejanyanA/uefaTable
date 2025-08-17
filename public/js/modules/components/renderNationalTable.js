@@ -16,6 +16,7 @@ export function renderNationalTable(data) {
   const backBtn = document.createElement("button");
   backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
+  backBtn.class = "backButtn";
 
   backBtn.addEventListener("click", async () => {
     const token = localStorage.getItem("authToken");
@@ -194,6 +195,8 @@ export function renderNationalInstances(instanceData) {
   const backBtn = document.createElement("button");
   backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
+  backBtn.class = "backButtn";
+
   backBtn.addEventListener("click", async () => {
     try {
       const data = await apiPost("/leagues", { bannerId, isGroup });
