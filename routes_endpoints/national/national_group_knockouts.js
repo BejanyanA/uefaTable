@@ -22,7 +22,7 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
     return jsonResponse({ success: false, error: "league_id_required" }, 400);
   }
 
-  // --- meta + access in ONE query ---
+  // --- meta + access in one query ---
   const meta = await env.core_data.prepare(`
     SELECT
       l.team_count    AS teamCount,
@@ -39,8 +39,7 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
   }
   const accessType = meta.isOwner ? "owner" : "granted";
 
-  // --- KO rows + team->group via CTE (single query) ---
-  // tg ranks groups per team within THIS league by played desc; rn=1 picks the best row
+  // --- fetch KO rows, with group info ---
   const rows = await env.core_data.prepare(`
     WITH tg AS (
       SELECT
@@ -57,16 +56,16 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
       WHERE li.league_id = ?
     )
     SELECT
-      lk.id,
-      lk.round,
-      lk.match_order,
-      lk.match_type,
-      lk.team1_id, lk.team2_id,
-      lk.team1_user_id, lk.team2_user_id,
-      lk.team1_score, lk.team2_score,
-      lk.is_vs_computer, lk.computer_team,
-      lk.updated_user_id, lk.updated_at,
-      lk.winner_team_id,
+      nk.id,
+      nk.round,
+      nk.match_order,
+      nk.match_type,
+      nk.team1_id, nk.team2_id,
+      nk.team1_user_id, nk.team2_user_id,
+      nk.team1_score, nk.team2_score,
+      nk.is_vs_computer, nk.computer_team,
+      nk.updated_user_id, nk.updated_at,
+      nk.winner_team_id,
 
       ac1.country_name AS team1_name,
       ac2.country_name AS team2_name,
@@ -76,79 +75,56 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
       tg2.group_id   AS team2_group_id,
       tg2.group_name AS team2_group_name
 
-    FROM national_knockouts lk
-    LEFT JOIN all_countries ac1 ON ac1.id = lk.team1_id
-    LEFT JOIN all_countries ac2 ON ac2.id = lk.team2_id
-    LEFT JOIN tg tg1        ON tg1.team_id = lk.team1_id AND tg1.rn = 1
-    LEFT JOIN tg tg2        ON tg2.team_id = lk.team2_id AND tg2.rn = 1
-    WHERE lk.league_id = ?
-    ORDER BY lk.round, lk.match_order, lk.match_type
+    FROM national_knockouts nk
+    LEFT JOIN all_countries ac1 ON ac1.id = nk.team1_id
+    LEFT JOIN all_countries ac2 ON ac2.id = nk.team2_id
+    LEFT JOIN tg tg1        ON tg1.team_id = nk.team1_id AND tg1.rn = 1
+    LEFT JOIN tg tg2        ON tg2.team_id = nk.team2_id AND tg2.rn = 1
+    WHERE nk.league_id = ?
+    ORDER BY nk.round, nk.match_order
   `).bind(leagueId, leagueId).all();
 
-  // --- build ties (same shape as before) ---
-  const roundOrder = { "1/16": 1, "1/8": 2, "1/4": 3, "1/2": 4, "final": 5 };
-  const tiesMap = new Map();
+  // --- flat matches, all neutral ---
+  const roundOrder = { "1/16": 1, "1/8": 2, "1/4": 3, "1/2": 4, "Final": 5 };
 
-  for (const r of rows.results) {
-    // make leg
-    const leg = {
+  const matches = (rows.results || []).map(r => {
+    const team1 = {
+      id: r.team1_id, name: r.team1_name, userId: r.team1_user_id,
+      groupId: r.team1_group_id ?? null, groupName: r.team1_group_name ?? null
+    };
+    const team2 = {
+      id: r.team2_id, name: r.team2_name, userId: r.team2_user_id,
+      groupId: r.team2_group_id ?? null, groupName: r.team2_group_name ?? null
+    };
+
+    let winnerTeamName = null;
+    let winnerUserId = null;
+    if (r.winner_team_id != null) {
+      if (r.winner_team_id === r.team1_id) { winnerTeamName = team1.name; winnerUserId = team1.userId; }
+      else if (r.winner_team_id === r.team2_id) { winnerTeamName = team2.name; winnerUserId = team2.userId; }
+    }
+
+    return {
       id: r.id,
-      matchType: r.match_type,
-      team1: {
-        id: r.team1_id, name: r.team1_name, userId: r.team1_user_id,
-        groupId: r.team1_group_id ?? null, groupName: r.team1_group_name ?? null
-      },
-      team2: {
-        id: r.team2_id, name: r.team2_name, userId: r.team2_user_id,
-        groupId: r.team2_group_id ?? null, groupName: r.team2_group_name ?? null
-      },
+      round: r.round,
+      matchOrder: r.match_order,
+      matchType: "neutral", // always neutral
+      team1,
+      team2,
       score: { team1: r.team1_score, team2: r.team2_score },
       isVsComputer: r.is_vs_computer,
       computerTeam: r.computer_team,
       updatedUserId: r.updated_user_id,
-      updatedAt: r.updated_at
+      updatedAt: r.updated_at,
+      winnerTeamId: r.winner_team_id ?? null,
+      winnerTeamName,
+      winnerUserId,
     };
-
-    // stable split for two ties under same match_order
-    const nonNullIds = [r.team1_id, r.team2_id].filter(v => v != null).map(Number).sort((a, b) => a - b);
-    const seedKey = nonNullIds.length ? nonNullIds.join('-') : `seed-${r.match_type}-${r.id}`;
-    const bucketKey = `${r.round}|${r.match_order}|${seedKey}`;
-
-    if (!tiesMap.has(bucketKey)) {
-      tiesMap.set(bucketKey, {
-        round: r.round,
-        matchOrder: r.match_order,
-        home: null,
-        away: null,
-        winnerTeamId: r.winner_team_id ?? null,
-        winnerTeamName: null,
-        winnerUserId: null, // <-- new field
-        _slotSeed: nonNullIds.length ? nonNullIds[0] : Number.MAX_SAFE_INTEGER
-      });
-    }
-    const tie = tiesMap.get(bucketKey);
-    if (r.winner_team_id != null && tie.winnerTeamId == null) tie.winnerTeamId = r.winner_team_id;
-    if (r.match_type === "home") tie.home = leg; else if (r.match_type === "away") tie.away = leg;
-  }
-
-  // derive winner name
-  for (const tie of tiesMap.values()) {
-    const candidates = [tie.home?.team1, tie.home?.team2, tie.away?.team1, tie.away?.team2].filter(Boolean);
-    if (tie.winnerTeamId != null) {
-      const hit = candidates.find(c => c.id === tie.winnerTeamId);
-      tie.winnerTeamName = hit ? hit.name : null;
-      tie.winnerUserId = hit ? hit.userId : null; // <-- assign userId if exists
-    }
-  }
-
-  const matches = Array.from(tiesMap.values())
-    .sort((a, b) => {
-      const ro = (roundOrder[a.round] ?? 999) - (roundOrder[b.round] ?? 999);
-      if (ro) return ro;
-      if (a.matchOrder !== b.matchOrder) return a.matchOrder - b.matchOrder;
-      return a._slotSeed - b._slotSeed;
-    })
-    .map(t => { delete t._slotSeed; return t; });
+  }).sort((a, b) => {
+    const ro = (roundOrder[a.round] ?? 999) - (roundOrder[b.round] ?? 999);
+    if (ro) return ro;
+    return (a.matchOrder ?? 0) - (b.matchOrder ?? 0);
+  });
 
   return jsonResponse({
     success: true,
@@ -157,7 +133,7 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
       teamCount: meta.teamCount,
       leagueType: meta.leagueType,
       accessType,
-      matches
+      matches // flat neutral matches with group info
     }
   }, 200);
 }
