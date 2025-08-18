@@ -222,6 +222,22 @@
   overflow: hidden;
 }
 
+#knockoutTab .ko-team-row > * { min-width: 0; }
+
+/* Same fixed width you’re using for the user select */
+:root { --userW: 120px; }
+
+/* LEFT single-leg row: [User][Team][Score][WinnerCB] */
+#knockoutTab .ko-team-row.single-leg.left {
+  grid-template-columns: var(--userW) minmax(120px,1fr) 34px 18px;
+}
+
+/* RIGHT single-leg row: [WinnerCB][Score][Team][User] */
+#knockoutTab .ko-team-row.single-leg.right {
+  grid-template-columns: 18px 34px minmax(120px,1fr) var(--userW);
+}
+
+
 
 /* Mobile */
 @media (max-width:900px){

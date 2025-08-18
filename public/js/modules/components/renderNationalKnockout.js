@@ -506,6 +506,10 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
+      /* NEW: mark these as single-leg rows */
+      row1.classList.add("single-leg");
+      row2.classList.add("single-leg");
+
       if (sideKey === "right") {
         // RIGHT side
         appendSafe(row1, isFinal ? null : H_top, tn1, u1);
