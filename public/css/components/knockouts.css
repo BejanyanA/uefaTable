@@ -28,12 +28,13 @@
 #knockoutTab .bracket-center {
   display: grid;
   grid-template-rows: auto auto; /* cup first, then final */
-  gap: 4px;
+  gap: 7px;
   justify-items: center;
 }
 
 #knockoutTab .cup-wrap {
   grid-row: 1; /* cup goes to the first row */
+  margin-top: -5px;
 }
 
 #knockoutTab .center-final {
@@ -42,7 +43,8 @@
 #knockoutTab .cup-image{max-width:138px;height:auto;opacity:.95}
 
 /* Cards */
-#knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px}
+#knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px; width: 350px;  min-width: 350px;
+  max-width: 350px;}
 #knockoutTab .ko-placeholder{background:rgb(83 82 82 / 50%);border:1px dashed rgba(255,255,255,.22);color:#f8f8f8}
 #knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
@@ -191,7 +193,7 @@
 }
 
 #knockoutTab .center-final .ko-team-row {
-  grid-template-columns: var(--userW) minmax(140px, max-content) 24px 24px;
+  grid-template-columns: var(--userW) minmax(160px, max-content) 24px 24px;
   /* removes the "away" score column */
 }
 
@@ -239,6 +241,56 @@
 
 
 
+:root {
+  --koW: 350px;     /* card width (matches what you already use) */
+  --koH: 68px;      /* card height – tune to your taste (60–76px works well) */
+}
+
+#knockoutTab .ko-card,
+#knockoutTab .ko-placeholder {
+  width: var(--koW);
+  min-width: var(--koW);
+  max-width: var(--koW);
+  height: var(--koH);
+  min-height: var(--koH);
+  /* keep content centered inside fixed-height cards */
+  display: grid;
+  align-content: center;
+}
+
+/* 2) Make the side columns hug their content (the 350px cards) */
+#knockoutTab .left-side {
+  grid-template-columns: repeat(3, max-content) !important;
+  justify-content: start !important;   /* push columns to the outer LEFT edge */
+}
+#knockoutTab .right-side {
+  grid-template-columns: repeat(3, max-content) !important;
+  justify-content: end !important;     /* push columns to the outer RIGHT edge */
+}
+
+/* 3) Anchor the cards inside each round column to the outer edges */
+#knockoutTab .left-side .round-body  { justify-items: start !important; }
+#knockoutTab .right-side .round-body { justify-items: end   !important; }
+#knockoutTab .left-side  .ko-card    { justify-self: start !important; }
+#knockoutTab .right-side .ko-card    { justify-self: end   !important; }
+
+
+
+:root { --rightRailOffset: 20px; }  /* try 24–60px to taste */
+
+#knockoutTab .right-side {
+  margin-left: var(--rightRailOffset);
+}
+
+
+
+:root { --leftRailOffset: 2px; }  /* try 24–60px to taste */
+
+#knockoutTab .left-side {
+  margin-right: var(--leftRailOffset);
+}
+
+
 /* Mobile */
 @media (max-width:900px){
 
@@ -249,5 +301,12 @@
 
   #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12px}
   #knockoutTab .ko-row-2{display:grid;gap:10px}
+
+
+  :root { --rightRailOffset: 10px; }  /* try 24–60px to taste */
+
+#knockoutTab .right-side {
+  margin-left: var(--rightRailOffset);
+}
 
 }

@@ -145,6 +145,7 @@
   box-sizing: content-box;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   position: fixed;
+  margin-left: 3px;
 }
 
 #backBtn:hover {
@@ -214,7 +215,7 @@
     position: fixed;
   }
 
-    .backButtn {
+  .backButtn {
     color: white;
     background: #1d1d1d;
     padding: 6px 3px;
@@ -228,6 +229,8 @@
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     position: fixed;
+    margin-top: -17px;
+    margin-left: -15px;
   }
 
   .standings-wrapper {
