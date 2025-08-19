@@ -743,21 +743,17 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
     const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2", "Final"] : ["1/8", "1/4", "1/2", "Final"];
     const firstRound = rounds[0];
 
-    const ROUND_LABELS = {
-      "1/16": "Round of 32",
-      "1/8": "Round of 16",
-      "1/4": "Quarter-finals",
-      "1/2": "Semi-finals",
-      "Final": "Final"
-    };
+    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": "Round of 16", "1/4": "Quarter-finals", "1/2": "Semi-finals", "Final": "Final" };
     const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
-
     const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
 
-    // ---------- Helpers ----------
+    // ---------- helpers ----------
+    const normRound = r => String(r || "").toLowerCase().replace(/\s+/g, "");
     const appendSafe = (parent, ...nodes) => nodes.forEach(n => { if (n && n.nodeType) parent.appendChild(n); });
+    const teamPresent = tm => !!(tm && (tm.id != null || (tm.name && String(tm.name).trim())));
+    const tieHasBothParticipants = m => m && teamPresent(m.team1) && teamPresent(m.team2);
 
-    // First-round placeholder labels (Group A 1st vs Group B 2nd, etc.)
+    // Placeholders for the first round (optional, kept same as your base)
     const groupsCnt = Math.max(2, Math.min(16, Math.round(teamCount / 4)));
     const GROUPS = Array.from({ length: groupsCnt }, (_, i) => String.fromCharCode(65 + i));
     function placeholderFirstRound(i) {
@@ -768,7 +764,6 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       return even ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
         : { t1: `Group ${g2} 1st`, t2: `Group ${g1} 2nd` };
     }
-
     function renderPlaceholderCard({ t1, t2 }) {
       const card = document.createElement("div");
       card.className = "ko-card ko-placeholder";
@@ -779,19 +774,116 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       return card;
     }
 
-    function splitForRound(ties, rk, expectedPerSide) {
-      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
-      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-      return { left: sorted.slice(0, perSide), right: sorted.slice(perSide), perSide };
-    }
-
-    // Bucket matches by round (use response shape directly)
+    // --- bucket matches by round (as delivered by backend) ---
     const byRound = new Map();
     (data.matches || []).forEach(m => {
       const r = m.round || firstRound;
       if (!byRound.has(r)) byRound.set(r, []);
       byRound.get(r).push(m);
     });
+
+    // --- map first round team ids to side 'L' | 'R' (for stable placement later) ---
+    const firstRoundTies = (byRound.get(firstRound) || [])
+      .slice()
+      .sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+
+    const FR_EXPECTED = EXPECTED_TIES[firstRound] || firstRoundTies.length || 0;
+    const FR_PER_SIDE = Math.max(1, Math.ceil(FR_EXPECTED / 2));
+
+    const teamHalf = new Map(); // teamId -> 'L' | 'R'
+    firstRoundTies.forEach((m, idx) => {
+      const half = (idx < FR_PER_SIDE) ? 'L' : 'R';
+      if (m.team1 && m.team1.id != null) teamHalf.set(+m.team1.id, half);
+      if (m.team2 && m.team2.id != null) teamHalf.set(+m.team2.id, half);
+    });
+
+    // --- side-aware splitter (stable order) ---
+    function splitForRound(ties, rk, expectedPerSide) {
+      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+
+      const left = Array(perSide).fill(null);
+      const right = Array(perSide).fill(null);
+
+      const place = (arr, idx, t) => {
+        // try desired slot, otherwise spill to the next free slot on this side
+        if (idx >= 0 && idx < arr.length && arr[idx] == null) { arr[idx] = t; return; }
+        for (let i = 0; i < arr.length; i++) if (arr[i] == null) { arr[i] = t; return; }
+      };
+
+      const chooseSide = (m) => {
+        // vote from known participants (preferred)
+        let L = 0, R = 0;
+        const vote = (tm) => {
+          if (!tm || tm.id == null) return;
+          const h = teamHalf.get(+tm.id);
+          if (h === 'L') L++;
+          else if (h === 'R') R++;
+        };
+        vote(m.team1); vote(m.team2);
+        if (L > R) return 'L';
+        if (R > L) return 'R';
+
+        // fallback: derive side from matchOrder block
+        const mo = +(m.matchOrder ?? 1);
+        const sideBlock = Math.floor((mo - 1) / perSide); // 0 = left block, 1 = right block
+        return sideBlock === 0 ? 'L' : 'R';
+      };
+
+      for (const t of sorted) {
+        const side = chooseSide(t);
+
+        // desired position **inside** the side:
+        // 1..N across the whole round -> (mo-1)%perSide gives 0..perSide-1
+        const mo = +(t.matchOrder ?? 1);
+        const localIdx = ((mo - 1) % perSide + perSide) % perSide;
+
+        if (side === 'R') place(right, localIdx, t);
+        else place(left, localIdx, t);
+      }
+
+      return { left, right, perSide };
+    }
+
+    // --------- side-aware locks ----------
+    const locksSide = { left: new Set(), right: new Set() };
+    const present = (r) => Array.from(byRound.keys()).some(k => normRound(k) === normRound(r));
+
+    // Lock 1/8 only when that side's SF card has BOTH teams
+    if (present("1/2")) {
+      const semiTies = byRound.get("1/2") || [];
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);
+
+      if (tieHasBothParticipants(sfLeft.find(Boolean))) locksSide.left.add(normRound("1/8"));
+      if (tieHasBothParticipants(sfRight.find(Boolean))) locksSide.right.add(normRound("1/8"));
+    }
+
+    // If Final has both teams, lock 1/4 on the side that contains a finalist
+    (() => {
+      const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
+      const finalTie = finalsRaw.find(Boolean);
+      if (!finalTie || !tieHasBothParticipants(finalTie)) return;
+
+      const finalIds = new Set(
+        [finalTie?.home?.team1, finalTie?.home?.team2, finalTie?.away?.team1, finalTie?.away?.team2]
+          .filter(Boolean).map(x => +x.id)
+      );
+
+      const semiTies = byRound.get("1/2") || [];
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);
+
+      const sideHasFinalist = (arr) => {
+        const t = arr.find(Boolean); if (!t) return false;
+        const ids = [t?.home?.team1, t?.home?.team2, t?.away?.team1, t?.away?.team2]
+          .filter(Boolean).map(x => +x.id);
+        return ids.some(id => finalIds.has(id));
+      };
+
+      if (sideHasFinalist(sfLeft)) locksSide.left.add(normRound("1/4"));
+      if (sideHasFinalist(sfRight)) locksSide.right.add(normRound("1/4"));
+    })();
 
     // ===== Frame =====
     const frame = document.createElement("div");
@@ -816,16 +908,15 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
     finalTitle.textContent = ROUND_LABELS["Final"];
     finalCol.appendChild(finalTitle);
 
-    const finals = byRound.get("Final") || byRound.get("final") || [];
-    if (finals.length) finalCol.appendChild(renderTie(finals[0], "center"));
+    const finalsList = byRound.get("Final") || byRound.get("final") || [];
+    const finalMatch = finalsList.find(Boolean) || null;
+    if (finalMatch) finalCol.appendChild(renderTie(finalMatch, "center"));
     else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
     cupWrap.className = "cup-wrap";
     const img = document.createElement("img");
-    img.className = "cup-image";
-    img.src = cupSrc;
-    img.alt = "Trophy";
+    img.className = "cup-image"; img.src = cupSrc; img.alt = "Trophy";
     cupWrap.appendChild(img);
     centerSide.append(finalCol, cupWrap);
 
@@ -837,79 +928,126 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       const firstRoundTiesTotal = (EXPECTED_TIES[firstRound] || (byRound.get(firstRound) || []).length);
       const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
 
-      // Grid visual config
       const BASE_SPAN = 4;
       const ROW_H_PX = 18;
       const TOTAL_ROWS = lanes * BASE_SPAN;
 
-      rounds
-        .filter(r => r !== "Final")
-        .forEach((rk, rIdx) => {
-          const col = document.createElement("div");
-          col.className = `side-round round-${rk.replace("/", "-")}`;
+      rounds.filter(r => r !== "Final").forEach((rk, rIdx) => {
+        const col = document.createElement("div");
+        col.className = `side-round round-${rk.replace("/", "-")}`;
 
-          const title = document.createElement("h3");
-          title.textContent = ROUND_LABELS[rk];
-          col.appendChild(title);
+        const title = document.createElement("h3");
+        title.textContent = ROUND_LABELS[rk];
+        col.appendChild(title);
 
-          const body = document.createElement("div");
-          body.className = "round-body";
-          body.style.display = "grid";
-          body.style.alignContent = "start";
-          body.style.gap = "6px";
-          body.style.setProperty("--rowH", `${ROW_H_PX}px`);
-          body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
-          col.appendChild(body);
+        const body = document.createElement("div");
+        body.className = "round-body";
+        body.style.display = "grid";
+        body.style.alignContent = "start";
+        body.style.gap = "6px";
+        body.style.setProperty("--rowH", `${ROW_H_PX}px`);
+        body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
+        col.appendChild(body);
 
-          const tiesAll = byRound.get(rk) || [];
-          const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
-          const expectedPerSide = Math.ceil(expected / 2);
+        // de-dup identical cards (defensive)
+        const raw = byRound.get(rk) || [];
+        const seen = new Set();
+        const tiesAll = [];
+        for (const m of raw) {
+          const key = String(m?.id ?? `${m.round || rk}:${m.matchOrder}`);
+          if (!seen.has(key)) { seen.add(key); tiesAll.push(m); }
+        }
 
-          const { left, right, perSide } = splitForRound(tiesAll, rk, expectedPerSide);
-          const list = sideKey === "left" ? left : right;
+        const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
+        const expectedPerSide = Math.ceil(expected / 2);
+        const { left, right, perSide } = splitForRound(tiesAll, rk, expectedPerSide);
+        const list = sideKey === "left" ? left : right;
 
-          // Build cards (real ties)
-          const cards = [];
-          const useGroupFallback = (rk === firstRound);
-
-          list.forEach((tie, i) => {
-            let ph = null;
-            if (rk === firstRound) {
-              const baseIndex = (sideKey === "left" ? i : i + perSide);
-              ph = placeholderFirstRound(baseIndex);
-            }
-            const card = renderTie(tie, sideKey, ph, useGroupFallback);
-            card.style.margin = "0";
-            cards.push(card);
-          });
-
-          // Pad placeholders
-          const missing = perSide - list.length;
-          if (missing > 0) {
-            for (let i = 0; i < missing; i++) {
-              let phCard;
-              if (rk === firstRound) {
-                const indexOnSide = list.length + i;
-                const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
-                phCard = renderPlaceholderCard(placeholderFirstRound(baseIndex));
-              } else {
-                phCard = renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
-              }
-              phCard.style.margin = "0";
-              cards.push(phCard);
-            }
+        const cards = [];
+        for (let i = 0; i < perSide; i++) {
+          const match = list[i] || null;
+          let card;
+          if (match) {
+            card = renderTie(match, sideKey, rk === firstRound ? placeholderFirstRound(sideKey === "left" ? i : i + perSide) : null, rk === firstRound);
+          } else {
+            card = rk === firstRound
+              ? renderPlaceholderCard(placeholderFirstRound(sideKey === "left" ? i : i + perSide))
+              : renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
           }
+          card.style.margin = "0";
+          cards.push(card);
+        }
 
-          // Place in fixed-row grid
-          cards.forEach((card, j) => {
-            const start = j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
-            card.style.gridRow = `${start} / span ${BASE_SPAN}`;
-            card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
-            body.appendChild(card);
-          });
-
-          sideEl.appendChild(col);
+        cards.forEach((card, j) => {
+          const start = j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
+          card.style.gridRow = `${start} / span ${BASE_SPAN}`;
+          card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
+          body.appendChild(card);
         });
+
+        sideEl.appendChild(col);
+      });
+    }
+
+    // ---------------- mini refresh helpers (single-leg) ----------------
+    const nextRoundOf = (rk) => {
+      const i = rounds.indexOf(rk || firstRound);
+      return i >= 0 && i + 1 < rounds.length ? rounds[i + 1] : null;
+    };
+    const tieLikelySettled = (m) => {
+      if (m && m.winnerTeamId) return true;
+      const s = m?.score || {};
+      const isNum = v => Number.isFinite(v);
+      return isNum(s.team1) && isNum(s.team2) && s.team1 !== s.team2; // single leg: non-draw decides it
+    };
+
+    async function maybeReloadNextRound(match) {
+      const rk = match?.round || firstRound;
+      const next = nextRoundOf(rk);
+      if (!next) return;
+
+      const nextNorm = normRound(next);
+      const collect = (roundName, source) => {
+        const rn = normRound(roundName);
+        const out = [];
+        source.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
+        return out;
+      };
+      const oldNext = collect(next, byRound);
+
+      const keyOf = (m) => String(m?.id ?? `${m.round || next}:${m.matchOrder}`);
+      const sigOf = (m) => {
+        const s = m?.score || {};
+        const idOrName = x => (x && (x.id ?? (x.name || ""))) ?? "";
+        return [
+          idOrName(m.team1), idOrName(m.team2),
+          m?.winnerTeamId ?? "",
+          Number.isFinite(s.team1) ? s.team1 : "",
+          Number.isFinite(s.team2) ? s.team2 : "",
+        ].join("|");
+      };
+
+      try {
+        const res = await apiPost("/national-round-knockouts", { leagueId }, { showLoading: false });
+        if (!res?.success || !res.data) return;
+
+        const newerNext = (res.data.matches || []).filter(
+          m => normRound(m.round || next) === nextNorm
+        );
+
+        if (newerNext.length !== oldNext.length) { await renderNationalOnlyKnockouts(leagueId, rootEl); return; }
+
+        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
+        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
+
+        if (oldMap.size !== newMap.size) { await renderNationalOnlyKnockouts(leagueId, rootEl); return; }
+        for (const [k, v] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== v) {
+            await renderNationalOnlyKnockouts(leagueId, rootEl);
+            return;
+          }
+        }
+      } catch (e) { console.error(e); }
     }
 
     // ===== Tie card (single-leg) =====
@@ -919,10 +1057,15 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       const r = /([12])(?:st|nd)/i.exec(phText);
       return { group: g ? `Group ${g[1].toUpperCase()}` : null, rank: r ? +r[1] : null };
     }
-    function normGroup(g) { return g ? String(g).replace(/\s+/g, '').toUpperCase() : null; }
 
     function renderTie(match, sideKey, ph, useGroupFallback = false) {
-      // Single match (neutral)
+      if (!match) return renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
+
+      const roundKey = normRound(match.round || firstRound);
+      const canEdit = editable && !(sideKey === "left" || sideKey === "right")
+        ? editable // center (Final) – no side lock
+        : !(locksSide[sideKey] && locksSide[sideKey].has(roundKey));
+
       const knockoutId = match?.id ?? match?.matchOrder;
       const isFinal = String(match.round || "").toLowerCase() === "final";
 
@@ -933,11 +1076,10 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       const card = document.createElement("div");
       card.className = "ko-card ko-row-2";
 
-      // --- builders ---
       const buildUserSelect = (team, role) => {
         const sel = document.createElement("select");
         sel.className = "user-dropdown";
-        sel.disabled = !editable || !team?.id;
+        sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
         def.value = ""; def.textContent = t.selectUser || "Select Player";
@@ -945,11 +1087,10 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
         if (team?.userId) sel.value = String(team.userId);
 
-        if (editable && team?.id) {
+        if (canEdit && team?.id) {
           sel.addEventListener("change", async () => {
             try {
               const userId = sel.value ? parseInt(sel.value, 10) : null;
-              // single-leg assign: one request per changed team
               const teamId = role === "A" ? teamA?.id : teamB?.id;
               await apiPost("/attach-national-round-knock-players", { matchId: knockoutId, teamId, userId, leagueId }, { showLoading: false });
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
@@ -964,37 +1105,35 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         return sel;
       };
 
-      function buildTeam(teamObj, position, groupName, phText) {
+      function buildTeam(teamObj, position, groupName) {
         const d = document.createElement("div");
         d.className = "team-name";
         const name = teamObj?.name && String(teamObj.name).trim() ? teamObj.name : null;
-        const grp = (groupName && String(groupName).trim()) || null;
-
         if (name) d.textContent = name;
-        else if (useGroupFallback && grp) { d.textContent = `${grp} Team ${position}`; d.classList.add("placeholder-text"); }
+        else if (useGroupFallback && groupName) { d.textContent = `${groupName} Team ${position}`; d.classList.add("placeholder-text"); }
         else { d.textContent = t.tbd || "TBD"; d.classList.add("placeholder-text"); }
         return d;
       }
 
-      const buildScore = (which /* "t1" | "t2" */) => {
+      const buildScore = (which) => {
         const el = document.createElement("input");
         el.type = "number";
         el.className = "score-input";
         const initial = (which === "t1" ? (score.team1 ?? "") : (score.team2 ?? ""));
         el.value = initial;
         el.dataset.initial = String(initial);
-        el.disabled = !editable || !knockoutId;
+
+        const bothTeamsReady = teamPresent(teamA) && teamPresent(teamB);
+        el.disabled = !canEdit || !knockoutId || !bothTeamsReady;
         el.dataset.matchId = knockoutId || "";
         el.dataset.which = which;
 
-        if (editable && knockoutId) {
+        if (canEdit && knockoutId && bothTeamsReady) {
           el.addEventListener("input", () => { if (el.value !== "" && +el.value < 0) el.value = ""; });
           el.addEventListener("blur", async () => {
             const matchId = Number(el.dataset.matchId);
             const val = el.value.trim();
-            if (!matchId) return;
-            if (val === "") return;
-            if (val === el.dataset.initial) return;
+            if (!matchId || val === "" || val === el.dataset.initial) return;
             const n = Number(val);
             if (!Number.isFinite(n) || n < 0) return;
 
@@ -1003,35 +1142,37 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
 
             try {
               const res = await apiPost("/update-national-round-knock-matches", payload, { showLoading: false });
-              if (res.success) el.dataset.initial = String(n);
               showToast(res.success ? (t.score_updated || "Score Updated")
                 : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
-              if (res.success) await renderNationalOnlyKnockouts(leagueId, rootEl);
+              if (res.success) {
+                el.dataset.initial = String(n);
+                if (!match.score) match.score = {};
+                if (which === "t1") match.score.team1 = n; else match.score.team2 = n;
+                refreshTieUI();
+                if (tieLikelySettled(match)) await maybeReloadNextRound(match);
+              }
             } catch (e) { console.error(e); }
           });
         }
         return el;
       };
 
-      // Inputs & selects
       const H_top = buildScore("t1");
       const H_bottom = buildScore("t2");
-
       const u1 = buildUserSelect(teamA, "A");
       const u2 = buildUserSelect(teamB, "B");
 
-      // Fallback placeholders for first round (optional)
       const p1 = parsePh(ph?.t1);
       const p2 = parsePh(ph?.t2);
-      let grpA = p1.group, grpB = p2.group;
+      const tn1 = buildTeam(teamA, 1, p1.group);
+      const tn2 = buildTeam(teamB, 2, p2.group);
 
-      const tn1 = buildTeam(teamA, 1, grpA, ph?.t1 || null);
-      const tn2 = buildTeam(teamB, 2, grpB, ph?.t2 || null);
-
-      // Winner pick allowed only on draw (single-leg rule)
-      const isNum = v => Number.isFinite(v);
-      const canPickWinner = editable && isNum(score.team1) && isNum(score.team2) && (score.team1 === score.team2);
+      const canPickWinner = (() => {
+        const s = match.score || {};
+        const isNum = v => Number.isFinite(v);
+        return canEdit && isNum(s.team1) && isNum(s.team2) && (s.team1 === s.team2);
+      })();
 
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
       const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
@@ -1044,41 +1185,50 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
-            if (res.success) await renderNationalOnlyKnockouts(leagueId, rootEl);
+            if (res.success) {
+              match.winnerTeamId = winnerId;
+              refreshTieUI();
+              await maybeReloadNextRound(match);
+            }
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
         cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
       }
 
-      // --- rows ---
       const row1 = document.createElement("div");
       const row2 = document.createElement("div");
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
-
-      /* NEW: mark these as single-leg rows */
       row1.classList.add("single-leg");
       row2.classList.add("single-leg");
 
+      function refreshTieUI() {
+        const s = match.score || {};
+        const isNum = v => Number.isFinite(v);
+
+        cbA.disabled = cbB.disabled = !(canEdit && isNum(s.team1) && isNum(s.team2) && s.team1 === s.team2);
+
+        row1.classList.remove("winner-row");
+        row2.classList.remove("winner-row");
+
+        if (match.winnerTeamId) {
+          if (match.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
+          if (match.winnerTeamId === teamB?.id) row2.classList.add("winner-row");
+        } else if (isNum(s.team1) && isNum(s.team2) && s.team1 !== s.team2) {
+          (s.team1 > s.team2 ? row1 : row2).classList.add("winner-row");
+        }
+      }
+
       if (sideKey === "right") {
-        // RIGHT side
-        appendSafe(row1, isFinal ? null : H_top, tn1, u1);
-        row1.prepend(cbA);
-        appendSafe(row2, isFinal ? null : H_bottom, tn2, u2);
-        row2.prepend(cbB);
+        appendSafe(row1, isFinal ? null : H_top, tn1, u1); row1.prepend(cbA);
+        appendSafe(row2, isFinal ? null : H_bottom, tn2, u2); row2.prepend(cbB);
       } else {
-        // LEFT / center
         appendSafe(row1, u1, tn1, H_top, isFinal ? null : cbA);
         appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : cbB);
       }
 
-
-      if (match.winnerTeamId) {
-        if (match.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
-        if (match.winnerTeamId === teamB?.id) row2.classList.add("winner-row");
-      }
-
+      refreshTieUI();
       card.append(row1, row2);
       return card;
     }
