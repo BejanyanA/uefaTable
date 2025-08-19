@@ -175,6 +175,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
   root.innerHTML = "";
   const t = langMap[currentLang];
 
+
   try {
     const [{ success, data }, playersRes] = await Promise.all([
       apiPost("/group-knockouts", { leagueId }),
@@ -183,6 +184,93 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
     if (!success || !data) {
       root.innerHTML = `<p style="color:#fff">${t.not_found || "Knockout data not found"}</p>`;
       return;
+    }
+
+    const nextRoundOf = (rk) => {
+      const i = rounds.indexOf(rk || firstRound);
+      return i >= 0 && i + 1 < rounds.length ? rounds[i + 1] : null;
+    };
+
+    const tieLikelySettled = (tie) => {
+      if (tie && tie.winnerTeamId) return true;
+
+      const H = tie?.home?.score || {};
+      const A = tie?.away?.score || {};
+      const isNum = v => Number.isFinite(v);
+
+      const isFinal = String(tie?.round || "").toLowerCase() === "final";
+      if (isFinal) return isNum(H.team1) && isNum(H.team2) && H.team1 !== H.team2;
+
+      const haveAll = isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2);
+      if (!haveAll) return false;
+      const aggA = (H.team1 || 0) + (A.team2 || 0);
+      const aggB = (H.team2 || 0) + (A.team1 || 0);
+      return aggA !== aggB;
+    };
+
+    // 🔁 Re-render only when next round *content* changed (ids OR participants/winner)
+    async function maybeReloadNextRound(tie) {
+      const rk = tie?.round || firstRound;
+      const next = nextRoundOf(rk);
+      if (!next) return;
+
+      const oldNext = byRound.get(next) || [];
+
+      // stable key for a tie
+      const keyOf = (m) =>
+        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || next}:${m.matchOrder}`);
+
+      // participant/winner fingerprint
+      const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
+      const sigOf = (m) => {
+        const H = m?.home || {}, A = m?.away || {};
+        const hs = H.score || {}, as = A.score || {};
+        return [
+          idOrName(H.team1), idOrName(H.team2),
+          idOrName(A.team1), idOrName(A.team2),
+          m?.winnerTeamId ?? "",
+          // include scores if you want next-round score updates to trigger refresh too:
+          Number.isFinite(hs.team1) ? hs.team1 : "",
+          Number.isFinite(hs.team2) ? hs.team2 : "",
+          Number.isFinite(as.team1) ? as.team1 : "",
+          Number.isFinite(as.team2) ? as.team2 : "",
+        ].join("|");
+      };
+
+      try {
+        // tiny delay helps if backend is eventually consistent
+        // await new Promise(r => setTimeout(r, 120));
+
+        const res = await apiPost("/group-knockouts", { leagueId }, { showLoading: false });
+        if (!res?.success || !res.data) return;
+
+        const newerNext = (res.data.matches || []).filter(m => (m.round || next) === next);
+
+        // count changed -> refresh
+        if (newerNext.length !== oldNext.length) {
+          await renderLeagueKnockoutsStage(leagueId, rootEl);
+          return;
+        }
+
+        // build maps: key -> signature
+        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
+        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
+
+        // key set or signature changed -> refresh
+        if (oldMap.size !== newMap.size) {
+          await renderLeagueKnockoutsStage(leagueId, rootEl);
+          return;
+        }
+        for (const [k, oldSig] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== oldSig) {
+            await renderLeagueKnockoutsStage(leagueId, rootEl);
+            return;
+          }
+        }
+        // otherwise, nothing material changed – keep the smooth local UI
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     const editable = data.accessType === "owner";
@@ -713,7 +801,15 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
               if (res.success) el.dataset.initial = String(n);
               showToast(res.success ? (t.score_updated || "Score Updated") : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
-              if (res.success) await renderLeagueKnockoutsStage(leagueId, rootEl);
+
+              if (res.success) el.dataset.initial = String(n);
+              if (!leg.score) leg.score = {};
+              if (el.dataset.which === "t1") leg.score.team1 = n; else leg.score.team2 = n;
+              refreshTieUI();;
+
+              if (tieLikelySettled(tie)) {
+                await maybeReloadNextRound(tie);
+              }
             } catch (e) { console.error(e); }
           });
         }
@@ -771,7 +867,11 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
             const res = await apiPost("/update-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
             showToast(res.success ? (t.score_updated || "Score Updated") : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
-            if (res.success) await renderLeagueKnockoutsStage(leagueId, rootEl);
+
+            if (res.success) tie.winnerTeamId = winnerId; // patch local model
+            refreshTieUI();
+            await maybeReloadNextRound(tie);
+
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
@@ -783,6 +883,43 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
+
+      function refreshTieUI() {
+        // Re-read scores from the tie object (they may have just changed)
+        const H = tie.home?.score || {};
+        const A = tie.away?.score || {};
+        const isNum = v => Number.isFinite(v);
+
+        // Enable/disable winner checkboxes
+        let canPick;
+        if (isFinal) {
+          const drawFinal = isNum(H.team1) && isNum(H.team2) && H.team1 === H.team2;
+          canPick = editable && drawFinal;
+        } else {
+          const haveAll = isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2);
+          const drawAgg = haveAll && ((H.team1 || 0) + (A.team2 || 0) === (H.team2 || 0) + (A.team1 || 0));
+          canPick = editable && drawAgg;
+        }
+        cbA.disabled = cbB.disabled = !canPick;
+
+        // Winner highlight
+        row1.classList.remove('winner-row');
+        row2.classList.remove('winner-row');
+
+        if (tie.winnerTeamId) {
+          if (tie.winnerTeamId === (tie.home?.team1?.id || tie.away?.team2?.id)) row1.classList.add('winner-row');
+          if (tie.winnerTeamId === (tie.home?.team2?.id || tie.away?.team1?.id)) row2.classList.add('winner-row');
+        } else {
+          if (isFinal && isNum(H.team1) && isNum(H.team2) && H.team1 !== H.team2) {
+            (H.team1 > H.team2 ? row1 : row2).classList.add('winner-row');
+          } else if (!isFinal && isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2)) {
+            const aggA = (H.team1 || 0) + (A.team2 || 0);
+            const aggB = (H.team2 || 0) + (A.team1 || 0);
+            if (aggA !== aggB) (aggA > aggB ? row1 : row2).classList.add('winner-row');
+          }
+        }
+      }
+
       if (sideKey === "right") {
         appendSafe(row1, isFinal ? null : A_top, H_top, tn1, u1); row1.prepend(cbA);
         appendSafe(row2, isFinal ? null : A_bottom, H_bottom, tn2, u2); row2.prepend(cbB);
@@ -790,6 +927,8 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
         appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
         appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
       }
+
+      refreshTieUI();
 
       if (tie.winnerTeamId) {
         if (tie.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
