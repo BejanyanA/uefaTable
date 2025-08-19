@@ -2,11 +2,11 @@
 #leagueType1 {
   padding: 24px;
   overflow-y: auto;
-
 }
 
 #leagueType2 {
   padding: 24px;
+  overflow-y: auto;
 }
 
 /* League name row (horizontal layout) */
@@ -92,6 +92,7 @@
 
   #leagueType2 {
     padding: 8px;
+    overflow-x: auto;
   }
 
 
