@@ -1,6 +1,8 @@
 /* Outer section or container */
 #leagueType1 {
   padding: 24px;
+  overflow-y: auto;
+
 }
 
 #leagueType2 {
@@ -15,6 +17,7 @@
   padding-left: 0px;
   padding-right: 0px;
   margin-top: 120px;
+  flex-wrap: wrap;
 }
 
 /* Each league box */
@@ -45,7 +48,7 @@
 .league-names-row-item {
   display: flex;
   align-items: center;
-  margin-right: 55px;
+  margin-right: 20px;
 }
 
 .league-edit-icon,
@@ -84,9 +87,10 @@
   /* Outer section or container */
   #leagueType1 {
     padding: 8px;
+    overflow-x: auto;
   }
 
-    #leagueType2 {
+  #leagueType2 {
     padding: 8px;
   }
 
