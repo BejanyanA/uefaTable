@@ -1016,54 +1016,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       return card;
     }
 
-    // Stable, group-less placement:
-    // sort ties by matchOrder, then first half → left side, second half → right side
-    function splitForRound(ties, rk, expectedPerSide) {
-      // Stable order first
-      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
-
-      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-      const left = Array(perSide).fill(null);
-      const right = Array(perSide).fill(null);
-      let lp = 0, rp = 0;
-
-      // Helper: figure out which half ('L' or 'R') this tie belongs to
-      function halfOfTie(t) {
-        const ids = [];
-        const push = (x) => { if (x && x.id != null) ids.push(+x.id); };
-        push(t?.home?.team1); push(t?.home?.team2);
-        push(t?.away?.team1); push(t?.away?.team2);
-
-        // count votes from Round-of-16 map
-        let l = 0, r = 0;
-        for (const id of ids) {
-          const h = teamHalf.get(id);
-          if (h === 'L') l++;
-          else if (h === 'R') r++;
-        }
-        if (l > r) return 'L';
-        if (r > l) return 'R';
-
-        // fallback: use matchOrder threshold if no identities are known
-        const mo = +(t.matchOrder ?? Number.MAX_SAFE_INTEGER);
-        return (mo >= 1 && mo <= perSide) ? 'L' : 'R';
-      }
-
-      // Place each tie on its proper side; keep side order by matchOrder
-      for (const t of sorted) {
-        const h = halfOfTie(t);
-        if (h === 'R') {
-          if (rp < right.length) right[rp++] = t;
-          else if (lp < left.length) left[lp++] = t;  // spill if side is full
-        } else {
-          if (lp < left.length) left[lp++] = t;
-          else if (rp < right.length) right[rp++] = t; // spill if side is full
-        }
-      }
-      return { left, right, perSide };
-    }
-
-    // Build round -> ties map
+    // Build round -> ties map (keep original order for matchOrder)
     const byRound = new Map();
     (data.matches || []).forEach(m => {
       const r = m.round || firstRound;
@@ -1071,24 +1024,102 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       byRound.get(r).push(m);
     });
 
-    // NEW: map every team id seen in Round of 16 to 'L' or 'R'
-    const firstRoundTies = (byRound.get(firstRound) || []).slice()
+    // ===== Seed the Round of 16 (or the first round) =====
+    // We assign each team a half (L/R) and a seed index within that half (0..FR_PER_SIDE-1).
+    const firstRoundTies = (byRound.get(firstRound) || [])
+      .slice()
       .sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
 
     const FR_EXPECTED = EXPECTED_TIES[firstRound] || firstRoundTies.length || 0;
     const FR_PER_SIDE = Math.max(1, Math.ceil(FR_EXPECTED / 2));
 
-    const teamHalf = new Map();   // teamId -> 'L' | 'R'
-    function tagHalf(team, half) {
-      if (team && team.id != null) teamHalf.set(+team.id, half);
+    const teamHalf = new Map();      // id -> 'L' | 'R'   (kept for compatibility)
+    const teamMeta = new Map();      // id -> { half: 'L'|'R', seed: number }
+
+    function tagMeta(team, half, seed) {
+      if (!team || team.id == null) return;
+      const id = +team.id;
+      teamHalf.set(id, half);
+      teamMeta.set(id, { half, seed });
     }
+
     firstRoundTies.forEach((t, idx) => {
       const half = (idx < FR_PER_SIDE) ? 'L' : 'R';
-      tagHalf(t?.home?.team1, half);
-      tagHalf(t?.home?.team2, half);
-      tagHalf(t?.away?.team1, half);
-      tagHalf(t?.away?.team2, half);
+      const seed = (idx < FR_PER_SIDE) ? idx : (idx - FR_PER_SIDE);
+      tagMeta(t?.home?.team1, half, seed);
+      tagMeta(t?.home?.team2, half, seed);
+      tagMeta(t?.away?.team1, half, seed);
+      tagMeta(t?.away?.team2, half, seed);
     });
+
+    // ===== Seed-aware splitter =====
+    // Ensures ties go to the correct SIDE and SLOT within that side based on Ro16 seeds.
+    function splitForRound(ties, rk, expectedPerSide) {
+      const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+
+      const left = Array(perSide).fill(null);
+      const right = Array(perSide).fill(null);
+
+      const firstIdx = rounds.indexOf(firstRound);
+      const rkIdx = rounds.indexOf(rk);
+      const depth = Math.max(0, rkIdx - firstIdx); // 0=firstRd, 1=QF, 2=SF, ...
+      const cluster = Math.pow(2, depth);            // QF:2, SF:4, ...
+
+
+      const chooseSide = (t) => {
+        let l = 0, r = 0;
+
+        const bump = (meta) => {
+          if (!meta) return;
+          if (meta.half === 'L') l++;
+          else r++;
+        };
+
+        bump(teamMeta.get(t?.home?.team1?.id));
+        bump(teamMeta.get(t?.home?.team2?.id));
+        bump(teamMeta.get(t?.away?.team1?.id));
+        bump(teamMeta.get(t?.away?.team2?.id));
+
+        if (l > r) return 'L';
+        if (r > l) return 'R';
+
+        const mo = +(t.matchOrder ?? Number.MAX_SAFE_INTEGER);
+        return (mo >= 1 && mo <= perSide) ? 'L' : 'R';
+      };
+
+      const placeAt = (arr, pos, tie) => {
+        if (Number.isInteger(pos) && pos >= 0 && pos < arr.length && arr[pos] == null) {
+          arr[pos] = tie; return;
+        }
+        // fallback: first free slot
+        let i = arr.findIndex(x => x === null);
+        if (i === -1) i = arr.length - 1;
+        arr[i] = tie;
+      };
+
+      for (const t of sorted) {
+        const side = chooseSide(t);
+        const arr = (side === 'R') ? right : left;
+
+        // collect any seeds we know for teams in this tie
+        const seeds = [
+          teamMeta.get(t?.home?.team1?.id)?.seed,
+          teamMeta.get(t?.home?.team2?.id)?.seed,
+          teamMeta.get(t?.away?.team1?.id)?.seed,
+          teamMeta.get(t?.away?.team2?.id)?.seed,
+        ].filter(s => Number.isInteger(s));
+
+        if (seeds.length) {
+          const minSeed = Math.min(...seeds);          // stable even if only one team known
+          const localPos = Math.floor(minSeed / cluster); // 0..perSide-1 at this depth
+          placeAt(arr, localPos, t);
+        } else {
+          placeAt(arr, null, t);
+        }
+      }
+      return { left, right, perSide };
+    }
 
     // --------- SIDE-AWARE LOCKS (no global blanket locks) ----------
     const locksSide = { left: new Set(), right: new Set() };
@@ -1106,10 +1137,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     if (present("1/2")) {
       const semiTies = byRound.get("1/2") || [];
       const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
-
-      // Use the correct signature for your file:
-      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);           // only-knockouts
-
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);
       if (tieHasBothParticipants(sfLeft.find(Boolean))) locksSide.left.add(normRound("1/8"));
       if (tieHasBothParticipants(sfRight.find(Boolean))) locksSide.right.add(normRound("1/8"));
     }
@@ -1127,9 +1155,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
       const semiTies = byRound.get("1/2") || [];
       const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
-
-      // Use the correct signature for your file:
-      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);           // only-knockouts
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);
 
       const sideHasFinalist = (arr) => {
         const t = arr.find(Boolean); if (!t) return false;
@@ -1180,7 +1206,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     renderSide(rightSide, "right");
 
     function renderSide(sideEl, sideKey) {
-      // rows layout
       const firstRoundTiesTotal = EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
       const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
       const BASE_SPAN = 4;
@@ -1204,7 +1229,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
         col.appendChild(body);
 
-        // de-dup by stable key (prevents duplicate “stacked” cards)
+        // de-dup by stable key (prevents duplicate cards)
         const raw = byRound.get(rk) || [];
         const seen = new Set();
         const tiesAll = [];
@@ -1263,7 +1288,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     };
 
     // Re-render only when next round *content* changed (ids OR participants/winner/scores).
-    // When the next round is the Final, patch the center Final card in-place if possible.
     async function maybeReloadNextRound(tie) {
       const rk = tie?.round || firstRound;
       const next = nextRoundOf(rk);
@@ -1271,7 +1295,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
       const nextNorm = normRound(next);
 
-      // Collect old ties for the next round using normalized round names (handles "Final"/"final")
+      // Collect old ties for the next round using normalized round names
       const getRoundList = (roundName, sourceMap) => {
         const rn = normRound(roundName);
         const out = [];
@@ -1303,18 +1327,15 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         const res = await apiPost("/round-knockouts", { leagueId }, { showLoading: false });
         if (!res?.success || !res.data) return;
 
-        // New ties from backend for the same normalized round
         const newerNext = (res.data.matches || []).filter(
           m => normRound(m.round || next) === nextNorm
         );
 
-        // If number of ties changed -> full re-render
         if (newerNext.length !== oldNext.length) {
           await renderLeagueOnlyKnockouts(leagueId, rootEl);
           return;
         }
 
-        // If content signature changed -> full re-render
         const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
         const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
 
@@ -1328,8 +1349,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
             return;
           }
         }
-        // otherwise no-op (no changes)
-
       } catch (e) {
         console.error(e);
       }
@@ -1372,7 +1391,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
               }
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"), "success");
-              // local patch only
               if (tie.home?.id && (role === "A" ? tie.home?.team1?.id : tie.home?.team2?.id)) {
                 if (role === "A") (tie.home.team1 || tie.home.team2).userId = userId;
               }
@@ -1403,7 +1421,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         el.value = initial;
         el.dataset.initial = String(initial);
 
-        // require both teams to exist before enabling
         const hasBothTeams = !!(
           leg?.team1 && (leg.team1.id || (leg.team1.name && leg.team1.name.trim())) &&
           leg?.team2 && (leg.team2.id || (leg.team2.name && leg.team2.name.trim()))
@@ -1431,7 +1448,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
                 : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
               if (res.success) {
-                // local patch + smooth refresh
                 el.dataset.initial = String(n);
                 if (!leg.score) leg.score = {};
                 if (el.dataset.which === "t1") leg.score.team1 = n; else leg.score.team2 = n;
@@ -1444,7 +1460,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         return el;
       };
 
-      // score inputs
       const H_top = buildScore(tie.home, "t1");
       const H_bottom = buildScore(tie.home, "t2");
       const A_top = isFinal ? null : buildScore(tie.away, "t2");
@@ -1453,7 +1468,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       const u1 = buildUserSelect(teamA, "A");
       const u2 = buildUserSelect(teamB, "B");
 
-      // winner controls
       const isNum = v => Number.isFinite(v);
       const h = tie.home?.score || {};
       const a = tie.away?.score || {};
@@ -1479,7 +1493,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
             if (res.success) {
-              tie.winnerTeamId = winnerId; // local patch
+              tie.winnerTeamId = winnerId;
               refreshTieUI();
               await maybeReloadNextRound(tie);
             }
@@ -1489,19 +1503,16 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
       }
 
-      // rows
       const row1 = document.createElement("div");
       const row2 = document.createElement("div");
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
-      // refresh helper (local, no re-render)
       function refreshTieUI() {
         const H = tie.home?.score || {};
         const A = tie.away?.score || {};
         const isNum = v => Number.isFinite(v);
 
-        // enable/disable pickers depending on draw
         let canPick;
         if (isFinal) {
           const drawFinal = isNum(H.team1) && isNum(H.team2) && H.team1 === H.team2;
@@ -1513,7 +1524,6 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         }
         cbA.disabled = cbB.disabled = !canPick;
 
-        // winner highlight
         row1.classList.remove("winner-row");
         row2.classList.remove("winner-row");
         if (tie.winnerTeamId) {
