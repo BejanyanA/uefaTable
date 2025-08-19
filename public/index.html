@@ -187,12 +187,12 @@
             <div id="banner2" class="banner" banner-id="2">
               <h2 id="banner-title">Europe League</h2>
             </div>
-            <div id="banner3" class="banner" banner-id="3">
+            <!-- <div id="banner3" class="banner" banner-id="3">
               <h2 id="banner-title">EURO Cup</h2>
             </div>
             <div id="banner4" class="banner" banner-id="4">
               <h2 id="banner-title">WORLD Cup</h2>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -259,7 +259,7 @@
                 <select id="count-select" class="modal-dropdown">
                   <option class="teamCount" value="16">16</option>
                   <option class="teamCount" value="32" selected>32</option>
-                  <!-- <option class="teamCount" value="64">64</option> -->
+                  <option class="teamCount" value="64">64</option>
                 </select>
               </div>
             </div>
@@ -360,7 +360,8 @@
           const isKnockout = stageSelect.value === "false"; // knockout option
           [...teamCountSelect.options].forEach(opt => {
             const val = parseInt(opt.value, 10);
-            const show = isKnockout ? (val === 16 || val === 32) : (val === 32 || val === 64);
+            const show = isKnockout ? (val === 16) : (val === 32);
+            // const show = isKnockout ? (val === 16 || val === 32) : (val === 32 || val === 64);
             opt.hidden = !show;
           });
 
