@@ -550,55 +550,55 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
 
     // --- side-aware locks ---
     const locksGlobal = new Set();                           // applies to both sides (e.g. Final -> lock 1/4)
-    const locksSide = { left: new Set(), right: new Set() }; // per-side locks (e.g. SF -> lock 1/8 on that side)
-    const anyTie = arr => Array.isArray(arr) && arr.some(Boolean);
+    const locksSide = { left: new Set(), right: new Set() };
+    const present = (r) => Array.from(byRound.keys()).some(k => normRound(k) === normRound(r));
 
-    // 1) Lock 1/8 per side if that side has a Semi-final
-    (() => {
+    const teamPresent = (tm) => !!(tm && (tm.id != null || (tm.name && String(tm.name).trim())));
+    const tieHasBothParticipants = (tie) => {
+      if (!tie) return false;
+      const top = tie?.home?.team1 || tie?.away?.team2;
+      const bottom = tie?.home?.team2 || tie?.away?.team1;
+      return teamPresent(top) && teamPresent(bottom);
+    };
+
+    // Lock 1/8 per side ONLY when that side’s SF has both teams
+    if (present("1/2")) {
       const semiTies = byRound.get("1/2") || [];
-      const perSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2); // usually 1
-      const split = splitForRound(semiTies, "1/2", firstRound, perSide);
-      if (anyTie(split.left)) locksSide.left.add(normRound("1/8"));
-      if (anyTie(split.right)) locksSide.right.add(normRound("1/8"));
-    })();
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
 
-    // 2) If Final exists → lock 1/4 globally
+      // Use the correct signature for your file:
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", firstRound, expectedPerSide); // group-knockouts
+
+      if (tieHasBothParticipants(sfLeft.find(Boolean))) locksSide.left.add(normRound("1/8"));
+      if (tieHasBothParticipants(sfRight.find(Boolean))) locksSide.right.add(normRound("1/8"));
+    }
+
+    // If Final has both teams, lock 1/4 only on the side that contains a finalist
     (() => {
       const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
       const finalTie = finalsRaw.find(Boolean);
-      if (!finalTie) return;
+      if (!finalTie || !tieHasBothParticipants(finalTie)) return;
 
-      // helper: collect all team ids mentioned in a tie (both legs)
-      const idsOf = (tie) => {
-        const ids = [];
-        const push = (x) => { if (x && x.id) ids.push(+x.id); };
-        const H = tie?.home || {}, A = tie?.away || {};
-        push(H.team1); push(H.team2); push(A.team1); push(A.team2);
-        return new Set(ids);
-      };
+      const finalIds = new Set(
+        [finalTie?.home?.team1, finalTie?.home?.team2, finalTie?.away?.team1, finalTie?.away?.team2]
+          .filter(Boolean).map(x => +x.id)
+      );
 
-      const finalIds = idsOf(finalTie);
-
-      // split semis to know which is left/right
       const semiTies = byRound.get("1/2") || [];
-      const perSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
-      const { left: sfLeftArr, right: sfRightArr } =
-        splitForRound(semiTies, "1/2", firstRound, perSide);
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
 
-      const leftSF = sfLeftArr.find(Boolean);
-      const rightSF = sfRightArr.find(Boolean);
+      // Use the correct signature for your file:
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", firstRound, expectedPerSide); // group-knockouts
 
-      const sideHasFinalist = (sf) => {
-        if (!sf) return false;
-        if (sf.winnerTeamId) return true;                 // winner decided
-        const sfIds = idsOf(sf);
-        // a team from this semi already appears in the final
-        for (const id of sfIds) if (finalIds.has(id)) return true;
-        return false;
+      const sideHasFinalist = (arr) => {
+        const t = arr.find(Boolean); if (!t) return false;
+        const ids = [t?.home?.team1, t?.home?.team2, t?.away?.team1, t?.away?.team2]
+          .filter(Boolean).map(x => +x.id);
+        return ids.some(id => finalIds.has(id));
       };
 
-      if (sideHasFinalist(leftSF)) locksSide.left.add(normRound("1/4"));
-      if (sideHasFinalist(rightSF)) locksSide.right.add(normRound("1/4"));
+      if (sideHasFinalist(sfLeft)) locksSide.left.add(normRound("1/4"));
+      if (sideHasFinalist(sfRight)) locksSide.right.add(normRound("1/4"));
     })();
 
     // Frame
@@ -1092,49 +1092,54 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
     // --------- SIDE-AWARE LOCKS (no global blanket locks) ----------
     const locksSide = { left: new Set(), right: new Set() };
-
-    const anyTie = (arr) => (arr && arr.some(Boolean));
     const present = (r) => Array.from(byRound.keys()).some(k => normRound(k) === normRound(r));
 
-    // Lock Round of 16 per side when that side has a Semi-final tie
+    const teamPresent = (tm) => !!(tm && (tm.id != null || (tm.name && String(tm.name).trim())));
+    const tieHasBothParticipants = (tie) => {
+      if (!tie) return false;
+      const top = tie?.home?.team1 || tie?.away?.team2;
+      const bottom = tie?.home?.team2 || tie?.away?.team1;
+      return teamPresent(top) && teamPresent(bottom);
+    };
+
+    // Lock 1/8 per side ONLY when that side’s SF has both teams
     if (present("1/2")) {
       const semiTies = byRound.get("1/2") || [];
       const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
-      const { left: sfLeftArr, right: sfRightArr } = splitForRound(semiTies, "1/2", expectedPerSide);
-      if (anyTie(sfLeftArr)) locksSide.left.add(normRound("1/8"));
-      if (anyTie(sfRightArr)) locksSide.right.add(normRound("1/8"));
+
+      // Use the correct signature for your file:
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);           // only-knockouts
+
+      if (tieHasBothParticipants(sfLeft.find(Boolean))) locksSide.left.add(normRound("1/8"));
+      if (tieHasBothParticipants(sfRight.find(Boolean))) locksSide.right.add(normRound("1/8"));
     }
 
-    // If there is a finalist, lock THAT side's Quarter-finals only
+    // If Final has both teams, lock 1/4 only on the side that contains a finalist
     (() => {
       const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
       const finalTie = finalsRaw.find(Boolean);
-      if (!finalTie) return;
+      if (!finalTie || !tieHasBothParticipants(finalTie)) return;
 
-      const idsOf = (tie) => {
-        const ids = [];
-        const push = (x) => { if (x && x.id) ids.push(+x.id); };
-        const H = tie?.home || {}, A = tie?.away || {};
-        push(H.team1); push(H.team2); push(A.team1); push(A.team2);
-        return new Set(ids);
-      };
-      const finalIds = idsOf(finalTie);
+      const finalIds = new Set(
+        [finalTie?.home?.team1, finalTie?.home?.team2, finalTie?.away?.team1, finalTie?.away?.team2]
+          .filter(Boolean).map(x => +x.id)
+      );
 
       const semiTies = byRound.get("1/2") || [];
       const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
-      const { left: sfLeftArr, right: sfRightArr } = splitForRound(semiTies, "1/2", expectedPerSide);
 
-      const sideHasFinalist = (sf) => {
-        const tie = sf && sf.find(Boolean);
-        if (!tie) return false;
-        if (tie.winnerTeamId) return true;
-        const sfIds = idsOf(tie);
-        for (const id of sfIds) if (finalIds.has(id)) return true;
-        return false;
+      // Use the correct signature for your file:
+      const { left: sfLeft, right: sfRight } = splitForRound(semiTies, "1/2", expectedPerSide);           // only-knockouts
+
+      const sideHasFinalist = (arr) => {
+        const t = arr.find(Boolean); if (!t) return false;
+        const ids = [t?.home?.team1, t?.home?.team2, t?.away?.team1, t?.away?.team2]
+          .filter(Boolean).map(x => +x.id);
+        return ids.some(id => finalIds.has(id));
       };
 
-      if (sideHasFinalist(sfLeftArr)) locksSide.left.add(normRound("1/4"));
-      if (sideHasFinalist(sfRightArr)) locksSide.right.add(normRound("1/4"));
+      if (sideHasFinalist(sfLeft)) locksSide.left.add(normRound("1/4"));
+      if (sideHasFinalist(sfRight)) locksSide.right.add(normRound("1/4"));
     })();
 
     // ----------------------------- UI frame -----------------------------
