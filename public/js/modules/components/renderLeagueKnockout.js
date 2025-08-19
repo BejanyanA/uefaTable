@@ -210,20 +210,29 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
       return aggA !== aggB;
     };
 
-    // 🔁 Re-render only when next round *content* changed (ids OR participants/winner)
+    // 🔁 Re-render only when the *next* round actually changed (ids/participants/winner/scores)
+    // Works for all rounds (incl. Final) and handles "Final"/"final" casing.
     async function maybeReloadNextRound(tie) {
       const rk = tie?.round || firstRound;
       const next = nextRoundOf(rk);
       if (!next) return;
 
-      const oldNext = byRound.get(next) || [];
+      const nextNorm = normRound(next);
 
-      // stable key for a tie
+      // Gather "old" next-round ties from byRound using normalized keys
+      const getRoundList = (roundName, sourceMap) => {
+        const rn = normRound(roundName);
+        const out = [];
+        sourceMap.forEach((list, key) => { if (normRound(key) === rn) out.push(...list); });
+        return out;
+      };
+      const oldNext = getRoundList(next, byRound);
+
       const keyOf = (m) =>
         String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || next}:${m.matchOrder}`);
 
-      // participant/winner fingerprint
       const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
+
       const sigOf = (m) => {
         const H = m?.home || {}, A = m?.away || {};
         const hs = H.score || {}, as = A.score || {};
@@ -231,7 +240,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
           idOrName(H.team1), idOrName(H.team2),
           idOrName(A.team1), idOrName(A.team2),
           m?.winnerTeamId ?? "",
-          // include scores if you want next-round score updates to trigger refresh too:
+          // include scores so next-round score changes also trigger refresh
           Number.isFinite(hs.team1) ? hs.team1 : "",
           Number.isFinite(hs.team2) ? hs.team2 : "",
           Number.isFinite(as.team1) ? as.team1 : "",
@@ -240,25 +249,24 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
       };
 
       try {
-        // tiny delay helps if backend is eventually consistent
-        // await new Promise(r => setTimeout(r, 120));
-
         const res = await apiPost("/group-knockouts", { leagueId }, { showLoading: false });
         if (!res?.success || !res.data) return;
 
-        const newerNext = (res.data.matches || []).filter(m => (m.round || next) === next);
+        // "New" next-round ties (normalized)
+        const newerNext = (res.data.matches || []).filter(
+          m => normRound(m.round || next) === nextNorm
+        );
 
-        // count changed -> refresh
+        // Count change → re-render
         if (newerNext.length !== oldNext.length) {
           await renderLeagueKnockoutsStage(leagueId, rootEl);
           return;
         }
 
-        // build maps: key -> signature
+        // Signature change → re-render
         const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
         const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
 
-        // key set or signature changed -> refresh
         if (oldMap.size !== newMap.size) {
           await renderLeagueKnockoutsStage(leagueId, rootEl);
           return;
@@ -269,7 +277,8 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
             return;
           }
         }
-        // otherwise, nothing material changed – keep the smooth local UI
+        // no material change → keep local UI
+
       } catch (e) {
         console.error(e);
       }
