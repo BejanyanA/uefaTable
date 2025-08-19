@@ -1001,53 +1001,68 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       return isNum(s.team1) && isNum(s.team2) && s.team1 !== s.team2; // single leg: non-draw decides it
     };
 
-    async function maybeReloadNextRound(match) {
-      const rk = match?.round || firstRound;
+    async function maybeReloadNextRound(tie) {
+      const rk = tie?.round || firstRound;
+      const rkNorm = normRound(rk);
       const next = nextRoundOf(rk);
-      if (!next) return;
+      const nextNorm = next ? normRound(next) : null;
+      const force = !!tie?.winnerTeamId;
 
-      const nextNorm = normRound(next);
-      const collect = (roundName, source) => {
+      const collectRound = (roundName, sourceMap) => {
         const rn = normRound(roundName);
         const out = [];
-        source.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
+        sourceMap.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
         return out;
       };
-      const oldNext = collect(next, byRound);
 
-      const keyOf = (m) => String(m?.id ?? `${m.round || next}:${m.matchOrder}`);
+      const keyOf = (m, fallbackRound) =>
+        String(m?.id ?? `${m.round || fallbackRound}:${m.matchOrder}`);
+
+      const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
+
       const sigOf = (m) => {
         const s = m?.score || {};
-        const idOrName = x => (x && (x.id ?? (x.name || ""))) ?? "";
         return [
-          idOrName(m.team1), idOrName(m.team2),
+          idOrName(m?.team1), idOrName(m?.team2),
           m?.winnerTeamId ?? "",
           Number.isFinite(s.team1) ? s.team1 : "",
           Number.isFinite(s.team2) ? s.team2 : "",
         ].join("|");
       };
 
+      const changed = (oldArr, newArr, fallbackRound) => {
+        if (oldArr.length !== newArr.length) return true;
+        const oldMap = new Map(oldArr.map(m => [keyOf(m, fallbackRound), sigOf(m)]));
+        const newMap = new Map(newArr.map(m => [keyOf(m, fallbackRound), sigOf(m)]));
+        if (oldMap.size !== newMap.size) return true;
+        for (const [k, v] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== v) return true;
+        }
+        return false;
+      };
+
       try {
         const res = await apiPost("/national-round-knockouts", { leagueId }, { showLoading: false });
         if (!res?.success || !res.data) return;
+        const allNew = res.data.matches || [];
 
-        const newerNext = (res.data.matches || []).filter(
-          m => normRound(m.round || next) === nextNorm
-        );
-
-        if (newerNext.length !== oldNext.length) { await renderNationalOnlyKnockouts(leagueId, rootEl); return; }
-
-        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
-        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
-
-        if (oldMap.size !== newMap.size) { await renderNationalOnlyKnockouts(leagueId, rootEl); return; }
-        for (const [k, v] of oldMap) {
-          if (!newMap.has(k) || newMap.get(k) !== v) {
+        if (nextNorm) {
+          const oldNext = collectRound(next, byRound);
+          const newNext = allNew.filter(m => normRound(m.round || next) === nextNorm);
+          if (changed(oldNext, newNext, next) || force) {
             await renderNationalOnlyKnockouts(leagueId, rootEl);
-            return;
           }
+          return;
         }
-      } catch (e) { console.error(e); }
+
+        const oldFinal = collectRound("Final", byRound);
+        const newFinal = allNew.filter(m => normRound(m.round || "Final") === "final");
+        if (changed(oldFinal, newFinal, "Final") || force) {
+          await renderNationalOnlyKnockouts(leagueId, rootEl);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     // ===== Tie card (single-leg) =====
@@ -1221,11 +1236,11 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       }
 
       if (sideKey === "right") {
-        appendSafe(row1, isFinal ? null : H_top, tn1, u1); row1.prepend(cbA);
-        appendSafe(row2, isFinal ? null : H_bottom, tn2, u2); row2.prepend(cbB);
-      } else {
-        appendSafe(row1, u1, tn1, H_top, isFinal ? null : cbA);
-        appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : cbB);
+        appendSafe(row1, H_top, tn1, u1); row1.prepend(cbA);
+        appendSafe(row2, H_bottom, tn2, u2); row2.prepend(cbB);
+      } else { // left or center
+        appendSafe(row1, u1, tn1, H_top, cbA);
+        appendSafe(row2, u2, tn2, H_bottom, cbB);
       }
 
       refreshTieUI();

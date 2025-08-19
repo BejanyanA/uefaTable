@@ -214,33 +214,32 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
     // Works for all rounds (incl. Final) and handles "Final"/"final" casing.
     async function maybeReloadNextRound(tie) {
       const rk = tie?.round || firstRound;
+      const rkNorm = normRound(rk);
       const next = nextRoundOf(rk);
-      if (!next) return;
+      const nextNorm = next ? normRound(next) : null;
 
-      const nextNorm = normRound(next);
+      // if user explicitly picked a winner, force a refresh even if the diff looks unchanged
+      const force = !!tie?.winnerTeamId;
 
-      // Gather "old" next-round ties from byRound using normalized keys
-      const getRoundList = (roundName, sourceMap) => {
+      const collectRound = (roundName, sourceMap) => {
         const rn = normRound(roundName);
         const out = [];
-        sourceMap.forEach((list, key) => { if (normRound(key) === rn) out.push(...list); });
+        sourceMap.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
         return out;
       };
-      const oldNext = getRoundList(next, byRound);
 
-      const keyOf = (m) =>
-        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || next}:${m.matchOrder}`);
+      const keyOf = (m, fallbackRound) =>
+        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || fallbackRound}:${m.matchOrder}`);
 
       const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
 
-      const sigOf = (m) => {
+      const sigOf = (m, fallbackRound) => {
         const H = m?.home || {}, A = m?.away || {};
         const hs = H.score || {}, as = A.score || {};
         return [
           idOrName(H.team1), idOrName(H.team2),
           idOrName(A.team1), idOrName(A.team2),
           m?.winnerTeamId ?? "",
-          // include scores so next-round score changes also trigger refresh
           Number.isFinite(hs.team1) ? hs.team1 : "",
           Number.isFinite(hs.team2) ? hs.team2 : "",
           Number.isFinite(as.team1) ? as.team1 : "",
@@ -248,37 +247,37 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
         ].join("|");
       };
 
+      const changed = (oldArr, newArr, fallbackRound) => {
+        if (oldArr.length !== newArr.length) return true;
+        const oldMap = new Map(oldArr.map(m => [keyOf(m, fallbackRound), sigOf(m, fallbackRound)]));
+        const newMap = new Map(newArr.map(m => [keyOf(m, fallbackRound), sigOf(m, fallbackRound)]));
+        if (oldMap.size !== newMap.size) return true;
+        for (const [k, v] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== v) return true;
+        }
+        return false;
+      };
+
       try {
         const res = await apiPost("/group-knockouts", { leagueId }, { showLoading: false });
         if (!res?.success || !res.data) return;
+        const allNew = res.data.matches || [];
 
-        // "New" next-round ties (normalized)
-        const newerNext = (res.data.matches || []).filter(
-          m => normRound(m.round || next) === nextNorm
-        );
-
-        // Count change → re-render
-        if (newerNext.length !== oldNext.length) {
-          await renderLeagueKnockoutsStage(leagueId, rootEl);
-          return;
-        }
-
-        // Signature change → re-render
-        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
-        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
-
-        if (oldMap.size !== newMap.size) {
-          await renderLeagueKnockoutsStage(leagueId, rootEl);
-          return;
-        }
-        for (const [k, oldSig] of oldMap) {
-          if (!newMap.has(k) || newMap.get(k) !== oldSig) {
+        if (nextNorm) {
+          const oldNext = collectRound(next, byRound);
+          const newNext = allNew.filter(m => normRound(m.round || next) === nextNorm);
+          if (changed(oldNext, newNext, next) || force) {
             await renderLeagueKnockoutsStage(leagueId, rootEl);
-            return;
           }
+          return;
         }
-        // no material change → keep local UI
 
+        // FINAL case (no next round)
+        const oldFinal = collectRound("Final", byRound);
+        const newFinal = allNew.filter(m => normRound(m.round || "Final") === "final");
+        if (changed(oldFinal, newFinal, "Final") || force) {
+          await renderLeagueKnockoutsStage(leagueId, rootEl);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -956,8 +955,6 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
   }
 }
 
-
-
 export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
   const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
   root.innerHTML = "";
@@ -1290,26 +1287,24 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     // Re-render only when next round *content* changed (ids OR participants/winner/scores).
     async function maybeReloadNextRound(tie) {
       const rk = tie?.round || firstRound;
+      const rkNorm = normRound(rk);
       const next = nextRoundOf(rk);
-      if (!next) return;
+      const nextNorm = next ? normRound(next) : null;
+      const force = !!tie?.winnerTeamId;
 
-      const nextNorm = normRound(next);
-
-      // Collect old ties for the next round using normalized round names
-      const getRoundList = (roundName, sourceMap) => {
+      const collectRound = (roundName, sourceMap) => {
         const rn = normRound(roundName);
         const out = [];
         sourceMap.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
         return out;
       };
-      const oldNext = getRoundList(next, byRound);
 
-      const keyOf = (m) =>
-        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || next}:${m.matchOrder}`);
+      const keyOf = (m, fallbackRound) =>
+        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || fallbackRound}:${m.matchOrder}`);
 
       const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
 
-      const sigOf = (m) => {
+      const sigOf = (m, fallbackRound) => {
         const H = m?.home || {}, A = m?.away || {};
         const hs = H.score || {}, as = A.score || {};
         return [
@@ -1323,31 +1318,35 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         ].join("|");
       };
 
+      const changed = (oldArr, newArr, fallbackRound) => {
+        if (oldArr.length !== newArr.length) return true;
+        const oldMap = new Map(oldArr.map(m => [keyOf(m, fallbackRound), sigOf(m, fallbackRound)]));
+        const newMap = new Map(newArr.map(m => [keyOf(m, fallbackRound), sigOf(m, fallbackRound)]));
+        if (oldMap.size !== newMap.size) return true;
+        for (const [k, v] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== v) return true;
+        }
+        return false;
+      };
+
       try {
         const res = await apiPost("/round-knockouts", { leagueId }, { showLoading: false });
         if (!res?.success || !res.data) return;
+        const allNew = res.data.matches || [];
 
-        const newerNext = (res.data.matches || []).filter(
-          m => normRound(m.round || next) === nextNorm
-        );
-
-        if (newerNext.length !== oldNext.length) {
-          await renderLeagueOnlyKnockouts(leagueId, rootEl);
-          return;
-        }
-
-        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
-        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
-
-        if (oldMap.size !== newMap.size) {
-          await renderLeagueOnlyKnockouts(leagueId, rootEl);
-          return;
-        }
-        for (const [k, oldSig] of oldMap) {
-          if (!newMap.has(k) || newMap.get(k) !== oldSig) {
+        if (nextNorm) {
+          const oldNext = collectRound(next, byRound);
+          const newNext = allNew.filter(m => normRound(m.round || next) === nextNorm);
+          if (changed(oldNext, newNext, next) || force) {
             await renderLeagueOnlyKnockouts(leagueId, rootEl);
-            return;
           }
+          return;
+        }
+
+        const oldFinal = collectRound("Final", byRound);
+        const newFinal = allNew.filter(m => normRound(m.round || "Final") === "final");
+        if (changed(oldFinal, newFinal, "Final") || force) {
+          await renderLeagueOnlyKnockouts(leagueId, rootEl);
         }
       } catch (e) {
         console.error(e);
