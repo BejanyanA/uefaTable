@@ -951,7 +951,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
               const userId = sel.value ? parseInt(sel.value, 10) : null;
               // single-leg assign: one request per changed team
               const teamId = role === "A" ? teamA?.id : teamB?.id;
-              await apiPost("/attach-round-knock-players", { matchId: knockoutId, teamId, userId, leagueId }, { showLoading: false });
+              await apiPost("/attach-national-round-knock-players", { matchId: knockoutId, teamId, userId, leagueId }, { showLoading: false });
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"), "success");
               await renderNationalOnlyKnockouts(leagueId, rootEl);
@@ -1002,7 +1002,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
             if (el.dataset.which === "t1") payload.team1_score = n; else payload.team2_score = n;
 
             try {
-              const res = await apiPost("/update-round-knock-matches", payload, { showLoading: false });
+              const res = await apiPost("/update-national-round-knock-matches", payload, { showLoading: false });
               if (res.success) el.dataset.initial = String(n);
               showToast(res.success ? (t.score_updated || "Score Updated")
                 : (t.score_update_failed || "Failed to update score"),
@@ -1040,7 +1040,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         const pick = async (winnerId, otherCb) => {
           try {
             otherCb.checked = false;
-            const res = await apiPost("/update-round-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
+            const res = await apiPost("/update-national-round-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
