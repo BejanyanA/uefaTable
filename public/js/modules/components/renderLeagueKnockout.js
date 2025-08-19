@@ -186,6 +186,8 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
       return;
     }
 
+
+    // Helper for rendering if needed
     const nextRoundOf = (rk) => {
       const i = rounds.indexOf(rk || firstRound);
       return i >= 0 && i + 1 < rounds.length ? rounds[i + 1] : null;
@@ -272,6 +274,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
         console.error(e);
       }
     }
+
 
     const editable = data.accessType === "owner";
     const teamCount = Number(data.teamCount) || 32;
@@ -944,8 +947,9 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
   }
 }
 
-export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
+
+export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
   const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType1");
   root.innerHTML = "";
   const t = langMap[currentLang];
@@ -962,7 +966,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
     const editable = data.accessType === "owner";
     const teamCount = Number(data.teamCount) || 32;
-    const koTeams = teamCount === 64 ? 32 : 16;
+    const koTeams = teamCount === 64 ? 32 : 16; // teams that reach the KOs
     const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2", "Final"] : ["1/8", "1/4", "1/2", "Final"];
     const firstRound = rounds[0];
 
@@ -970,29 +974,19 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
     const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
 
-    // ---------- Helpers (declare BEFORE anything uses them) ----------
-    const getNameOrNull = v => (v && String(v).trim()) || null;   // return null if missing
-    const toNum = n => (n == null || isNaN(n)) ? 0 : +n;
-    const appendSafe = (parent, ...nodes) => {
-      nodes.forEach(n => { if (n && n.nodeType) parent.appendChild(n); });
-    };
+    // --------------------------- helpers ---------------------------
+    const normRound = r => String(r || '').toLowerCase().replace(/\s+/g, '');
+    const appendSafe = (parent, ...nodes) => nodes.forEach(n => { if (n && n.nodeType) parent.appendChild(n); });
 
+    const scoresFilled = (leg) =>
+      !!(leg && leg.score && typeof leg.score.team1 === "number" && typeof leg.score.team2 === "number");
 
-    function splitLeftRightAlt(arr) { const L = [], R = []; arr.forEach((x, i) => (i % 2 === 0 ? L : R).push(x)); return { left: L, right: R }; }
-
-    function scoresFilled(leg) {
-      return !!(leg && leg.score &&
-        typeof leg.score.team1 === "number" &&
-        typeof leg.score.team2 === "number");
-    }
-
-    function calcAggregate(tie) {
+    const calcAggregate = (tie) => {
       const H = tie.home?.score || {};
       const A = tie.away?.score || {};
       const teamA = tie.home?.team1 || tie.away?.team2 || {};
       const teamB = tie.home?.team2 || tie.away?.team1 || {};
 
-      // Aggregate uses: A = home.t1 + away.t2,  B = home.t2 + away.t1
       const aggA = (typeof H.team1 === "number" ? H.team1 : 0) + (typeof A.team2 === "number" ? A.team2 : 0);
       const aggB = (typeof H.team2 === "number" ? H.team2 : 0) + (typeof A.team1 === "number" ? A.team1 : 0);
 
@@ -1001,19 +995,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       const draw = homeDone && awayDone && aggA === aggB;
 
       return { teamA, teamB, aggA, aggB, draw, homeDone, awayDone };
-    }
-
-    // First-round placeholders (A1 vs B2, then B1 vs A2, …)
-    const groupsCnt = Math.max(2, Math.min(16, Math.round(teamCount / 4)));
-    const GROUPS = Array.from({ length: groupsCnt }, (_, i) => String.fromCharCode(65 + i));
-    function placeholderFirstRound(i) {
-      const pair = Math.floor(i / 2);
-      const even = (i % 2) === 0;
-      const g1 = GROUPS[pair * 2], g2 = GROUPS[pair * 2 + 1];
-      if (!g1 || !g2) return { t1: `Qualifier ${i * 2 + 1}`, t2: `Qualifier ${i * 2 + 2}` };
-      return even ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
-        : { t1: `Group ${g2} 1st`, t2: `Group ${g1} 2nd` };
-    }
+    };
 
     function renderPlaceholderCard({ t1, t2 }) {
       const card = document.createElement("div");
@@ -1025,20 +1007,54 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       return card;
     }
 
-    function splitForRound(ties, rk, firstRound, expectedPerSide) {
-      // Always work on a sorted copy (by matchOrder) so the split is stable
+    // Stable, group-less placement:
+    // sort ties by matchOrder, then first half → left side, second half → right side
+    function splitForRound(ties, rk, expectedPerSide) {
+      // Stable order first
       const sorted = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
 
-      // For all rounds we do a block split: first half → left, second half → right.
       const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
-      return {
-        left: sorted.slice(0, perSide),
-        right: sorted.slice(perSide),
-        perSide
-      };
+      const left = Array(perSide).fill(null);
+      const right = Array(perSide).fill(null);
+      let lp = 0, rp = 0;
+
+      // Helper: figure out which half ('L' or 'R') this tie belongs to
+      function halfOfTie(t) {
+        const ids = [];
+        const push = (x) => { if (x && x.id != null) ids.push(+x.id); };
+        push(t?.home?.team1); push(t?.home?.team2);
+        push(t?.away?.team1); push(t?.away?.team2);
+
+        // count votes from Round-of-16 map
+        let l = 0, r = 0;
+        for (const id of ids) {
+          const h = teamHalf.get(id);
+          if (h === 'L') l++;
+          else if (h === 'R') r++;
+        }
+        if (l > r) return 'L';
+        if (r > l) return 'R';
+
+        // fallback: use matchOrder threshold if no identities are known
+        const mo = +(t.matchOrder ?? Number.MAX_SAFE_INTEGER);
+        return (mo >= 1 && mo <= perSide) ? 'L' : 'R';
+      }
+
+      // Place each tie on its proper side; keep side order by matchOrder
+      for (const t of sorted) {
+        const h = halfOfTie(t);
+        if (h === 'R') {
+          if (rp < right.length) right[rp++] = t;
+          else if (lp < left.length) left[lp++] = t;  // spill if side is full
+        } else {
+          if (lp < left.length) left[lp++] = t;
+          else if (rp < right.length) right[rp++] = t; // spill if side is full
+        }
+      }
+      return { left, right, perSide };
     }
 
-    // Bucket ties by round
+    // Build round -> ties map
     const byRound = new Map();
     (data.matches || []).forEach(m => {
       const r = m.round || firstRound;
@@ -1046,16 +1062,81 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       byRound.get(r).push(m);
     });
 
-    // Frame
+    // NEW: map every team id seen in Round of 16 to 'L' or 'R'
+    const firstRoundTies = (byRound.get(firstRound) || []).slice()
+      .sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
+
+    const FR_EXPECTED = EXPECTED_TIES[firstRound] || firstRoundTies.length || 0;
+    const FR_PER_SIDE = Math.max(1, Math.ceil(FR_EXPECTED / 2));
+
+    const teamHalf = new Map();   // teamId -> 'L' | 'R'
+    function tagHalf(team, half) {
+      if (team && team.id != null) teamHalf.set(+team.id, half);
+    }
+    firstRoundTies.forEach((t, idx) => {
+      const half = (idx < FR_PER_SIDE) ? 'L' : 'R';
+      tagHalf(t?.home?.team1, half);
+      tagHalf(t?.home?.team2, half);
+      tagHalf(t?.away?.team1, half);
+      tagHalf(t?.away?.team2, half);
+    });
+
+    // --------- SIDE-AWARE LOCKS (no global blanket locks) ----------
+    const locksSide = { left: new Set(), right: new Set() };
+
+    const anyTie = (arr) => (arr && arr.some(Boolean));
+    const present = (r) => Array.from(byRound.keys()).some(k => normRound(k) === normRound(r));
+
+    // Lock Round of 16 per side when that side has a Semi-final tie
+    if (present("1/2")) {
+      const semiTies = byRound.get("1/2") || [];
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
+      const { left: sfLeftArr, right: sfRightArr } = splitForRound(semiTies, "1/2", expectedPerSide);
+      if (anyTie(sfLeftArr)) locksSide.left.add(normRound("1/8"));
+      if (anyTie(sfRightArr)) locksSide.right.add(normRound("1/8"));
+    }
+
+    // If there is a finalist, lock THAT side's Quarter-finals only
+    (() => {
+      const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
+      const finalTie = finalsRaw.find(Boolean);
+      if (!finalTie) return;
+
+      const idsOf = (tie) => {
+        const ids = [];
+        const push = (x) => { if (x && x.id) ids.push(+x.id); };
+        const H = tie?.home || {}, A = tie?.away || {};
+        push(H.team1); push(H.team2); push(A.team1); push(A.team2);
+        return new Set(ids);
+      };
+      const finalIds = idsOf(finalTie);
+
+      const semiTies = byRound.get("1/2") || [];
+      const expectedPerSide = Math.ceil((EXPECTED_TIES["1/2"] || semiTies.length) / 2);
+      const { left: sfLeftArr, right: sfRightArr } = splitForRound(semiTies, "1/2", expectedPerSide);
+
+      const sideHasFinalist = (sf) => {
+        const tie = sf && sf.find(Boolean);
+        if (!tie) return false;
+        if (tie.winnerTeamId) return true;
+        const sfIds = idsOf(tie);
+        for (const id of sfIds) if (finalIds.has(id)) return true;
+        return false;
+      };
+
+      if (sideHasFinalist(sfLeftArr)) locksSide.left.add(normRound("1/4"));
+      if (sideHasFinalist(sfRightArr)) locksSide.right.add(normRound("1/4"));
+    })();
+
+    // ----------------------------- UI frame -----------------------------
     const frame = document.createElement("div");
     frame.className = "bracket-frame";
     const leftSide = document.createElement("div"); leftSide.className = "bracket-side left-side";
-    const centerSide = document.createElement("div"); centerSide.className = "bracket-center";
+    const center = document.createElement("div"); center.className = "bracket-center";
     const rightSide = document.createElement("div"); rightSide.className = "bracket-side right-side";
-    frame.append(leftSide, centerSide, rightSide);
+    frame.append(leftSide, center, rightSide);
     root.appendChild(frame);
 
-    // Cup + Final
     const cupSrc = {
       1: "assets/images/champ1.png",
       2: "assets/images/eur2.png",
@@ -1068,9 +1149,9 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const finalTitle = document.createElement("h3"); finalTitle.textContent = ROUND_LABELS["Final"];
     finalCol.appendChild(finalTitle);
 
-    // ⬇️ old: const finals = byRound.get("Final") || [];
-    const finals = byRound.get("Final") || byRound.get("final") || [];
-    if (finals.length) finalCol.appendChild(renderTie(finals[0], "center"));
+    const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
+    const finalTie0 = finalsRaw.find(Boolean) || null;
+    if (finalTie0) finalCol.appendChild(renderTie(finalTie0, "center"));
     else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
@@ -1078,129 +1159,186 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const img = document.createElement("img");
     img.className = "cup-image"; img.src = cupSrc; img.alt = "Trophy";
     cupWrap.appendChild(img);
-    centerSide.append(finalCol, cupWrap);
+    center.append(finalCol, cupWrap);
 
-    // Sides
+    // ----------------------------- rounds per side -----------------------------
     renderSide(leftSide, "left");
     renderSide(rightSide, "right");
 
     function renderSide(sideEl, sideKey) {
-      // how many first-round ties per SIDE (4 for R16, 8 for R32)
-      const firstRoundTiesTotal =
-        EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
+      // rows layout
+      const firstRoundTiesTotal = EXPECTED_TIES[firstRound] || ((byRound.get(firstRound) || []).length);
       const lanes = Math.max(1, Math.ceil(firstRoundTiesTotal / 2));
+      const BASE_SPAN = 4;
+      const ROW_H_PX = 18;
+      const TOTAL_ROWS = lanes * BASE_SPAN;
 
-      // visual grid config
-      const BASE_SPAN = 4;                    // each card spans 4 grid rows
-      const ROW_H_PX = 18;                   // height of ONE grid row (tweak to taste)
-      const TOTAL_ROWS = lanes * BASE_SPAN;   // total rows in each round column
+      rounds.filter(r => r !== "Final").forEach((rk, rIdx) => {
+        const col = document.createElement("div");
+        col.className = `side-round round-${rk.replace("/", "-")}`;
 
-      rounds
-        .filter(r => r !== "Final")
-        .forEach((rk, rIdx) => {
-          const col = document.createElement("div");
-          col.className = `side-round round-${rk.replace("/", "-")}`;
+        const title = document.createElement("h3");
+        title.textContent = ROUND_LABELS[rk];
+        col.appendChild(title);
 
-          // Title OUTSIDE the cards grid
-          const title = document.createElement("h3");
-          title.textContent = ROUND_LABELS[rk];
-          col.appendChild(title);
+        const body = document.createElement("div");
+        body.className = "round-body";
+        body.style.display = "grid";
+        body.style.alignContent = "start";
+        body.style.gap = "6px";
+        body.style.setProperty("--rowH", `${ROW_H_PX}px`);
+        body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
+        col.appendChild(body);
 
-          // Cards grid with FIXED row height & EXACT row count
-          const body = document.createElement("div");
-          body.className = "round-body";
-          body.style.display = "grid";
-          body.style.alignContent = "start";
-          body.style.gap = "6px";
-          body.style.setProperty("--rowH", `${ROW_H_PX}px`);
-          body.style.gridTemplateRows = `repeat(${TOTAL_ROWS}, var(--rowH))`;
-          col.appendChild(body);
+        // de-dup by stable key (prevents duplicate “stacked” cards)
+        const raw = byRound.get(rk) || [];
+        const seen = new Set();
+        const tiesAll = [];
+        for (const m of raw) {
+          const key = String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || rk}:${m.matchOrder}`);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          tiesAll.push(m);
+        }
+        const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
+        const expectedPerSide = Math.ceil(expected / 2);
 
-          const tiesAll = byRound.get(rk) || [];
-          const expected = EXPECTED_TIES[rk] || tiesAll.length || 0;
-          const expectedPerSide = Math.ceil(expected / 2);
+        const { left, right, perSide } = splitForRound(tiesAll, rk, expectedPerSide);
+        const list = sideKey === "left" ? left : right;
 
-          const { left, right, perSide } = splitForRound(tiesAll, rk, firstRound, expectedPerSide);
-          const list = sideKey === "left" ? left : right;
+        const cards = [];
+        for (let i = 0; i < perSide; i++) {
+          const tie = list[i] || null;
+          const card = tie
+            ? renderTie(tie, sideKey)
+            : renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
+          card.style.margin = "0";
+          cards.push(card);
+        }
 
-          // Build cards (real ties)
-          const cards = [];
-          const useGroupFallback = (rk === firstRound);
-
-          list.forEach((tie, i) => {
-            let ph = null;
-            if (rk === firstRound) {
-              const baseIndex = (sideKey === "left" ? i : i + perSide);
-              ph = placeholderFirstRound(baseIndex);
-            }
-            const card = renderTie(tie, sideKey, ph, useGroupFallback);
-            card.style.margin = "0";                 // grid controls spacing
-            cards.push(card);
-          });
-
-          // Pad placeholders
-          const missing = perSide - list.length;
-          if (missing > 0) {
-            for (let i = 0; i < missing; i++) {
-              let phCard;
-              if (rk === firstRound) {
-                const indexOnSide = list.length + i;
-                const baseIndex = (sideKey === "left" ? indexOnSide : indexOnSide + perSide);
-                phCard = renderPlaceholderCard(placeholderFirstRound(baseIndex));
-              } else {
-                phCard = renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
-              }
-              phCard.style.margin = "0";
-              cards.push(phCard);
-            }
-          }
-
-          // Precise placement inside FIXED-ROW grid (no title offset needed)
-          // startRow = j * (BASE_SPAN * 2^rIdx) + (2^(rIdx+1) - 1)
-          cards.forEach((card, j) => {
-            const start =
-              j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
-            card.style.gridRow = `${start} / span ${BASE_SPAN}`;
-            // Let the grid define height; card stretches to its spanned rows
-            card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
-            body.appendChild(card);
-          });
-
-          sideEl.appendChild(col);
+        // precise placement in fixed-row grid
+        cards.forEach((card, j) => {
+          const start = j * (BASE_SPAN * Math.pow(2, rIdx)) + (Math.pow(2, rIdx + 1) - 1);
+          card.style.gridRow = `${start} / span ${BASE_SPAN}`;
+          card.style.height = `calc(var(--rowH) * ${BASE_SPAN})`;
+          body.appendChild(card);
         });
+
+        sideEl.appendChild(col);
+      });
     }
 
-    // ===== Tie card =====
-    function normGroup(g) { return g ? String(g).replace(/\s+/g, '').toUpperCase() : null; }
-    function parsePh(phText) {
-      if (!phText) return { group: null, rank: null };
-      const g = /Group\s+([A-P])/i.exec(phText);
-      const r = /([12])(?:st|nd)/i.exec(phText);
-      return { group: g ? `Group ${g[1].toUpperCase()}` : null, rank: r ? +r[1] : null };
+    // ------------------------------ mini refresh helpers ------------------------------
+    const nextRoundOf = (rk) => {
+      const i = rounds.indexOf(rk || firstRound);
+      return i >= 0 && i + 1 < rounds.length ? rounds[i + 1] : null;
+    };
+
+    const tieLikelySettled = (tie) => {
+      if (tie && tie.winnerTeamId) return true;
+      const H = tie?.home?.score || {};
+      const A = tie?.away?.score || {};
+      const isNum = (v) => Number.isFinite(v);
+      const isFinal = String(tie?.round || "").toLowerCase() === "final";
+      if (isFinal) return isNum(H.team1) && isNum(H.team2) && H.team1 !== H.team2;
+      const haveAll = isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2);
+      if (!haveAll) return false;
+      const aggA = (H.team1 || 0) + (A.team2 || 0);
+      const aggB = (H.team2 || 0) + (A.team1 || 0);
+      return aggA !== aggB;
+    };
+
+    // Re-render only when next round *content* changed (ids OR participants/winner/scores).
+    // When the next round is the Final, patch the center Final card in-place if possible.
+    async function maybeReloadNextRound(tie) {
+      const rk = tie?.round || firstRound;
+      const next = nextRoundOf(rk);
+      if (!next) return;
+
+      const nextNorm = normRound(next);
+
+      // Collect old ties for the next round using normalized round names (handles "Final"/"final")
+      const getRoundList = (roundName, sourceMap) => {
+        const rn = normRound(roundName);
+        const out = [];
+        sourceMap.forEach((v, k) => { if (normRound(k) === rn) out.push(...v); });
+        return out;
+      };
+      const oldNext = getRoundList(next, byRound);
+
+      const keyOf = (m) =>
+        String(m?.home?.id ?? m?.away?.id ?? m?.id ?? `${m.round || next}:${m.matchOrder}`);
+
+      const idOrName = (x) => (x && (x.id ?? (x.name || ""))) ?? "";
+
+      const sigOf = (m) => {
+        const H = m?.home || {}, A = m?.away || {};
+        const hs = H.score || {}, as = A.score || {};
+        return [
+          idOrName(H.team1), idOrName(H.team2),
+          idOrName(A.team1), idOrName(A.team2),
+          m?.winnerTeamId ?? "",
+          Number.isFinite(hs.team1) ? hs.team1 : "",
+          Number.isFinite(hs.team2) ? hs.team2 : "",
+          Number.isFinite(as.team1) ? as.team1 : "",
+          Number.isFinite(as.team2) ? as.team2 : "",
+        ].join("|");
+      };
+
+      try {
+        const res = await apiPost("/round-knockouts", { leagueId }, { showLoading: false });
+        if (!res?.success || !res.data) return;
+
+        // New ties from backend for the same normalized round
+        const newerNext = (res.data.matches || []).filter(
+          m => normRound(m.round || next) === nextNorm
+        );
+
+        // If number of ties changed -> full re-render
+        if (newerNext.length !== oldNext.length) {
+          await renderLeagueOnlyKnockouts(leagueId, rootEl);
+          return;
+        }
+
+        // If content signature changed -> full re-render
+        const oldMap = new Map(oldNext.map(m => [keyOf(m), sigOf(m)]));
+        const newMap = new Map(newerNext.map(m => [keyOf(m), sigOf(m)]));
+
+        if (oldMap.size !== newMap.size) {
+          await renderLeagueOnlyKnockouts(leagueId, rootEl);
+          return;
+        }
+        for (const [k, oldSig] of oldMap) {
+          if (!newMap.has(k) || newMap.get(k) !== oldSig) {
+            await renderLeagueOnlyKnockouts(leagueId, rootEl);
+            return;
+          }
+        }
+        // otherwise no-op (no changes)
+
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function renderTie(tie, sideKey, ph, useGroupFallback = false) {
+    // ================ TIE CARD =================
+    function renderTie(tie, sideKey) {
+      if (!tie) return renderPlaceholderCard({ t1: "TBD", t2: "TBD" });
+
+      const roundKey = normRound(tie.round || firstRound);
+      const canEdit = editable && !(locksSide[sideKey] && locksSide[sideKey].has(roundKey));
+
       const knockoutId = tie?.home?.id ?? tie?.away?.id ?? tie?.id ?? tie?.matchOrder;
       const isFinal = String(tie.round || "").toLowerCase() === "final";
-      const { teamA, teamB, draw, homeDone, awayDone } = calcAggregate(tie);
+      const { teamA, teamB } = calcAggregate(tie);
 
       const card = document.createElement("div");
       card.className = "ko-card ko-row-2";
 
-      // if (tie.winnerTeamId && tie.winnerTeamName) {
-      //   const wb = document.createElement("div");
-      //   wb.style.textAlign = "center";
-      //   wb.style.fontWeight = "700";
-      //   wb.style.marginBottom = "4px";
-      //   // wb.textContent = `${t.winner || "Winner"}: ${tie.winnerTeamName}`;
-      //   card.appendChild(wb);
-      // }
-
-      // --- builders ---
       const buildUserSelect = (team, role) => {
         const sel = document.createElement("select");
         sel.className = "user-dropdown";
-        sel.disabled = !editable || !team?.id;
+        sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
         def.value = ""; def.textContent = t.selectUser || "Select Player";
@@ -1208,7 +1346,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
         if (team?.userId) sel.value = String(team.userId);
 
-        if (editable && team?.id) {
+        if (canEdit && team?.id) {
           sel.addEventListener("change", async () => {
             const userId = sel.value ? parseInt(sel.value, 10) : null;
             const legs = [];
@@ -1219,56 +1357,54 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
                 await apiPost("/attach-round-knock-players", { matchId: l.matchId, teamId: l.teamId, userId, leagueId }, { showLoading: false });
               }
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
-                : (t.player_success_unassigned || "User unassigned successfully"),
-                "success");
-              // Refresh the page/state after successful request
-              await renderLeagueOnlyKnockouts(leagueId, rootEl);
-            } catch (e) {
-              console.error(e);
-              showToast(t.player_assign_failed || "Failed to attach user", "error");
-            }
+                : (t.player_success_unassigned || "User unassigned successfully"), "success");
+              // local patch only
+              if (tie.home?.id && (role === "A" ? tie.home?.team1?.id : tie.home?.team2?.id)) {
+                if (role === "A") (tie.home.team1 || tie.home.team2).userId = userId;
+              }
+              if (tie.away?.id && (role === "A" ? tie.away?.team2?.id : tie.away?.team1?.id)) {
+                if (role === "A") (tie.away.team2 || tie.away.team1).userId = userId;
+              }
+            } catch (e) { console.error(e); }
           });
         }
         return sel;
       };
 
-      // NEW: smarter team label (real name -> group fallback -> TBD)
-      function buildTeam(teamObj, position, groupName, phText) {
+      const buildTeam = (teamObj) => {
         const d = document.createElement("div");
         d.className = "team-name";
-
         const name = teamObj?.name && String(teamObj.name).trim() ? teamObj.name : null;
-        const grp = (groupName && String(groupName).trim())
-          || (teamObj?.groupName && String(teamObj.groupName).trim())
-          || null;
-
-        if (name) {
-          d.textContent = name;
-        } else if (useGroupFallback && grp) {
-          d.textContent = `${grp} Team ${position}`;
-          d.classList.add("placeholder-text");
-        } else {
-          d.textContent = t.tbd || "TBD";
-          d.classList.add("placeholder-text");
-        }
+        d.textContent = name || (t.tbd || "TBD");
+        if (!name) d.classList.add("placeholder-text");
         return d;
-      }
+      };
 
       const buildScore = (leg, which) => {
-        const el = document.createElement("input"); el.type = "number"; el.className = "score-input";
-        const initial = leg?.score ? (which === "t1" ? (leg.score.team1 ?? "") : (leg.score.team2 ?? "")) : "";
-        el.value = initial; el.dataset.initial = String(initial);
-        el.disabled = !editable || !leg?.id;
-        el.dataset.matchId = leg?.id || ""; el.dataset.which = which;
+        const el = document.createElement("input");
+        el.type = "number";
+        el.className = "score-input";
 
-        if (editable && leg?.id) {
+        const initial = leg?.score ? (which === "t1" ? (leg.score.team1 ?? "") : (leg.score.team2 ?? "")) : "";
+        el.value = initial;
+        el.dataset.initial = String(initial);
+
+        // require both teams to exist before enabling
+        const hasBothTeams = !!(
+          leg?.team1 && (leg.team1.id || (leg.team1.name && leg.team1.name.trim())) &&
+          leg?.team2 && (leg.team2.id || (leg.team2.name && leg.team2.name.trim()))
+        );
+
+        el.disabled = !canEdit || !leg?.id || !hasBothTeams;
+        el.dataset.matchId = leg?.id || "";
+        el.dataset.which = which;
+
+        if (canEdit && leg?.id && hasBothTeams) {
           el.addEventListener("input", () => { if (el.value !== "" && +el.value < 0) el.value = ""; });
           el.addEventListener("blur", async () => {
             const matchId = Number(el.dataset.matchId);
             const val = el.value.trim();
-            if (!matchId) return;
-            if (val === "") return;
-            if (val === el.dataset.initial) return;
+            if (!matchId || val === "" || val === el.dataset.initial) return;
             const n = Number(val);
             if (!Number.isFinite(n) || n < 0) return;
 
@@ -1277,83 +1413,44 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
             try {
               const res = await apiPost("/update-round-knock-matches", payload, { showLoading: false });
-              if (res.success) el.dataset.initial = String(n);
               showToast(res.success ? (t.score_updated || "Score Updated")
                 : (t.score_update_failed || "Failed to update score"),
                 res.success ? "success" : "error");
-              // Refresh the page/state after successful request
-              if (res.success) await renderLeagueOnlyKnockouts(leagueId, rootEl);
+              if (res.success) {
+                // local patch + smooth refresh
+                el.dataset.initial = String(n);
+                if (!leg.score) leg.score = {};
+                if (el.dataset.which === "t1") leg.score.team1 = n; else leg.score.team2 = n;
+                refreshTieUI();
+                if (tieLikelySettled(tie)) await maybeReloadNextRound(tie);
+              }
             } catch (e) { console.error(e); }
           });
         }
         return el;
       };
 
-      // --- score inputs mapped to your vertical/column rules ---
-      // Home leg (same matchId for both cells)
-      const H_top = buildScore(tie.home, "t1"); // top row: home.team1
-      const H_bottom = buildScore(tie.home, "t2"); // bottom row: home.team2
-      // Away leg (same matchId for both cells) — note the flip
-      const A_top = isFinal ? null : buildScore(tie.away, "t2"); // top row: away.team2
-      const A_bottom = isFinal ? null : buildScore(tie.away, "t1"); // bottom row: away.team1
+      // score inputs
+      const H_top = buildScore(tie.home, "t1");
+      const H_bottom = buildScore(tie.home, "t2");
+      const A_top = isFinal ? null : buildScore(tie.away, "t2");
+      const A_bottom = isFinal ? null : buildScore(tie.away, "t1");
 
       const u1 = buildUserSelect(teamA, "A");
       const u2 = buildUserSelect(teamB, "B");
 
-      // Try multiple common API keys for group labels; harmless if absent
-      const p1 = parsePh(ph?.t1);  // e.g., "Group C 1st"
-      const p2 = parsePh(ph?.t2);  // e.g., "Group D 2nd"
-
-      // Decide fallback group for each slot (A = top row, B = bottom row)
-      let grpA = teamA?.groupName || tie.home?.team1?.groupName || tie.away?.team2?.groupName || null;
-      let grpB = teamB?.groupName || tie.home?.team2?.groupName || tie.away?.team1?.groupName || null;
-
-      if (!grpA || !grpB) {
-        const gA = p1.group, gB = p2.group;
-        const tb = normGroup(teamB?.groupName);
-        const ta = normGroup(teamA?.groupName);
-        const ngA = normGroup(gA), ngB = normGroup(gB);
-
-        // If only one side is known, use the paired placeholder group for the other
-        if (!grpA) {
-          if (tb && ngA && tb === ngA) grpA = gB;
-          else if (tb && ngB && tb === ngB) grpA = gA;
-          else grpA = gA || grpA; // fallback to ph.t1's group if nothing else
-        }
-        if (!grpB) {
-          if (ta && ngA && ta === ngA) grpB = gB;
-          else if (ta && ngB && ta === ngB) grpB = gA;
-          else grpB = gB || grpB; // fallback to ph.t2's group if nothing else
-        }
-      }
-
-      // Build labels (position = 1 for top row, 2 for bottom row)
-      const tn1 = buildTeam(
-        teamA,
-        1,
-        grpA,
-        ph?.t1 || null  // keep hint for rank if you ever want to use it
-      );
-      const tn2 = buildTeam(
-        teamB,
-        2,
-        grpB,
-        ph?.t2 || null
-      );
-
-      // Checkboxes only when both legs have scores AND aggregate draw
+      // winner controls
       const isNum = v => Number.isFinite(v);
       const h = tie.home?.score || {};
       const a = tie.away?.score || {};
-
       let canPickWinner;
       if (isFinal) {
         const drawFinal = isNum(h.team1) && isNum(h.team2) && h.team1 === h.team2;
-        canPickWinner = editable && drawFinal;
+        canPickWinner = canEdit && drawFinal;
       } else {
         const haveAll = isNum(h.team1) && isNum(h.team2) && isNum(a.team1) && isNum(a.team2);
         const drawAgg = haveAll && (h.team1 + a.team2 === h.team2 + a.team1);
-        canPickWinner = editable && drawAgg;
+        canPickWinner = canEdit && drawAgg;
       }
 
       const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
@@ -1367,37 +1464,70 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
             showToast(res.success ? (t.score_updated || "Score Updated")
               : (t.score_update_failed || "Failed to update score"),
               res.success ? "success" : "error");
-            // Refresh the page/state after successful request
-            if (res.success) await renderLeagueOnlyKnockouts(leagueId, rootEl);
+            if (res.success) {
+              tie.winnerTeamId = winnerId; // local patch
+              refreshTieUI();
+              await maybeReloadNextRound(tie);
+            }
           } catch (e) { console.error(e); }
         };
         cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
         cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
       }
 
-      // --- rows ---
+      // rows
       const row1 = document.createElement("div");
       const row2 = document.createElement("div");
       row1.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
       row2.className = `ko-team-row ${sideKey === "right" ? "right" : "left"}`;
 
+      // refresh helper (local, no re-render)
+      function refreshTieUI() {
+        const H = tie.home?.score || {};
+        const A = tie.away?.score || {};
+        const isNum = v => Number.isFinite(v);
+
+        // enable/disable pickers depending on draw
+        let canPick;
+        if (isFinal) {
+          const drawFinal = isNum(H.team1) && isNum(H.team2) && H.team1 === H.team2;
+          canPick = canEdit && drawFinal;
+        } else {
+          const haveAll = isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2);
+          const drawAgg = haveAll && ((H.team1 || 0) + (A.team2 || 0) === (H.team2 || 0) + (A.team1 || 0));
+          canPick = canEdit && drawAgg;
+        }
+        cbA.disabled = cbB.disabled = !canPick;
+
+        // winner highlight
+        row1.classList.remove("winner-row");
+        row2.classList.remove("winner-row");
+        if (tie.winnerTeamId) {
+          if (tie.winnerTeamId === (tie.home?.team1?.id || tie.away?.team2?.id)) row1.classList.add("winner-row");
+          if (tie.winnerTeamId === (tie.home?.team2?.id || tie.away?.team1?.id)) row2.classList.add("winner-row");
+        } else {
+          if (isFinal && isNum(H.team1) && isNum(H.team2) && H.team1 !== H.team2) {
+            (H.team1 > H.team2 ? row1 : row2).classList.add("winner-row");
+          } else if (!isFinal && isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2)) {
+            const aggA = (H.team1 || 0) + (A.team2 || 0);
+            const aggB = (H.team2 || 0) + (A.team1 || 0);
+            if (aggA !== aggB) (aggA > aggB ? row1 : row2).classList.add("winner-row");
+          }
+        }
+      }
+
+      const tn1 = buildTeam(teamA);
+      const tn2 = buildTeam(teamB);
+
       if (sideKey === "right") {
-        // RIGHT side
-        appendSafe(row1, isFinal ? null : A_top, H_top, tn1, u1);
-        row1.prepend(cbA);
-        appendSafe(row2, isFinal ? null : A_bottom, H_bottom, tn2, u2);
-        row2.prepend(cbB);
+        appendSafe(row1, isFinal ? null : A_top, H_top, tn1, u1); row1.prepend(cbA);
+        appendSafe(row2, isFinal ? null : A_bottom, H_bottom, tn2, u2); row2.prepend(cbB);
       } else {
-        // LEFT / center
         appendSafe(row1, u1, tn1, H_top, isFinal ? null : A_top, cbA);
         appendSafe(row2, u2, tn2, H_bottom, isFinal ? null : A_bottom, cbB);
       }
 
-      if (tie.winnerTeamId) {
-        if (tie.winnerTeamId === teamA?.id) row1.classList.add("winner-row");
-        if (tie.winnerTeamId === teamB?.id) row2.classList.add("winner-row");
-      }
-
+      refreshTieUI();
       card.append(row1, row2);
       return card;
     }
