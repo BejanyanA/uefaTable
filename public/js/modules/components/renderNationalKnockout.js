@@ -4,172 +4,6 @@ import { renderNationalInstances } from './renderNationalTable.js';
 import { LeagueManager } from '../LeagueManager.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 
-
-// export function renderNationalOnlyKnockoutLeagues(data) {
-//   const translation = langMap[currentLang];
-//   const section = document.getElementById("leagueType2");
-//   const leagues = data.leagues || [];
-
-//   section.innerHTML = ""; // Clear previous content
-//   section.style.display = "block";
-
-//   // ✅ Add Back Button to /me
-//   const backBtn = document.createElement("button");
-//   backBtn.textContent = translation.backButton;
-//   backBtn.id = "backBtn";
-
-//   backBtn.addEventListener("click", async () => {
-//     const token = localStorage.getItem("authToken");
-
-//     try {
-//       const response = await apiGet("/me", token);
-//       if (response.success && response.user) {
-//         document.getElementById("logoutButtn").style.display = "block";
-//         document.getElementById("stageContainer").style.display = "block";
-//         document.getElementById("leagueType2").style.display = "none";
-//       } else {
-//         localStorage.removeItem("authToken");
-//         if (authButtons) authButtons.style.display = "flex";
-//       }
-//     } catch (err) {
-//       console.error("🔴 Error in Back button to /me:", err);
-//       localStorage.removeItem("authToken");
-//       if (authButtons) authButtons.style.display = "flex";
-//     }
-//   });
-
-//   section.appendChild(backBtn); // Add Back button
-
-//   // ✅ If no leagues
-//   if (!leagues.length) {
-//     const translation = langMap[currentLang];
-//     const noDataMsg = document.createElement("div");
-//     noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
-//     noDataMsg.id = "noLeaguedata";
-//     section.appendChild(noDataMsg);
-//     return;
-//   }
-
-//   // ✅ Container for league boxes
-//   const rowContainer = document.createElement("div");
-//   rowContainer.className = "league-names-row";
-//   section.appendChild(rowContainer);
-
-//   leagues.forEach(league => {
-//     const leagueRow = document.createElement("div");
-//     leagueRow.className = "league-names-row-item";
-
-//     const leagueBox = document.createElement("div");
-//     leagueBox.className = "league-name-box";
-//     leagueBox.textContent = league.name;
-//     leagueBox.style.cursor = "pointer";
-
-//     leagueBox.addEventListener("click", async () => {
-//       try {
-//         const response = await apiPost("/league-instances", { leagueId: league.id });
-//         if (response.success) {
-//           localStorage.setItem("leagueId", league.id);
-//           renderNationalInstances(response.data);
-//         } else {
-//           section.innerHTML = `<p>Error loading instances</p>`;
-//         }
-//       } catch (err) {
-//         console.error("Failed to fetch league instances", err);
-//       }
-//     });
-
-//     leagueRow.appendChild(leagueBox);
-
-//     // 👤 Check owner access
-//     const translation = langMap[currentLang];
-//     const isOwner = league.accessType === "owner";
-
-//     // ✏️ Edit icon
-//     const editIcon = document.createElement("img");
-//     editIcon.src = "assets/icons/edit.svg";
-//     editIcon.alt = "Edit";
-//     editIcon.className = "league-edit-icon";
-//     editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-//     editIcon.title = isOwner ? "" : translation.owner_edit || "Only the owner can edit";
-//     if (!isOwner) {
-//       editIcon.classList.add("icon-disabled");
-//     }
-//     editIcon.addEventListener("click", (e) => {
-//       e.stopPropagation();
-//       if (isOwner) {
-//         LeagueManager.initEdit(league.id, league.name);
-//       } else {
-//         showMobileTooltip(editIcon, "owner_edit");
-//       }
-//     });
-
-
-//     // 🗑️ Delete icon
-//     const deleteIcon = document.createElement("img");
-//     deleteIcon.src = "assets/icons/delete.svg";
-//     deleteIcon.alt = "Delete";
-//     deleteIcon.className = "league-delete-icon";
-//     deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-//     deleteIcon.title = isOwner ? "" : translation.owner_delete || "Only the owner can delete";
-//     if (!isOwner) {
-//       deleteIcon.classList.add("icon-disabled");
-//     }
-//     deleteIcon.addEventListener("click", (e) => {
-//       e.stopPropagation();
-//       if (isOwner) {
-//         LeagueManager.initDelete(league.id);
-//       } else {
-//         showMobileTooltip(deleteIcon, "owner_delete");
-//       }
-//     });
-
-//     leagueRow.appendChild(editIcon);
-//     leagueRow.appendChild(deleteIcon);
-
-//     rowContainer.appendChild(leagueRow);
-//   });
-
-//   function showMobileTooltip(targetElement, messageKey) {
-//     if (document.querySelector(".mobile-tooltip")) return;
-
-//     const translation = langMap[currentLang];
-//     const message =
-//       translation[messageKey] ||
-//       (messageKey === "owner_edit"
-//         ? "Only the owner can edit"
-//         : messageKey === "owner_delete"
-//           ? "Only the owner can delete"
-//           : "Restricted");
-
-//     const tooltip = document.createElement("div");
-//     tooltip.className = "mobile-tooltip";
-//     tooltip.textContent = message;
-
-//     document.body.appendChild(tooltip);
-
-//     // Get positions
-//     const rect = targetElement.getBoundingClientRect();
-
-//     // Adjust: move lower and to the left
-//     const verticalOffset = 8;
-//     const horizontalOffset = 1;
-
-//     const top = rect.bottom + window.scrollY + verticalOffset;
-//     const left = rect.left + window.scrollX - tooltip.offsetWidth - horizontalOffset;
-
-//     tooltip.style.top = `${top}px`;
-//     tooltip.style.left = `${left}px`;
-
-//     setTimeout(() => {
-//       tooltip.classList.add("show");
-//       setTimeout(() => {
-//         tooltip.classList.remove("show");
-//         setTimeout(() => tooltip.remove(), 300);
-//       }, 2000);
-//     }, 10);
-//   }
-// }
-
 export async function renderNationalKnockoutsStage(leagueId, rootEl) {
   const root = rootEl ?? document.getElementById("knockoutTab") ?? document.getElementById("leagueType2");
   root.innerHTML = "";
@@ -725,27 +559,73 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
       const isNum = v => Number.isFinite(v);
       const canPickWinner = canEdit && isNum(s.team1) && isNum(s.team2) && s.team1 === s.team2;
 
-      const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
-      const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
+      const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox";
+      const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox";
 
-      if (canPickWinner) {
-        const pick = async (winnerId, otherCb) => {
-          try {
-            otherCb.checked = false;
-            const res = await apiPost("/update-national-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
-            showToast(res.success ? (t.score_updated || "Score Updated")
-              : (t.score_update_failed || "Failed to update score"),
-              res.success ? "success" : "error");
-            if (res.success) {
-              tie.winnerTeamId = winnerId;
-              refreshTieUI();
-              await maybeReloadNextRound(tie);
-            }
-          } catch (e) { console.error(e); }
-        };
-        cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
-        cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
+      // recompute whether a winner can be picked *right now*
+      function canPickNow() {
+        if (!canEdit) return false;
+
+        if (isFinal) {
+          const H = tie.home?.score || tie.score || {}; // single-leg uses tie.score
+          const isNum = v => Number.isFinite(v);
+          return isNum(H.team1) && isNum(H.team2) && H.team1 === H.team2; // draw
+        } else {
+          const H = tie.home?.score || {};
+          const A = tie.away?.score || {};
+          const isNum = v => Number.isFinite(v);
+          const haveAll = isNum(H.team1) && isNum(H.team2) && isNum(A.team1) && isNum(A.team2);
+          return haveAll && (H.team1 + A.team2 === H.team2 + A.team1); // aggregate draw
+        }
       }
+
+      // keep UI in sync with current ability
+      function refreshPickersDisabled() {
+        const allowed = canPickNow();
+        cbA.disabled = cbB.disabled = !allowed;
+      }
+      refreshPickersDisabled(); // call again inside refreshTieUI too
+
+      let picking = false;
+      async function doPick(winnerId, otherCb) {
+        if (picking) return;                 // prevent double submit
+        if (cbA.disabled || cbB.disabled) {  // safety if enabled state raced
+          cbA.checked = cbB.checked = false;
+          return;
+        }
+        try {
+          picking = true;
+          otherCb.checked = false;
+
+          const res = await apiPost("/update-national-knock-winner", {
+            knockoutId,
+            winner_team_id: winnerId
+          }, { showLoading: false });
+
+          showToast(res.success ? (t.score_updated || "Score Updated")
+            : (t.score_update_failed || "Failed to update score"),
+            res.success ? "success" : "error");
+
+          if (res.success) {
+            // local patch + refresh logic (includes FINAL)
+            tie.winnerTeamId = winnerId;
+            refreshTieUI();                 // updates highlights and (re)disables pickers
+            await maybeReloadNextRound(tie); // forces a re-render for next round/Final
+          } else {
+            cbA.checked = cbB.checked = false;
+          }
+        } catch (e) {
+          console.error(e);
+          cbA.checked = cbB.checked = false;
+        } finally {
+          picking = false;
+        }
+      }
+
+      // bind listeners UNCONDITIONALLY
+      cbA.addEventListener("change", () => { if (cbA.checked) doPick(teamA?.id, cbB); });
+      cbB.addEventListener("change", () => { if (cbB.checked) doPick(teamB?.id, cbA); });
+
 
       // rows
       const row1 = document.createElement("div");
@@ -780,6 +660,7 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
         appendSafe(row2, u2, tn2, H_bottom, null, cbB);
       }
 
+      refreshPickersDisabled();
       refreshTieUI();
       card.append(row1, row2);
       return card;
@@ -1258,27 +1139,67 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         return canEdit && isNum(s.team1) && isNum(s.team2) && (s.team1 === s.team2);
       })();
 
-      const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox"; cbA.disabled = !canPickWinner;
-      const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox"; cbB.disabled = !canPickWinner;
+      const cbA = document.createElement("input"); cbA.type = "checkbox"; cbA.className = "winner-checkbox";
+      const cbB = document.createElement("input"); cbB.type = "checkbox"; cbB.className = "winner-checkbox";
 
-      if (canPickWinner) {
-        const pick = async (winnerId, otherCb) => {
-          try {
-            otherCb.checked = false;
-            const res = await apiPost("/update-national-round-knock-winner", { knockoutId, winner_team_id: winnerId }, { showLoading: false });
-            showToast(res.success ? (t.score_updated || "Score Updated")
-              : (t.score_update_failed || "Failed to update score"),
-              res.success ? "success" : "error");
-            if (res.success) {
-              match.winnerTeamId = winnerId;
-              refreshTieUI();
-              await maybeReloadNextRound(match);
-            }
-          } catch (e) { console.error(e); }
-        };
-        cbA.addEventListener("change", () => { if (cbA.checked) pick(teamA?.id, cbB); });
-        cbB.addEventListener("change", () => { if (cbB.checked) pick(teamB?.id, cbA); });
+      // can we pick a winner right now? (single-leg = draw only)
+      function canPickNow() {
+        if (!canEdit) return false;
+        const s = (match && match.score) || {};
+        const isNum = v => Number.isFinite(v);
+        return isNum(s.team1) && isNum(s.team2) && s.team1 === s.team2;
       }
+
+      // keep UI in sync
+      function refreshPickersDisabled() {
+        const allowed = canPickNow();
+        cbA.disabled = cbB.disabled = !allowed;
+      }
+      refreshPickersDisabled();
+
+      let picking = false;
+      async function doPick(winnerId, otherCb) {
+        if (picking) return;                         // prevent double submit
+        if (cbA.disabled || cbB.disabled) {          // safety if state raced
+          cbA.checked = cbB.checked = false;
+          return;
+        }
+        picking = true;
+        try {
+          otherCb.checked = false;
+
+          // 1-leg NATIONAL endpoint
+          const res = await apiPost("/update-national-round-knock-winner", {
+            knockoutId,
+            winner_team_id: winnerId
+          }, { showLoading: false });
+
+          showToast(
+            res.success ? (t.score_updated || "Score Updated")
+              : (t.score_update_failed || "Failed to update score"),
+            res.success ? "success" : "error"
+          );
+
+          if (res.success) {
+            // local patch + smooth refresh
+            match.winnerTeamId = winnerId;
+            if (typeof refreshTieUI === "function") refreshTieUI();
+            refreshPickersDisabled();
+            await maybeReloadNextRound(match);        // handles Final as well
+          } else {
+            cbA.checked = cbB.checked = false;
+          }
+        } catch (e) {
+          console.error(e);
+          cbA.checked = cbB.checked = false;
+        } finally {
+          picking = false;
+        }
+      }
+
+      // bind listeners (controls themselves enforce disabled state)
+      cbA.addEventListener("change", () => { if (cbA.checked) doPick(teamA?.id, cbB); });
+      cbB.addEventListener("change", () => { if (cbB.checked) doPick(teamB?.id, cbA); });
 
       const row1 = document.createElement("div");
       const row2 = document.createElement("div");
@@ -1312,6 +1233,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         appendSafe(row2, u2, tn2, H_bottom, cbB);
       }
 
+      refreshPickersDisabled();
       refreshTieUI();
       card.append(row1, row2);
       return card;
