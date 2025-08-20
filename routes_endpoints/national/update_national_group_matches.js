@@ -5,12 +5,14 @@ import { verifyToken } from '../../utils/jwt.js';
 
 export async function handleUpdateNationalMatches(request, env) {
   const authHeader = request.headers.get("Authorization");
+
   if (!authHeader?.startsWith("Bearer ")) {
     return jsonResponse({ success: false, message: "Unauthorized" }, 401);
   }
 
   const token = authHeader.split(" ")[1];
   const payload = await verifyToken(token, env.JWT_SECRET);
+
   if (!payload) {
     return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
   }
@@ -29,28 +31,27 @@ export async function handleUpdateNationalMatches(request, env) {
       .bind(leagueId)
       .first();
 
-    // Fallback if league missing (defensive)
-    if (!row) return "1/8";
+    if (!row) return "1/8"; // safe fallback
 
-    const koTeams = Math.floor(Number(row.team_count) / 2); // e.g., 32 -> 16
-    const labelMap = { 32: "1/16", 16: "1/8", 8: "1/4", 4: "1/2", 2: "Final" };
+    const koTeams = Math.floor(Number(row.team_count) / 2); // e.g., 32->16, 64->32
+    const labelMap = { 32: "1/16", 16: "1/8", 8: "1/4", 4: "1/2", 2: "final" };
     return labelMap[koTeams] || "1/8";
   }
 
-  // --- load the group match + league id
+  // NOTE: national group stage uses country_* tables
   const match = await env.core_data.prepare(`
-    SELECT lm.*, li.league_id
-    FROM country_matches lm
-    JOIN league_groups lg ON lg.id = lm.group_id
+    SELECT cm.*, li.league_id
+    FROM country_matches cm
+    JOIN league_groups lg ON lg.id = cm.group_id
     JOIN league_instances li ON li.id = lg.league_instance_id
-    WHERE lm.id = ?
+    WHERE cm.id = ?
   `).bind(matchId).first();
 
   if (!match) {
     return jsonResponse({ success: false, error: "match_not_found" }, 404);
   }
 
-  // access check
+  // access check (unchanged)
   const owned = await env.core_data.prepare(`
     SELECT 1 FROM leagues WHERE id = ? AND created_by_user_id = ?
   `).bind(match.league_id, userId).first();
@@ -64,7 +65,6 @@ export async function handleUpdateNationalMatches(request, env) {
     }
   }
 
-  // --- current scores and flags
   const currentScores = await env.core_data.prepare(`
     SELECT team1_score, team2_score, winner_team_id, score_processed
     FROM country_matches
@@ -89,7 +89,7 @@ export async function handleUpdateNationalMatches(request, env) {
 
   const scoresNowFilled = updated_team1_score !== null && updated_team2_score !== null;
 
-  // --- standings helpers (unchanged)
+  // standings helpers (same logic, national table)
   const updateTeamStats = async (team_id, played, win, win_vs_computer, win_vs_player, draw, loss, gf, ga, points) => {
     await env.core_data.prepare(`
       UPDATE country_group_standings
@@ -120,22 +120,19 @@ export async function handleUpdateNationalMatches(request, env) {
 
   const getPairedGroupId = (groupId) => (groupId % 2 === 0 ? groupId - 1 : groupId + 1);
 
-  // ===================== UPDATED: single‑leg neutral knockout seeding =====================
+  // ====== KO seeding (kept logic, adapted to 1-leg neutral & national tables) ======
   const updateKnockoutStage = async () => {
-    // Fetch all teams of this group
     const allTeams = await env.core_data.prepare(`
       SELECT team_id, points, played, goal_difference, goals_for
       FROM country_group_standings
       WHERE group_id = ?
     `).bind(match.group_id).all();
 
-    // Group is complete when each of 4 teams played all 3 matches vs 3 opponents twice? For single round‑robin: 3 matches.
-    // Your schema used 6 earlier (home/away); for national single‑leg groups use 3.
+    // Single‑leg groups: 3 matches per team in a 4‑team group
     const groupIsComplete =
       allTeams.results.length >= 4 && allTeams.results.every(t => t.played === 3);
     if (!groupIsComplete) return;
 
-    // Rank this group's top 2
     const sorted = allTeams.results.sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
       if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
@@ -143,154 +140,105 @@ export async function handleUpdateNationalMatches(request, env) {
       return a.team_id - b.team_id;
     });
 
-    const top2 = sorted.slice(0, 2); // [{team_id, ...}, {team_id, ...}]
+    const top2 = sorted.slice(0, 2); // current group's top 2
     const pairedGroupId = getPairedGroupId(match.group_id);
 
-    // Compute stable base order for this pair of groups
+    // NEW: derive two match orders for the pair (A1vB2 odd, B1vA2 even)
     const base = Math.min(match.group_id, pairedGroupId);
     const orderA1vB2 = base * 2 - 1; // odd
     const orderB1vA2 = base * 2;     // even
 
-    // Dynamic initial knockout round (based on league team_count)
+    // Dynamic initial knockout round label
     const initialRound = await getInitialKnockoutRound(env, match.league_id);
 
-    // Ensure both rows exist (neutral, single leg). We do not delete; we create if missing.
-    async function ensureRow(order) {
-      let row = await env.core_data.prepare(`
-        SELECT id, team1_id, team2_id FROM national_knockouts
-        WHERE league_id = ? AND round = ? AND match_order = ?
-        LIMIT 1
-      `).bind(match.league_id, initialRound, order).first();
+    // DELETE previous rows for this pair (kept behavior) — now deletes both orders
+    await env.core_data.prepare(`
+      DELETE FROM national_knockouts
+      WHERE round = ? AND league_id = ? AND match_order IN (?, ?)
+    `).bind(initialRound, match.league_id, orderA1vB2, orderB1vA2).run();
 
-      if (!row) {
-        await env.core_data.prepare(`
-          INSERT INTO national_knockouts (
-            league_id, round, match_order, match_type,
-            team1_id, team2_id, team1_user_id, team2_user_id,
-            team1_score, team2_score, winner_team_id,
-            is_vs_computer, computer_team, updated_user_id
-          ) VALUES (?, ?, ?, 'neutral',
-                    NULL, NULL, NULL, NULL,
-                    NULL, NULL, NULL,
-                    0, NULL, ?)
-        `).bind(match.league_id, initialRound, order, userId).run();
+    // INSERT fresh placeholders (single‑leg, neutral)
+    await env.core_data.prepare(`
+      INSERT INTO national_knockouts
+        (league_id, round, match_order, match_type,
+         team1_id, team2_id, team1_user_id, team2_user_id,
+         team1_score, team2_score, winner_team_id,
+         is_vs_computer, computer_team, updated_user_id)
+      VALUES
+        (?, ?, ?, 'neutral', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?),
+        (?, ?, ?, 'neutral', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?)
+    `).bind(
+      match.league_id, initialRound, orderA1vB2, userId,
+      match.league_id, initialRound, orderB1vA2, userId
+    ).run();
 
-        row = await env.core_data.prepare(`
-          SELECT id, team1_id, team2_id FROM national_knockouts
-          WHERE league_id = ? AND round = ? AND match_order = ?
-          LIMIT 1
-        `).bind(match.league_id, initialRound, order).first();
-      }
-      return row;
-    }
-
-    // Write only our side based on whether this group's id is lower (A) or higher (B)
-    const thisIsLower = match.group_id === base;
-
-    // If paired group is also complete, fetch its top2 for immediate fill
-    const paired = await env.core_data.prepare(`
-      SELECT team_id, points, played, goal_difference, goals_for
+    // If the paired group is also complete, get its top2 now
+    const pairedCompleteRow = await env.core_data.prepare(`
+      SELECT COUNT(*) AS total,
+             SUM(CASE WHEN played = 3 THEN 1 ELSE 0 END) AS played_count
       FROM country_group_standings
       WHERE group_id = ?
-    `).bind(pairedGroupId).all();
+    `).bind(pairedGroupId).first();
 
-    const pairedComplete =
-      paired.results.length >= 4 && paired.results.every(t => t.played === 3);
+    const isPairedReady =
+      pairedCompleteRow && pairedCompleteRow.total >= 4 && Number(pairedCompleteRow.played_count) === Number(pairedCompleteRow.total);
 
     let p1 = null, p2 = null;
-    if (pairedComplete) {
-      const ps = paired.results.sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
-        if (b.goals_for !== a.goals_for) return b.goals_for - a.goals_for;
-        return a.team_id - b.team_id;
-      }).slice(0, 2);
-      p1 = ps[0]?.team_id ?? null;
-      p2 = ps[1]?.team_id ?? null;
+    if (isPairedReady) {
+      const pairedTeams = await env.core_data.prepare(`
+        SELECT team_id, points, goal_difference, goals_for
+        FROM country_group_standings
+        WHERE group_id = ?
+        ORDER BY points DESC, goal_difference DESC, goals_for DESC, team_id ASC
+        LIMIT 2
+      `).bind(pairedGroupId).all();
+
+      p1 = pairedTeams.results[0]?.team_id ?? null; // paired group's #1
+      p2 = pairedTeams.results[1]?.team_id ?? null; // paired group's #2
     }
 
-    // Ensure rows exist
-    const row1 = await ensureRow(orderA1vB2); // A1 vs B2
-    const row2 = await ensureRow(orderB1vA2); // B1 vs A2
+    // Write the two neutral fixtures:
+    // orderA1vB2: team1 = lower group's #1, team2 = upper group's #2
+    // orderB1vA2: team1 = upper group's #1, team2 = lower group's #2
+    const thisIsLower = match.group_id === base;
+    const G1 = top2[0]?.team_id ?? null; // this group's #1
+    const G2 = top2[1]?.team_id ?? null; // this group's #2
 
-    const A1 = top2[0]?.team_id ?? null;
-    const A2 = top2[1]?.team_id ?? null;
-
-    // Update our side(s) only:
     if (thisIsLower) {
-      // We are A. Row1: team1 = A1. Row2: team2 = A2.
-      if (A1 != null) {
-        await env.core_data.prepare(`
-          UPDATE national_knockouts
-          SET team1_id = ?, updated_user_id = ?
-          WHERE id = ?
-        `).bind(A1, userId, row1.id).run();
-      }
-      if (A2 != null) {
-        await env.core_data.prepare(`
-          UPDATE national_knockouts
-          SET team2_id = ?, updated_user_id = ?
-          WHERE id = ?
-        `).bind(A2, userId, row2.id).run();
-      }
-    } else {
-      // We are B. Row1: team2 = B2. Row2: team1 = B1.
-      if (A2 != null) { // A2 variable holds "our group's #2" (since we used top2)
-        await env.core_data.prepare(`
-          UPDATE national_knockouts
-          SET team2_id = ?, updated_user_id = ?
-          WHERE id = ?
-        `).bind(A2, userId, row1.id).run();
-      }
-      if (A1 != null) { // A1 variable holds "our group's #1"
-        await env.core_data.prepare(`
-          UPDATE national_knockouts
-          SET team1_id = ?, updated_user_id = ?
-          WHERE id = ?
-        `).bind(A1, userId, row2.id).run();
-      }
-    }
+      // We are the lower‑letter group (A):
+      // A1 v B2
+      await env.core_data.prepare(`
+        UPDATE national_knockouts
+        SET team1_id = ?, team2_id = COALESCE(?, team2_id), updated_user_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+      `).bind(G1, p2, userId, match.league_id, initialRound, orderA1vB2).run();
 
-    // If paired group is complete, fill the other sides too
-    if (pairedComplete) {
-      if (thisIsLower) {
-        // Row1 other side = B2 (p2), Row2 other side = B1 (p1)
-        if (p2 != null) {
-          await env.core_data.prepare(`
-            UPDATE national_knockouts
-            SET team2_id = ?, updated_user_id = ?
-            WHERE id = ?
-          `).bind(p2, userId, row1.id).run();
-        }
-        if (p1 != null) {
-          await env.core_data.prepare(`
-            UPDATE national_knockouts
-            SET team1_id = ?, updated_user_id = ?
-            WHERE id = ?
-          `).bind(p1, userId, row2.id).run();
-        }
-      } else {
-        // We are B; other side are A seeds from the lower group
-        if (top2[0]?.team_id != null) {
-          await env.core_data.prepare(`
-            UPDATE national_knockouts
-            SET team2_id = ?, updated_user_id = ?
-            WHERE id = ?
-          `).bind(top2[0].team_id, userId, row2.id).run(); // A2 side on row2
-        }
-        if (top2[1]?.team_id != null) {
-          await env.core_data.prepare(`
-            UPDATE national_knockouts
-            SET team1_id = ?, updated_user_id = ?
-            WHERE id = ?
-          `).bind(top2[1].team_id, userId, row1.id).run(); // A1 side on row1
-        }
-      }
+      // B1 v A2
+      await env.core_data.prepare(`
+        UPDATE national_knockouts
+        SET team1_id = COALESCE(?, team1_id), team2_id = ?, updated_user_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+      `).bind(p1, G2, userId, match.league_id, initialRound, orderB1vA2).run();
+
+    } else {
+      // We are the upper‑letter group (B):
+      // A1 v B2
+      await env.core_data.prepare(`
+        UPDATE national_knockouts
+        SET team1_id = COALESCE(?, team1_id), team2_id = ?, updated_user_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+      `).bind(p1, G2, userId, match.league_id, initialRound, orderA1vB2).run();
+
+      // B1 v A2
+      await env.core_data.prepare(`
+        UPDATE national_knockouts
+        SET team1_id = ?, team2_id = COALESCE(?, team2_id), updated_user_id = ?
+        WHERE league_id = ? AND round = ? AND match_order = ?
+      `).bind(G1, p2, userId, match.league_id, initialRound, orderB1vA2).run();
     }
   };
-  // ===================== /UPDATED single‑leg seeding =====================
 
-  // --- process standings (unchanged logic)
+  // process scores & standings (unchanged, but on national tables)
   if (scoresNowFilled) {
     if (currentScores.score_processed === 1) {
       const oldIsDraw = currentScores.team1_score === currentScores.team2_score;

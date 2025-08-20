@@ -78,8 +78,8 @@
   }
 
   #stageBackBtn {
-      top: 88px;
-      left: 25px;
+      top: 87px;
+      left: 28px;
       z-index: 1;
       color: white;
       background: #1d1d1d;
@@ -169,6 +169,8 @@
           box-sizing: content-box;
           box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
           position: absolute;
+          margin-top: -17px;
+          margin-left: -15px;
       }
 
 
