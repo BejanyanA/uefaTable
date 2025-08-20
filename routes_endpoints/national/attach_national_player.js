@@ -154,7 +154,7 @@ export async function handleAttachNationalKnockPlayers(request, env) {
 
     const matchData = await env.core_data.prepare(`
         SELECT id, team1_id, team2_id
-        FROM league_knockouts
+        FROM national_knockouts
         WHERE id = ? AND league_id = ?
     `).bind(matchId, leagueId).first();
 
@@ -167,7 +167,7 @@ export async function handleAttachNationalKnockPlayers(request, env) {
 
     const columnToUpdate = matchData.team1_id === teamId ? 'team1_user_id' : 'team2_user_id';
     await env.core_data.prepare(
-        `UPDATE league_knockouts SET ${columnToUpdate} = ?, updated_user_id = ? WHERE id = ?`
+        `UPDATE national_knockouts SET ${columnToUpdate} = ?, updated_user_id = ? WHERE id = ?`
     ).bind(userId, loggedInUserId, matchId).run();
 
     return jsonResponse({ success: true, message: "User assigned to match and team" }, 200);
