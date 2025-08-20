@@ -76,11 +76,11 @@ const routeRegistry = {
   "/national-matches": { POST: handleNationalMatches },
   "/national-group-knockouts": { POST: handleNationalGroupKnockoutMatches },
   "/update-national-score": { POST: handleUpdateNationalMatches },
+  "/national-players": { POST: handleGetNationalPlayers },
 
   "/national-round-knockouts": { POST: handleNationalOnlyKnockoutMatches },
   "/update-national-round-knock-matches": { POST: handleUpdateNationalOnlyKnockoutMatches },
   "/update-national-round-knock-winner": { POST: handleUpdateNationalOnlyKnockoutWinner },
-  "/national-players": { POST: handleGetNationalPlayers },
   "/attach-national-players": { POST: handleAttachNationalPlayers },
   "/attach-national-knock-players": { POST: handleAttachNationalKnockPlayers },
   "/attach-national-round-knock-players": { POST: handleAttachNationalOnlyKnockPlayers },
