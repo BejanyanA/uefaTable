@@ -230,70 +230,64 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
     }
 
     // Stable, group-aware split into left/right with deterministic ordering
-    function splitForRound(ties, rk, expectedPerSide) {
-      const sorted = (ties || []).slice(); // work on a copy
-      const perSide = expectedPerSide ?? Math.ceil(sorted.length / 2);
+    function splitForRound(ties, rk, firstRound, expectedPerSide) {
+      // Stable order inside the round
+      const all = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
 
-      // depth: first round = 0, QF = 1, SF = 2, ...
-      const depth = Math.max(0, rounds.indexOf(rk) - rounds.indexOf(firstRound));
-      const clusterSize = Math.pow(2, depth + 1); // 2, 4, 8, ...
+      const perSide = expectedPerSide ?? Math.ceil((EXPECTED_TIES[rk] || all.length) / 2);
 
-      const groupLetterToIndex = (g) => {
+      // How many groups total (A..H for 32-team with 8 groups)
+      const halfGroups = Math.max(1, Math.floor(GROUPS.length / 2)); // e.g., 4 (A–D on left, E–H on right)
+
+      const slotsL = new Array(perSide).fill(null);
+      const slotsR = new Array(perSide).fill(null);
+
+      const groupIdx = (g) => {
         if (!g) return null;
         const m = /group\s*([A-P])/i.exec(g);
-        if (!m) return null;
-        return m[1].toUpperCase().charCodeAt(0) - 65; // 'A' -> 0
+        return m ? (m[1].toUpperCase().charCodeAt(0) - 65) : null; // 'A' -> 0
       };
 
-      const allGroupIdxs = (tie) => {
-        const idxs = [];
-        const push = (v) => { const i = groupLetterToIndex(v); if (i !== null) idxs.push(i); };
-        push(tie?.team1?.groupName);
-        push(tie?.team2?.groupName);
-        idxs.sort((a, b) => a - b);
-        return idxs;
-      };
+      // try both single-leg (team1/team2) and two-leg (home/away.team1/2) shapes
+      const primaryGroupIndex = (t) =>
+        groupIdx(t?.team1?.groupName) ??
+        groupIdx(t?.team2?.groupName) ??
+        groupIdx(t?.home?.team1?.groupName) ??
+        groupIdx(t?.home?.team2?.groupName) ??
+        groupIdx(t?.away?.team1?.groupName) ??
+        groupIdx(t?.away?.team2?.groupName) ??
+        null;
 
-      const primaryGroupIndex = (tie) => {
-        // prefer team1 group if present, else team2
-        return groupLetterToIndex(tie?.team1?.groupName) ??
-          groupLetterToIndex(tie?.team2?.groupName) ??
-          null;
-      };
-
-      const enriched = sorted.map(t => {
-        const primary = primaryGroupIndex(t);
-        const idxs = allGroupIdxs(t);
-        const partner = idxs.length > 1 ? idxs[1] : Number.MAX_SAFE_INTEGER;
-        const sortBucket = (primary !== null) ? Math.floor(primary / clusterSize) : Number.MAX_SAFE_INTEGER;
-        const sideByGroup = (primary !== null) ? (primary < (groupsCnt / 2) ? 'L' : 'R') : null;
-        const mo = +t.matchOrder || Number.MAX_SAFE_INTEGER;
-        const id = +t.id || 0;
-        return { t, primary, partner, sortBucket, sideByGroup, mo, id };
-      });
-
-      const left = [], right = [];
-      for (const e of enriched) {
-        if (e.sideByGroup) {
-          (e.sideByGroup === 'L' ? left : right).push(e);
-        } else {
-          // fallback to matchOrder threshold
-          (e.mo >= 1 && e.mo <= perSide ? left : right).push(e);
-        }
+      function place(slots, base, tie) {
+        // try the cluster’s two seats first (base, base+1), else any first free slot
+        if (base != null && base >= 0 && base < slots.length && !slots[base]) { slots[base] = tie; return; }
+        if (base != null && base + 1 < slots.length && !slots[base + 1]) { slots[base + 1] = tie; return; }
+        for (let i = 0; i < slots.length; i++) if (!slots[i]) { slots[i] = tie; return; }
       }
 
-      // order inside side: bucket -> primary -> partner -> id -> matchOrder
-      const sortSide = (a, b) => {
-        if (a.sortBucket !== b.sortBucket) return a.sortBucket - b.sortBucket;
-        if (a.primary !== b.primary) return a.primary - b.primary;
-        if (a.partner !== b.partner) return a.partner - b.partner;
-        if (a.id !== b.id) return a.id - b.id;
-        return a.mo - b.mo;
-      };
-      left.sort(sortSide);
-      right.sort(sortSide);
+      for (const tie of all) {
+        const p = primaryGroupIndex(tie);
 
-      return { left: left.map(x => x.t), right: right.map(x => x.t), perSide };
+        if (p == null) {
+          // No group info anywhere: keep round-local order but don’t
+          // push C–D into A–B’s slots if A–B is empty — pick the first
+          // free slot on the *left* first half of the draw (consistent with your layout),
+          // then spill to the right if left fills up.
+          if (slotsL.includes(null)) place(slotsL, null, tie);
+          else place(slotsR, null, tie);
+          continue;
+        }
+
+        const isLeft = (p < halfGroups);               // A–D -> left, E–H -> right
+        const withinHalf = p % halfGroups;             // 0..3
+        const cluster = Math.floor(withinHalf / 2);    // 0: A–B / E–F, 1: C–D / G–H
+        const baseSlot = cluster * 2;                  // reserve slots [0,1] or [2,3]
+
+        if (isLeft) place(slotsL, baseSlot, tie);
+        else place(slotsR, baseSlot, tie);
+      }
+
+      return { left: slotsL, right: slotsR, perSide };
     }
 
     // bucket matches by round
