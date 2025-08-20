@@ -293,7 +293,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
 
           try {
             const translation = langMap[currentLang];
-            const res = await apiPost("/update-score", payload);
+            const res = await apiPost("/update-national-score", payload);
             if (res.success) {
               // update baseline so future blurs don't re-send the same value
               input.dataset.initial = newVal;

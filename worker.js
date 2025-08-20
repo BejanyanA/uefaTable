@@ -5,6 +5,7 @@ import { handleMe } from './routes_endpoints/me.js';
 import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 
+// Club
 import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/leagues/attach_player.js';
 import { handleGetAllClubs, handleSearchClubs } from './routes_endpoints/leagues/get_clubs.js';
 import { handleGroupKnockoutMatches } from './routes_endpoints/leagues/group_knockouts.js';
@@ -19,15 +20,17 @@ import { handleUpdateKnockoutWinner } from './routes_endpoints/leagues/update_kn
 import { handleUpdateOnlyKnockoutMatches } from './routes_endpoints/leagues/update_only_knock_matches.js';
 import { handleUpdateOnlyKnockoutWinner } from './routes_endpoints/leagues/update_only_knock_team_winner.js';
 
+// National
 import { handleGetAllWorldCountries, handleSearchWorldCountries, handleGetAllEuropeCountries, handleSearchEuropeCountries } from './routes_endpoints/national/get_countries.js';
 import { handleNationalInstances } from './routes_endpoints/national/national_instances.js';
 import { handleNationalStandings } from './routes_endpoints/national/national_standings.js';
 import { handleNationalMatches } from './routes_endpoints/national/national_matches.js';
 import { handleNationalGroupKnockoutMatches } from './routes_endpoints/national/national_group_knockouts.js';
+import { handleUpdateNationalMatches } from './routes_endpoints/national/update_national_group_matches.js';
+
 import { handleNationalOnlyKnockoutMatches } from './routes_endpoints/national/national_round_knockouts.js';
 import { handleUpdateNationalOnlyKnockoutMatches } from './routes_endpoints/national/update_national_only_knock_matches.js';
 import { handleUpdateNationalOnlyKnockoutWinner } from './routes_endpoints/national/update_national_only_knock_team_winner.js';
-
 import { handleGetNationalPlayers } from './routes_endpoints/national/national_player.js';
 import { handleAttachNationalPlayers, handleAttachNationalKnockPlayers, handleAttachNationalOnlyKnockPlayers } from './routes_endpoints/national/attach_national_player.js';
 
@@ -45,7 +48,7 @@ const routeRegistry = {
   "/update-leagues": { POST: handleLeaguesEdit },
   "/delete-league": { POST: handleLeaguesDelete },
 
-  // Clubs
+  // Club
   "/clubs": { GET: handleGetAllClubs },
   "/search-clubs": { POST: handleSearchClubs },
   "/league-instances": { POST: handleLeagueInstances },
@@ -72,11 +75,11 @@ const routeRegistry = {
   "/national-standings": { POST: handleNationalStandings },
   "/national-matches": { POST: handleNationalMatches },
   "/national-group-knockouts": { POST: handleNationalGroupKnockoutMatches },
+  "/update-national-score": { POST: handleUpdateNationalMatches },
+
   "/national-round-knockouts": { POST: handleNationalOnlyKnockoutMatches },
   "/update-national-round-knock-matches": { POST: handleUpdateNationalOnlyKnockoutMatches },
   "/update-national-round-knock-winner": { POST: handleUpdateNationalOnlyKnockoutWinner },
-
-
   "/national-players": { POST: handleGetNationalPlayers },
   "/attach-national-players": { POST: handleAttachNationalPlayers },
   "/attach-national-knock-players": { POST: handleAttachNationalKnockPlayers },
