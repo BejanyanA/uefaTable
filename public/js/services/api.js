@@ -1,5 +1,6 @@
 import { API_BASE } from './config.js';
 import { showLoader, hideLoader } from '../utils/helper.js';
+import { logout } from '../modules/MeHomepage.js'
 
 
 async function handleResponse(response) {
@@ -13,15 +14,20 @@ async function handleResponse(response) {
     console.warn("❗ Failed to parse JSON", jsonErr);
   }
 
-  // ✅ Network/server error (like 500, 404), no usable response
-  if (!response.ok && typeof data !== "object") {
+  // 🔴 Handle unauthorized
+  if (response.status === 401) {
+    logout();
+    return { success: false, status: 401, message: "unauthorized" };
+  }
+
+  // 🔴 Handle other non-ok responses
+  if (!response.ok) {
     throw {
       status: response.status,
-      body: { message: "something_went_wrong" },
+      body: data || { message: "something_went_wrong" },
     };
   }
 
-  // ✅ Let your code handle data.success === false
   return data;
 }
 
