@@ -5,14 +5,12 @@ import { verifyToken } from '../../utils/jwt.js';
 
 export async function handleUpdateNationalMatches(request, env) {
   const authHeader = request.headers.get("Authorization");
-
   if (!authHeader?.startsWith("Bearer ")) {
     return jsonResponse({ success: false, message: "Unauthorized" }, 401);
   }
 
   const token = authHeader.split(" ")[1];
   const payload = await verifyToken(token, env.JWT_SECRET);
-
   if (!payload) {
     return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
   }
@@ -142,35 +140,103 @@ export async function handleUpdateNationalMatches(request, env) {
 
     const top2 = sorted.slice(0, 2); // current group's top 2
     const pairedGroupId = getPairedGroupId(match.group_id);
-
-    // NEW: derive two match orders for the pair (A1vB2 odd, B1vA2 even)
-    const base = Math.min(match.group_id, pairedGroupId);
-    const orderA1vB2 = base * 2 - 1; // odd
-    const orderB1vA2 = base * 2;     // even
+    const base = Math.min(match.group_id, pairedGroupId); // for thisIsLower & deterministic in non-1/8
 
     // Dynamic initial knockout round label
     const initialRound = await getInitialKnockoutRound(env, match.league_id);
 
-    // DELETE previous rows for this pair (kept behavior) — now deletes both orders
-    await env.core_data.prepare(`
-      DELETE FROM national_knockouts
-      WHERE round = ? AND league_id = ? AND match_order IN (?, ?)
-    `).bind(initialRound, match.league_id, orderA1vB2, orderB1vA2).run();
+    // Helper to ensure a placeholder row exists for (round, order)
+    async function ensureRow(order) {
+      const exists = await env.core_data.prepare(`
+        SELECT id FROM national_knockouts
+        WHERE league_id = ? AND round = ? AND match_order = ?
+        LIMIT 1
+      `).bind(match.league_id, initialRound, order).first();
+      if (!exists) {
+        await env.core_data.prepare(`
+          INSERT INTO national_knockouts
+            (league_id, round, match_order, match_type,
+             team1_id, team2_id, team1_user_id, team2_user_id,
+             team1_score, team2_score, winner_team_id,
+             is_vs_computer, computer_team, updated_user_id)
+          VALUES (?, ?, ?, 'neutral', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?)
+        `).bind(match.league_id, initialRound, order, userId).run();
+      }
+    }
 
-    // INSERT fresh placeholders (single‑leg, neutral)
-    await env.core_data.prepare(`
-      INSERT INTO national_knockouts
-        (league_id, round, match_order, match_type,
-         team1_id, team2_id, team1_user_id, team2_user_id,
-         team1_score, team2_score, winner_team_id,
-         is_vs_computer, computer_team, updated_user_id)
-      VALUES
-        (?, ?, ?, 'neutral', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?),
-        (?, ?, ?, 'neutral', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, ?)
-    `).bind(
-      match.league_id, initialRound, orderA1vB2, userId,
-      match.league_id, initialRound, orderB1vA2, userId
-    ).run();
+    // Choose two match_order values to (re)use, then overwrite both sides unconditionally
+    let orderA1vB2, orderB1vA2;
+
+    if (initialRound === "1/8") {
+      // Try to reuse existing two orders that already involve teams from either of the two groups
+      const groupTeamIdsRes = await env.core_data.prepare(`
+        SELECT team_id FROM country_group_standings
+        WHERE group_id IN (?, ?)
+      `).bind(match.group_id, pairedGroupId).all();
+      const groupTeamIds = groupTeamIdsRes.results.map(r => r.team_id);
+
+      let existingOrders = [];
+      if (groupTeamIds.length) {
+        const placeholders = groupTeamIds.map(() => "?").join(",");
+        const existing = await env.core_data.prepare(`
+          SELECT DISTINCT match_order
+          FROM national_knockouts
+          WHERE league_id = ? AND round = ?
+            AND (team1_id IN (${placeholders}) OR team2_id IN (${placeholders}))
+          ORDER BY match_order ASC
+        `).bind(match.league_id, initialRound, ...groupTeamIds, ...groupTeamIds).all();
+        existingOrders = existing.results.map(r => Number(r.match_order));
+      }
+
+      if (existingOrders.length >= 2) {
+        // Reuse the lowest two; delete any extras for safety
+        [orderA1vB2, orderB1vA2] = existingOrders.slice(0, 2);
+        const extras = existingOrders.slice(2);
+        if (extras.length) {
+          const qs = extras.map(() => "?").join(",");
+          await env.core_data.prepare(`
+            DELETE FROM national_knockouts
+            WHERE league_id = ? AND round = ? AND match_order IN (${qs})
+          `).bind(match.league_id, initialRound, ...extras).run();
+        }
+      } else if (existingOrders.length === 1) {
+        orderA1vB2 = existingOrders[0];
+        const lastOrderRow = await env.core_data.prepare(`
+          SELECT COALESCE(MAX(match_order), 0) AS max_order
+          FROM national_knockouts
+          WHERE league_id = ? AND round = ?
+        `).bind(match.league_id, initialRound).first();
+        orderB1vA2 = Number(lastOrderRow.max_order) + 1;
+      } else {
+        // No rows yet for these groups → allocate next two sequential orders
+        const lastOrderRow = await env.core_data.prepare(`
+          SELECT COALESCE(MAX(match_order), 0) AS max_order
+          FROM national_knockouts
+          WHERE league_id = ? AND round = ?
+        `).bind(match.league_id, initialRound).first();
+        let order = Number(lastOrderRow.max_order) + 1;
+        orderA1vB2 = order++;
+        orderB1vA2 = order++;
+      }
+
+      // Ensure both rows exist
+      await ensureRow(orderA1vB2);
+      await ensureRow(orderB1vA2);
+
+    } else {
+      // deterministic orders for 1/4, 1/2
+      orderA1vB2 = base * 2 - 1; // odd
+      orderB1vA2 = base * 2;     // even
+
+      // Clear these two orders to avoid stale seeds, then ensure rows
+      await env.core_data.prepare(`
+        DELETE FROM national_knockouts
+        WHERE league_id = ? AND round = ? AND match_order IN (?, ?)
+      `).bind(match.league_id, initialRound, orderA1vB2, orderB1vA2).run();
+
+      await ensureRow(orderA1vB2);
+      await ensureRow(orderB1vA2);
+    }
 
     // If the paired group is also complete, get its top2 now
     const pairedCompleteRow = await env.core_data.prepare(`
@@ -197,42 +263,39 @@ export async function handleUpdateNationalMatches(request, env) {
       p2 = pairedTeams.results[1]?.team_id ?? null; // paired group's #2
     }
 
-    // Write the two neutral fixtures:
-    // orderA1vB2: team1 = lower group's #1, team2 = upper group's #2
-    // orderB1vA2: team1 = upper group's #1, team2 = lower group's #2
+    // Desired seeds
     const thisIsLower = match.group_id === base;
     const G1 = top2[0]?.team_id ?? null; // this group's #1
     const G2 = top2[1]?.team_id ?? null; // this group's #2
 
+    // UNCONDITIONAL overwrites (no COALESCE): always replace with current seeds
     if (thisIsLower) {
-      // We are the lower‑letter group (A):
       // A1 v B2
       await env.core_data.prepare(`
         UPDATE national_knockouts
-        SET team1_id = ?, team2_id = COALESCE(?, team2_id), updated_user_id = ?
+        SET team1_id = ?, team2_id = ?, updated_user_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
       `).bind(G1, p2, userId, match.league_id, initialRound, orderA1vB2).run();
 
       // B1 v A2
       await env.core_data.prepare(`
         UPDATE national_knockouts
-        SET team1_id = COALESCE(?, team1_id), team2_id = ?, updated_user_id = ?
+        SET team1_id = ?, team2_id = ?, updated_user_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
       `).bind(p1, G2, userId, match.league_id, initialRound, orderB1vA2).run();
 
     } else {
-      // We are the upper‑letter group (B):
       // A1 v B2
       await env.core_data.prepare(`
         UPDATE national_knockouts
-        SET team1_id = COALESCE(?, team1_id), team2_id = ?, updated_user_id = ?
+        SET team1_id = ?, team2_id = ?, updated_user_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
       `).bind(p1, G2, userId, match.league_id, initialRound, orderA1vB2).run();
 
       // B1 v A2
       await env.core_data.prepare(`
         UPDATE national_knockouts
-        SET team1_id = ?, team2_id = COALESCE(?, team2_id), updated_user_id = ?
+        SET team1_id = ?, team2_id = ?, updated_user_id = ?
         WHERE league_id = ? AND round = ? AND match_order = ?
       `).bind(G1, p2, userId, match.league_id, initialRound, orderB1vA2).run();
     }
