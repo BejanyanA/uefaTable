@@ -471,7 +471,6 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
               );
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"), "success");
-              await renderNationalKnockoutsStage(leagueId, rootEl);
             } catch (e) {
               console.error(e);
               showToast(t.player_assign_failed || "Failed to attach user", "error");
@@ -1060,7 +1059,6 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
               await apiPost("/attach-national-round-knock-players", { matchId: knockoutId, teamId, userId, leagueId }, { showLoading: false });
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"), "success");
-              await renderNationalOnlyKnockouts(leagueId, rootEl);
             } catch (e) {
               console.error(e);
               showToast(t.player_assign_failed || "Failed to attach user", "error");

@@ -588,7 +588,6 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
               showToast(userId ? (t.player_success_assigned || "User assigned successfully")
                 : (t.player_success_unassigned || "User unassigned successfully"),
                 "success");
-              await renderLeagueKnockoutsStage(leagueId, rootEl);
             } catch (e) {
               console.error(e);
               showToast(t.player_assign_failed || "Failed to attach user", "error");
