@@ -224,6 +224,10 @@
   overflow: hidden;
 }
 
+#knockoutTab .user-dropdown option {
+  background: #333;
+}
+
 #knockoutTab .ko-team-row > * { min-width: 0; }
 
 /* Same fixed width you’re using for the user select */

@@ -70,6 +70,8 @@ export const langMap = {
     stageType: "Competition Type",
     groupStage: "Group + Playoff",
     knockoutStage: "Only Playoff",
+    groupStageTitle: "Group Stage",
+    knockoutStageTitle: "Play-Off",
 
     //BE translations
     username_exists: "Username already exists",
@@ -158,6 +160,8 @@ export const langMap = {
     stageType: "Մրցաշարի տեսակը",
     groupStage: "Խմբային + Փլեյ-օֆֆ",
     knockoutStage: "Միայն Փլեյ-օֆֆ",
+    groupStageTitle: "Խմբային փուլ",
+    knockoutStageTitle: "Փլեյ-օֆֆ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -246,6 +250,8 @@ export const langMap = {
     stageType: "Type de compétition",
     groupStage: "Groupe + Playoffs",
     knockoutStage: "Playoffs Seulement",
+    groupStageTitle: "Phase de groupes",
+    knockoutStageTitle: "Playoffs",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -288,6 +294,16 @@ function changeLang(lang) {
   const selectUser = langMap[currentLang].selectUser || "Select Player";
   document.querySelectorAll("#selectUserDesk").forEach(opt => {
     opt.textContent = selectUser;
+  });
+
+  const groupTabButton = langMap[currentLang].groupStageTitle || "Group Stage";
+  document.querySelectorAll("#groupStageTitle").forEach(opt => {
+    opt.textContent = groupTabButton;
+  });
+
+  const knockoutTabButton = langMap[currentLang].knockoutStageTitle || "Playoff";
+  document.querySelectorAll("#knockoutStageTitle").forEach(opt => {
+    opt.textContent = knockoutTabButton;
   });
 
   const leagueNotExistEl = document.getElementById("leagueNotExist");

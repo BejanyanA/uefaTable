@@ -223,16 +223,18 @@ export function renderNationalInstances(instanceData) {
   let groupStageBtn = null;
   if (isGroup) {
     groupStageBtn = document.createElement("button");
-    groupStageBtn.textContent = "Group Stage";
+    groupStageBtn.textContent = translation.groupStageTitle || "Group Stage";
     groupStageBtn.dataset.tab = "group";
+    groupStageBtn.id = "groupStageTitle"
     groupStageBtn.classList.add("tab-btn", "active-tab"); // default active when group exists
     tabWrapper.appendChild(groupStageBtn);
   }
 
   // Always create Knockouts button
   const knockoutBtn = document.createElement("button");
-  knockoutBtn.textContent = "Knockouts";
+  knockoutBtn.textContent = translation.knockoutStageTitle || "Knockouts";
   knockoutBtn.dataset.tab = "knockouts";
+  knockoutBtn.id = "knockoutStageTitle"
   knockoutBtn.classList.add("tab-btn");
   if (!isGroup) {
     // No group stage -> Knockouts is active by default
