@@ -456,6 +456,7 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
         sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
+        def.id="selectUserDesk";
         def.value = ""; def.textContent = t.selectUser || "Select Player";
         sel.appendChild(def);
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
@@ -1046,6 +1047,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
         sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
+        def.id="selectUserDesk";
         def.value = ""; def.textContent = t.selectUser || "Select Player";
         sel.appendChild(def);
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
