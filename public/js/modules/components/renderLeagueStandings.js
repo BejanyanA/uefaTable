@@ -39,11 +39,16 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
 
   loadTabContent("standings");
 
-
+  const ACTIVE_CLASS = "active";
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+      if (btn.classList.contains(ACTIVE_CLASS)) return;
+      // visual
+      document.querySelectorAll(".tab-btn").forEach(b => {
+        b.classList.remove(ACTIVE_CLASS);
+        b.classList.remove("active");
+      });
+      btn.classList.add(ACTIVE_CLASS);
       loadTabContent(btn.dataset.tab);
     });
   });
