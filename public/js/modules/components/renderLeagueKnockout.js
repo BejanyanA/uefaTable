@@ -125,7 +125,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
     const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2", "Final"] : ["1/8", "1/4", "1/2", "Final"];
     const firstRound = rounds[0];
 
-    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": "Round of 16", "1/4": "Quarter-finals", "1/2": "Semi-finals", "Final": "Final" };
+    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": t.round16 || "Round of 16", "1/4": t.quarterFinal || "Quarter-finals", "1/2": t.semiFinal || "Semi-finals", "Final": t.final || "Final" };
     const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
     const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
 
@@ -455,6 +455,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
     const finalCol = document.createElement("div");
     finalCol.className = "center-final";
     const finalTitle = document.createElement("h3"); finalTitle.textContent = ROUND_LABELS["Final"];
+    finalTitle.id = "finalRound";
     finalCol.appendChild(finalTitle);
 
     // finals (null-safe)
@@ -490,6 +491,17 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
 
           const title = document.createElement("h3");
           title.textContent = ROUND_LABELS[rk];
+          const roundPlayOffIds = {
+            "1/16": "round32Round",
+            "1/8": "round16Round",
+            "1/4": "quarterFinalRound",
+            "1/2": "semiFinalRound",
+            "Final": "finalRound"
+          };
+          if (roundPlayOffIds[rk]) {
+            title.id = roundPlayOffIds[rk];
+          }
+
           col.appendChild(title);
 
           const body = document.createElement("div");
@@ -570,7 +582,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
         sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
-        def.id="selectUserDesk";
+        def.id = "selectUserDesk";
         def.value = ""; def.textContent = t.selectUser || "Select Player";
         sel.appendChild(def);
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });
@@ -862,7 +874,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const rounds = koTeams === 32 ? ["1/16", "1/8", "1/4", "1/2", "Final"] : ["1/8", "1/4", "1/2", "Final"];
     const firstRound = rounds[0];
 
-    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": "Round of 16", "1/4": "Quarter-finals", "1/2": "Semi-finals", "Final": "Final" };
+    const ROUND_LABELS = { "1/16": "Round of 32", "1/8": t.round16 || "Round of 16", "1/4": t.quarterFinal || "Quarter-finals", "1/2": t.semiFinal || "Semi-finals", "Final": t.final || "Final" };
     const EXPECTED_TIES = { "1/16": 16, "1/8": 8, "1/4": 4, "1/2": 2, "Final": 1 };
     const players = (playersRes && playersRes.success) ? (playersRes.data.players || []) : [];
 
@@ -1070,6 +1082,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const finalCol = document.createElement("div");
     finalCol.className = "center-final";
     const finalTitle = document.createElement("h3"); finalTitle.textContent = ROUND_LABELS["Final"];
+    finalTitle.id = "finalRound";
     finalCol.appendChild(finalTitle);
 
     const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
@@ -1101,6 +1114,17 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
 
         const title = document.createElement("h3");
         title.textContent = ROUND_LABELS[rk];
+        const roundPlayOffIds = {
+          "1/16": "round32Round",
+          "1/8": "round16Round",
+          "1/4": "quarterFinalRound",
+          "1/2": "semiFinalRound",
+          "Final": "finalRound"
+        };
+        if (roundPlayOffIds[rk]) {
+          title.id = roundPlayOffIds[rk];
+        }
+
         col.appendChild(title);
 
         const body = document.createElement("div");
@@ -1259,7 +1283,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         sel.disabled = !canEdit || !team?.id;
 
         const def = document.createElement("option");
-        def.id="selectUserDesk";
+        def.id = "selectUserDesk";
         def.value = ""; def.textContent = t.selectUser || "Select Player";
         sel.appendChild(def);
         players.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.username; sel.appendChild(o); });

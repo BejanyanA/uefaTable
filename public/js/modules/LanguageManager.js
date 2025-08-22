@@ -72,6 +72,11 @@ export const langMap = {
     knockoutStage: "Only Playoff",
     groupStageTitle: "Group Stage",
     knockoutStageTitle: "Play-Off",
+    round16: "Round of 16",
+    quarterFinal: "Quarter-finals",
+    semiFinal: "Semi-finals",
+    final: "Final",
+
 
     //BE translations
     username_exists: "Username already exists",
@@ -162,6 +167,10 @@ export const langMap = {
     knockoutStage: "Միայն Փլեյ-օֆֆ",
     groupStageTitle: "Խմբային փուլ",
     knockoutStageTitle: "Փլեյ-օֆֆ",
+    round16: "1/8 եզրափակիչ",
+    quarterFinal: "Քառորդ եզրափակիչ",
+    semiFinal: "Կիսաեզրափակիչ",
+    final: "Եզրափակիչ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -252,6 +261,10 @@ export const langMap = {
     knockoutStage: "Playoffs Seulement",
     groupStageTitle: "Phase de groupes",
     knockoutStageTitle: "Playoffs",
+    round16: "Huitièmes de finale",
+    quarterFinal: "Quarts de finale",
+    semiFinal: "Demi-finales",
+    final: "Finale",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -291,25 +304,46 @@ function changeLang(lang) {
 
   const t = langMap[lang];
 
+  const leagueNotExistEl = document.getElementById("leagueNotExist");
+  if (leagueNotExistEl) {
+    leagueNotExistEl.textContent = langMap[currentLang].leagueNotExist || "No leagues found";
+  }
+
   const selectUser = langMap[currentLang].selectUser || "Select Player";
   document.querySelectorAll("#selectUserDesk").forEach(opt => {
     opt.textContent = selectUser;
   });
 
+  // Tabs
   const groupTabButton = langMap[currentLang].groupStageTitle || "Group Stage";
   document.querySelectorAll("#groupStageTitle").forEach(opt => {
     opt.textContent = groupTabButton;
   });
-
   const knockoutTabButton = langMap[currentLang].knockoutStageTitle || "Playoff";
   document.querySelectorAll("#knockoutStageTitle").forEach(opt => {
     opt.textContent = knockoutTabButton;
   });
 
-  const leagueNotExistEl = document.getElementById("leagueNotExist");
-  if (leagueNotExistEl) {
-    leagueNotExistEl.textContent = langMap[currentLang].leagueNotExist || "No leagues found";
-  }
+
+
+
+  // Knockout rounds
+    const round16Round = langMap[currentLang].round16 || "Round of 16";
+  document.querySelectorAll("#round16Round").forEach(opt => {
+    opt.textContent = round16Round;
+  });
+    const quarterFinalRound = langMap[currentLang].quarterFinal || "Quarter-finals";
+  document.querySelectorAll("#quarterFinalRound").forEach(opt => {
+    opt.textContent = quarterFinalRound;
+  });
+    const semiFinalRound = langMap[currentLang].semiFinal || "Semi-finals";
+  document.querySelectorAll("#semiFinalRound").forEach(opt => {
+    opt.textContent = semiFinalRound;
+  });
+    const finalRound = langMap[currentLang].final || "Final";
+  document.querySelectorAll("#finalRound").forEach(opt => {
+    opt.textContent = finalRound;
+  });
 
   const dynamicLabels = {
 
