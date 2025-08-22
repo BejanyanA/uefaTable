@@ -51,7 +51,7 @@ export const langMap = {
     points: "Pts",
     player: "Player",
     team: "Team",
-    selectUser: "Select Player",
+    selectUser: "Player",
     leagueNotExist: "No leagues found",
     league_delete_success: "League deleted successfully",
     league_delete_failed: "Failed to delete league",
@@ -148,7 +148,7 @@ export const langMap = {
     points: "Մվր",
     player: "Խաղացող",
     team: "Թիմ",
-    selectUser: "Ընտրել խաղացող",
+    selectUser: "Խաղացող",
     leagueNotExist: "Լիգաներ չեն գտնվել",
     league_delete_success: "Լիգան հաջողությամբ ջնջվեց",
     league_delete_failed: "Չհաջողվեց ջնջել լիգան",
@@ -244,7 +244,7 @@ export const langMap = {
     points: "Pts",
     player: "Joueur",
     team: "Équipe",
-    selectUser: "Sélectionner un utilisateur",
+    selectUser: "Utilisateur",
     leagueNotExist: "Aucune ligue trouvée",
     league_delete_success: "Ligue supprimée avec succès",
     league_delete_failed: "Échec de la suppression de la ligue",
@@ -330,9 +330,6 @@ function changeLang(lang) {
     opt.textContent = knockoutTabButton;
   });
 
-
-
-
   // Knockout rounds
   const round16Round = langMap[currentLang].round16 || "Round of 16";
   document.querySelectorAll("#round16Round").forEach(opt => {
@@ -357,6 +354,20 @@ function changeLang(lang) {
   const rightSFWinner = langMap[currentLang].rightSFWinner || "Winner Right SF";
   document.querySelectorAll("#rightSFWinner").forEach(opt => {
     opt.textContent = rightSFWinner;
+  });
+
+  // Back Buttons
+  const backButton1 = langMap[currentLang].backButton || "< Back";
+  document.querySelectorAll("#backBtn").forEach(opt => {
+    opt.innerText = backButton1;
+  });
+  const backButton2 = langMap[currentLang].backButton || "< Back";
+  document.querySelectorAll("#stageBackBtn").forEach(opt => {
+    opt.innerText = backButton2;
+  });
+  const backButton3 = langMap[currentLang].backButton || "< Back";
+  document.querySelectorAll("#nationalBackBtn").forEach(opt => {
+    opt.innerText = backButton3;
   });
 
   const dynamicLabels = {
