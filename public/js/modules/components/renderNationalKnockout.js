@@ -135,6 +135,24 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
       return card;
     }
 
+    function renderPlaceholderCardFinal({ t1, t2 }) {
+      const card = document.createElement("div");
+      card.className = "ko-card ko-placeholder";
+      const row = document.createElement("div");
+      row.className = "ko-placeholder-row";
+      const span1 = document.createElement("span");
+      span1.id = "leftSFWinner";
+      span1.textContent = t1 || "TBD";
+      const vs = document.createElement("span");
+      vs.textContent = "   vs   ";
+      const span2 = document.createElement("span");
+      span2.id = "rightSFWinner";
+      span2.textContent = t2 || "TBD";
+      row.append(span1, vs, span2);
+      card.appendChild(row);
+      return card;
+    }
+
     // -------- core: split for round with fixed group slots --------
     function splitForRound(ties, rk, firstRound, expectedPerSide) {
       const all = (ties || []).slice().sort((a, b) => (a.matchOrder ?? 0) - (b.matchOrder ?? 0));
@@ -351,7 +369,7 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
     const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
     const finalTie = finalsRaw.find(Boolean) || null;
     if (finalTie) finalCol.appendChild(renderTie(finalTie, "center"));
-    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
+    else finalCol.appendChild(renderPlaceholderCardFinal({ t1: "Winner Left SF", t2: "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
     cupWrap.className = "cup-wrap";
@@ -726,12 +744,31 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
       return even ? { t1: `Group ${g1} 1st`, t2: `Group ${g2} 2nd` }
         : { t1: `Group ${g2} 1st`, t2: `Group ${g1} 2nd` };
     }
+
     function renderPlaceholderCard({ t1, t2 }) {
       const card = document.createElement("div");
       card.className = "ko-card ko-placeholder";
       const row = document.createElement("div");
       row.className = "ko-placeholder-row";
       row.textContent = `${t1}   vs   ${t2}`;
+      card.appendChild(row);
+      return card;
+    }
+
+    function renderPlaceholderCardFinal({ t1, t2 }) {
+      const card = document.createElement("div");
+      card.className = "ko-card ko-placeholder";
+      const row = document.createElement("div");
+      row.className = "ko-placeholder-row";
+      const span1 = document.createElement("span");
+      span1.id = "leftSFWinner";
+      span1.textContent = t1 || "TBD";
+      const vs = document.createElement("span");
+      vs.textContent = "   vs   ";
+      const span2 = document.createElement("span");
+      span2.id = "rightSFWinner";
+      span2.textContent = t2 || "TBD";
+      row.append(span1, vs, span2);
       card.appendChild(row);
       return card;
     }
@@ -873,7 +910,7 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
     const finalsList = byRound.get("Final") || byRound.get("final") || [];
     const finalMatch = finalsList.find(Boolean) || null;
     if (finalMatch) finalCol.appendChild(renderTie(finalMatch, "center"));
-    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
+    else finalCol.appendChild(renderPlaceholderCardFinal({ t1: t.leftSFWinner || "Winner Left SF", t2: t.rightSFWinner || "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
     cupWrap.className = "cup-wrap";

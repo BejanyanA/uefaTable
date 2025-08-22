@@ -76,6 +76,8 @@ export const langMap = {
     quarterFinal: "Quarter-finals",
     semiFinal: "Semi-finals",
     final: "Final",
+    leftSFWinner: "Winner Left SF",
+    rightSFWinner: "Winner Right SF",
 
 
     //BE translations
@@ -171,6 +173,8 @@ export const langMap = {
     quarterFinal: "Քառորդ եզրափակիչ",
     semiFinal: "Կիսաեզրափակիչ",
     final: "Եզրափակիչ",
+    leftSFWinner: "Ձախ կ/ե հաղթող",
+    rightSFWinner: "Աջ կ/ե հաղթող",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -265,6 +269,8 @@ export const langMap = {
     quarterFinal: "Quarts de finale",
     semiFinal: "Demi-finales",
     final: "Finale",
+    leftSFWinner: "Vainqueur SF gauche",
+    rightSFWinner: "Vainqueur SF droite",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -328,21 +334,29 @@ function changeLang(lang) {
 
 
   // Knockout rounds
-    const round16Round = langMap[currentLang].round16 || "Round of 16";
+  const round16Round = langMap[currentLang].round16 || "Round of 16";
   document.querySelectorAll("#round16Round").forEach(opt => {
     opt.textContent = round16Round;
   });
-    const quarterFinalRound = langMap[currentLang].quarterFinal || "Quarter-finals";
+  const quarterFinalRound = langMap[currentLang].quarterFinal || "Quarter-finals";
   document.querySelectorAll("#quarterFinalRound").forEach(opt => {
     opt.textContent = quarterFinalRound;
   });
-    const semiFinalRound = langMap[currentLang].semiFinal || "Semi-finals";
+  const semiFinalRound = langMap[currentLang].semiFinal || "Semi-finals";
   document.querySelectorAll("#semiFinalRound").forEach(opt => {
     opt.textContent = semiFinalRound;
   });
-    const finalRound = langMap[currentLang].final || "Final";
+  const finalRound = langMap[currentLang].final || "Final";
   document.querySelectorAll("#finalRound").forEach(opt => {
     opt.textContent = finalRound;
+  });
+  const leftSFWinner = langMap[currentLang].leftSFWinner || "Winner Left SF";
+  document.querySelectorAll("#leftSFWinner").forEach(opt => {
+    opt.textContent = leftSFWinner;
+  });
+  const rightSFWinner = langMap[currentLang].rightSFWinner || "Winner Right SF";
+  document.querySelectorAll("#rightSFWinner").forEach(opt => {
+    opt.textContent = rightSFWinner;
   });
 
   const dynamicLabels = {

@@ -180,6 +180,24 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
       return card;
     }
 
+    function renderPlaceholderCardFinal({ t1, t2 }) {
+      const card = document.createElement("div");
+      card.className = "ko-card ko-placeholder";
+      const row = document.createElement("div");
+      row.className = "ko-placeholder-row";
+      const span1 = document.createElement("span");
+      span1.id = "leftSFWinner";
+      span1.textContent = t1 || "TBD";
+      const vs = document.createElement("span");
+      vs.textContent = "   vs   ";
+      const span2 = document.createElement("span");
+      span2.id = "rightSFWinner";
+      span2.textContent = t2 || "TBD";
+      row.append(span1, vs, span2);
+      card.appendChild(row);
+      return card;
+    }
+
     // -------- core: split for round (first round by groups; others unchanged) --------
     function splitForRound(ties, rk, firstRound, expectedPerSide) {
       const all = (ties || []).slice();
@@ -462,7 +480,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
     const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
     const finalTie = finalsRaw.find(Boolean) || null;
     if (finalTie) finalCol.appendChild(renderTie(finalTie, "center"));
-    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
+    else finalCol.appendChild(renderPlaceholderCardFinal({ t1: t.leftSFWinner || "Winner Left SF", t2: t.rightSFWinner || "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
     cupWrap.className = "cup-wrap";
@@ -911,6 +929,24 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
       return card;
     }
 
+    function renderPlaceholderCardFinal({ t1, t2 }) {
+      const card = document.createElement("div");
+      card.className = "ko-card ko-placeholder";
+      const row = document.createElement("div");
+      row.className = "ko-placeholder-row";
+      const span1 = document.createElement("span");
+      span1.id = "leftSFWinner";
+      span1.textContent = t1 || "TBD";
+      const vs = document.createElement("span");
+      vs.textContent = "   vs   ";
+      const span2 = document.createElement("span");
+      span2.id = "rightSFWinner";
+      span2.textContent = t2 || "TBD";
+      row.append(span1, vs, span2);
+      card.appendChild(row);
+      return card;
+    }
+
     // Build round -> ties map (keep original order for matchOrder)
     const byRound = new Map();
     (data.matches || []).forEach(m => {
@@ -1088,7 +1124,7 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
     const finalsRaw = byRound.get("Final") || byRound.get("final") || [];
     const finalTie0 = finalsRaw.find(Boolean) || null;
     if (finalTie0) finalCol.appendChild(renderTie(finalTie0, "center"));
-    else finalCol.appendChild(renderPlaceholderCard({ t1: "Winner Left SF", t2: "Winner Right SF" }));
+    else finalCol.appendChild(renderPlaceholderCardFinal({ t1: t.leftSFWinner || "Winner Left SF", t2: t.rightSFWinner || "Winner Right SF" }));
 
     const cupWrap = document.createElement("div");
     cupWrap.className = "cup-wrap";
