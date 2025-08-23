@@ -269,8 +269,8 @@ export const langMap = {
     quarterFinal: "Quarts de finale",
     semiFinal: "Demi-finales",
     final: "Finale",
-    leftSFWinner: "Vainqueur SF gauche",
-    rightSFWinner: "Vainqueur SF droite",
+    leftSFWinner: "Vainqueur DF gauche",
+    rightSFWinner: "Vainqueur DF droite",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
