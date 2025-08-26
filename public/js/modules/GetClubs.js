@@ -128,19 +128,17 @@ export const getClubs = {
                         }, { signal });
                     });
                     countEl.textContent = `${translation.selectedCount} (${selectedIds.size})`;
-                    // } else {
-                    //     const message = translation.no_clubs_found || "No clubs found.";
-                    //     const err = document.createElement("div");
-                    //     err.className = "clubs-list-error";
-                    //     err.textContent = message;
-                    //     container.appendChild(err);
+                } else {
+                    const message = translation.no_clubs_found || "No clubs found.";
+                    const err = document.createElement("div");
+                    err.className = "clubs-list-error";
+                    err.textContent = message;
+                    container.appendChild(err);
                 }
             } catch (e) {
-                const message = translation.no_clubs_found || "No clubs found.";
-                const err = document.createElement("div");
-                err.className = "clubs-list-error";
-                err.textContent = message;
-                container.appendChild(err);
+                if (e?.name === "AbortError") return;
+                container.innerHTML = `<div class="clubs-list-error">Something went wrong during search.</div>`;
+                console.error("❌ Error in getClubs.initSearchClubs:", e);
             }
         }
 

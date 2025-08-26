@@ -47,7 +47,7 @@ export const getEuropeCountries = {
                 });
 
             } else {
-                const message = translation.no_countries_found || "No clubs found.";
+                const message = translation.no_countries_found || "No countries found.";
                 // clubError.textContent = message;
 
                 const error = document.createElement("div");
@@ -56,7 +56,7 @@ export const getEuropeCountries = {
                 container.appendChild(error);
             }
         } catch (err) {
-            container.innerHTML = `<div class="clubs-list-error">Something went wrong while loading clubs.</div>`;
+            container.innerHTML = `<div class="clubs-list-error">Something went wrong while loading countries.</div>`;
             console.error("❌ Error in getCountries.initGetAllCountries:", err);
         }
     },
@@ -76,7 +76,7 @@ export const getEuropeCountries = {
         _europeCountriesSearchAbort = ac;
         const { signal } = ac;
 
-        // same shared elements as clubs (you said they’re the same)
+        // same shared elements as countries (you said they’re the same)
         const searchInput = root.querySelector("#clubSearch");
         const container = root.querySelector("#clubList");
         const countEl = root.querySelector("#clubCount");
@@ -139,19 +139,17 @@ export const getEuropeCountries = {
                 const countries = response?.data?.countries ?? [];
                 if (response?.success && countries.length) {
                     renderEuropeCountryList(countries);
-                // } else {
-                //     const message = translation.no_countries_found || "No countries found.";
-                //     const error = document.createElement("div");
-                //     error.className = "clubs-list-error";
-                //     error.textContent = message;
-                //     container.appendChild(error);
+                } else {
+                    const message = translation.no_countries_found || "No countries found.";
+                    const error = document.createElement("div");
+                    error.className = "clubs-list-error";
+                    error.textContent = message;
+                    container.appendChild(error);
                 }
             } catch (err) {
-                const message = translation.no_countries_found || "No countries found.";
-                const error = document.createElement("div");
-                error.className = "clubs-list-error";
-                error.textContent = message;
-                container.appendChild(error);
+                if (err?.name === "AbortError") return;
+                container.innerHTML = `<div class="clubs-list-error">Something went wrong during search.</div>`;
+                console.error("❌ Error in getCountries.initSearchWorldCountries:", err);
             }
         }
 

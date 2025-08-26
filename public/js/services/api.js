@@ -19,15 +19,6 @@ async function handleResponse(response) {
     logout();
     return { success: false, status: 401, message: "unauthorized" };
   }
-
-  // 🔴 Handle other non-ok responses
-  if (!response.ok) {
-    throw {
-      status: response.status,
-      body: data || { message: "something_went_wrong" },
-    };
-  }
-
   return data;
 }
 
