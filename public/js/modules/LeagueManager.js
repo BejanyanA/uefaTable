@@ -47,27 +47,16 @@ export const LeagueManager = {
 
       getFriends.initGetAllFriends();
 
+      // 🔧 Teardown everything first (idempotent if not active)
+      getClubs?.teardownSearch?.();
+      getEuropeCountries?.teardownSearch?.();
+      getCountries?.teardownSearch?.();
+
       if (bannerId === 1 || bannerId === 2) {
-        // ensure club search is off
-        if (typeof getClubs?.teardownSearch === "function") getClubs.teardownSearch();
-
-        // getClubs.initGetAllClubs(); - no need to keep this as the below is already gets all
         getClubs.initSearchClubs(modal);
-      }
-
-      if (bannerId === 3) {
-        // ensure country search is off
-        if (typeof getEuropeCountries?.teardownSearch === "function") getEuropeCountries.teardownSearch();
-
-        // getCountries.initGetAllCountries(); - no need to keep this as the below is already gets all
+      } else if (bannerId === 3) {
         getEuropeCountries.initSearchEuropeCountries(modal);
-      }
-
-      if (bannerId === 4) {
-        // ensure country search is off
-        if (typeof getCountries?.teardownSearch === "function") getCountries.teardownSearch();
-
-        // getCountries.initGetAllCountries(); - no need to keep this as the below is already gets all
+      } else if (bannerId === 4) {
         getCountries.initSearchWorldCountries(modal);
       }
 
@@ -213,7 +202,7 @@ export const LeagueManager = {
                 window.closeModal("tableModal");
                 showToast(translation.league_create_success || "League Successfully Created", "success");
                 document.getElementById("bannerContainer").style.display = "none";
-                
+
                 if (bannerId === 1 || bannerId === 2) {
                   renderLeagueTable(data.data);
                 } else {
