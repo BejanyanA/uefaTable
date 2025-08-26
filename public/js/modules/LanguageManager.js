@@ -94,6 +94,7 @@ export const langMap = {
     not_found: "Not found",
     league_create_success: "League Successfully Created",
     league_creation_failed: "League Creation failed",
+    no_countries_found: "No countries found",
   },
 
   am: {
@@ -190,6 +191,7 @@ export const langMap = {
     not_found: "Չի գտնվել",
     league_create_success: "Լիգան հաջողությամբ ստեղծվեց",
     league_creation_failed: "Լիգայի ստեղծումը ձախողվեց",
+    no_countries_found: "Քաղաքներ չեն գտնվել",
   },
 
   fr: {
@@ -286,6 +288,7 @@ export const langMap = {
     not_found: "Introuvable",
     league_create_success: "Ligue créée avec succès",
     league_creation_failed: "Échec de la création de la ligue",
+    no_countries_found: "Aucun pays trouvé",
   }
 };
 

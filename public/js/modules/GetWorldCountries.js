@@ -47,7 +47,7 @@ export const getCountries = {
                 });
 
             } else {
-                const message = translation.no_clubs_found || "No clubs found.";
+                const message = translation.no_countries_found || "No clubs found.";
                 // clubError.textContent = message;
 
                 const error = document.createElement("div");
