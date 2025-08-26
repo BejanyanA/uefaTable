@@ -207,7 +207,9 @@
   }
 
   .club-checkbox-list {
-    height: 230px;
+    height: 25vh;
+    max-height: 300px;
+    min-height: 180px;
   }
 
   .friend-checkbox-list {
