@@ -90,7 +90,7 @@ export const getEuropeCountries = {
 
         const selectedIds = new Set();
 
-        function renderWorldCountryList(countries) {
+        function renderEuropeCountryList(countries) {
             container.innerHTML = "";
 
             countries.forEach(country => {
@@ -138,18 +138,20 @@ export const getEuropeCountries = {
 
                 const countries = response?.data?.countries ?? [];
                 if (response?.success && countries.length) {
-                    renderWorldCountryList(countries);
-                } else {
-                    const message = translation.no_clubs_found || "No countries found.";
-                    const error = document.createElement("div");
-                    error.className = "clubs-list-error";
-                    error.textContent = message;
-                    container.appendChild(error);
+                    renderEuropeCountryList(countries);
+                // } else {
+                //     const message = translation.no_countries_found || "No countries found.";
+                //     const error = document.createElement("div");
+                //     error.className = "clubs-list-error";
+                //     error.textContent = message;
+                //     container.appendChild(error);
                 }
             } catch (err) {
-                if (err?.name === "AbortError") return;
-                container.innerHTML = `<div class="clubs-list-error">Something went wrong during search.</div>`;
-                console.error("❌ Error in getCountries.initSearchWorldCountries:", err);
+                const message = translation.no_countries_found || "No countries found.";
+                const error = document.createElement("div");
+                error.className = "clubs-list-error";
+                error.textContent = message;
+                container.appendChild(error);
             }
         }
 
