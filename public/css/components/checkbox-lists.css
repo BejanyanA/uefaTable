@@ -99,6 +99,7 @@
   text-overflow: ellipsis;
   color: #f0f0f0;
   font-size: 14px;
+  height: 15px;
 }
 
 .club-list-scroll {
@@ -123,12 +124,9 @@
   color: red;
   font-size: 12px;
   margin-top: 4px;
-  /* 👈 Add this for spacing above */
-  margin-bottom: 20px;
-  /* 👈 Reduce bottom if needed */
+  margin-bottom: 10px;
   align-self: flex-start;
   min-height: 18px;
-  /* 👈 Optional: keep consistent height */
 }
 
 .friend-list-error,
@@ -209,7 +207,7 @@
   }
 
   .club-checkbox-list {
-    height: 220px;
+    height: 230px;
   }
 
   .friend-checkbox-list {
