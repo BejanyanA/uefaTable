@@ -14,7 +14,9 @@
     width: 100%;
     max-width: 100%;
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: -15px;
+    background-color: rgba(48, 47, 47, 0.342);
+    border-radius: 10px;
 }
 
 #bannerContainerWrapper {
@@ -33,8 +35,8 @@
 }
 
 .banner {
-    height: 293px;
-    width: 456px;
+    height: 300px;
+    width: 430px;
     cursor: pointer;
     position: relative;
     display: flex;
@@ -42,7 +44,7 @@
     background-position: center;
     background-repeat: no-repeat;
     border-radius: 10px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); */
     flex-direction: column;
     justify-content: end;
     align-items: center;
@@ -66,22 +68,22 @@
 
 #banner1 {
 
-    background-image: url('../../assets/images/champLDesk.png');
+    background-image: url('../../assets/images/champLeaOnlyCup.png');
 }
 
 #banner2 {
 
-    background-image: url('../../assets/images/europaLDesk.png');
+    background-image: url('../../assets/images/eur2OnlyCup.png');
 }
 
 #banner3 {
 
-    background-image: url('../../assets/images/euroDesk.png');
+    background-image: url('../../assets/images/europ3OnlyCup.png');
 }
 
 #banner4 {
 
-    background-image: url('../../assets/images/worldDesk.png');
+    background-image: url('../../assets/images/wrld4OnlyCup.png');
 }
 
 
@@ -117,8 +119,8 @@
     .banner {
         display: flex;
         margin-bottom: 3px;
-        height: 188px;
-        width: 343px;
+        height: 150px;
+        width: 300px;
         justify-content: flex-start;
         /* left alignment */
         flex-direction: column;
@@ -128,6 +130,7 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        margin-top: 15px;
     }
 
     #banner-wrap {
@@ -144,21 +147,21 @@
 
     #banner1 {
 
-        background-image: url('../../assets/images/champLMob.png') !important;
+        background-image: url('../../assets/images/champLeaMobOnlyCup.png') !important;
     }
 
     #banner2 {
 
-        background-image: url('../../assets/images/europLmob.png') !important;
+        background-image: url('../../assets/images/eur2MobOnlyCup.png') !important;
     }
 
     #banner3 {
 
-        background-image: url('../../assets/images/euroMob.png') !important;
+        background-image: url('../../assets/images/europ3MobOnlyCup.png') !important;
     }
 
     #banner4 {
 
-        background-image: url('../../assets/images/worldMobile.png') !important;
+        background-image: url('../../assets/images/wrld4MobOnlyCup.png') !important;
     }
 }
