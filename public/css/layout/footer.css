@@ -1,14 +1,7 @@
 footer.page-footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 10;
-  bottom: 0;              /* stick to bottom */
-  height: var(--footer-height);
   background: transparent;
   color: white;
   text-align: center;
   padding: 6px;
   font-size: x-small;
-  z-index: 1000;          /* above content, below modals if needed */
 }
