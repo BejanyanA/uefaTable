@@ -91,6 +91,7 @@
 
     /* only scroll if content is larger */
     max-width: 100%;     /* horizontal scroll only if needed */
+    overflow-x: auto;
     overflow-y: auto;       /* vertical scroll only if needed */
     -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
   }
