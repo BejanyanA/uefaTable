@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -8,11 +9,13 @@ html, body {
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Ensures full viewport height */
+  min-height: 100vh;
+  /* Ensures full viewport height */
 }
 
 .content-wrapper {
-  flex: 1; /* Takes up all remaining space above footer */
+  flex: 1;
+  /* Takes up all remaining space above footer */
   display: flex;
   flex-direction: column;
 }
@@ -26,6 +29,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-bottom: var(--footer-height);
 }
 
 .body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
@@ -56,9 +60,13 @@ body {
   body::before {
     content: "";
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: url('../assets/images/mobileBack.png') no-repeat center center;
     background-size: cover;
-    z-index: -1;   /* sit behind all content */
+    z-index: -1;
+    /* sit behind all content */
   }
 }
