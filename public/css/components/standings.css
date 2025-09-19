@@ -244,7 +244,7 @@
     text-align: center;
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    position: absolute;
+    position: fixed;
     margin-top: -17px;
     margin-left: -11px;
   }
@@ -275,7 +275,7 @@
     text-align: center;
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    position: absolute;
+    position: fixed;
     margin-top: -17px;
     margin-left: -11px;
   }
