@@ -1,7 +1,7 @@
 #banner-wrap {
     display: flex;
     justify-content: center;
-    gap: 50px;
+    gap: 30px;
     flex-wrap: wrap;
     margin: 20px auto;
 }
@@ -104,7 +104,6 @@
     #bannerContainerWrapper {
         display: flex;
         justify-content: center;
-        margin-top: 20px;
     }
 
     #competition-types {

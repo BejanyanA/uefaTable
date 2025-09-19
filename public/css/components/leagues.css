@@ -86,12 +86,12 @@
 
   /* Outer section or container */
   #leagueType1 {
-    padding: 8px;
+    padding: 14px;
     overflow-x: auto;
   }
 
   #leagueType2 {
-    padding: 8px;
+    padding: 14px;
     overflow-x: auto;
   }
 
@@ -102,10 +102,9 @@
     flex-wrap: wrap;
     gap: 16px;
     margin: 30 auto;
-    padding-left: 0px;
+    padding-left: 2px;
     padding-right: 0px;
     text-align: center;
-    margin-top: 95px;
   }
 
   /* Each league box */

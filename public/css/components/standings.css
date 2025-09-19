@@ -7,10 +7,11 @@
 }
 
 .group-tabs {
-  margin-top: 130px;
+  margin-top: 115px;
   display: flex;
   gap: 10px;
   position: relative;
+  position: fixed;
 }
 
 .tab-btn {
@@ -123,15 +124,19 @@
 
 .group-standings-header h2 {
   color: white;
-  margin-top: 10px;
-  padding: 0 20px 20px;
+  margin-top: 130px;
+  margin-bottom: 0px;
+  padding: 0 20px 0px;
   font-size: 30px;
   text-align: center;
-  margin-bottom: 5px;
-  padding: 40px;
+  margin-bottom: 0px;
+  padding-top: 40px;
 }
 
 #backBtn {
+  top: 87px;
+  left: 25px;
+  z-index: 1;
   color: white;
   background: #1d1d1d;
   padding: 6px 3px;
@@ -145,7 +150,6 @@
   box-sizing: content-box;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   position: fixed;
-  margin-left: 3px;
 }
 
 #backBtn:hover {
@@ -157,6 +161,9 @@
 }
 
 .backButtn {
+  top: 87px;
+  left: 25px;
+  z-index: 1;
   color: white;
   background: #1d1d1d;
   padding: 6px 3px;
@@ -210,26 +217,25 @@
 @media (max-width: 600px) {
 
   .group-tabs {
-    margin-top: 60px;
     display: flex;
     gap: 10px;
     position: fixed;
   }
 
+  .tab-content {
+    margin-top: 10px;
+  }
+
   .group-standings-header h2 {
     color: white;
-    margin-top: 130px;
-    font-size: 30px;
+    margin-top: 180px;
+    font-size: 20px;
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     padding: 10px;
   }
 
   #backBtn {
-    color: white;
-    background: #1d1d1d;
-    padding: 6px 3px;
-    cursor: pointer;
     font-size: 12px;
     border-radius: 6px;
     transition: background 0.3s, color 0.3s, transform 0.1s;
@@ -238,7 +244,9 @@
     text-align: center;
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    position: fixed;
+    position: absolute;
+    margin-top: -17px;
+    margin-left: -11px;
   }
 
   .backButtn {
@@ -255,14 +263,10 @@
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     position: fixed;
-    margin-left: -15px;
+    margin-left: -11px;
   }
 
   #nationalBackBtn {
-    color: white;
-    background: #1d1d1d;
-    padding: 6px 3px;
-    cursor: pointer;
     font-size: 12px;
     border-radius: 6px;
     transition: background 0.3s, color 0.3s, transform 0.1s;
@@ -271,7 +275,9 @@
     text-align: center;
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    position: fixed;
+    position: absolute;
+    margin-top: -17px;
+    margin-left: -11px;
   }
 
   .standings-wrapper {
@@ -280,7 +286,7 @@
     border-radius: 12px;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     color: white;
-    margin: 20px auto;
+    margin: 10px auto;
     max-width: 100%;
   }
 

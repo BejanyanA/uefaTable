@@ -5,15 +5,16 @@
       flex-direction: column;
   }
 
+  #stageContainerWrapper {
+      padding-top: 30px;
+  }
+
   #stageBanner-wrap {
       display: flex;
       justify-content: center;
-      gap: 150px;
-      /* Space between stageBanners */
-      flex-wrap: wrap;
-      /* Allows wrapping on small screens */
-      margin: 20px auto;
-      /* Optional centering */
+      gap: 50px;     /* Space between stageBanners */
+      flex-wrap: wrap;      /* Allows wrapping on small screens */
+      margin: 20px auto;    /* Optional centering */
   }
 
   #knockoutStage-title,
@@ -31,7 +32,7 @@
       font-size: 36px;
       color: white;
       width: fit-content;
-      margin: 30px auto;
+      margin: 20px auto;
       padding: 40px 20px;
       text-align: center;
   }
@@ -79,7 +80,7 @@
 
   #stageBackBtn {
       top: 87px;
-      left: 28px;
+      left: 25px;
       z-index: 1;
       color: white;
       background: #1d1d1d;
@@ -109,8 +110,8 @@
   /* Mobile */
   @media (max-width: 480px) {
 
-      .stage-container {
-          padding-top: 75px;
+      #stageContainerWrapper {
+          padding-top: 50px;
           position: relative;
           display: flex;
           flex-direction: column;
@@ -147,19 +148,12 @@
       #stageBanner-wrap {
           display: flex;
           justify-content: center;
-          gap: 50px;
+          gap: 30px;
           flex-wrap: wrap;
           margin: 3%;
       }
 
       #stageBackBtn {
-          top: 25px;
-          left: 25px;
-          z-index: 1;
-          color: white;
-          background: #1d1d1d;
-          padding: 6px 3px;
-          cursor: pointer;
           font-size: 12px;
           border-radius: 6px;
           transition: background 0.3s, color 0.3s, transform 0.1s;
@@ -170,7 +164,7 @@
           box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
           position: absolute;
           margin-top: -17px;
-          margin-left: -15px;
+          margin-left: -11px;
       }
 
 
