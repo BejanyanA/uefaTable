@@ -104,7 +104,6 @@
     #bannerContainerWrapper {
         display: flex;
         justify-content: center;
-        overflow: visible
     }
 
     #competition-types {

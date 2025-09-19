@@ -119,7 +119,6 @@
           display: flex;
           flex-direction: column;
 
-          overflow: visible;
           -webkit-overflow-scrolling: touch;
       }
 

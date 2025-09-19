@@ -88,9 +88,6 @@
   #leagueType1,
   #leagueType2 {
     padding: 14px;
-
-    /* only scroll if content is larger */
-    overflow: visible;       /* vertical scroll only if needed */
     -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
   }
 
