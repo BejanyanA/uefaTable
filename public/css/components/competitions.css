@@ -104,10 +104,7 @@
     #bannerContainerWrapper {
         display: flex;
         justify-content: center;
-        max-width: 100%;
-        overflow-x: auto;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow: visible
     }
 
     #competition-types {
