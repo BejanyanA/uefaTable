@@ -60,7 +60,7 @@ body {
     background-repeat: no-repeat;
   }
 
-  /* body {
+  body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: url('../assets/images/mobileBack.png') no-repeat center center fixed;
@@ -70,5 +70,5 @@ body {
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
-  } */
+  }
 }
