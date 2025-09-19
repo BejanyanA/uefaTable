@@ -118,7 +118,7 @@
           position: relative;
           display: flex;
           flex-direction: column;
-
+          margin-inline: 0;
           -webkit-overflow-scrolling: touch;
       }
 

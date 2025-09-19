@@ -89,6 +89,7 @@
   #leagueType2 {
     padding: 14px;
     -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+    margin-inline: 0
   }
 
 
