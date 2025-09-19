@@ -104,6 +104,9 @@
     #bannerContainerWrapper {
         display: flex;
         justify-content: center;
+        max-width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     #competition-types {

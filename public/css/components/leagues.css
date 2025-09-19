@@ -85,14 +85,14 @@
 @media (max-width: 480px) {
 
   /* Outer section or container */
-  #leagueType1 {
-    padding: 14px;
-    overflow-x: auto;
-  }
-
+  #leagueType1,
   #leagueType2 {
     padding: 14px;
-    overflow-x: auto;
+
+    /* only scroll if content is larger */
+    max-width: 100%;     /* horizontal scroll only if needed */
+    overflow-y: auto;       /* vertical scroll only if needed */
+    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
   }
 
 

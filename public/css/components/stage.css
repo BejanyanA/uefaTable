@@ -12,9 +12,12 @@
   #stageBanner-wrap {
       display: flex;
       justify-content: center;
-      gap: 50px;     /* Space between stageBanners */
-      flex-wrap: wrap;      /* Allows wrapping on small screens */
-      margin: 20px auto;    /* Optional centering */
+      gap: 50px;
+      /* Space between stageBanners */
+      flex-wrap: wrap;
+      /* Allows wrapping on small screens */
+      margin: 20px auto;
+      /* Optional centering */
   }
 
   #knockoutStage-title,
@@ -115,6 +118,10 @@
           position: relative;
           display: flex;
           flex-direction: column;
+
+          max-height: 100vh;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
       }
 
 
