@@ -69,6 +69,8 @@ export const AuthManager = {
           closeModal("loginModal");
         } else {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
+          localStorage.removeItem("lastActiveLeagueTab");
+          localStorage.removeItem("lastActiveNationalLeagueTab");
         }
       } catch (err) {
         showToast(translation.something_went_wrong, "error");

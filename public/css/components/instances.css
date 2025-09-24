@@ -81,7 +81,6 @@
 
 .tab-switcher {
     position: fixed;
-    z-index: 100;
     display: flex;
     gap: 10px;
     margin: 115px 0;

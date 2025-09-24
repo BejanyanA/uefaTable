@@ -78,6 +78,8 @@ export const langMap = {
     final: "Final",
     leftSFWinner: "Winner Left SF",
     rightSFWinner: "Winner Right SF",
+    myCreatedLeagues: "My Leagues",
+    myInvitedLeagues: "Invited Leagues",
 
 
     //BE translations
@@ -176,6 +178,8 @@ export const langMap = {
     final: "Եզրափակիչ",
     leftSFWinner: "Ձախ կ/ե հաղթող",
     rightSFWinner: "Աջ կ/ե հաղթող",
+    myCreatedLeagues: "Իմ մրցաշարերը",
+    myInvitedLeagues: "Հրավիրված լիգաներ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -273,6 +277,8 @@ export const langMap = {
     final: "Finale",
     leftSFWinner: "Vainqueur DF gauche",
     rightSFWinner: "Vainqueur DF droite",
+    myCreatedLeagues: "Mes ligues",
+    myInvitedLeagues: "Ligues invitées",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -318,10 +324,22 @@ function changeLang(lang) {
     leagueNotExistEl.textContent = langMap[currentLang].leagueNotExist || "No leagues found";
   }
 
-    const noLeagueFound = langMap[currentLang].leagueNotExist || "No leagues found";
+  const noLeagueFound = langMap[currentLang].leagueNotExist || "No leagues found";
   document.querySelectorAll("#leagueNotExist").forEach(opt => {
     opt.textContent = noLeagueFound;
   });
+
+  const myLeagues = langMap[currentLang].myCreatedLeagues || "My Leagues";
+  document.querySelectorAll("#myLeaguesTab").forEach(opt => {
+    opt.textContent = myLeagues;
+  });
+
+  const myInvitedLeagues = langMap[currentLang].myInvitedLeagues || "Invited Leagues";
+  document.querySelectorAll("#invitedLeaguesTab").forEach(opt => {
+    opt.textContent = myInvitedLeagues;
+  });
+
+
 
   const selectUser = langMap[currentLang].selectUser || "Select Player";
   document.querySelectorAll("#selectUserDesk").forEach(opt => {

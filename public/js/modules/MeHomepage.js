@@ -16,8 +16,12 @@ export async function checkLoggedIn() {
       if (data.success && data.user) {
          document.getElementById("logoutButtn").style.display = "block";
          document.getElementById("homePage").style.display = "block";
+         localStorage.removeItem("lastActiveLeagueTab");
+         localStorage.removeItem("lastActiveNationalLeagueTab");
       } else {
          localStorage.removeItem("authToken");
+         localStorage.removeItem("lastActiveLeagueTab");
+         localStorage.removeItem("lastActiveNationalLeagueTab");
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
@@ -31,6 +35,8 @@ export async function checkLoggedIn() {
 // 🔹 Logout
 export function logout () {
    localStorage.removeItem("authToken");
+   localStorage.removeItem("lastActiveLeagueTab");
+   localStorage.removeItem("lastActiveNationalLeagueTab");
    location.reload();
 
    document.getElementById("homePage").style.display = "none";

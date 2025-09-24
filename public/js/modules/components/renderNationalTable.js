@@ -27,6 +27,7 @@ export function renderNationalTable(data) {
         document.getElementById("logoutButtn").style.display = "block";
         document.getElementById("stageContainer").style.display = "block";
         document.getElementById("leagueType2").style.display = "none";
+        localStorage.removeItem("lastActiveNationalLeagueTab");
       } else {
         localStorage.removeItem("authToken");
         if (authButtons) authButtons.style.display = "flex";
@@ -41,23 +42,55 @@ export function renderNationalTable(data) {
   section.appendChild(backBtn); // Add Back button
 
   // ✅ If no leagues
-  if (!leagues.length) {
-    const translation = langMap[currentLang];
-    const noDataMsg = document.createElement("div");
-    noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
-    noDataMsg.id = "noLeaguedata";
-    section.appendChild(noDataMsg);
-    return;
-  }
+  // if (!leagues.length) {
+  //   const noDataMsg = document.createElement("div");
+  //   noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+  //   noDataMsg.id = "noLeaguedata";
+  //   section.appendChild(noDataMsg);
+  //   return;
+  // }
 
-  // ✅ Container for league boxes
+  // Split groups
+  const hasOwners = leagues.some(l => l.accessType === "owner");
+  const hasInvited = leagues.some(l => l.accessType !== "owner"); // (kept for future use)
+
+  // ✅ Tabs header (always shown now since we have some data)
+  const tabsHeader = document.createElement("div");
+  tabsHeader.className = "tab-switcher";
+  tabsHeader.id = "leaguesTabs";
+  tabsHeader.setAttribute("role", "tablist");
+
+  const myTabBtn = document.createElement("button");
+  myTabBtn.className = "tab-btn";
+  myTabBtn.dataset.tab = "owners";
+  myTabBtn.id = "myLeaguesTab";
+  myTabBtn.setAttribute("role", "tab");
+  myTabBtn.setAttribute("aria-controls", "leaguesRow");
+  myTabBtn.textContent = translation.myCreatedLeagues || "My leagues";
+
+  const invitedTabBtn = document.createElement("button");
+  invitedTabBtn.className = "tab-btn";
+  invitedTabBtn.dataset.tab = "invited";
+  invitedTabBtn.id = "invitedLeaguesTab";
+  invitedTabBtn.setAttribute("role", "tab");
+  invitedTabBtn.setAttribute("aria-controls", "leaguesRow");
+  invitedTabBtn.textContent = translation.myInvitedLeagues || "Invited Leagues";
+
+  tabsHeader.appendChild(myTabBtn);
+  tabsHeader.appendChild(invitedTabBtn);
+  section.appendChild(tabsHeader);
+
+  // ✅ Single container (preserves desktop layout)
   const rowContainer = document.createElement("div");
   rowContainer.className = "league-names-row";
+  rowContainer.id = "leaguesRow";
   section.appendChild(rowContainer);
 
+  // Render all items once; filter via tabs
   leagues.forEach(league => {
     const leagueRow = document.createElement("div");
     leagueRow.className = "league-names-row-item";
+    leagueRow.dataset.group = (league.accessType === "owner") ? "owners" : "invited";
 
     const leagueBox = document.createElement("div");
     leagueBox.className = "league-name-box";
@@ -70,6 +103,7 @@ export function renderNationalTable(data) {
         if (response.success) {
           localStorage.setItem("leagueId", league.id);
           renderNationalInstances(response.data);
+
         } else {
           section.innerHTML = `<p>Error loading instances</p>`;
         }
@@ -80,20 +114,17 @@ export function renderNationalTable(data) {
 
     leagueRow.appendChild(leagueBox);
 
-    // 👤 Check owner access
-    const translation = langMap[currentLang];
+    // 👤 Access
     const isOwner = league.accessType === "owner";
 
-    // ✏️ Edit icon
+    // ✏️ Edit
     const editIcon = document.createElement("img");
     editIcon.src = "assets/icons/edit.svg";
     editIcon.alt = "Edit";
     editIcon.className = "league-edit-icon";
     editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    editIcon.title = isOwner ? "" : translation.owner_edit || "Only the owner can edit";
-    if (!isOwner) {
-      editIcon.classList.add("icon-disabled");
-    }
+    editIcon.title = isOwner ? "" : (translation.owner_edit || "Only the owner can edit");
+    if (!isOwner) editIcon.classList.add("icon-disabled");
     editIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
@@ -103,17 +134,14 @@ export function renderNationalTable(data) {
       }
     });
 
-
-    // 🗑️ Delete icon
+    // 🗑️ Delete
     const deleteIcon = document.createElement("img");
     deleteIcon.src = "assets/icons/delete.svg";
     deleteIcon.alt = "Delete";
     deleteIcon.className = "league-delete-icon";
     deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    deleteIcon.title = isOwner ? "" : translation.owner_delete || "Only the owner can delete";
-    if (!isOwner) {
-      deleteIcon.classList.add("icon-disabled");
-    }
+    deleteIcon.title = isOwner ? "" : (translation.owner_delete || "Only the owner can delete");
+    if (!isOwner) deleteIcon.classList.add("icon-disabled");
     deleteIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
@@ -129,10 +157,74 @@ export function renderNationalTable(data) {
     rowContainer.appendChild(leagueRow);
   });
 
+
+  // 🔹 Per-tab empty placeholders (only used if one group is empty)
+  const ownersEmpty = document.createElement("div");
+  ownersEmpty.id = "noLeaguedata";
+  ownersEmpty.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+  section.appendChild(ownersEmpty)
+
+  const invitedEmpty = document.createElement("div");
+  invitedEmpty.id = "noLeaguedata";
+  invitedEmpty.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+  section.appendChild(invitedEmpty)
+
+  // ✅ Tab filtering (show/hide items, keep grid/row layout intact)
+  const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
+
+  let activeTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+  if (activeTab === "owners") {
+    myTabBtn.classList.add(ACTIVE);
+    myTabBtn.setAttribute("aria-selected", "true");
+  } else {
+    invitedTabBtn.classList.add(ACTIVE);
+    invitedTabBtn.setAttribute("aria-selected", "true");
+  }
+
+  const showTab = (tab) => {
+    activeTab = tab;
+    localStorage.setItem("lastActiveNationalLeagueTab", tab);
+    const items = rowContainer.querySelectorAll(".league-names-row-item");
+    let visibleCount = 0;
+
+    items.forEach(item => {
+      if (item === ownersEmpty || item === invitedEmpty) {
+        item.style.display = "none";
+        return;
+      }
+      const match = (item.dataset.group === tab);
+      item.style.display = match ? "" : "none";
+      if (match) visibleCount++;
+    });
+
+    ownersEmpty.style.display = (tab === "owners" && visibleCount === 0) ? "" : "none";
+    invitedEmpty.style.display = (tab === "invited" && visibleCount === 0) ? "" : "none";
+
+    myTabBtn.setAttribute("aria-selected", tab === "owners" ? "true" : "false");
+    invitedTabBtn.setAttribute("aria-selected", tab === "invited" ? "true" : "false");
+
+    [myTabBtn, invitedTabBtn].forEach(b => {
+      b.classList.remove(ACTIVE);
+      b.classList.remove("active");
+    });
+    if (tab === "owners") myTabBtn.classList.add(ACTIVE);
+    else invitedTabBtn.classList.add(ACTIVE);
+  };
+
+  [myTabBtn, invitedTabBtn].forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains(ACTIVE)) return; // already active
+      const tab = btn.dataset.tab === "owners" ? "owners" : "invited";
+      showTab(tab);
+    });
+  });
+
+  // Initial view
+  showTab(activeTab);
+
   function showMobileTooltip(targetElement, messageKey) {
     if (document.querySelector(".mobile-tooltip")) return;
 
-    const translation = langMap[currentLang];
     const message =
       translation[messageKey] ||
       (messageKey === "owner_edit"
@@ -147,10 +239,7 @@ export function renderNationalTable(data) {
 
     document.body.appendChild(tooltip);
 
-    // Get positions
     const rect = targetElement.getBoundingClientRect();
-
-    // Adjust: move lower and to the left
     const verticalOffset = 8;
     const horizontalOffset = 1;
 
