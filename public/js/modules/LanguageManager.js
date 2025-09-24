@@ -318,6 +318,11 @@ function changeLang(lang) {
     leagueNotExistEl.textContent = langMap[currentLang].leagueNotExist || "No leagues found";
   }
 
+    const noLeagueFound = langMap[currentLang].leagueNotExist || "No leagues found";
+  document.querySelectorAll("#leagueNotExist").forEach(opt => {
+    opt.textContent = noLeagueFound;
+  });
+
   const selectUser = langMap[currentLang].selectUser || "Select Player";
   document.querySelectorAll("#selectUserDesk").forEach(opt => {
     opt.textContent = selectUser;

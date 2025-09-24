@@ -39,9 +39,8 @@ export function renderLeagueTable(data) {
 
   section.appendChild(backBtn); // Add Back button
 
-  // ✅ If no leagues
+  // ✅ If no leagues at all → show your exact empty state and RETURN (no tabs)
   if (!leagues.length) {
-    const translation = langMap[currentLang];
     const noDataMsg = document.createElement("div");
     noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
     noDataMsg.id = "noLeaguedata";
@@ -49,14 +48,45 @@ export function renderLeagueTable(data) {
     return;
   }
 
-  // ✅ Container for league boxes
+  // --- From here on, we have some data. Show tabs and filter inside one row ---
+
+  // Split groups
+  const hasOwners = leagues.some(l => l.accessType === "owner");
+  const hasInvited = leagues.some(l => l.accessType !== "owner");
+
+  // ✅ Tabs header (always shown now since we have some data)
+  const tabsHeader = document.createElement("div");
+  tabsHeader.className = "tab-switcher";
+  tabsHeader.id = "leaguesTabs";
+  tabsHeader.setAttribute("role", "tablist");
+
+  const myTabBtn = document.createElement("button");
+  myTabBtn.id = "myLeaguesTab";
+  myTabBtn.setAttribute("role", "tab");
+  myTabBtn.setAttribute("aria-controls", "leaguesRow");
+  myTabBtn.textContent = translation.my_leagues || "My leagues";
+
+  const invitedTabBtn = document.createElement("button");
+  invitedTabBtn.id = "invitedLeaguesTab";
+  invitedTabBtn.setAttribute("role", "tab");
+  invitedTabBtn.setAttribute("aria-controls", "leaguesRow");
+  invitedTabBtn.textContent = translation.invited_leagues || "Invited Leagues";
+
+  tabsHeader.appendChild(myTabBtn);
+  tabsHeader.appendChild(invitedTabBtn);
+  section.appendChild(tabsHeader);
+
+  // ✅ Single container (preserves desktop layout)
   const rowContainer = document.createElement("div");
   rowContainer.className = "league-names-row";
+  rowContainer.id = "leaguesRow";
   section.appendChild(rowContainer);
 
+  // Render all items once; filter via tabs
   leagues.forEach(league => {
     const leagueRow = document.createElement("div");
     leagueRow.className = "league-names-row-item";
+    leagueRow.dataset.group = (league.accessType === "owner") ? "owners" : "invited";
 
     const leagueBox = document.createElement("div");
     leagueBox.className = "league-name-box";
@@ -79,20 +109,17 @@ export function renderLeagueTable(data) {
 
     leagueRow.appendChild(leagueBox);
 
-    // 👤 Check owner access
-    const translation = langMap[currentLang];
+    // 👤 Access
     const isOwner = league.accessType === "owner";
 
-    // ✏️ Edit icon
+    // ✏️ Edit
     const editIcon = document.createElement("img");
     editIcon.src = "assets/icons/edit.svg";
     editIcon.alt = "Edit";
     editIcon.className = "league-edit-icon";
     editIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    editIcon.title = isOwner ? "" : translation.owner_edit || "Only the owner can edit";
-    if (!isOwner) {
-      editIcon.classList.add("icon-disabled");
-    }
+    editIcon.title = isOwner ? "" : (translation.owner_edit || "Only the owner can edit");
+    if (!isOwner) editIcon.classList.add("icon-disabled");
     editIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
@@ -102,17 +129,14 @@ export function renderLeagueTable(data) {
       }
     });
 
-
-    // 🗑️ Delete icon
+    // 🗑️ Delete
     const deleteIcon = document.createElement("img");
     deleteIcon.src = "assets/icons/delete.svg";
     deleteIcon.alt = "Delete";
     deleteIcon.className = "league-delete-icon";
     deleteIcon.style.cursor = isOwner ? "pointer" : "not-allowed";
-    deleteIcon.title = isOwner ? "" : translation.owner_delete || "Only the owner can delete";
-    if (!isOwner) {
-      deleteIcon.classList.add("icon-disabled");
-    }
+    deleteIcon.title = isOwner ? "" : (translation.owner_delete || "Only the owner can delete");
+    if (!isOwner) deleteIcon.classList.add("icon-disabled");
     deleteIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       if (isOwner) {
@@ -128,10 +152,61 @@ export function renderLeagueTable(data) {
     rowContainer.appendChild(leagueRow);
   });
 
+  // 🔹 Per-tab empty placeholders (only used if one group is empty)
+  const ownersEmpty = document.createElement("div");
+  ownersEmpty.className = "league-names-row-item";
+  ownersEmpty.style.display = "none";
+  {
+    const noDataMsg = document.createElement("div");
+    noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+    ownersEmpty.appendChild(noDataMsg)
+  }
+  rowContainer.appendChild(ownersEmpty);
+
+  const invitedEmpty = document.createElement("div");
+  invitedEmpty.className = "league-names-row-item";
+  invitedEmpty.style.display = "none";
+  {
+    const noDataMsg = document.createElement("div");
+    noDataMsg.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+    invitedEmpty.appendChild(noDataMsg)
+  }
+  rowContainer.appendChild(invitedEmpty);
+
+  // ✅ Tab filtering (show/hide items, keep grid/row layout intact)
+  let activeTab = hasOwners ? "owners" : "invited";
+
+  const showTab = (tab) => {
+    activeTab = tab;
+    const items = rowContainer.querySelectorAll(".league-names-row-item");
+    let visibleCount = 0;
+
+    items.forEach(item => {
+      if (item === ownersEmpty || item === invitedEmpty) {
+        item.style.display = "none";
+        return;
+      }
+      const match = (item.dataset.group === tab);
+      item.style.display = match ? "" : "none";
+      if (match) visibleCount++;
+    });
+
+    ownersEmpty.style.display = (tab === "owners" && visibleCount === 0) ? "" : "none";
+    invitedEmpty.style.display = (tab === "invited" && visibleCount === 0) ? "" : "none";
+
+    myTabBtn.setAttribute("aria-selected", tab === "owners" ? "true" : "false");
+    invitedTabBtn.setAttribute("aria-selected", tab === "invited" ? "true" : "false");
+  };
+
+  myTabBtn.addEventListener("click", () => showTab("owners"));
+  invitedTabBtn.addEventListener("click", () => showTab("invited"));
+
+  // Initial view
+  showTab(activeTab);
+
   function showMobileTooltip(targetElement, messageKey) {
     if (document.querySelector(".mobile-tooltip")) return;
 
-    const translation = langMap[currentLang];
     const message =
       translation[messageKey] ||
       (messageKey === "owner_edit"
@@ -146,10 +221,7 @@ export function renderLeagueTable(data) {
 
     document.body.appendChild(tooltip);
 
-    // Get positions
     const rect = targetElement.getBoundingClientRect();
-
-    // Adjust: move lower and to the left
     const verticalOffset = 8;
     const horizontalOffset = 1;
 

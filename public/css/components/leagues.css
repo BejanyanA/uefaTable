@@ -14,9 +14,9 @@
   display: flex;
   gap: 16px;
   margin: 30px auto;
-  padding-left: 0px;
+  padding-left: 5px;
   padding-right: 0px;
-  margin-top: 120px;
+  margin-top: 180px;
   flex-wrap: wrap;
 }
 
