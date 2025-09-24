@@ -126,6 +126,10 @@
         position: fixed;
     }
 
+    .tab-switcher button {
+        padding: 8px 10px;
+    }
+
     .league-instance {
         margin-top: 10px;
         padding: 10px 10px;
