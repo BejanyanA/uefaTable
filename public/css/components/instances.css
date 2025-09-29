@@ -123,8 +123,12 @@
         display: flex;
         gap: 10px;
         margin-bottom: 10px;
-        margin: 115px 0;
+        margin: 120px 0;
         position: fixed;
+    }
+
+    .tab-switcher button {
+        padding: 8px 10px;
     }
 
     .league-instance {

@@ -121,7 +121,7 @@
 
     .banner {
         display: flex;
-        margin-bottom: 3px;
+        margin-bottom: 20px;
         height: 150px;
         width: 300px;
         justify-content: flex-start;
@@ -143,7 +143,7 @@
         /* Space between banners */
         flex-wrap: wrap;
         /* Allows wrapping on small screens */
-        margin: 3%;
+        margin: 2%;
         /* Optional centering */
         padding-bottom: 50px;
     }
