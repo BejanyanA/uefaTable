@@ -145,7 +145,7 @@
         /* Allows wrapping on small screens */
         margin: 2%;
         /* Optional centering */
-        padding-bottom: 50px;
+        margin-bottom: 50px;
     }
 
 
