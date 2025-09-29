@@ -135,8 +135,8 @@
           font-size: 25px;
           color: white;
           width: fit-content;
-          margin: 0px auto;
-          padding: 30px 20px 0px;
+          margin: 15px auto;
+          padding: 5px 20px;
           text-align: center;
       }
 
@@ -145,7 +145,7 @@
           display: flex;
           margin-bottom: 3px;
           height: 200px;
-          width: 480px;
+          width: 360px;
           justify-content: flex-start;
           align-items: flex-end;
           background-size: cover;
