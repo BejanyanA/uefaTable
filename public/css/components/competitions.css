@@ -101,9 +101,9 @@
         width: 100%;
     }
 
-    .banner-container {
+    /* .banner-container {
         margin-inline: 0;
-    }
+    } */
 
     #bannerContainerWrapper {
         display: flex;
