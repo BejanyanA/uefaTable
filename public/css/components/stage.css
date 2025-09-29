@@ -12,7 +12,7 @@
   #stageBanner-wrap {
       display: flex;
       justify-content: center;
-      gap: 3px;
+      gap: 50px;
       /* Space between stageBanners */
       flex-wrap: wrap;
       /* Allows wrapping on small screens */
@@ -28,10 +28,11 @@
       font-size: 24px;
       color: white;
       max-width: 100%;
-      padding-left: 60px;
+      padding-bottom: 10px;
+      /* padding-left: 60px;
       padding-right: 60px;
       background-color: rgba(48, 47, 47, 0.342);
-      border-radius: 10px;
+      border-radius: 10px; */
   }
 
   #stage-types {
@@ -39,13 +40,14 @@
       color: white;
       width: fit-content;
       margin: 20px auto;
-      padding: 60px 20px 20px;
+      padding: 40px 20px;
+      /* padding: 60px 20px 20px; */
       text-align: center;
   }
 
   .stageBanner {
       height: 350px;
-      width: 700px;
+      width: 600px;
       cursor: pointer;
       position: relative;
       display: flex;
@@ -135,8 +137,10 @@
           font-size: 25px;
           color: white;
           width: fit-content;
-          margin: 10px auto;
-          padding: 30px 20px 0px;
+          margin: 15px auto;
+          padding: 5px 20px;
+          /* margin: 10px auto;
+          padding: 30px 20px 0px; */
           text-align: center;
       }
 
@@ -145,7 +149,7 @@
           display: flex;
           margin-bottom: 3px;
           height: 200px;
-          width: 480px;
+          width: 360px;
           justify-content: flex-start;
           align-items: flex-end;
           background-size: cover;

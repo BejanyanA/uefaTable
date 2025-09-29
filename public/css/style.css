@@ -6,12 +6,11 @@ body {
   overflow-x: hidden;
 }
 
-.page-wrapper {
+/* .page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  /* Ensures full viewport height */
-}
+} */
 
 .content-wrapper {
   flex: 1;

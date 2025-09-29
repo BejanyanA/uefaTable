@@ -34,6 +34,47 @@
 </head>
 
 <body>
+
+  <!-- Header  -->
+  <header>
+    <div class="language-auth-group">
+      <div class="language-switcher">
+        <img src="assets/flags/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
+        <div id="langDropdown" class="dropdown-menu">
+          <div class="language-option" onclick="setLanguage('en')">
+            <img src="assets/flags/en.svg" />
+            <span>English</span>
+          </div>
+          <div class="language-option" onclick="setLanguage('am')">
+            <img src="assets/flags/am.svg" />
+            <span>Հայերեն</span>
+          </div>
+          <div class="language-option" onclick="setLanguage('fr')">
+            <img src="assets/flags/fr.svg" />
+            <span>Français</span>
+          </div>
+        </div>
+      </div>
+      <div class="auth-buttons" style="display: none;" id="authButtons">
+        <button onclick="openModal('loginModal')" id="loginBtn">Login</button>
+        <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
+      </div>
+    </div>
+
+
+    <div class="profileMenu">
+
+      <div class="logoutButtn">
+        <section id="logoutButtn" style="display: none;">
+          <div class="logout-button">
+            <button onclick="logout()" id="logoutBtn">Logout</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </header>
+
   <div class="page-wrapper">
     <div class="content-wrapper">
       <div id="overlay" class="overlay"></div>
@@ -73,7 +114,7 @@
       </div>
 
       <!-- Header  -->
-      <header>
+      <!-- <header>
         <div class="language-auth-group">
           <div class="language-switcher">
             <img src="assets/flags/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
@@ -110,7 +151,7 @@
           </div>
         </div>
 
-      </header>
+      </header> -->
 
       <!-- Login Modal  -->
       <div class="modal" id="loginModal">
@@ -207,15 +248,15 @@
         <button id="stageBackBtn">⬅ Back</button>
         <div id="stageContainerWrapper">
           <h2 id="stage-types">Stages</h2>
-        
-        <div class="banner-wrap" id="stageBanner-wrap">
-          <div id="stageBanner1" class="stageBanner" stageBanner-id="1">
-            <h2 id="groupStage-title">Group + Knockouts</h2>
+
+          <div class="banner-wrap" id="stageBanner-wrap">
+            <div id="stageBanner1" class="stageBanner" stageBanner-id="1">
+              <h2 id="groupStage-title">Group + Knockouts</h2>
+            </div>
+            <div id="stageBanner2" class="stageBanner" stageBanner-id="2">
+              <h2 id="knockoutStage-title">Knockouts</h2>
+            </div>
           </div>
-          <div id="stageBanner2" class="stageBanner" stageBanner-id="2">
-            <h2 id="knockoutStage-title">Knockouts</h2>
-          </div>
-        </div>
         </div>
       </div>
 
@@ -351,9 +392,9 @@
     </div>
 
 
-    <footer class="page-footer">
+    <!-- <footer class="page-footer">
       Powered by And Bejanyan © <span id="year"></span> All rights reserved
-    </footer>
+    </footer> -->
 
     <script>
       document.getElementById("year").textContent = new Date().getFullYear();
@@ -394,6 +435,11 @@
       });
     </script>
   </div>
+
+  <footer class="page-footer">
+    Powered by And Bejanyan © <span id="year"></span> All rights reserved
+  </footer>
+
 </body>
 
 </html>
