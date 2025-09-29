@@ -23,12 +23,12 @@ header {
 
   header {
     color: transparent;
-    margin-top: 16px;
+    margin-top: 0px;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    padding: 6px 16px;
+    padding: 20px 16px;
     display: flex;
     justify-content: flex-end;
     flex-wrap: nowrap;
