@@ -1,9 +1,3 @@
-.header-username h2 {
-  font-size: 14px;
-  color: #fff;
-}
-
-
 /* 🌙 Dropdown container */
 .user-icon {
   width: 30px;
@@ -99,11 +93,6 @@
 
 /* 📱 Responsive */
 @media (max-width: 480px) {
-
-  .header-username h2 {
-    font-size: 10px;
-    color: #fff;
-  }
 
   .user-icon {
     width: 25px;

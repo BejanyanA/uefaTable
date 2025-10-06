@@ -17,6 +17,12 @@ header {
   height: var(--header-height);
 }
 
+.header-username h2 {
+  font-size: 16px;
+  color: #fff;
+  padding-right: 8px;
+}
+
 
 /* Mobile */
 @media (max-width: 480px) {
@@ -37,6 +43,11 @@ header {
     z-index: 2;
     position: fixed;
     backdrop-filter: blur(6px);
+  }
+
+  .header-username h2 {
+    font-size: 12px;
+    color: #fff;
   }
 
   .profile-menu {
