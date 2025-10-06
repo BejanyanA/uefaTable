@@ -273,7 +273,7 @@ export const LeagueManager = {
         try {
           const response = await apiGet("/me", token);
           if (response.success && response.user) {
-            document.getElementById("logoutButtn").style.display = "block";
+            // document.getElementById("logoutButtn").style.display = "block";
             document.getElementById("bannerContainer").style.display = "block";
             document.getElementById("stageContainer").style.display = "none";
           } else {

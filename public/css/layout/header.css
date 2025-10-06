@@ -39,7 +39,7 @@ header {
     backdrop-filter: blur(6px);
   }
 
-  .profileMenu {
+  .profile-menu {
     display: flex;
     align-items: center;
     gap: 10px;

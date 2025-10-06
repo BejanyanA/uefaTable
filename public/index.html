@@ -63,10 +63,11 @@
       </div>
     </div>
 
-    <div class="header-username">
-      <h2 id="headerUsername">Test123</h2>
+    <div class="header-username" id="headerUsername" style="display: none;">
+      <h2 id="headerUsernameTitle">Test123</h2>
     </div>
-    <div class="profileMenu">
+
+    <div class="profile-menu" id="profileMenu" style="display: none;">
       <div class="dropdown">
         <div class="user-icon" id="userIcon" tabindex="0">
           <i class="fa fa-user"></i>
@@ -74,17 +75,9 @@
         <div class="dropdown-content" id="dropdownMenu">
           <a href="#">👤 Profile</a>
           <a href="#">🤝 Friends</a>
-          <a href="#">🚪 Logout</a>
+          <a href="#" id="logoutBtn">🚪 Logout</a>
         </div>
       </div>
-
-      <!-- <div class="logoutButtn">
-        <section id="logoutButtn" style="display: none;">
-          <div class="logout-button">
-            <button onclick="logout()" id="logoutBtn">Logout</button>
-          </div>
-        </section>
-      </div> -->
     </div>
   </header>
 
@@ -407,18 +400,32 @@
     <script>
       const userIcon = document.getElementById("userIcon");
       const dropdownMenu = document.getElementById("dropdownMenu");
+      const logoutBtn = document.getElementById("logoutBtn");
 
-      // Toggle dropdown on icon click
+      // Toggle dropdown open/close
       userIcon.addEventListener("click", (e) => {
-        e.stopPropagation(); // prevent document click from firing
+        e.stopPropagation();
         dropdownMenu.classList.toggle("show");
       });
 
       // Close dropdown when clicking outside
-      document.addEventListener("click", () => {
+      document.addEventListener("click", () => dropdownMenu.classList.remove("show"));
+
+      // Logout functionality
+      logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         dropdownMenu.classList.remove("show");
+
+        // Call your existing logout() function if available
+        if (typeof logout === "function") {
+          logout();
+        } else {
+          console.warn("logout() function not found");
+        }
       });
     </script>
+
+
   </div>
 
 

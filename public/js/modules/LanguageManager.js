@@ -1,7 +1,7 @@
 export const langMap = {
   en: {
     login: "Login",
-    logout: "Logout",
+    logout: "🚪 Logout",
     register: "Registration",
     registerBtn: "Sign Up",
     registerSubmit: "Submit",
@@ -101,7 +101,7 @@ export const langMap = {
 
     am: {
     login: "Մուտք",
-    logout: "Դուրս գալ",
+    logout: "🚪 Դուրս գալ",
     register: "Գրանցվել",
     registerBtn: "Գրանցվել",
     registerSubmit: "Հաստատել",
@@ -200,7 +200,7 @@ export const langMap = {
 
   fr: {
     login: "Connexion",
-    logout: "Se déconnecter",
+    logout: "🚪 Se déconnecter",
     register: "Inscription",
     registerBtn: "S’inscrire",
     registerSubmit: "Envoyer",

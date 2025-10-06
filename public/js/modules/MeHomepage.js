@@ -14,8 +14,10 @@ export async function checkLoggedIn() {
    try {
       const data = await apiGet("/me", token); // ✅ Cleaner
       if (data.success && data.user) {
-         document.getElementById("logoutButtn").style.display = "block";
+         // document.getElementById("logoutButtn").style.display = "block";
          document.getElementById("homePage").style.display = "block";
+         document.getElementById("headerUsername").style.display = "block";
+         document.getElementById("profileMenu").style.display = "block";
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
       } else {

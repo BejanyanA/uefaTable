@@ -30,7 +30,7 @@ export const AuthManager = {
       } else if (!isValidEmail(emailInput.value)) {
         setError("loginEmailError", translation.invalidEmail);
         hasError = true;
-      }       
+      }
 
       // Password Validations
       if (!passwordInput.value.trim()) {
@@ -60,8 +60,10 @@ export const AuthManager = {
 
           const me = await apiGet("/me");
           if (me.success) {
-            document.getElementById("logoutButtn").style.display = "block";
+            // document.getElementById("logoutButtn").style.display = "block";
             document.getElementById("homePage").style.display = "block";
+            document.getElementById("headerUsername").style.display = "block";
+            document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
           }

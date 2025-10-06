@@ -23,7 +23,7 @@ export function renderLeagueTable(data) {
     try {
       const response = await apiGet("/me", token);
       if (response.success && response.user) {
-        document.getElementById("logoutButtn").style.display = "block";
+        // document.getElementById("logoutButtn").style.display = "block";
         document.getElementById("stageContainer").style.display = "block";
         document.getElementById("leagueType1").style.display = "none";
         localStorage.removeItem("lastActiveLeagueTab");

@@ -57,7 +57,7 @@
 .dropdown-content {
   display: none;
   position: absolute;
-  background: #1f1f1f;
+  background: rgba(43, 42, 42, 0.4);
   min-width: 160px;
   border-radius: 10px;
   overflow: hidden;
@@ -127,19 +127,24 @@
   }
 
   .dropdown-trigger {
-    font-size: 14px;
+    font-size: 16px;
     padding: 10px 14px;
   }
 
   .dropdown-content {
     min-width: 100px;
     top: 30px;
+    background: rgba(0, 0, 0, 0.9);
   }
 
   .dropdown-content a {
     color: #fff;
-    padding: 6px;
+    padding-left: 4px;
+    padding-right: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     font-size: 12px;
+    white-space: nowrap;
   }
 
 }
