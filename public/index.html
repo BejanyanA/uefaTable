@@ -357,11 +357,6 @@
       </div>
     </div>
 
-
-    <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
-
     <!-- Load language system, validations, then main logic -->
     <script type="module" src="js/app.js"></script>
 
@@ -425,14 +420,15 @@
       });
     </script>
 
-
   </div>
-
 
   <footer class="page-footer">
     Powered by And Bejanyan © <span id="year"></span> All rights reserved
   </footer>
 
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 
 </body>
 
