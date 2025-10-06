@@ -356,71 +356,70 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Load language system, validations, then main logic -->
-    <script type="module" src="js/app.js"></script>
+  <!-- Load language system, validations, then main logic -->
+  <script type="module" src="js/app.js"></script>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const stageSelect = document.getElementById("stageSelect");
-        const teamCountSelect = document.getElementById("count-select");
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const stageSelect = document.getElementById("stageSelect");
+      const teamCountSelect = document.getElementById("count-select");
 
-        function updateTeamCountOptions(setDefault = false) {
-          const isKnockout = stageSelect.value === "false"; // knockout option
-          [...teamCountSelect.options].forEach(opt => {
-            const val = parseInt(opt.value, 10);
-            const show = isKnockout ? (val === 16) : (val === 32);
-            // const show = isKnockout ? (val === 16 || val === 32) : (val === 32 || val === 64);
-            opt.hidden = !show;
-          });
+      function updateTeamCountOptions(setDefault = false) {
+        const isKnockout = stageSelect.value === "false"; // knockout option
+        [...teamCountSelect.options].forEach(opt => {
+          const val = parseInt(opt.value, 10);
+          const show = isKnockout ? (val === 16) : (val === 32);
+          // const show = isKnockout ? (val === 16 || val === 32) : (val === 32 || val === 64);
+          opt.hidden = !show;
+        });
 
-          if (setDefault) {
-            teamCountSelect.value = isKnockout ? "16" : "32"; // ⬅ default values
-          } else {
-            // Ensure valid selection if current is hidden
-            if (teamCountSelect.options[teamCountSelect.selectedIndex].hidden) {
-              const firstVisible = [...teamCountSelect.options].find(o => !o.hidden);
-              if (firstVisible) teamCountSelect.value = firstVisible.value;
-            }
+        if (setDefault) {
+          teamCountSelect.value = isKnockout ? "16" : "32"; // ⬅ default values
+        } else {
+          // Ensure valid selection if current is hidden
+          if (teamCountSelect.options[teamCountSelect.selectedIndex].hidden) {
+            const firstVisible = [...teamCountSelect.options].find(o => !o.hidden);
+            if (firstVisible) teamCountSelect.value = firstVisible.value;
           }
         }
+      }
 
-        stageSelect.addEventListener("change", () => updateTeamCountOptions(true));
+      stageSelect.addEventListener("change", () => updateTeamCountOptions(true));
 
-        // Initial run — set default for initial stage type (Group → 32)
-        updateTeamCountOptions(true);
-      });
-    </script>
+      // Initial run — set default for initial stage type (Group → 32)
+      updateTeamCountOptions(true);
+    });
+  </script>
 
-    <script>
-      const userIcon = document.getElementById("userIcon");
-      const dropdownMenu = document.getElementById("dropdownMenu");
-      const logoutBtn = document.getElementById("logoutBtn");
+  <script>
+    const userIcon = document.getElementById("userIcon");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-      // Toggle dropdown open/close
-      userIcon.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle("show");
-      });
+    // Toggle dropdown open/close
+    userIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("show");
+    });
 
-      // Close dropdown when clicking outside
-      document.addEventListener("click", () => dropdownMenu.classList.remove("show"));
+    // Close dropdown when clicking outside
+    document.addEventListener("click", () => dropdownMenu.classList.remove("show"));
 
-      // Logout functionality
-      logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        dropdownMenu.classList.remove("show");
+    // Logout functionality
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      dropdownMenu.classList.remove("show");
 
-        // Call your existing logout() function if available
-        if (typeof logout === "function") {
-          logout();
-        } else {
-          console.warn("logout() function not found");
-        }
-      });
-    </script>
-
-  </div>
+      // Call your existing logout() function if available
+      if (typeof logout === "function") {
+        logout();
+      } else {
+        console.warn("logout() function not found");
+      }
+    });
+  </script>
 
   <footer class="page-footer">
     Powered by And Bejanyan © <span id="year"></span> All rights reserved
