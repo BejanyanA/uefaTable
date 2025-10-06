@@ -6,13 +6,6 @@ body {
   overflow-x: hidden;
 }
 
-.root {
-  /* flex: 1; */
-  /* Takes up all remaining space above footer */
-  display: flex;
-  flex-direction: column;
-}
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
