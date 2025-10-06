@@ -142,11 +142,8 @@
         display: flex;
         justify-content: center;
         gap: 15px;
-        /* Space between banners */
-        flex-wrap: wrap;
-        /* Allows wrapping on small screens */
-        margin: 2%;
-        /* Optional centering */
+        /* flex-wrap: wrap; */
+        /* margin: 2%; */
         margin-bottom: 50px;
     }
 
