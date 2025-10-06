@@ -50,8 +50,6 @@ body {
     /* -webkit-overflow-scrolling: touch;  */
     overscroll-behavior-y: contain;    /* prevent “bounce” chaining */
     scroll-behavior: smooth;
-    overflow-x: hidden;
-    overflow-y: auto;
   }
 
   body::before {
