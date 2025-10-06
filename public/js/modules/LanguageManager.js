@@ -80,6 +80,8 @@ export const langMap = {
     rightSFWinner: "Winner Right SF",
     myCreatedLeagues: "My Leagues",
     myInvitedLeagues: "Invited Leagues",
+    profile: "👤 Profile",
+    friends: "🤝 Friends",
 
 
     //BE translations
@@ -180,6 +182,8 @@ export const langMap = {
     rightSFWinner: "Աջ կ/ե հաղթող",
     myCreatedLeagues: "Իմ մրցաշարերը",
     myInvitedLeagues: "Հրավիրված մրցաշարեր",
+    profile: "👤 Պրոֆիլ",
+    friends: "🤝 Ընկերներ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -279,6 +283,8 @@ export const langMap = {
     rightSFWinner: "Vainqueur DF droite",
     myCreatedLeagues: "Mes ligues",
     myInvitedLeagues: "Ligues invitées",
+    profile: "👤 Profil",
+    friends: "🤝 Amis",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -455,6 +461,8 @@ function changeLang(lang) {
   document.getElementById("stage-types").innerText = t.stageType;
   document.getElementById("groupStage-title").innerText = t.groupStage;
   document.getElementById("knockoutStage-title").innerText = t.knockoutStage;
+  document.getElementById("profile").innerText = t.profile;
+  document.getElementById("friends").innerText = t.friends;
 
   // Labels
   document.getElementById("regUsernameLabel").textContent = t.username;

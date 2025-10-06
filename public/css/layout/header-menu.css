@@ -73,6 +73,7 @@
   text-decoration: none;
   display: block;
   transition: background 0.25s;
+  font-size: 14px;
 }
 
 .dropdown-content a:hover {
