@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="css/layout/header.css">
   <link rel="stylesheet" href="css/layout/footer.css">
+  <link rel="stylesheet" href="css/layout/header-menu.css">
   <link rel="stylesheet" href="css/components/auth.css">
   <link rel="stylesheet" href="css/components/modal.css">
   <link rel="stylesheet" href="css/components/language-switcher.css">
@@ -31,6 +32,7 @@
   <link rel="stylesheet" href="css/components/stage.css">
   <link rel="stylesheet" href="css/components/knockouts.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -61,15 +63,28 @@
       </div>
     </div>
 
-
+    <div class="header-username">
+      <h2 id="headerUsername">Test123</h2>
+    </div>
     <div class="profileMenu">
-      <div class="logoutButtn">
+      <div class="dropdown">
+        <div class="user-icon" id="userIcon" tabindex="0">
+          <i class="fa fa-user"></i>
+        </div>
+        <div class="dropdown-content" id="dropdownMenu">
+          <a href="#">👤 Profile</a>
+          <a href="#">🤝 Friends</a>
+          <a href="#">🚪 Logout</a>
+        </div>
+      </div>
+
+      <!-- <div class="logoutButtn">
         <section id="logoutButtn" style="display: none;">
           <div class="logout-button">
             <button onclick="logout()" id="logoutBtn">Logout</button>
           </div>
         </section>
-      </div>
+      </div> -->
     </div>
   </header>
 
@@ -388,13 +403,30 @@
         updateTeamCountOptions(true);
       });
     </script>
+
+    <script>
+      const userIcon = document.getElementById("userIcon");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+
+      // Toggle dropdown on icon click
+      userIcon.addEventListener("click", (e) => {
+        e.stopPropagation(); // prevent document click from firing
+        dropdownMenu.classList.toggle("show");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", () => {
+        dropdownMenu.classList.remove("show");
+      });
+    </script>
   </div>
 
 
-    <footer class="page-footer">
-      Powered by And Bejanyan © <span id="year"></span> All rights reserved
-    </footer>
-    
+  <footer class="page-footer">
+    Powered by And Bejanyan © <span id="year"></span> All rights reserved
+  </footer>
+
 
 </body>
+
 </html>
