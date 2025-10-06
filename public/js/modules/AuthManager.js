@@ -66,6 +66,7 @@ export const AuthManager = {
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
+            localStorage.setItem('user', JSON.stringify(me.user.username));
           }
 
           closeModal("loginModal");
@@ -73,6 +74,10 @@ export const AuthManager = {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
           localStorage.removeItem("lastActiveLeagueTab");
           localStorage.removeItem("lastActiveNationalLeagueTab");
+          localStorage.removeItem("user");
+          localStorage.removeItem("currentBannerId");
+          localStorage.removeItem("leagueId");
+          localStorage.removeItem("selectedStageType");
         }
       } catch (err) {
         showToast(translation.something_went_wrong, "error");

@@ -18,12 +18,14 @@ export async function checkLoggedIn() {
          document.getElementById("homePage").style.display = "block";
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
+         localStorage.setItem('user', JSON.stringify(data.user.username));
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
       } else {
          localStorage.removeItem("authToken");
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
+         localStorage.removeItem("user");
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
@@ -35,10 +37,14 @@ export async function checkLoggedIn() {
 }
 
 // 🔹 Logout
-export function logout () {
+export function logout() {
    localStorage.removeItem("authToken");
    localStorage.removeItem("lastActiveLeagueTab");
    localStorage.removeItem("lastActiveNationalLeagueTab");
+   localStorage.removeItem("user");
+   localStorage.removeItem("currentBannerId");
+   localStorage.removeItem("leagueId");
+   localStorage.removeItem("selectedStageType");
    location.reload();
 
    document.getElementById("homePage").style.display = "none";

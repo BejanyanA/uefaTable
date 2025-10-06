@@ -19,6 +19,10 @@ async function handleResponse(response) {
     logout();
     localStorage.removeItem("lastActiveLeagueTab");
     localStorage.removeItem("lastActiveNationalLeagueTab");
+    localStorage.removeItem("user");
+    localStorage.removeItem("currentBannerId");
+    localStorage.removeItem("leagueId");
+    localStorage.removeItem("selectedStageType");
     return { success: false, status: 401, message: "unauthorized" };
   }
   return data;
