@@ -108,8 +108,6 @@
     #bannerContainerWrapper {
         display: flex;
         justify-content: center;
-        overflow-x: auto;
-        overflow-y: hidden;
     }
 
     #competition-types {
