@@ -60,13 +60,18 @@ export const AuthManager = {
 
           const me = await apiGet("/me");
           if (me.success) {
-            // document.getElementById("logoutButtn").style.display = "block";
             document.getElementById("homePage").style.display = "block";
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
-            localStorage.setItem('user', JSON.stringify(me.user.username));
+            localStorage.setItem('user', JSON.stringify(me.user));
+
+            // ✅ Immediately update the username in header
+            const usernameEl = document.getElementById("headerUsernameTitle");
+            if (usernameEl && me.user.username) {
+              usernameEl.textContent = me.user.username;
+            }
           }
 
           closeModal("loginModal");

@@ -18,9 +18,15 @@ export async function checkLoggedIn() {
          document.getElementById("homePage").style.display = "block";
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
-         localStorage.setItem('user', JSON.stringify(data.user.username));
+         localStorage.setItem('user', JSON.stringify(data.user));
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
+
+         const usernameEl = document.getElementById("headerUsernameTitle");
+         if (usernameEl && data.user.username) {
+            usernameEl.textContent = data.user.username;
+         }
+
       } else {
          localStorage.removeItem("authToken");
          localStorage.removeItem("lastActiveLeagueTab");
