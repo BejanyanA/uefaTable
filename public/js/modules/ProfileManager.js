@@ -14,6 +14,7 @@ export const ProfileManager = {
     const friendsLink = document.getElementById("friends");
     friendsLink.addEventListener("click", () => {
 
+      section.innerHTML = "";
       const homeButton = document.createElement("button");
       homeButton.textContent = translation.homeButton;
       homeButton.id = "homeButton";
