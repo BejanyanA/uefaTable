@@ -1,0 +1,80 @@
+#homeButton {
+  top: 87px;
+  left: 25px;
+  z-index: 1;
+  color: white;
+  background: #1d1d1d;
+  padding: 6px 3px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: 80px;
+  text-align: center;
+  box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  position: fixed;
+}
+
+#homeButton:hover {
+  background: black;
+}
+
+#homeButton:active {
+  transform: scale(0.96);
+}
+
+#friendsContainer {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+#noUsersData {
+  display: flex;
+  justify-content: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-top: 130px;
+  font-size: 18px;
+  color: #ffffff;
+
+}
+
+
+
+
+@media (max-width: 480px) {
+
+  /* Outer section or container */
+  #friendsContainer {
+    padding: 14px;
+    -webkit-overflow-scrolling: touch;
+    /* smooth scroll on iOS */
+    margin-inline: 0
+  }
+
+  #homeButton {
+    font-size: 12px;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s, transform 0.1s;
+    white-space: nowrap;
+    width: 60px;
+    text-align: center;
+    box-sizing: content-box;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    position: fixed;
+    margin-top: -17px;
+    margin-left: -11px;
+  }
+
+  #noUsersData {
+    display: flex;
+    justify-content: center;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-top: 100px;
+    font-size: 14px;
+
+  }
+}

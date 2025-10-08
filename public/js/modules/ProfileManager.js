@@ -1,15 +1,9 @@
-import { showToast } from '../utils/toast.js';
-import { setError, clearErrors } from '../utils/helper.js';
 import { langMap, currentLang } from './LanguageManager.js';
-import { renderLeagueTable } from './components/renderLeagueTable.js';
 import { getFriends } from './GetFriends.js';
-import { getClubs } from './GetClubs.js';
-import { getCountries } from './GetWorldCountries.js';
-import { getEuropeCountries } from './GetEuropeCountries.js';
 import { apiGet, apiPost } from '../services/api.js';
-import { renderNationalTable } from './components/renderNationalTable.js';
 
 export const ProfileManager = {
+
   openFriends: async function () {
     const translation = langMap[currentLang];
     const section = document.getElementById("friendsContainer");
@@ -20,23 +14,11 @@ export const ProfileManager = {
     const friendsLink = document.getElementById("friends");
     friendsLink.addEventListener("click", () => {
 
-      document.getElementById("headerUsername").style.display = "block";
-      document.getElementById("profileMenu").style.display = "block";
-      document.getElementById("bannerContainer").style.display = "none";
-      localStorage.removeItem("lastActiveLeagueTab");
-      localStorage.removeItem("leaguesActiveTab");
-      localStorage.removeItem("lastActiveNationalLeagueTab");
-      localStorage.removeItem("currentBannerId");
-      localStorage.removeItem("leagueId");
-      localStorage.removeItem("selectedStageType");
+      const homeButton = document.createElement("button");
+      homeButton.textContent = translation.homeButton;
+      homeButton.id = "homeButton";
 
-      getFriends.initGetAllFriends();
-
-      const backBtn = document.createElement("button");
-      backBtn.textContent = translation.backButton;
-      backBtn.id = "backBtn";
-
-      backBtn.addEventListener("click", async () => {
+      homeButton.addEventListener("click", async () => {
         const token = localStorage.getItem("authToken");
 
         try {
@@ -46,6 +28,9 @@ export const ProfileManager = {
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("homePage").style.display = "block";
             document.getElementById("bannerContainer").style.display = "block";
+            document.getElementById("stageContainer").style.display = "none";
+            document.getElementById("leagueType1").style.display = "none";
+            document.getElementById("leagueType2").style.display = "none";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
             document.getElementById("friendsContainer").style.display = "none";
@@ -61,34 +46,128 @@ export const ProfileManager = {
         }
       });
 
-      section.appendChild(backBtn); // Add Back button
+      section.appendChild(homeButton); // Add Back button
+
+
+      document.getElementById("headerUsername").style.display = "block";
+      document.getElementById("profileMenu").style.display = "block";
+      document.getElementById("friendsContainer").style.display = "block";
+      document.getElementById("bannerContainer").style.display = "none";
+      document.getElementById("stageContainer").style.display = "none";
+      document.getElementById("leagueType1").style.display = "none";
+      document.getElementById("leagueType2").style.display = "none";
+      localStorage.removeItem("lastActiveLeagueTab");
+      localStorage.removeItem("leaguesActiveTab");
+      localStorage.removeItem("lastActiveNationalLeagueTab");
+      localStorage.removeItem("currentBannerId");
+      localStorage.removeItem("leagueId");
+      localStorage.removeItem("selectedStageType");
+
+      getFriends.initGetAllFriendsStatuses();
 
 
       // ✅ Tabs header (always shown now since we have some data)
       const tabsHeader = document.createElement("div");
       tabsHeader.className = "tab-switcher";
-      tabsHeader.id = "leaguesTabs";
-      tabsHeader.setAttribute("role", "tablist");
+      tabsHeader.id = "friendsTab";
 
-      const myTabBtn = document.createElement("button");
-      myTabBtn.className = "tab-btn";
-      myTabBtn.dataset.tab = "owners";
-      myTabBtn.id = "myLeaguesTab";
-      myTabBtn.setAttribute("role", "tab");
-      myTabBtn.setAttribute("aria-controls", "leaguesRow");
-      myTabBtn.textContent = translation.myCreatedLeagues || "Friends";
+      const friendsTabBtn = document.createElement("button");
+      friendsTabBtn.className = "tab-btn";
+      friendsTabBtn.dataset.tab = "approvedFriendsTab";
+      friendsTabBtn.id = "friends";
+      friendsTabBtn.textContent = translation.friends || "Friends";
 
-      const invitedTabBtn = document.createElement("button");
-      invitedTabBtn.className = "tab-btn";
-      invitedTabBtn.dataset.tab = "invited";
-      invitedTabBtn.id = "invitedLeaguesTab";
-      invitedTabBtn.setAttribute("role", "tab");
-      invitedTabBtn.setAttribute("aria-controls", "leaguesRow");
-      invitedTabBtn.textContent = translation.myInvitedLeagues || "Friend Requests";
+      const pendingUsersTabBtn = document.createElement("button");
+      pendingUsersTabBtn.className = "tab-btn";
+      pendingUsersTabBtn.dataset.tab = "pendingUsersTab";
+      pendingUsersTabBtn.id = "pendingUsers";
+      pendingUsersTabBtn.textContent = translation.pendingUsers || "Friend Requests";
 
-      tabsHeader.appendChild(myTabBtn);
-      tabsHeader.appendChild(invitedTabBtn);
+
+      const rejectedUsersTabBtn = document.createElement("button");
+      rejectedUsersTabBtn.className = "tab-btn";
+      rejectedUsersTabBtn.dataset.tab = "rejectedUsersTab";
+      rejectedUsersTabBtn.id = "rejectedUsers";
+      rejectedUsersTabBtn.textContent = translation.rejectedUsers || "Rejected Users";
+
+      tabsHeader.appendChild(friendsTabBtn);
+      tabsHeader.appendChild(pendingUsersTabBtn);
+      tabsHeader.appendChild(rejectedUsersTabBtn);
       section.appendChild(tabsHeader);
+
+
+
+
+      const friendsEmpty = document.createElement("div");
+      friendsEmpty.id = "noUsersData";
+      friendsEmpty.innerHTML = `<h2 id="usersNotExist">${translation.friendsNotExist || "No friends found"}</h2>`;
+      section.appendChild(friendsEmpty)
+
+      const pendingUsersEmpty = document.createElement("div");
+      pendingUsersEmpty.id = "noUsersData";
+      pendingUsersEmpty.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
+      section.appendChild(pendingUsersEmpty)
+
+      const rejectedUsersEmpty = document.createElement("div");
+      rejectedUsersEmpty.id = "noUsersData";
+      rejectedUsersEmpty.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
+      section.appendChild(rejectedUsersEmpty)
+
+      // ✅ Tab filtering (show/hide items, keep grid/row layout intact)
+      const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
+
+      let activeTab = localStorage.getItem("lastActiveFriendsTab") || "friends";
+      if (activeTab === "friends") {
+        friendsTabBtn.classList.add(ACTIVE);
+        friendsTabBtn.setAttribute("aria-selected", "true");
+      } else {
+        pendingUsersTabBtn.classList.add(ACTIVE);
+        pendingUsersTabBtn.setAttribute("aria-selected", "true");
+      }
+
+      const showTab = (tab) => {
+        activeTab = tab;
+        localStorage.setItem("lastActiveFriendsTab", tab);
+        const items = rowContainer.querySelectorAll(".league-names-row-item");
+        let visibleCount = 0;
+
+        items.forEach(item => {
+          if (item === friendsEmpty || item === invitedEmpty) {
+            item.style.display = "none";
+            return;
+          }
+          const match = (item.dataset.group === tab);
+          item.style.display = match ? "" : "none";
+          if (match) visibleCount++;
+        });
+
+        friendsEmpty.style.display = (tab === "friends" && visibleCount === 0) ? "" : "none";
+        invitedEmpty.style.display = (tab === "invited" && visibleCount === 0) ? "" : "none";
+
+        friendsTabBtn.setAttribute("aria-selected", tab === "friends" ? "true" : "false");
+        pendingUsersTabBtn.setAttribute("aria-selected", tab === "invited" ? "true" : "false");
+
+        [friendsTabBtn, pendingUsersTabBtn].forEach(b => {
+          b.classList.remove(ACTIVE);
+          b.classList.remove("active");
+        });
+        if (tab === "friends") friendsTabBtn.classList.add(ACTIVE);
+        else pendingUsersTabBtn.classList.add(ACTIVE);
+      };
+
+      [friendsTabBtn, pendingUsersTabBtn].forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (btn.classList.contains(ACTIVE)) return; // already active
+          const tab = btn.dataset.tab === "friends" ? "friends" : "invited";
+          showTab(tab);
+        });
+      });
+
+      // Initial view
+      showTab(activeTab);
+
+
+
 
     });
 

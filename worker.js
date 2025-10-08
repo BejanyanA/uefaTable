@@ -2,7 +2,7 @@ import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
-import { handleGetApprovedFriends } from './routes_endpoints/get_friends.js';
+import { handleGetApprovedFriends, handleGetAllFriendsStatuses } from './routes_endpoints/get_friends.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 
 // Club
@@ -42,6 +42,7 @@ const routeRegistry = {
   "/login": { POST: handleLogin },
   "/me": { GET: handleMe },
   "/friends": { POST: handleGetApprovedFriends },
+  "/all-users": { POST: handleGetAllFriendsStatuses },
 
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },

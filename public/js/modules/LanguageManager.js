@@ -82,6 +82,7 @@ export const langMap = {
     myInvitedLeagues: "Invited Leagues",
     profile: "👤 Profile",
     friends: "🤝 Friends",
+    homeButton: "Home",
 
 
     //BE translations
@@ -101,7 +102,7 @@ export const langMap = {
     no_countries_found: "No countries found",
   },
 
-    am: {
+  am: {
     login: "Մուտք",
     logout: "🚪 Դուրս գալ",
     register: "Գրանցվել",
@@ -184,6 +185,7 @@ export const langMap = {
     myInvitedLeagues: "Հրավիրված մրցաշարեր",
     profile: "👤 Պրոֆիլ",
     friends: "🤝 Ընկերներ",
+    homeButton: "Home",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -285,6 +287,7 @@ export const langMap = {
     myInvitedLeagues: "Ligues invitées",
     profile: "👤 Profil",
     friends: "🤝 Amis",
+    homeButton: "Home",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -400,6 +403,10 @@ function changeLang(lang) {
   const backButton3 = langMap[currentLang].backButton || "< Back";
   document.querySelectorAll("#nationalBackBtn").forEach(opt => {
     opt.innerText = backButton3;
+  });
+  const homeButton = langMap[currentLang].homeButton || "< Home";
+  document.querySelectorAll("#homeButton").forEach(opt => {
+    opt.innerText = homeButton;
   });
 
   const dynamicLabels = {
