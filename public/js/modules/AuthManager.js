@@ -77,6 +77,8 @@ export const AuthManager = {
           closeModal("loginModal");
         } else {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("leaguesActiveTab");
           localStorage.removeItem("lastActiveLeagueTab");
           localStorage.removeItem("lastActiveNationalLeagueTab");
           localStorage.removeItem("user");

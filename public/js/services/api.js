@@ -17,6 +17,8 @@ async function handleResponse(response) {
   // 🔴 Handle unauthorized
   if (response.status === 401) {
     logout();
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("leaguesActiveTab");
     localStorage.removeItem("lastActiveLeagueTab");
     localStorage.removeItem("lastActiveNationalLeagueTab");
     localStorage.removeItem("user");

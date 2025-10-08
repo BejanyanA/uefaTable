@@ -1,6 +1,7 @@
 import { checkLoggedIn, logout } from './modules/MeHomepage.js';
 import { AuthManager } from './modules/AuthManager.js';
 import { LeagueManager } from './modules/LeagueManager.js';
+import { ProfileManager } from './modules/ProfileManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
    AuthManager.initRegister();
    LeagueManager.initCreate();
    LeagueManager.initOpen();
+   ProfileManager.openFriends();
    changeLang(currentLang);
    
    checkLoggedIn();

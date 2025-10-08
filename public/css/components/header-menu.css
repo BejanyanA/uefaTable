@@ -1,0 +1,18 @@
+#friendsContainer {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+
+
+
+@media (max-width: 480px) {
+
+  /* Outer section or container */
+  #friendsContainer {
+    padding: 14px;
+    -webkit-overflow-scrolling: touch;
+    /* smooth scroll on iOS */
+    margin-inline: 0
+  }
+}

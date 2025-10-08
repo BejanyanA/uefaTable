@@ -29,9 +29,13 @@ export async function checkLoggedIn() {
 
       } else {
          localStorage.removeItem("authToken");
+         localStorage.removeItem("leaguesActiveTab");
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
          localStorage.removeItem("user");
+         localStorage.removeItem("currentBannerId");
+         localStorage.removeItem("leagueId");
+         localStorage.removeItem("selectedStageType");
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
@@ -45,6 +49,7 @@ export async function checkLoggedIn() {
 // 🔹 Logout
 export function logout() {
    localStorage.removeItem("authToken");
+   localStorage.removeItem("leaguesActiveTab");
    localStorage.removeItem("lastActiveLeagueTab");
    localStorage.removeItem("lastActiveNationalLeagueTab");
    localStorage.removeItem("user");
