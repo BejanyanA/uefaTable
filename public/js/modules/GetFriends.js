@@ -42,10 +42,12 @@ export const getFriends = {
 
     initGetAllFriendsStatuses: async function () {
         try {
-            const response = await apiPost("/all-users", { showLoading: false });
+            const response = await apiPost("/all-users");
             const container = document.getElementById("user-select");
             const friendError = document.getElementById("friendError");
             const translation = langMap[currentLang];
+
+            window.__setFriendsStatuses(response.data);
 
             clearErrors(["friendError"]);
             container.innerHTML = "";

@@ -1,16 +1,21 @@
+#friendsContainer {
+  padding: 24px;
+  overflow-y: auto;
+}
+
 #homeButton {
   top: 87px;
   left: 25px;
   z-index: 1;
   color: white;
   background: #1d1d1d;
-  padding: 6px 3px;
+  padding: 6px 6px;
   cursor: pointer;
   font-size: 14px;
   border-radius: 6px;
   transition: background 0.3s, color 0.3s, transform 0.1s;
   white-space: nowrap;
-  width: 80px;
+  width: auto;
   text-align: center;
   box-sizing: content-box;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
@@ -25,12 +30,37 @@
   transform: scale(0.96);
 }
 
-#friendsContainer {
-  padding: 24px;
-  overflow-y: auto;
+.friends-row {
+  display: flex;
+  gap: 16px;
+  margin: 30px auto;
+  padding-left: 5px;
+  padding-right: 0px;
+  margin-top: 190px;
+  flex-wrap: wrap;
 }
 
-#noUsersData {
+.friends-row-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.friend-box {
+  padding: 12px 12px;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  min-width: 250px;
+  max-width: 280px;
+}
+
+#usersData {
   display: flex;
   justify-content: center;
   padding-left: 0px;
@@ -38,7 +68,6 @@
   margin-top: 130px;
   font-size: 18px;
   color: #ffffff;
-
 }
 
 
@@ -59,7 +88,7 @@
     border-radius: 6px;
     transition: background 0.3s, color 0.3s, transform 0.1s;
     white-space: nowrap;
-    width: 60px;
+    width: auto;
     text-align: center;
     box-sizing: content-box;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
@@ -68,7 +97,33 @@
     margin-left: -11px;
   }
 
-  #noUsersData {
+  .friends-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 30 auto;
+    margin-top: 180px;
+    padding-left: 2px;
+    padding-right: 0px;
+    text-align: start;
+  }
+
+  /* Each league box */
+  .friend-box {
+    padding: 6px 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .friends-row-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+    margin-right: 1;
+  }
+
+  #usersData {
     display: flex;
     justify-content: center;
     padding-left: 0px;

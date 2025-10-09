@@ -72,100 +72,141 @@ export const ProfileManager = {
       tabsHeader.className = "tab-switcher";
       tabsHeader.id = "friendsTab";
 
-      const friendsTabBtn = document.createElement("button");
-      friendsTabBtn.className = "tab-btn";
-      friendsTabBtn.dataset.tab = "approvedFriendsTab";
-      friendsTabBtn.id = "friends";
-      friendsTabBtn.textContent = translation.friends || "Friends";
-
-      const pendingUsersTabBtn = document.createElement("button");
-      pendingUsersTabBtn.className = "tab-btn";
-      pendingUsersTabBtn.dataset.tab = "pendingUsersTab";
-      pendingUsersTabBtn.id = "pendingUsers";
-      pendingUsersTabBtn.textContent = translation.pendingUsers || "Friend Requests";
-
-
-      const rejectedUsersTabBtn = document.createElement("button");
-      rejectedUsersTabBtn.className = "tab-btn";
-      rejectedUsersTabBtn.dataset.tab = "rejectedUsersTab";
-      rejectedUsersTabBtn.id = "rejectedUsers";
-      rejectedUsersTabBtn.textContent = translation.rejectedUsers || "Rejected Users";
-
-      tabsHeader.appendChild(friendsTabBtn);
-      tabsHeader.appendChild(pendingUsersTabBtn);
-      tabsHeader.appendChild(rejectedUsersTabBtn);
-      section.appendChild(tabsHeader);
-
-
-
-
-      const friendsEmpty = document.createElement("div");
-      friendsEmpty.id = "noUsersData";
-      friendsEmpty.innerHTML = `<h2 id="usersNotExist">${translation.friendsNotExist || "No friends found"}</h2>`;
-      section.appendChild(friendsEmpty)
-
-      const pendingUsersEmpty = document.createElement("div");
-      pendingUsersEmpty.id = "noUsersData";
-      pendingUsersEmpty.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
-      section.appendChild(pendingUsersEmpty)
-
-      const rejectedUsersEmpty = document.createElement("div");
-      rejectedUsersEmpty.id = "noUsersData";
-      rejectedUsersEmpty.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
-      section.appendChild(rejectedUsersEmpty)
-
-      // ✅ Tab filtering (show/hide items, keep grid/row layout intact)
+      // --- after: const tabsHeader = document.createElement("div"); tabsHeader.className = "tab-switcher"; tabsHeader.id = "friendsTab";
       const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
 
-      let activeTab = localStorage.getItem("lastActiveFriendsTab") || "friends";
-      if (activeTab === "friends") {
-        friendsTabBtn.classList.add(ACTIVE);
-        friendsTabBtn.setAttribute("aria-selected", "true");
-      } else {
-        pendingUsersTabBtn.classList.add(ACTIVE);
-        pendingUsersTabBtn.setAttribute("aria-selected", "true");
+      // Build tab buttons (keep your class naming)
+      const friendsTabBtn = document.createElement("button");
+      friendsTabBtn.className = "tab-btn";
+      friendsTabBtn.dataset.tab = "approved";
+      friendsTabBtn.id = "myFriendsTab";
+      friendsTabBtn.textContent = translation.myFriends || "Friends";
+
+      const pendingTabBtn = document.createElement("button");
+      pendingTabBtn.className = "tab-btn";
+      pendingTabBtn.dataset.tab = "pending";
+      pendingTabBtn.id = "pendingUsersTab";
+      pendingTabBtn.textContent = translation.pendingUsers || "Pending";
+
+      const rejectedTabBtn = document.createElement("button");
+      rejectedTabBtn.className = "tab-btn";
+      rejectedTabBtn.dataset.tab = "rejected";
+      rejectedTabBtn.id = "rejectedUsersTab";
+      rejectedTabBtn.textContent = translation.rejectedUsers || "Rejected";
+
+      tabsHeader.appendChild(friendsTabBtn);
+      tabsHeader.appendChild(pendingTabBtn);
+      tabsHeader.appendChild(rejectedTabBtn);
+      section.appendChild(tabsHeader);
+
+      // Container row for items
+      const rowContainer = document.createElement("div");
+      rowContainer.className = "friends-row"; // your grid/row class if you have
+      rowContainer.id = "friendsRow";
+      section.appendChild(rowContainer);
+
+      // Per-tab empty placeholders (hidden by default)
+      const emptyApproved = document.createElement("div");
+      emptyApproved.id = "usersData";
+      emptyApproved.innerHTML = `<h2 id="friendsNotExist">${translation.no_friends_found || "No friends found"}</h2>`;
+      section.appendChild(emptyApproved);
+
+      const emptyPending = document.createElement("div");
+      emptyPending.id = "usersData";
+      emptyPending.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
+      section.appendChild(emptyPending);
+
+      const emptyRejected = document.createElement("div");
+      emptyRejected.id = "usersData";
+      emptyRejected.innerHTML = `<h2 id="usersNotExist">${translation.usersNotExist || "No users found"}</h2>`;
+      section.appendChild(emptyRejected);
+
+      // State
+      let friendsData = []; // will be set when the request returns
+      let activeTab = "approved"; // default to Friends
+
+      // Render list items (id, username, status)
+      function renderFriendsList(list) {
+        // Remove previously rendered items but keep placeholders
+        rowContainer.querySelectorAll(".friends-row-item[data-status]").forEach(n => n.remove());
+
+        (list || []).forEach(user => {
+          const item = document.createElement("div");
+          item.className = "friends-row-item";
+          item.dataset.status = user.status; // "approved" | "pending" | "rejected"
+
+          const box = document.createElement("div");
+          box.className = "friend-box"; // keep your own class if you have a style
+          box.textContent = user.username;
+          item.appendChild(box);
+
+          // (Optional) add action icons per status later
+
+          rowContainer.appendChild(item);
+        });
       }
 
-      const showTab = (tab) => {
+      // Show/hide per tab
+      function showFriendsTab(tab) {
         activeTab = tab;
-        localStorage.setItem("lastActiveFriendsTab", tab);
-        const items = rowContainer.querySelectorAll(".league-names-row-item");
-        let visibleCount = 0;
 
-        items.forEach(item => {
-          if (item === friendsEmpty || item === invitedEmpty) {
-            item.style.display = "none";
-            return;
-          }
-          const match = (item.dataset.group === tab);
-          item.style.display = match ? "" : "none";
-          if (match) visibleCount++;
-        });
-
-        friendsEmpty.style.display = (tab === "friends" && visibleCount === 0) ? "" : "none";
-        invitedEmpty.style.display = (tab === "invited" && visibleCount === 0) ? "" : "none";
-
-        friendsTabBtn.setAttribute("aria-selected", tab === "friends" ? "true" : "false");
-        pendingUsersTabBtn.setAttribute("aria-selected", tab === "invited" ? "true" : "false");
-
-        [friendsTabBtn, pendingUsersTabBtn].forEach(b => {
+        // buttons visual (mirror your tab logic)
+        [friendsTabBtn, pendingTabBtn, rejectedTabBtn].forEach(b => {
           b.classList.remove(ACTIVE);
           b.classList.remove("active");
         });
-        if (tab === "friends") friendsTabBtn.classList.add(ACTIVE);
-        else pendingUsersTabBtn.classList.add(ACTIVE);
-      };
+        if (tab === "approved") friendsTabBtn.classList.add(ACTIVE);
+        if (tab === "pending") pendingTabBtn.classList.add(ACTIVE);
+        if (tab === "rejected") rejectedTabBtn.classList.add(ACTIVE);
 
-      [friendsTabBtn, pendingUsersTabBtn].forEach(btn => {
+        // Filter visibility
+        const items = rowContainer.querySelectorAll(".friends-row-item");
+        let visibleCount = 0;
+        items.forEach(el => {
+          if (!el.dataset.status) { // placeholders handled below
+            el.style.display = "none";
+            return;
+          }
+          const match = el.dataset.status === tab;
+          el.style.display = match ? "" : "none";
+          if (match) visibleCount++;
+        });
+
+        // Empty states
+        emptyApproved.style.display = (tab === "approved" && visibleCount === 0) ? "" : "none";
+        emptyPending.style.display = (tab === "pending" && visibleCount === 0) ? "" : "none";
+        emptyRejected.style.display = (tab === "rejected" && visibleCount === 0) ? "" : "none";
+      }
+
+      // Click handlers — same pattern as your tabs
+      [friendsTabBtn, pendingTabBtn, rejectedTabBtn].forEach(btn => {
         btn.addEventListener("click", () => {
-          if (btn.classList.contains(ACTIVE)) return; // already active
-          const tab = btn.dataset.tab === "friends" ? "friends" : "invited";
-          showTab(tab);
+          if (btn.classList.contains(ACTIVE)) return;
+          showFriendsTab(btn.dataset.tab);
         });
       });
 
-      // Initial view
-      showTab(activeTab);
+      // Hook for your fetcher:
+      // 1) If your getFriends.initGetAllFriendsStatuses() can call this, we're done:
+      window.__setFriendsStatuses = function (payload) {
+        // expecting payload like: { friends: [ {id, username, status}, ... ] }
+        const list = (payload && payload.friends) || [];
+        friendsData = list;
+        renderFriendsList(friendsData);
+        showFriendsTab(activeTab);
+      };
+
+      // 2) Or, if your fetcher dispatches an event instead, we support it too:
+      document.addEventListener("friends:statuses:loaded", (e) => {
+        const detail = (e && e.detail) || {};
+        const list = (detail && detail.friends) || [];
+        friendsData = list;
+        renderFriendsList(friendsData);
+        showFriendsTab(activeTab);
+      });
+
+      // Initialize the view (tabs visible immediately; content appears when data arrives)
+      showFriendsTab(activeTab);
 
 
 

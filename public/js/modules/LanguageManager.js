@@ -82,7 +82,11 @@ export const langMap = {
     myInvitedLeagues: "Invited Leagues",
     profile: "👤 Profile",
     friends: "🤝 Friends",
-    homeButton: "Home",
+    homeButton: "Homepage",
+    myFriends: "Friends",
+    pendingUsers: "Pending",
+    rejectedUsers: "Rejected",
+    usersNotExist: "No users found",
 
 
     //BE translations
@@ -185,7 +189,11 @@ export const langMap = {
     myInvitedLeagues: "Հրավիրված մրցաշարեր",
     profile: "👤 Պրոֆիլ",
     friends: "🤝 Ընկերներ",
-    homeButton: "Home",
+    homeButton: "Գլխավոր էջ",
+    myFriends: "Ընկերներ",
+    pendingUsers: "Սպասվող",
+    rejectedUsers: "Մերժված",
+    usersNotExist: "Օգտատերեր չեն գտնվել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -287,7 +295,11 @@ export const langMap = {
     myInvitedLeagues: "Ligues invitées",
     profile: "👤 Profil",
     friends: "🤝 Amis",
-    homeButton: "Home",
+    homeButton: "Page d’accueil",
+    myFriends: "Amis",
+    pendingUsers: "En attente",
+    rejectedUsers: "Rejeté",
+    usersNotExist: "Aucun utilisateur trouvé",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -407,6 +419,31 @@ function changeLang(lang) {
   const homeButton = langMap[currentLang].homeButton || "< Home";
   document.querySelectorAll("#homeButton").forEach(opt => {
     opt.innerText = homeButton;
+  });
+
+  const myFriends = langMap[currentLang].myFriends || "Friends";
+  document.querySelectorAll("#myFriendsTab").forEach(opt => {
+    opt.textContent = myFriends;
+  });
+
+  const pendingUsersTab = langMap[currentLang].pendingUsers || "Pending";
+  document.querySelectorAll("#pendingUsersTab").forEach(opt => {
+    opt.textContent = pendingUsersTab;
+  });
+
+  const rejectedUsersTab = langMap[currentLang].rejectedUsers || "Rejected";
+  document.querySelectorAll("#rejectedUsersTab").forEach(opt => {
+    opt.textContent = rejectedUsersTab;
+  });
+
+  const noFriendsFound = langMap[currentLang].no_friends_found || "No friends found";
+  document.querySelectorAll("#friendsNotExist").forEach(opt => {
+    opt.textContent = noFriendsFound;
+  });
+
+  const noUsersFound = langMap[currentLang].usersNotExist || "No users found";
+  document.querySelectorAll("#usersNotExist").forEach(opt => {
+    opt.textContent = noUsersFound;
   });
 
   const dynamicLabels = {
