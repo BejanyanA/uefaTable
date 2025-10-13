@@ -80,7 +80,14 @@ export async function handleGetAllFriendsStatuses(request, env) {
     JOIN users u ON u.id = f.friend_id
     WHERE f.user_id = ?
 
-  `).bind(loggedInUserId).all();
+    UNION
+
+    SELECT u.id, u.username, f.status
+    FROM friends f
+    JOIN users u ON u.id = f.user_id
+    WHERE f.friend_id = ?
+
+  `).bind(loggedInUserId, loggedInUserId).all();
 
     if (friends.results.length === 0) {
         return jsonResponse({ success: false, message: "no_friends_found" }, 404);
