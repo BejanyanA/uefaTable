@@ -87,6 +87,8 @@ export const langMap = {
     pendingUsers: "Pending",
     rejectedUsers: "Rejected",
     usersNotExist: "No users found",
+    reject: "Reject",
+    approve: "Approve",
 
 
     //BE translations
@@ -194,6 +196,8 @@ export const langMap = {
     pendingUsers: "Սպասվող",
     rejectedUsers: "Մերժված",
     usersNotExist: "Օգտատերեր չեն գտնվել",
+    reject: "Մերժել",
+    approve: "Ընդունել",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -300,6 +304,8 @@ export const langMap = {
     pendingUsers: "En attente",
     rejectedUsers: "Rejeté",
     usersNotExist: "Aucun utilisateur trouvé",
+    reject: "Rejeter",
+    approve: "Approuver",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -337,6 +343,7 @@ function changeLang(lang) {
   currentLang = lang;
   updateURLWithLang(lang);
   updateIconTitles();
+  buttonsTranslate();
 
   const t = langMap[lang];
 
@@ -447,9 +454,19 @@ function changeLang(lang) {
   });
 
 
-  const deleteItem = langMap[currentLang].delete || "Delete";
+  const deleteOption = langMap[currentLang].delete || "Delete";
   document.querySelectorAll("#delete").forEach(opt => {
-    opt.textContent = deleteItem;
+    opt.textContent = deleteOption;
+  });
+
+  const rejectOption = langMap[currentLang].reject || "Reject";
+  document.querySelectorAll("#reject").forEach(opt => {
+    opt.textContent = rejectOption;
+  });
+
+  const approveOption = langMap[currentLang].approve || "Approve";
+  document.querySelectorAll("#approve").forEach(opt => {
+    opt.textContent = approveOption;
   });
 
   const dynamicLabels = {
@@ -549,6 +566,26 @@ function updateIconTitles() {
       : translation.delete || "Delete League";
   });
 }
+
+
+
+function buttonsTranslate() {
+  const { delete: deleteLabel = "Delete" } = langMap[currentLang] || {};
+  document.querySelectorAll(".action-delete").forEach(button => {
+    button.textContent = deleteLabel;
+  });
+
+  const { reject: rejectLabel = "Reject" } = langMap[currentLang] || {};
+  document.querySelectorAll(".action-reject").forEach(button => {
+    button.textContent = rejectLabel;
+  });
+
+  const { approve: approveLabel = "Approve" } = langMap[currentLang] || {};
+  document.querySelectorAll(".action-approve").forEach(button => {
+    button.textContent = approveLabel;
+  });
+}
+
 
 // Export + global registration
 export { changeLang, currentLang };

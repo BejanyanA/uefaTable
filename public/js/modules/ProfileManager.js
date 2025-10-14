@@ -15,6 +15,7 @@ export const ProfileManager = {
     friendsLink.addEventListener("click", () => {
 
       section.innerHTML = "";
+      const translation = langMap[currentLang];
       const homeButton = document.createElement("button");
       homeButton.textContent = translation.homeButton;
       homeButton.id = "homeButton";
@@ -127,37 +128,49 @@ export const ProfileManager = {
 
       // Render list items (id, username, status)
       function renderFriendsList(list) {
-        // Remove previously rendered items but keep placeholders
+        const t = (langMap[currentLang] || {});
         rowContainer.querySelectorAll(".friend-item").forEach(n => n.remove());
 
         (list || []).forEach(friend => {
           const item = document.createElement("div");
-          item.className = `friend-item status-${friend.status} friends-row-item friend-box`; // ← your exact classes
-          item.dataset.status = friend.status;                    // ← used by filter
+          item.className = `friend-item status-${friend.status} friends-row-item friend-box`;
+          item.dataset.status = friend.status;
 
-          // Friend name
-          const box = document.createElement("div");
+          // name
           const name = document.createElement("span");
           name.className = "friend-name";
           name.textContent = friend.username;
           item.appendChild(name);
 
+          // actions
           const actions = document.createElement("div");
           actions.className = "friend-actions";
-          if (friend.status === "approved") {
-            actions.innerHTML = `
-        <button class="action-delete" id="delete">Delete</button>
-        <button class="action-reject" id="reject">Reject</button>`;
-          } else if (friend.status === "pending") {
-            actions.innerHTML = `
-       <button class="action-approve" id="approve">Approve</button>
-       <button class="action-reject" id="reject">Reject</button>        
-       <button class="action-delete">Delete</button>`;
-          } else if (friend.status === "rejected") {
-            actions.innerHTML = `<button class="action-delete" id="delete">Delete</button>`;
-          }
-          item.appendChild(actions);
 
+          const mkBtn = (cls, labelKey, fallback) => {
+            const b = document.createElement("button");
+            b.className = cls;
+            b.textContent = t[labelKey] || fallback;
+            return b;
+          };
+
+          if (friend.status === "approved") {
+            actions.append(
+              mkBtn("action-delete", "delete", "Delete"),
+              mkBtn("action-reject", "reject", "Reject")
+            );
+          } else if (friend.status === "pending") {
+            actions.append(
+              mkBtn("action-approve", "approve", "Approve"),
+              mkBtn("action-reject", "reject", "Reject"),
+              mkBtn("action-delete", "delete", "Delete")
+            );
+          } else if (friend.status === "rejected") {
+            actions.append(
+              mkBtn("action-delete", "delete", "Delete")
+            );
+          }
+
+          item.appendChild(actions);
           rowContainer.appendChild(item);
           enhanceActionsForMobile(actions);
         });
@@ -182,9 +195,18 @@ export const ProfileManager = {
         originalButtons.forEach((btn, i) => {
           const item = document.createElement("button");
           item.type = "button";
-          item.className = `menu-item ${btn.className}` ; // preserve your action-* classes
+          item.className = `menu-item ${btn.className}`; // preserve your action-* classes
           item.textContent = btn.textContent;
           item.setAttribute("role", "menuitem");
+
+          // ✅ Add proper ID based on class
+          if (btn.classList.contains("action-delete")) {
+            item.id = "delete";
+          } else if (btn.classList.contains("action-approve")) {
+            item.id = "approve";
+          } else if (btn.classList.contains("action-reject")) {
+            item.id = "reject";
+          }
 
           // When a menu item is clicked, trigger the original button’s click (so existing handlers keep working)
           item.addEventListener("click", (e) => {
