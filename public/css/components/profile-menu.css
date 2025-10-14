@@ -48,7 +48,7 @@
 
 .friend-box {
   padding: 12px 12px;
-  color: white;
+  /* color: white; */
   background: rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   border-radius: 6px;
@@ -56,8 +56,8 @@
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
-  min-width: 250px;
-  max-width: 280px;
+  /* min-width: 250px;
+  max-width: 280px; */
 }
 
 #usersData {
@@ -73,6 +73,121 @@
 
 
 
+/* Base Styling */
+.friend-item {
+  display: flex;
+  justify-content: space-between;
+  /* Pushes name to left, actions to right */
+  align-items: center;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-family: Arial, sans-serif;
+}
+
+.friend-item:hover {
+  background-color: #f5f5f5;
+  /* Slight hover effect */
+}
+
+.friend-name {
+  font-weight: bold;
+  font-size: 16px;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.friend-actions button {
+  padding: 6px 12px;
+  /* margin-left: 8px; */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.friend-actions button:hover {
+  opacity: 0.9;
+}
+
+
+
+.status-approved {
+  border-left: 5px solid #28a745;
+  /* Green border on the side */
+  background-color: #e6ffed;
+  /* Very light green background */
+}
+
+/* Styles for the APPROVED action buttons */
+.status-approved .action-delete {
+  background-color: #dc3545;
+  /* Red for deletion */
+  color: white;
+}
+
+.status-approved .action-reject {
+  background-color: #6c757d;
+  /* Gray for "Change to Rejected" */
+  color: white;
+}
+
+
+
+.status-pending {
+  border-left: 5px solid #ffc107;
+  /* Yellow/Orange border on the side */
+  background-color: #fff9e6;
+  /* Very light yellow background */
+}
+
+/* Styles for the PENDING action buttons */
+.status-pending .action-approve {
+  background-color: #28a745;
+  /* Green for approval (primary action) */
+  color: white;
+  font-weight: bold;
+}
+
+.status-pending .action-reject {
+  background-color: #6c757d;
+  /* Gray for rejection */
+  color: white;
+}
+
+.status-pending .action-delete {
+  background-color: #007bff;
+  /* Blue for direct deletion (a neutral, non-status-changing action) */
+  color: white;
+}
+
+
+.status-rejected {
+  border-left: 5px solid #dc3545;
+  /* Red border on the side */
+  background-color: #fdeaea;
+  /* Very light red/pink background */
+  color: #555;
+  /* Slightly muted text color */
+}
+
+/* Styles for the REJECTED action buttons */
+.status-rejected .action-delete {
+  background-color: #dc3545;
+  /* Red for the only remaining action */
+  color: white;
+  font-weight: bold;
+}
+
+.friend-actions-menu-toggle,
+.friend-actions-menu {
+  display: none;
+}
+
+
+
 @media (max-width: 480px) {
 
   /* Outer section or container */
@@ -80,7 +195,8 @@
     padding: 14px;
     -webkit-overflow-scrolling: touch;
     /* smooth scroll on iOS */
-    margin-inline: 0
+    margin-inline: 0;
+    overflow-y: unset;
   }
 
   #homeButton {
@@ -131,5 +247,95 @@
     margin-top: 100px;
     font-size: 14px;
 
+  }
+
+  .friend-name {
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 250px;
+    max-width: 280px;
+  }
+
+
+
+  .friend-actions button {
+    display: none;
+  }
+
+  /* Hamburger (⋮) icon */
+  .friend-actions-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: var(--btn-bg, #222);
+    /* match your existing button bg */
+    color: var(--btn-fg, #fff);
+    /* match your existing button color */
+    cursor: pointer;
+    font-size: 22px;
+  }
+
+  .friend-actions-menu-toggle:active {
+    transform: scale(0.96);
+  }
+
+  /* Dropdown container */
+  .friend-actions-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* spacing between buttons */
+    position: absolute;
+    right: 8px;
+    top: 44px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--menu-bg, #1a1a1a);
+    /* same tone as your dark theme */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    min-width: 80px;
+  }
+
+  .friend-actions-menu.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* Menu items mimic your existing buttons */
+  .friend-actions-menu .menu-item {
+  padding: 6px 12px;
+  /* margin-left: 8px; */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: sans-serif;
+  transition: opacity 0.2s, background-color 0.2s;
+  }
+
+  /* Optional: per-action colors if your desktop had them */
+  .menu-item.action-approve {
+    background: #2e7d32;
+    /* green */
+  }
+
+  .menu-item.action-reject {
+    background: #b71c1c;
+    /* red */
+  }
+
+  .menu-item.action-delete {
+    background: #424242;
+    /* gray delete */
   }
 }

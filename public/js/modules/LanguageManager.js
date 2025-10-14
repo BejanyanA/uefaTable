@@ -446,6 +446,12 @@ function changeLang(lang) {
     opt.textContent = noUsersFound;
   });
 
+
+  const deleteItem = langMap[currentLang].delete || "Delete";
+  document.querySelectorAll("#delete").forEach(opt => {
+    opt.textContent = deleteItem;
+  });
+
   const dynamicLabels = {
 
     // Desktop

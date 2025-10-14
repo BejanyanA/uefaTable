@@ -128,22 +128,108 @@ export const ProfileManager = {
       // Render list items (id, username, status)
       function renderFriendsList(list) {
         // Remove previously rendered items but keep placeholders
-        rowContainer.querySelectorAll(".friends-row-item[data-status]").forEach(n => n.remove());
+        rowContainer.querySelectorAll(".friend-item").forEach(n => n.remove());
 
-        (list || []).forEach(user => {
+        (list || []).forEach(friend => {
           const item = document.createElement("div");
-          item.className = "friends-row-item";
-          item.dataset.status = user.status; // "approved" | "pending" | "rejected"
+          item.className = `friend-item status-${friend.status} friends-row-item friend-box`; // ← your exact classes
+          item.dataset.status = friend.status;                    // ← used by filter
 
+          // Friend name
           const box = document.createElement("div");
-          box.className = "friend-box"; // keep your own class if you have a style
-          box.textContent = user.username;
-          item.appendChild(box);
+          const name = document.createElement("span");
+          name.className = "friend-name";
+          name.textContent = friend.username;
+          item.appendChild(name);
 
-          // (Optional) add action icons per status later
+          const actions = document.createElement("div");
+          actions.className = "friend-actions";
+          if (friend.status === "approved") {
+            actions.innerHTML = `
+        <button class="action-delete" id="delete">Delete</button>
+        <button class="action-reject" id="reject">Reject</button>`;
+          } else if (friend.status === "pending") {
+            actions.innerHTML = `
+       <button class="action-approve" id="approve">Approve</button>
+       <button class="action-reject" id="reject">Reject</button>        
+       <button class="action-delete">Delete</button>`;
+          } else if (friend.status === "rejected") {
+            actions.innerHTML = `<button class="action-delete" id="delete">Delete</button>`;
+          }
+          item.appendChild(actions);
 
           rowContainer.appendChild(item);
+          enhanceActionsForMobile(actions);
         });
+      }
+
+      function enhanceActionsForMobile(actionsDiv) {
+        // Build toggle button (⋮) + menu container
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "friend-actions-menu-toggle"; // new class, mobile-only visible
+        toggle.setAttribute("aria-haspopup", "true");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.innerHTML = "&#8942;"; // vertical ellipsis (⋮)
+
+        const menu = document.createElement("div");
+        menu.className = "friend-actions-menu"; // new class, mobile-only dropdown
+        menu.setAttribute("role", "menu");
+        menu.tabIndex = -1;
+
+        // Clone existing action buttons into menu items
+        const originalButtons = Array.from(actionsDiv.querySelectorAll("button"));
+        originalButtons.forEach((btn, i) => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.className = `menu-item ${btn.className}` ; // preserve your action-* classes
+          item.textContent = btn.textContent;
+          item.setAttribute("role", "menuitem");
+
+          // When a menu item is clicked, trigger the original button’s click (so existing handlers keep working)
+          item.addEventListener("click", (e) => {
+            e.stopPropagation();
+            btn.click();
+            menu.classList.remove("open");
+            toggle.setAttribute("aria-expanded", "false");
+          });
+
+          menu.appendChild(item);
+        });
+
+        // Toggle logic
+        toggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const willOpen = !menu.classList.contains("open");
+          document.querySelectorAll(".friend-actions-menu.open").forEach(m => m.classList.remove("open"));
+          document.querySelectorAll(".friend-actions-menu-toggle[aria-expanded='true']").forEach(t => t.setAttribute("aria-expanded", "false"));
+          if (willOpen) {
+            menu.classList.add("open");
+            toggle.setAttribute("aria-expanded", "true");
+            // focus first item for accessibility
+            const first = menu.querySelector(".menu-item");
+            if (first) first.focus();
+          }
+        });
+
+        // Close on outside click / Escape
+        document.addEventListener("click", () => {
+          if (menu.classList.contains("open")) {
+            menu.classList.remove("open");
+            toggle.setAttribute("aria-expanded", "false");
+          }
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && menu.classList.contains("open")) {
+            menu.classList.remove("open");
+            toggle.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        // Mount right after the actionsDiv (so both exist in DOM)
+        const parent = actionsDiv.parentElement;              // .friend-item
+        parent.style.position = parent.style.position || "relative"; // for absolute menu positioning
+        actionsDiv.after(toggle, menu);
       }
 
       // Show/hide per tab
@@ -160,7 +246,7 @@ export const ProfileManager = {
         if (tab === "rejected") rejectedTabBtn.classList.add(ACTIVE);
 
         // Filter visibility
-        const items = rowContainer.querySelectorAll(".friends-row-item");
+        const items = rowContainer.querySelectorAll(".friend-item"); // ← use new class
         let visibleCount = 0;
         items.forEach(el => {
           if (!el.dataset.status) { // placeholders handled below
