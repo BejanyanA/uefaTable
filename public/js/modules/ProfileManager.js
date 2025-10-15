@@ -71,7 +71,7 @@ export const ProfileManager = {
       // ✅ Tabs header (always shown now since we have some data)
       const tabsHeader = document.createElement("div");
       tabsHeader.className = "tab-switcher status-tabs-container";
-      tabsHeader.id = "friendsTab";
+      tabsHeader.id = "friendsStatusesContainer";
 
       // --- after: const tabsHeader = document.createElement("div"); tabsHeader.className = "tab-switcher"; tabsHeader.id = "friendsTab";
       const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
@@ -99,6 +99,8 @@ export const ProfileManager = {
       tabsHeader.appendChild(pendingTabBtn);
       tabsHeader.appendChild(rejectedTabBtn);
       section.appendChild(tabsHeader);
+
+      ProfileManager.addFriends(); 
 
       // Container row for items
       const rowContainer = document.createElement("div");
@@ -320,8 +322,57 @@ export const ProfileManager = {
   },
 
 
+addFriends: async function () {
+    const translation = langMap[currentLang];
+    
+    // ⚠️ IMPORTANT: Get the main container ('friendsContainer')
+    //               because the search bar should sit BELOW the tabs header.
+    const mainContainer = document.getElementById("friendsContainer");
 
+    // Since friendsStatusesContainer is the *tabs header*, 
+    // it's generally best not to try and cram the search bar inside it.
+    
+    // 🌟 FIX: We can remove the error-prone 'section.style.display = "block";'
+    // The main container is already set to 'block' in openFriends.
 
+    const friendSearch = document.createElement("div");
+    friendSearch.className = "add-friend-bar";
+    friendSearch.id = "friendsSearchBar";
 
+    const friendsSearchInput = document.createElement("input");
+    friendsSearchInput.className = "add-friend-input";
+    friendsSearchInput.type = "text";
+    friendsSearchInput.id = "friendsSearchInput";
+    friendsSearchInput.placeholder = translation.friendsSearchPlaceholder || "Search or Enter Username...";
+
+    const friendsSearchBtn = document.createElement("button");
+    friendsSearchBtn.className = "add-friend-button";
+
+    const friendsSearchIcon = document.createElement("span");
+    friendsSearchIcon.textContent = "+";
+
+    friendsSearchBtn.appendChild(friendsSearchIcon); // Icon inside button
+
+    friendSearch.appendChild(friendsSearchInput);
+    friendSearch.appendChild(friendsSearchBtn);
+    
+    // 🌟 FIX: Append the search bar to the main container, AFTER the tabs header.
+    // We use insertBefore to place it correctly above the friend list content.
+    if (mainContainer) {
+        // Find the 'friendsStatusesContainer' to insert the search bar right after it
+        const tabsHeader = document.getElementById("friendsStatusesContainer");
+        
+        // Use insertBefore with the next element (rowContainer) to position it correctly.
+        // Assuming your 'rowContainer' (friend list) is the next element appended to 'section'
+        const nextElement = document.getElementById("friendsRow"); 
+        
+        if (tabsHeader && nextElement) {
+            mainContainer.insertBefore(friendSearch, nextElement);
+        } else {
+            // Fallback: just append it if we can't find the exact spot
+            mainContainer.appendChild(friendSearch); 
+        }
+    }
+  },
 
 };

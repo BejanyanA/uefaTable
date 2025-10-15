@@ -34,9 +34,8 @@
   display: flex;
   gap: 16px;
   margin: 30px auto;
-  padding-left: 5px;
   padding-right: 0px;
-  margin-top: 190px;
+  margin-top: 265px;
   flex-wrap: wrap;
 }
 
@@ -77,27 +76,35 @@
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   margin-bottom: 25px;
+  z-index: 1;
 }
 
 /* 1. APPROVED/FRIENDS Tab (Green) */
 .tab-btn.active-tab[data-tab="approved"] {
-  background-color: white; /* Dark Green fill */
+  background-color: white;
+  /* Dark Green fill */
   color: #333;
-  box-shadow: 0 0 8px rgba(3, 231, 56, 2.6); /* Green glowing shadow */
+  box-shadow: 0 0 8px rgba(3, 231, 56, 2.6);
+  /* Green glowing shadow */
 }
 
 /* 2. PENDING Tab (Yellow/Orange) */
 .tab-btn.active-tab[data-tab="pending"] {
-  background-color: white;/* Orange fill */
-  color: #333; /* Dark text for contrast against bright yellow/orange */
-  box-shadow: 0 0 8px rgba(255, 193, 7, 2.6); /* Yellow/Orange glowing shadow */
+  background-color: white;
+  /* Orange fill */
+  color: #333;
+  /* Dark text for contrast against bright yellow/orange */
+  box-shadow: 0 0 8px rgba(255, 193, 7, 2.6);
+  /* Yellow/Orange glowing shadow */
 }
 
 /* 3. REJECTED Tab (Red) */
 .tab-btn.active-tab[data-tab="rejected"] {
-  background-color: white; /* Red fill */
+  background-color: white;
+  /* Red fill */
   color: #333;
-  box-shadow: 0 0 8px rgba(220, 53, 69, 2.6); /* Red glowing shadow */
+  box-shadow: 0 0 8px rgba(220, 53, 69, 2.6);
+  /* Red glowing shadow */
 }
 
 /* Base Styling */
@@ -107,7 +114,6 @@
   /* Pushes name to left, actions to right */
   align-items: center;
   padding: 10px 12px;
-  margin-bottom: 8px;
   border-radius: 6px;
   transition: background-color 0.3s ease;
   font-family: Arial, sans-serif;
@@ -135,8 +141,10 @@
   transition: opacity 0.2s, background-color 0.2s;
   margin-right: 6px;
 }
+
 .friend-actions button:last-child {
-  margin-right: 0;     /* clean edge */
+  margin-right: 0;
+  /* clean edge */
 }
 
 .friend-actions button:hover {
@@ -215,6 +223,63 @@
 
 
 
+.add-friend-bar {
+  display: flex;
+  gap: 5px;
+  /* margin-bottom: 25px; */
+  margin-top: 200px;
+  padding: 8px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  position: fixed;
+  z-index: 200;
+width: 25%;
+}
+
+.add-friend-input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3d3d3d;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  width: 25%;
+}
+
+.add-friend-input::placeholder {
+  color: #a0a0a0;
+}
+
+.add-friend-input:focus {
+  background-color: #4a4a4a;
+  box-shadow: 0 0 0 2px #28a745;
+  /* Light green border on focus */
+}
+
+.add-friend-button {
+  background-color: #28a745;
+  /* Action color: Green */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  line-height: 1;
+}
+
+.add-friend-btn:hover {
+  background-color: #34b752;
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+
+
 @media (max-width: 480px) {
 
   /* Outer section or container */
@@ -244,11 +309,14 @@
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
-    margin: 30 auto;
-    margin-top: 180px;
+    margin: 0px;
+    margin-top: 250px;
     padding-left: 2px;
     padding-right: 0px;
     text-align: start;
+    flex-direction: column;
+    width: 100%;
+    z-index: 0;
   }
 
   /* Each league box */
@@ -263,7 +331,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 0px;
-    margin-right: 1;
+    margin-right: 0px;
   }
 
   #usersData {
@@ -280,7 +348,7 @@
     font-weight: bold;
     font-size: 14px;
     min-width: 250px;
-    max-width: 280px;
+    max-width: 350px;
   }
 
 
@@ -335,19 +403,19 @@
   .friend-actions-menu.open {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0);
+    /* transform: translateY(0); */
   }
 
   /* Menu items mimic your existing buttons */
   .friend-actions-menu .menu-item {
-  padding: 6px 12px;
-  /* margin-left: 8px; */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: sans-serif;
-  transition: opacity 0.2s, background-color 0.2s;
+    padding: 6px 12px;
+    /* margin-left: 8px; */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: sans-serif;
+    transition: opacity 0.2s, background-color 0.2s;
   }
 
   /* Optional: per-action colors if your desktop had them */
@@ -365,4 +433,53 @@
     background: #b71c1c;
     /* gray delete */
   }
+
+  .add-friend-bar {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 190px;
+    left: 15px;
+    right: 0px;
+    width: 90%;
+  }
+
+  .add-friend-input {
+  flex-grow: 1;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3d3d3d;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+}
+
+.add-friend-input::placeholder {
+  color: #a0a0a0;
+}
+
+.add-friend-input:focus {
+  background-color: #4a4a4a;
+  box-shadow: 0 0 0 2px #28a745;
+  /* Light green border on focus */
+}
+
+.add-friend-button {
+  background-color: #28a745;
+  /* Action color: Green */
+  color: white;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  line-height: 1;
+}
+
+.add-friend-btn:hover {
+  background-color: #34b752;
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
 }
