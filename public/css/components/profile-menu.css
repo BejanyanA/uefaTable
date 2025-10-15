@@ -133,7 +133,7 @@
 }
 
 .status-approved .action-reject {
-  background-color: #6c757d;
+  background-color: #0a57fc;
   /* Gray for "Change to Rejected" */
   color: white;
 }
@@ -156,7 +156,7 @@
 }
 
 .status-pending .action-reject {
-  background-color: #6c757d;
+  background-color: #0a57fc;
   /* Gray for rejection */
   color: white;
 }
@@ -334,12 +334,12 @@
   }
 
   .menu-item.action-reject {
-    background: #b71c1c;
+    background: #0a57fc;
     /* red */
   }
 
   .menu-item.action-delete {
-    background: #424242;
+    background: #b71c1c;
     /* gray delete */
   }
 }
