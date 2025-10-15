@@ -70,8 +70,35 @@
   color: #ffffff;
 }
 
+.status-tabs-container {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  margin-bottom: 25px;
+}
 
+/* 1. APPROVED/FRIENDS Tab (Green) */
+.tab-btn.active-tab[data-tab="approved"] {
+  background-color: white; /* Dark Green fill */
+  color: #333;
+  box-shadow: 0 0 8px rgba(3, 231, 56, 2.6); /* Green glowing shadow */
+}
 
+/* 2. PENDING Tab (Yellow/Orange) */
+.tab-btn.active-tab[data-tab="pending"] {
+  background-color: white;/* Orange fill */
+  color: #333; /* Dark text for contrast against bright yellow/orange */
+  box-shadow: 0 0 8px rgba(255, 193, 7, 2.6); /* Yellow/Orange glowing shadow */
+}
+
+/* 3. REJECTED Tab (Red) */
+.tab-btn.active-tab[data-tab="rejected"] {
+  background-color: white; /* Red fill */
+  color: #333;
+  box-shadow: 0 0 8px rgba(220, 53, 69, 2.6); /* Red glowing shadow */
+}
 
 /* Base Styling */
 .friend-item {
@@ -116,8 +143,6 @@
   opacity: 0.9;
 }
 
-
-
 .status-approved {
   border-left: 5px solid #28a745;
   /* Green border on the side */
@@ -137,8 +162,6 @@
   /* Gray for "Change to Rejected" */
   color: white;
 }
-
-
 
 .status-pending {
   border-left: 5px solid #ffc107;

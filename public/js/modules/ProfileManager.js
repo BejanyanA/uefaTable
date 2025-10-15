@@ -70,7 +70,7 @@ export const ProfileManager = {
 
       // ✅ Tabs header (always shown now since we have some data)
       const tabsHeader = document.createElement("div");
-      tabsHeader.className = "tab-switcher";
+      tabsHeader.className = "tab-switcher status-tabs-container";
       tabsHeader.id = "friendsTab";
 
       // --- after: const tabsHeader = document.createElement("div"); tabsHeader.className = "tab-switcher"; tabsHeader.id = "friendsTab";
@@ -315,10 +315,6 @@ export const ProfileManager = {
 
       // Initialize the view (tabs visible immediately; content appears when data arrives)
       showFriendsTab(activeTab);
-
-
-
-
     });
 
   },
