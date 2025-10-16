@@ -61,16 +61,16 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
         });
 
         item.appendChild(addButton);
+      } else {
+
+        // 5. Status Badge (Always the last element, guaranteed to be on the far right)
+        const statusBadge = document.createElement("span");
+        statusBadge.className = `status-badge ${status}`;
+        statusBadge.textContent = status;
+        item.appendChild(statusBadge);
+
+
       }
-
-      // 5. Status Badge (Always the last element, guaranteed to be on the far right)
-      const statusBadge = document.createElement("span");
-      statusBadge.className = `status-badge ${status}`;
-      statusBadge.textContent = status;
-      item.appendChild(statusBadge);
-
-
-
       resultsContainer.appendChild(item);
 
       // --- END OF DISPLAY LOGIC ---
