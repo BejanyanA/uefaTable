@@ -100,3 +100,80 @@ export async function handleGetAllFriendsStatuses(request, env) {
         }
     }, 200);
 }
+
+export async function handleSearchFriendByUsername(request, env) {
+    // 1) Auth
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.startsWith("Bearer ")) {
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+    }
+
+    const token = authHeader.split(" ")[1];
+    const payload = await verifyToken(token, env.JWT_SECRET);
+
+    if (!payload) {
+        return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+    }
+    const loggedInUserId = payload.id;
+
+    // 2) Input
+    const { username } = await parseBody(request);
+    if (typeof username !== "string" || username.trim().length === 0) {
+        return jsonResponse({ success: false, message: "invalid_username" }, 400);
+    }
+    const uname = username.trim();
+
+    // 3) Find the user by username (case-insensitive, exact match)
+    const candidate = await env.core_data.prepare(`
+    SELECT id, username, email
+    FROM users
+    WHERE LOWER(username) = LOWER(?)
+    LIMIT 1
+  `).bind(uname).first();
+
+    if (!candidate) {
+        return jsonResponse({ success: false, message: "user_not_found" }, 404);
+    }
+
+    // 4) Cannot friend yourself
+    if (candidate.id === loggedInUserId) {
+        return jsonResponse({
+            success: true,
+            data: {
+                user: { id: candidate.id, username: candidate.username, email: candidate.email },
+                relation_status: "self"  // or return 400 if you prefer
+            }
+        }, 200);
+    }
+
+    // 5) Look for a relationship in either direction.
+    // If there are (unexpectedly) multiple rows, take the most recent.
+    const relation = await env.core_data.prepare(`
+    SELECT status
+    FROM (
+      SELECT status, created_at
+      FROM friends
+      WHERE user_id = ? AND friend_id = ?
+      UNION ALL
+      SELECT status, created_at
+      FROM friends
+      WHERE user_id = ? AND friend_id = ?
+    ) r
+    ORDER BY datetime(created_at) DESC
+    LIMIT 1
+  `).bind(loggedInUserId, candidate.id, candidate.id, loggedInUserId).first();
+
+    const relationStatus = relation?.status || "available";
+
+    return jsonResponse({
+        success: true,
+        data: {
+            user: {
+                id: candidate.id,
+                username: candidate.username,
+                status: relationStatus  // e.g. "available" | "pending" | "approved" | "rejected" |
+            }
+        }
+    }, 200);
+}
