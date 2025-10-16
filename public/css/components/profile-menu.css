@@ -234,7 +234,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   position: fixed;
   z-index: 200;
-width: 25%;
+  width: 25%;
 }
 
 .add-friend-input {
@@ -273,10 +273,136 @@ width: 25%;
   line-height: 1;
 }
 
-.add-friend-btn:hover {
+.add-friend-button:hover {
   background-color: #34b752;
   box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
 }
+
+
+
+
+.search-icon-symbol {
+  font-size: 20px;
+  /* Make the icon a bit bigger */
+  display: block;
+  /* Helps with centering */
+  line-height: 1;
+}
+
+.search-icon {
+  font-size: 15px;
+  line-height: 1;
+  display: block;
+}
+
+/* Class to hide the icon without removing it from flow (for smooth toggling) */
+.hidden-icon {
+  display: none;
+}
+
+/* Style for the 'X' icon to ensure it's clickable */
+.search-clear-icon {
+  font-weight: bold;
+}
+
+
+#searchResultsContainer {
+  max-width: 600px;
+  margin: 260px auto 0;
+  padding: 0;
+}
+
+/* Base style for a single search result item */
+.search-result-item {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3d3d3db0;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  justify-content: space-between;
+  display: flex;
+    gap: 10px;
+}
+
+.result-username {
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 15px;
+  margin-right: 0;
+  /* ⬅️ Crucial: Allow the username to take up only the space it needs */
+  flex-shrink: 0;
+}
+
+/* Base style for the status badge */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  /* text-transform: uppercase; */
+  margin-left: 10px;
+  /* Keep a small gap from the action button or the end */
+  /* ⬅️ Crucial: Prevent the status badge from growing */
+  flex-shrink: 0;
+}
+
+/* --- Status Colors --- */
+
+/* "available" - Grey */
+.status-badge.available {
+  background-color: #6c757d;
+  /* Muted grey */
+  color: #fff;
+}
+
+/* "pending" - Yellow */
+.status-badge.pending {
+  background-color: #ffc107;
+  /* Yellow/Orange */
+  color: #333;
+  /* Dark text for contrast */
+}
+
+/* "approved" - Green */
+.status-badge.approved {
+  background-color: #28a745;
+  /* Green */
+  color: #fff;
+}
+
+/* "rejected" - Red */
+.status-badge.rejected {
+  background-color: #dc3545;
+  /* Red */
+  color: #fff;
+}
+
+/* Add Friend Button (only visible for 'available' status) */
+.action-add-friend {
+  background-color: #007bff;
+  /* Blue for primary action */
+  color: white;
+  border: none;
+  /* padding: 6px 12px; */
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: auto;
+  /* Push to the right */
+  margin-right: 10px;
+}
+
+.action-add-friend:hover {
+  background-color: #0056b3;
+}
+
+
+
+
+
 
 
 
@@ -444,42 +570,49 @@ width: 25%;
   }
 
   .add-friend-input {
-  flex-grow: 1;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background-color: #3d3d3d;
-  color: #fff;
-  font-size: 16px;
-  outline: none;
-}
+    flex-grow: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #3d3d3d;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+  }
 
-.add-friend-input::placeholder {
-  color: #a0a0a0;
-}
+  .add-friend-input::placeholder {
+    color: #a0a0a0;
+  }
 
-.add-friend-input:focus {
-  background-color: #4a4a4a;
-  box-shadow: 0 0 0 2px #28a745;
-  /* Light green border on focus */
-}
+  .add-friend-input:focus {
+    background-color: #4a4a4a;
+    box-shadow: 0 0 0 2px #28a745;
+    /* Light green border on focus */
+  }
 
-.add-friend-button {
-  background-color: #28a745;
-  /* Action color: Green */
-  color: white;
-  border: none;
-  padding: 6px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  transition: background-color 0.2s, box-shadow 0.2s;
-  line-height: 1;
-}
+  .add-friend-button {
+    background-color: #28a745;
+    /* Action color: Green */
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    line-height: 1;
+  }
 
-.add-friend-btn:hover {
-  background-color: #34b752;
-  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
-}
+  .add-friend-btn:hover {
+    background-color: #34b752;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+  }
+
+  #searchResultsContainer {
+    max-width: 600px;
+    margin: 240px auto 0;
+    padding: 0;
+    margin-left: 1px;
+  }
 }

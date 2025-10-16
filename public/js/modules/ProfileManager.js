@@ -2,6 +2,101 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 
+
+const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
+  const username = friendsSearchInput.value.trim();
+
+  resultsContainer.innerHTML = ''; // Clear old results
+
+  if (username.length === 0) {
+    // Should not happen if called correctly, but good to handle
+    toggleSearchIcon(false);
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("authToken");
+    const response = await apiPost("/search-user", { username: username }, token);
+
+    // CONFIRMED SUCCESS CHECK: response.data.user
+    if (response.success && response.data && response.data.user) {
+      const userData = response.data.user;
+      const { id, username: foundUsername, status } = userData;
+
+      // --- DISPLAY LOGIC (omitted for brevity) ---
+
+      // --- START OF DISPLAY LOGIC ---
+
+      const item = document.createElement("div");
+      item.className = "search-result-item";
+      item.dataset.userId = id;
+
+      // 2. Username (Far Left)
+      const nameDisplay = document.createElement("span");
+      nameDisplay.className = "result-username";
+      nameDisplay.textContent = foundUsername;
+      item.appendChild(nameDisplay);
+
+      // 3. Spacer (Takes up all remaining space to push elements to the right)
+      const spacer = document.createElement("div");
+      spacer.style.flexGrow = 1;
+      item.appendChild(spacer);
+
+      // 4. Action Button (Will sit to the left of the Status Badge)
+      if (status === "available") {
+        const addButton = document.createElement("button");
+        addButton.className = "action-add-friend";
+        addButton.textContent = "Add Friend";
+
+        addButton.addEventListener('click', async () => {
+          const reqResponse = await apiPost("/friends/request", { targetUserId: id }, token);
+          if (reqResponse.success) {
+            // Update UI to pending after request is sent
+            statusBadge.textContent = 'pending';
+            statusBadge.className = 'status-badge pending';
+            addButton.remove();
+          } else {
+            console.error("Failed to send friend request.");
+          }
+        });
+
+        item.appendChild(addButton);
+      }
+
+      // 5. Status Badge (Always the last element, guaranteed to be on the far right)
+      const statusBadge = document.createElement("span");
+      statusBadge.className = `status-badge ${status}`;
+      statusBadge.textContent = status;
+      item.appendChild(statusBadge);
+
+
+
+      resultsContainer.appendChild(item);
+
+      // --- END OF DISPLAY LOGIC ---
+
+
+      // 🎯 SUCCESSFUL SEARCH: Switch to X icon
+      toggleSearchIcon(true);
+
+    } else {
+      // Handle user not found or other errors
+      resultsContainer.innerHTML = `<div class="search-result-item status-rejected">User "${username}" not found.</div>`;
+      // 🎯 FAILED SEARCH: Switch to X icon (since results are now present)
+      toggleSearchIcon(true);
+    }
+
+  } catch (error) {
+    console.error("Search User API Error:", error);
+    resultsContainer.innerHTML = `<div class="search-result-item status-rejected">Search failed. Please try again.</div>`;
+    // 🎯 ERROR: Switch to X icon (since results are now present)
+    toggleSearchIcon(true);
+  }
+};
+
+
+
+
 export const ProfileManager = {
 
   openFriends: async function () {
@@ -100,7 +195,7 @@ export const ProfileManager = {
       tabsHeader.appendChild(rejectedTabBtn);
       section.appendChild(tabsHeader);
 
-      ProfileManager.addFriends(); 
+      ProfileManager.addFriends();
 
       // Container row for items
       const rowContainer = document.createElement("div");
@@ -322,19 +417,11 @@ export const ProfileManager = {
   },
 
 
-addFriends: async function () {
+  addFriends: async function () {
     const translation = langMap[currentLang];
-    
-    // ⚠️ IMPORTANT: Get the main container ('friendsContainer')
-    //               because the search bar should sit BELOW the tabs header.
     const mainContainer = document.getElementById("friendsContainer");
 
-    // Since friendsStatusesContainer is the *tabs header*, 
-    // it's generally best not to try and cram the search bar inside it.
-    
-    // 🌟 FIX: We can remove the error-prone 'section.style.display = "block";'
-    // The main container is already set to 'block' in openFriends.
-
+    // --- 1. ELEMENT CREATION (Remains the same) ---
     const friendSearch = document.createElement("div");
     friendSearch.className = "add-friend-bar";
     friendSearch.id = "friendsSearchBar";
@@ -347,32 +434,88 @@ addFriends: async function () {
 
     const friendsSearchBtn = document.createElement("button");
     friendsSearchBtn.className = "add-friend-button";
+    friendsSearchBtn.id = "searchUserButton";
+    friendsSearchBtn.type = "button";
 
-    const friendsSearchIcon = document.createElement("span");
-    friendsSearchIcon.textContent = "+";
+    const searchIcon = document.createElement("span");
+    searchIcon.className = "search-icon search-loop-icon";
+    searchIcon.textContent = "\uD83D\uDD0E";
 
-    friendsSearchBtn.appendChild(friendsSearchIcon); // Icon inside button
+    const clearIcon = document.createElement("span");
+    clearIcon.className = "search-icon search-clear-icon hidden-icon";
+    clearIcon.textContent = "\u2715";
+
+    friendsSearchBtn.appendChild(searchIcon);
+    friendsSearchBtn.appendChild(clearIcon);
 
     friendSearch.appendChild(friendsSearchInput);
     friendSearch.appendChild(friendsSearchBtn);
-    
-    // 🌟 FIX: Append the search bar to the main container, AFTER the tabs header.
-    // We use insertBefore to place it correctly above the friend list content.
-    if (mainContainer) {
-        // Find the 'friendsStatusesContainer' to insert the search bar right after it
-        const tabsHeader = document.getElementById("friendsStatusesContainer");
-        
-        // Use insertBefore with the next element (rowContainer) to position it correctly.
-        // Assuming your 'rowContainer' (friend list) is the next element appended to 'section'
-        const nextElement = document.getElementById("friendsRow"); 
-        
-        if (tabsHeader && nextElement) {
-            mainContainer.insertBefore(friendSearch, nextElement);
-        } else {
-            // Fallback: just append it if we can't find the exact spot
-            mainContainer.appendChild(friendSearch); 
-        }
-    }
-  },
 
+    const resultsContainer = document.createElement("div");
+    resultsContainer.id = "searchResultsContainer";
+    resultsContainer.className = "add-friend-bar ";
+
+    // --- 2. APPENDING ELEMENTS (Remains the same) ---
+    if (mainContainer) {
+      const nextElement = document.getElementById("friendsRow");
+      if (nextElement) {
+        mainContainer.insertBefore(friendSearch, nextElement);
+        mainContainer.insertBefore(resultsContainer, nextElement);
+      } else {
+        mainContainer.appendChild(friendSearch);
+        mainContainer.appendChild(resultsContainer);
+      }
+    }
+
+    // --- 3. ICON TOGGLE LOGIC (Remains the same helper) ---
+    const toggleSearchIcon = (hasContent) => {
+      if (hasContent) {
+        searchIcon.classList.add('hidden-icon');
+        clearIcon.classList.remove('hidden-icon');
+      } else {
+        searchIcon.classList.remove('hidden-icon');
+        clearIcon.classList.add('hidden-icon');
+      }
+    };
+
+    // --- 4. EVENT HANDLER LOGIC (Modified to ONLY run search/clear on click/enter) ---
+
+    const handleButtonAction = (e) => {
+      e.preventDefault();
+      const isClearAction = !clearIcon.classList.contains('hidden-icon');
+
+      if (isClearAction) {
+        // --- CLEAR ACTION (X icon clicked) ---
+        friendsSearchInput.value = '';
+        resultsContainer.innerHTML = '';
+        friendsSearchInput.focus();
+        toggleSearchIcon(false); // Switch to LOOP icon
+      } else {
+        // --- SEARCH ACTION (Loop icon clicked) ---
+        if (friendsSearchInput.value.trim().length > 0) {
+          handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon);
+          // NOTE: toggleSearchIcon(true) is now called INSIDE handleUserSearch
+        }
+      }
+    };
+
+    // --- 5. EVENT LISTENERS ---
+
+    // ❌ REMOVED: Listener for 'input' event (This is what caused the premature switch)
+
+    // Listener for click on the button
+    friendsSearchBtn.addEventListener('click', handleButtonAction);
+
+    // Listener for Enter key
+    friendsSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (friendsSearchInput.value.trim().length > 0) {
+          handleButtonAction(e);
+        }
+      }
+    });
+
+    // Initialize state (must be loop icon)
+    toggleSearchIcon(false);
+  },
 };
