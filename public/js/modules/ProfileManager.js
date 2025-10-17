@@ -314,8 +314,8 @@ export const ProfileManager = {
               }
             }
 
-            // 2. Re-render UI (using the function from your outer scope)
-            renderFriendsList(friendsData);
+            showToast(translation.friend_request_success || "Successfully Sent", "success");
+            getFriends.initGetAllFriendsStatuses();
 
           } else {
             console.error(`🔴 API action failed for ${actionType}:`, response);
