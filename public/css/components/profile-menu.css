@@ -53,7 +53,6 @@
   border-radius: 6px;
   font-weight: bold;
   white-space: nowrap;
-  cursor: pointer;
   transition: background 0.3s, transform 0.2s;
   /* min-width: 250px;
   max-width: 280px; */
@@ -117,11 +116,6 @@
   border-radius: 6px;
   transition: background-color 0.3s ease;
   font-family: Arial, sans-serif;
-}
-
-.friend-item:hover {
-  background-color: #f5f5f5;
-  /* Slight hover effect */
 }
 
 .friend-name {
