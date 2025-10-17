@@ -143,6 +143,7 @@
 
 .friend-actions button:hover {
   opacity: 0.9;
+  transform: scale(1.03);
 }
 
 .status-approved {
@@ -312,7 +313,8 @@
   padding: 10px 15px;
   border: none;
   border-radius: 6px;
-  background-color: #3d3d3db0;
+  background-color: rgba(15, 16, 19, 0.966);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 16px;
   outline: none;
@@ -376,7 +378,7 @@
 
 /* Add Friend Button (only visible for 'available' status) */
 .action-add-friend {
-  background-color: #007bff;
+  background-color: #0056b3;
   /* Blue for primary action */
   color: white;
   border: none;
@@ -390,7 +392,8 @@
 }
 
 .action-add-friend:hover {
-  background-color: #0056b3;
+  background-color: #007bff;
+  transform: scale(1.06);
 }
 
 
@@ -609,4 +612,19 @@
     padding: 0;
     margin-left: 1px;
   }
+
+  .action-add-friend {
+  background-color: #0056b3;
+  /* Blue for primary action */
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: auto;
+  /* Push to the right */
+  margin-right: 6px;
+  
+}
 }
