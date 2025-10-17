@@ -1,6 +1,7 @@
 import { langMap, currentLang } from './LanguageManager.js';
 import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
+import { showToast } from '../utils/toast.js';
 
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
@@ -27,6 +28,8 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
       // --- START OF DISPLAY LOGIC ---
 
+      const translation = langMap[currentLang];
+
       const item = document.createElement("div");
       item.className = "search-result-item";
       item.dataset.userId = id;
@@ -50,8 +53,9 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
         addButton.addEventListener('click', async () => {
           const reqResponse = await apiPost("/add-friend", { userId: id }, token);
-          if (reqResponse.success === true) {
+          if (reqResponse.success) {
             // Update UI to pending after request is sent
+            showToast(translation.friend_request_success || "Successfully Sent", "success");
             addButton.remove();
             handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
           } else {

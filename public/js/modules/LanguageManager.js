@@ -106,6 +106,7 @@ export const langMap = {
     league_create_success: "League Successfully Created",
     league_creation_failed: "League Creation failed",
     no_countries_found: "No countries found",
+    friend_request_success: "Friend Request Sent",
   },
 
   am: {
@@ -214,6 +215,7 @@ export const langMap = {
     league_create_success: "Մրցաշարը հաջողությամբ ստեղծվեց",
     league_creation_failed: "Մրցաշարի ստեղծումը ձախողվեց",
     no_countries_found: "Քաղաքներ չեն գտնվել",
+    friend_request_success: "Հրավերը ուղարկվել է",
   },
 
   fr: {
@@ -322,6 +324,7 @@ export const langMap = {
     league_create_success: "Ligue créée avec succès",
     league_creation_failed: "Échec de la création de la ligue",
     no_countries_found: "Aucun pays trouvé",
+    friend_request_success: "Demande d’amitié envoyée",
   }
 };
 
