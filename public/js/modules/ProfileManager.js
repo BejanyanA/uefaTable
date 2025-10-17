@@ -494,7 +494,6 @@ export const ProfileManager = {
         // --- SEARCH ACTION (Loop icon clicked) ---
         if (friendsSearchInput.value.trim().length > 0) {
           handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon);
-          // NOTE: toggleSearchIcon(true) is now called INSIDE handleUserSearch
         }
       }
     };
@@ -509,8 +508,22 @@ export const ProfileManager = {
     // Listener for Enter key
     friendsSearchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
+        // Prevent form submission if it's inside a form
+        e.preventDefault();
+
+        // Only run the action if there's text in the box
         if (friendsSearchInput.value.trim().length > 0) {
-          handleButtonAction(e);
+
+          // 🎯 The key change: We unconditionally call the search action.
+          // The handleButtonAction function already knows that since 
+          // Enter was pressed, it should run the search logic, 
+          // NOT the clear logic (because the key pressed wasn't a mouse click).
+
+          // We'll call the handleUserSearch directly, as handleButtonAction
+          // is designed primarily for the mouse click event logic.
+
+          // We use the direct function call that handles the API request:
+          handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon);
         }
       }
     });
