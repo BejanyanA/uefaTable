@@ -271,9 +271,16 @@ export const ProfileManager = {
               mkBtn("action-reject", "reject", "Reject") // Approved friends can be deleted or reverted to rejected by the user
             );
           } else if (friend.status === "pending") {
+
+            // 🎯 NEW LOGIC: Only show Approve button if the request was NOT sent by me
+            if (friend.byMe !== true) {
+              actions.append(
+                mkBtn("action-approve", "approve", "Approve"),
+                mkBtn("action-reject", "reject", "Reject"),
+              );
+            }
+            // Always show Reject and Delete for a pending request
             actions.append(
-              mkBtn("action-approve", "approve", "Approve"),
-              mkBtn("action-reject", "reject", "Reject"),
               mkBtn("action-delete", "delete", "Delete")
             );
           } else if (friend.status === "rejected") {

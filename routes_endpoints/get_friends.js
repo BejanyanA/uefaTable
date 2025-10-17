@@ -74,30 +74,37 @@ export async function handleGetAllFriendsStatuses(request, env) {
 
     const loggedInUserId = payload.id;
 
+    // We include an extra derived column `byMe`
     const friends = await env.core_data.prepare(`
-    SELECT u.id, u.username, f.status
+    SELECT 
+        u.id,
+        u.username,
+        f.status,
+        CASE WHEN f.user_id = ? THEN 1 ELSE 0 END AS byMe
     FROM friends f
-    JOIN users u ON u.id = f.friend_id
-    WHERE f.user_id = ?
-
-    UNION
-
-    SELECT u.id, u.username, f.status
-    FROM friends f
-    JOIN users u ON u.id = f.user_id
-    WHERE f.friend_id = ?
-
-  `).bind(loggedInUserId, loggedInUserId).all();
+    JOIN users u ON u.id = 
+        CASE 
+          WHEN f.user_id = ? THEN f.friend_id
+          ELSE f.user_id
+        END
+    WHERE f.user_id = ? OR f.friend_id = ?
+  `).bind(loggedInUserId, loggedInUserId, loggedInUserId, loggedInUserId).all();
 
     if (friends.results.length === 0) {
         return jsonResponse({ success: false, message: "no_friends_found" }, 404);
     }
 
+    // Optional: normalize the boolean in JS (0/1 → true/false)
+    const result = friends.results.map(f => ({
+        id: f.id,
+        username: f.username,
+        status: f.status,
+        byMe: !!f.byMe
+    }));
+
     return jsonResponse({
         success: true,
-        data: {
-            friends: friends.results
-        }
+        data: { friends: result }
     }, 200);
 }
 
