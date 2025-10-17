@@ -49,7 +49,7 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
         addButton.textContent = "Add Friend";
 
         addButton.addEventListener('click', async () => {
-          const reqResponse = await apiPost("/friends/request", { userId: id }, token);
+          const reqResponse = await apiPost("/add-friend", { userId: id }, token);
           if (reqResponse.success) {
             // Update UI to pending after request is sent
             statusBadge.textContent = 'pending';

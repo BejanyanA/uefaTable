@@ -1,4 +1,4 @@
-// routes/leagues.js
+// routes/get_friends.js
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
