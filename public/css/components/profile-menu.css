@@ -112,7 +112,7 @@
   justify-content: space-between;
   /* Pushes name to left, actions to right */
   align-items: center;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: 6px;
   transition: background-color 0.3s ease;
   font-family: Arial, sans-serif;
@@ -431,7 +431,7 @@
   .friends-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     margin: 0px;
     margin-top: 250px;
     padding-left: 2px;
@@ -614,17 +614,28 @@
   }
 
   .action-add-friend {
-  background-color: #0056b3;
-  /* Blue for primary action */
-  color: white;
-  border: none;
-  padding: 4px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  margin-left: auto;
-  /* Push to the right */
-  margin-right: 6px;
-  
-}
+    background-color: #0056b3;
+    /* Blue for primary action */
+    color: white;
+    border: none;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: auto;
+    /* Push to the right */
+    margin-right: 6px;
+
+  }
+
+  .friend-item {
+    display: flex;
+    justify-content: space-between;
+    /* Pushes name to left, actions to right */
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    font-family: Arial, sans-serif;
+  }
 }
