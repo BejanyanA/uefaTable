@@ -150,4 +150,51 @@ export async function handleDeleteFriend(request, env) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
 
+    const loggedInUserId = payload.id;
+
+    // 2) Input
+    const { userId } = await parseBody(request);
+    const targetUserId = Number(userId);
+    if (!targetUserId || Number.isNaN(targetUserId)) {
+        return jsonResponse({ success: false, message: "invalid_user_id" }, 400);
+    }
+    if (targetUserId === loggedInUserId) {
+        return jsonResponse({ success: false, message: "cannot_delete_self_relation" }, 400);
+    }
+
+    // 3) (Optional) ensure target exists
+    const target = await env.core_data
+        .prepare(`SELECT id, username FROM users WHERE id = ?`)
+        .bind(targetUserId)
+        .first();
+    if (!target) {
+        return jsonResponse({ success: false, message: "user_not_found" }, 404);
+    }
+
+    // 4) Count existing relations (either direction)
+    const countRow = await env.core_data.prepare(`
+    SELECT COUNT(*) AS cnt
+    FROM friends
+    WHERE (user_id = ? AND friend_id = ?)
+       OR (user_id = ? AND friend_id = ?)
+  `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).first();
+
+    const toDelete = Number(countRow?.cnt || 0);
+
+    // 5) Delete permanently (either direction), regardless of status
+    if (toDelete > 0) {
+        await env.core_data.prepare(`
+      DELETE FROM friends
+      WHERE (user_id = ? AND friend_id = ?)
+         OR (user_id = ? AND friend_id = ?)
+    `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).run();
+    }
+
+    // 6) Return idempotent success (OK even if nothing was there)
+    return jsonResponse({
+        success: true,
+        data: {
+            message: "user_deleted_success"
+        }
+    }, 200);
 }

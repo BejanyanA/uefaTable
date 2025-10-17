@@ -3,7 +3,7 @@ import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
 import { handleGetApprovedFriends, handleGetAllFriendsStatuses, handleSearchFriendByUsername } from './routes_endpoints/get_friends.js';
-import { handleAddFriends } from './routes_endpoints/friend_actions.js';
+import { handleAddFriends, handleDeleteFriend } from './routes_endpoints/friend_actions.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 
 // Club
@@ -46,6 +46,7 @@ const routeRegistry = {
   "/all-users": { POST: handleGetAllFriendsStatuses },
   "/search-user": { POST: handleSearchFriendByUsername },
   "/add-friend": { POST: handleAddFriends },
+  "/user-delete": { POST: handleDeleteFriend },
 
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },

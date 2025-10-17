@@ -57,6 +57,7 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
             // Update UI to pending after request is sent
             showToast(translation.friend_request_success || "Successfully Sent", "success");
             addButton.remove();
+            getFriends.initGetAllFriendsStatuses();
             handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
           } else {
             console.error("Failed to send friend request.");
@@ -245,18 +246,29 @@ export const ProfileManager = {
           // actions
           const actions = document.createElement("div");
           actions.className = "friend-actions";
+          actions.dataset.friendId = friend.id; // Store ID on the parent
 
           const mkBtn = (cls, labelKey, fallback) => {
             const b = document.createElement("button");
             b.className = cls;
             b.textContent = t[labelKey] || fallback;
+
+            // 🎯 NEW: Add click listener here
+            const actionType = cls.split('-')[1]; // Extracts 'delete', 'reject', or 'approve'
+
+            // Attach the listener to the button
+            b.addEventListener('click', () => {
+              // Pass the friend ID and the action type
+              handleFriendAction(friend.id, actionType);
+            });
+
             return b;
           };
 
           if (friend.status === "approved") {
             actions.append(
               mkBtn("action-delete", "delete", "Delete"),
-              mkBtn("action-reject", "reject", "Reject")
+              mkBtn("action-reject", "reject", "Reject") // Approved friends can be deleted or reverted to rejected by the user
             );
           } else if (friend.status === "pending") {
             actions.append(
@@ -274,6 +286,43 @@ export const ProfileManager = {
           rowContainer.appendChild(item);
           enhanceActionsForMobile(actions);
         });
+      }
+
+      async function handleFriendAction(friendId, actionType) {
+        const token = localStorage.getItem("authToken");
+        const endpoint = `/user-${actionType}`; // e.g., /friends/approve
+
+        try {
+          const response = await apiPost(endpoint, { userId: friendId }, token);
+
+          if (response.success) {
+
+            // 1. Update State (friendsData)
+            const newStatus = actionType === 'approve' ? 'approved' :
+              actionType === 'reject' ? 'rejected' : null;
+
+            if (newStatus || actionType === 'delete') {
+              const index = friendsData.findIndex(f => f.id === friendId);
+              if (index > -0) {
+                if (actionType === 'delete') {
+                  // Remove the friend completely for delete action
+                  friendsData.splice(index, 1);
+                } else if (newStatus) {
+                  // Update the status for approve/reject actions
+                  friendsData[index].status = newStatus;
+                }
+              }
+            }
+
+            // 2. Re-render UI (using the function from your outer scope)
+            renderFriendsList(friendsData);
+
+          } else {
+            console.error(`🔴 API action failed for ${actionType}:`, response);
+          }
+        } catch (error) {
+          console.error(`🔴 API Error during ${actionType}:`, error);
+        }
       }
 
       function enhanceActionsForMobile(actionsDiv) {
