@@ -50,11 +50,10 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
         addButton.addEventListener('click', async () => {
           const reqResponse = await apiPost("/add-friend", { userId: id }, token);
-          if (reqResponse.success) {
+          if (reqResponse.success === true) {
             // Update UI to pending after request is sent
-            statusBadge.textContent = 'pending';
-            statusBadge.className = 'status-badge pending';
             addButton.remove();
+            handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
           } else {
             console.error("Failed to send friend request.");
           }
