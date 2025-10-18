@@ -316,7 +316,7 @@ export const ProfileManager = {
                   confirmationTimers[`timer-${friendId}`] = null;
                 };
 
-                const timerId = setTimeout(resetAction, 3000);
+                const timerId = setTimeout(resetAction, 2000);
                 confirmationTimers[friendId] = actionType;
                 confirmationTimers[`timer-${friendId}`] = timerId;
                 confirmationTimers[`reset-${friendId}`] = resetAction;
@@ -507,7 +507,7 @@ export const ProfileManager = {
               confirmationTimers[`reset-${friendId}`] = null;
             };
 
-            const timerId = setTimeout(resetAction, 3000);
+            const timerId = setTimeout(resetAction, 2000);
             confirmationTimers[friendId] = actionType;
             confirmationTimers[`timer-${friendId}`] = timerId;
             confirmationTimers[`reset-${friendId}`] = resetAction;

@@ -696,7 +696,7 @@ function updateFriendActionButtonTranslations() {
                  button.classList.add('confirming-action');
                  confirmationTimers[friendId] = actionType;
 
-                 const newTimerId = setTimeout(resetFunction, 3000); 
+                 const newTimerId = setTimeout(resetFunction, 2000); 
                  confirmationTimers[`timer-${friendId}`] = newTimerId;
 
             }
