@@ -264,6 +264,18 @@ export const ProfileManager = {
             const b = document.createElement("button");
             b.className = cls;
             b.textContent = t[labelKey] || fallback;
+
+            b.dataset.labelKey = labelKey;
+            b.dataset.fallback = fallback;
+
+            // helper: always resolve original label from CURRENT language
+            const getOriginalText = (btn) => {
+              const lk = btn.dataset.labelKey;
+              const fb = btn.dataset.fallback;
+              const tt = (langMap[currentLang] || {});
+              return lk ? (tt[lk] ?? fb ?? btn.textContent) : btn.textContent;
+            };
+
             const parts = cls.split('-');
             const actionType = parts.length > 1 ? parts[1] : '';
 
@@ -392,7 +404,6 @@ export const ProfileManager = {
       }
 
       function enhanceActionsForMobile(actionsDiv) {
-        // Build toggle button (⋮) + menu container
         const toggle = document.createElement("button");
         toggle.type = "button";
         toggle.className = "friend-actions-menu-toggle";
@@ -405,120 +416,129 @@ export const ProfileManager = {
         menu.setAttribute("role", "menu");
         menu.tabIndex = -1;
 
-        // Get friend ID from the parent div
-        const friendId = actionsDiv.dataset.friendId;
+        const friendId = String(actionsDiv.dataset.friendId || "");
 
-        // Clone existing action buttons into menu items
+        const getConfirmText = () => {
+          const t = (langMap[currentLang] || {});
+          return t.confirmQuestion || "Confirm ?";
+        };
+
+        // resolve “original” label from CURRENT language using data-label-key/fallback
+        const getOriginalText = (el) => {
+          const lk = el.dataset.labelKey;
+          const fb = el.dataset.fallback;
+          const t = (langMap[currentLang] || {});
+          return lk ? (t[lk] ?? fb ?? el.textContent) : el.textContent;
+        };
+
         const originalButtons = Array.from(actionsDiv.querySelectorAll("button"));
         originalButtons.forEach((btn) => {
+          // ensure desktop button carries label metadata (in case older buttons exist)
+          if (!btn.dataset.labelKey) btn.dataset.labelKey = btn.getAttribute("data-label-key") || "";
+          if (!btn.dataset.fallback) btn.dataset.fallback = btn.getAttribute("data-fallback") || "";
+
           const item = document.createElement("button");
           item.type = "button";
           item.className = `menu-item ${btn.className}`;
-          item.textContent = btn.textContent; // Initial text content is correct
           item.setAttribute("role", "menuitem");
 
-          // We only need the actionType here
-          const parts = btn.className.split('-');
-          const actionType = parts.length > 1 ? parts[1] : '';
+          // mirror metadata so mobile item can also resolve dynamically
+          item.dataset.labelKey = btn.dataset.labelKey || "";
+          item.dataset.fallback = btn.dataset.fallback || "";
 
-          // ✅ MOBILE CONFIRMATION FIX: Apply the same 2-click logic here
+          // initial render uses current language
+          item.textContent = getOriginalText(item);
+
+          const parts = btn.className.split("-");
+          const actionType = parts.length > 1 ? parts[1] : "";
+
           item.addEventListener("click", async (e) => {
             e.stopPropagation();
-
             if (!actionType) return;
-            const currentT = (langMap[currentLang] || {});
-            const originalText = btn.textContent;
 
-            // Generate the confirmation text using the current language
-            const confirmWord = currentT.confirmQuestion || "Confirm ?"; // Get 'Confirm' translation
-            // const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
-            const confirmationText = `${confirmWord}`;
-
-
-            // If the item is already in confirmation state, proceed with action
             if (confirmationTimers[friendId] === actionType) {
-
-              // Clear the timer and reset the state (on the original desktop button too)
-              clearTimeout(confirmationTimers[`timer-${friendId}`]); // 🎯 Use the stored timer ID
+              if (confirmationTimers[`timer-${friendId}`]) {
+                clearTimeout(confirmationTimers[`timer-${friendId}`]);
+                confirmationTimers[`timer-${friendId}`] = null;
+              }
               confirmationTimers[friendId] = null;
-              confirmationTimers[`timer-${friendId}`] = null; // Clear the timer reference
 
-              // Reset both button texts/classes to the current language's original text
-              btn.textContent = originalText;
-              item.textContent = originalText;
-              btn.classList.remove('confirming-action');
-              item.classList.remove('confirming-action');
+              // ✅ restore labels using CURRENT language
+              const restore = getOriginalText(btn);
+              const restoreItem = getOriginalText(item);
+              btn.textContent = restore;
+              item.textContent = restoreItem;
+              btn.classList.remove("confirming-action");
+              item.classList.remove("confirming-action");
 
-              // Close the menu
               menu.classList.remove("open");
               toggle.setAttribute("aria-expanded", "false");
 
-              // Execute the API action
               await handleFriendAction(friendId, actionType);
-
-            } else {
-              // First click: Change text to confirmation
-
-              // Clear any other active confirmation timers for THIS friend
-              Object.keys(confirmationTimers).forEach(key => {
-                if (key === friendId && confirmationTimers[key]) {
-                  clearTimeout(confirmationTimers[`timer-${key}`]);
-                }
-              });
-
-              // Set both button texts/classes
-              btn.textContent = confirmationText; // 🎯 Use translated text
-              item.textContent = confirmationText; // 🎯 Use translated text
-              btn.classList.add('confirming-action');
-              item.classList.add('confirming-action');
-
-              // Set a new timer
-              const timerId = setTimeout(() => {
-                btn.textContent = originalText;
-                item.textContent = originalText;
-                btn.classList.remove('confirming-action');
-                item.classList.remove('confirming-action');
-                confirmationTimers[friendId] = null;
-                confirmationTimers[`timer-${friendId}`] = null; // Clear timer reference
-              }, 3000); // 3 seconds to confirm
-
-              // Store the timer ID and the current action type
-              confirmationTimers[friendId] = actionType;
-              confirmationTimers[`timer-${friendId}`] = timerId; // 🎯 FIX 2: Store the actual timer ID
+              return;
             }
+
+            // first click → confirming state (clear existing timer only for this friend)
+            if (confirmationTimers[`timer-${friendId}`]) {
+              clearTimeout(confirmationTimers[`timer-${friendId}`]);
+              confirmationTimers[`timer-${friendId}`] = null;
+            }
+
+            // if some other action is armed, run its reset
+            if (confirmationTimers[friendId] && confirmationTimers[friendId] !== actionType) {
+              const prevReset = confirmationTimers[`reset-${friendId}`];
+              if (typeof prevReset === "function") prevReset();
+            }
+
+            const confirmText = getConfirmText();
+            btn.textContent = confirmText;
+            item.textContent = confirmText;
+            btn.classList.add("confirming-action");
+            item.classList.add("confirming-action");
+
+            const resetAction = () => {
+              // ✅ recompute from CURRENT language at reset time
+              btn.textContent = getOriginalText(btn);
+              item.textContent = getOriginalText(item);
+              btn.classList.remove("confirming-action");
+              item.classList.remove("confirming-action");
+              confirmationTimers[friendId] = null;
+              confirmationTimers[`timer-${friendId}`] = null;
+              confirmationTimers[`reset-${friendId}`] = null;
+            };
+
+            const timerId = setTimeout(resetAction, 3000);
+            confirmationTimers[friendId] = actionType;
+            confirmationTimers[`timer-${friendId}`] = timerId;
+            confirmationTimers[`reset-${friendId}`] = resetAction;
           });
 
           menu.appendChild(item);
         });
 
-        // Toggle logic (remains unchanged)
         toggle.addEventListener("click", (e) => {
           e.stopPropagation();
-          const willOpen = !menu.classList.contains("open");
-          document.querySelectorAll(".friend-actions-menu.open").forEach(m => m.classList.remove("open"));
-          document.querySelectorAll(".friend-actions-menu-toggle[aria-expanded='true']").forEach(t => t.setAttribute("aria-expanded", "false"));
-          if (willOpen) {
-            menu.classList.add("open");
-            toggle.setAttribute("aria-expanded", "true");
-            // focus first item for accessibility
-            const first = menu.querySelector(".menu-item");
-            if (first) first.focus();
-          }
+          const isOpen = menu.classList.toggle("open");
+          toggle.setAttribute("aria-expanded", String(isOpen));
+          if (isOpen) menu.focus();
         });
 
-        // Close on outside click / Escape (remains unchanged)
-        document.addEventListener("click", () => {
-          if (menu.classList.contains("open")) {
+        document.addEventListener("click", (e) => {
+          if (!menu.contains(e.target) && e.target !== toggle) {
             menu.classList.remove("open");
             toggle.setAttribute("aria-expanded", "false");
           }
         });
+
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape" && menu.classList.contains("open")) {
             menu.classList.remove("open");
             toggle.setAttribute("aria-expanded", "false");
           }
         });
+
+        actionsDiv.appendChild(toggle);
+        actionsDiv.appendChild(menu);
 
         // Mount right after the actionsDiv (so both exist in DOM)
         const parent = actionsDiv.parentElement; 			// .friend-item
