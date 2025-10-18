@@ -312,7 +312,7 @@
   background-color: rgba(15, 16, 19, 0.966);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   outline: none;
   justify-content: space-between;
   display: flex;
@@ -604,7 +604,7 @@
     border-radius: 6px;
     background-color: rgba(0, 0, 0, 0.4);
     color: #fff;
-    font-size: 16px;
+    font-size: 12px;
     outline: none;
   }
 
@@ -642,6 +642,10 @@
     margin: 240px auto 0;
     padding: 0;
     margin-left: 1px;
+  }
+
+  .search-result-item {
+    font-size: 12px;
   }
 
   .action-add-friend {
