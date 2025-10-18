@@ -90,6 +90,7 @@ export const langMap = {
     reject: "Reject",
     approve: "Approve",
     friendsSearchPlaceholder: "Search by Username....",
+    confirmQuestion: "Confirm ?",
 
 
     //BE translations
@@ -204,6 +205,7 @@ export const langMap = {
     reject: "Մերժել",
     approve: "Ընդունել",
     friendsSearchPlaceholder: "Որոնել օգտանունով....",
+    confirmQuestion: "Հաստատե՞լ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -317,6 +319,7 @@ export const langMap = {
     reject: "Rejeter",
     approve: "Approuver",
     friendsSearchPlaceholder: "Rechercher par nom d’utilisateur....",
+    confirmQuestion: "Confirmer ?",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",

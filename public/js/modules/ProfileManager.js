@@ -259,23 +259,27 @@ export const ProfileManager = {
             const b = document.createElement("button");
             b.className = cls;
             b.textContent = t[labelKey] || fallback;
-            const originalText = b.textContent; // Store the original text
-
-            // 1. Robustly extract the action type
             const parts = cls.split('-');
             const actionType = parts.length > 1 ? parts[1] : '';
 
-            // 2. Attach the inline confirmation listener
             b.addEventListener('click', async () => {
 
               if (!actionType) return;
 
               const friendId = friend.id;
+              const currentT = (langMap[currentLang] || {});
+              const originalText = currentT[labelKey] || fallback; // Get the currently translated text for reset
+
+              // Generate the confirmation text using the current language's translation for "Confirm" (assuming you have one, or hardcode if not)
+              const confirmWord = currentT.confirmQuestion || "Confirm ?"; // 🚨 Ensure your langMap has a 'confirm' key
+              // const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+              const confirmationText = `${confirmWord}`;
+
 
               // If the button is already in confirmation state, proceed with action
               if (confirmationTimers[friendId] === actionType) {
                 // Clear the timer and reset the state
-                clearTimeout(confirmationTimers[friendId]);
+                clearTimeout(confirmationTimers[`timer-${friendId}`]); // 🎯 FIX: Clear the stored timer ID
                 confirmationTimers[friendId] = null;
 
                 // Execute the API action
@@ -287,24 +291,26 @@ export const ProfileManager = {
                 // Clear any other active confirmation timers for THIS friend
                 Object.keys(confirmationTimers).forEach(key => {
                   if (key === friendId && confirmationTimers[key]) {
-                    clearTimeout(confirmationTimers[key]);
+                    clearTimeout(confirmationTimers[`timer-${key}`]); // 🎯 FIX: Clear the stored timer ID
                   }
                 });
 
-                const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
-                b.textContent = `Confirm ${actionLabel}?`;
+                // 🎯 Apply the translated confirmation text
+                b.textContent = confirmationText;
                 b.classList.add('confirming-action');
 
                 // Set a new timer
                 const timerId = setTimeout(() => {
+                  // 🎯 Reset using the correctly scoped originalText
                   b.textContent = originalText;
                   b.classList.remove('confirming-action');
                   confirmationTimers[friendId] = null;
+                  confirmationTimers[`timer-${friendId}`] = null; // Clear timer reference
                 }, 3000); // 3 seconds to confirm
 
                 // Store the timer ID and the current action type
                 confirmationTimers[friendId] = actionType;
-                confirmationTimers[`timer-${friendId}`] = timerId;
+                confirmationTimers[`timer-${friendId}`] = timerId; // Store the actual timer ID
               }
             });
 
@@ -392,13 +398,13 @@ export const ProfileManager = {
         // Build toggle button (⋮) + menu container
         const toggle = document.createElement("button");
         toggle.type = "button";
-        toggle.className = "friend-actions-menu-toggle"; // new class, mobile-only visible
+        toggle.className = "friend-actions-menu-toggle";
         toggle.setAttribute("aria-haspopup", "true");
         toggle.setAttribute("aria-expanded", "false");
-        toggle.innerHTML = "&#8942;"; // vertical ellipsis (⋮)
+        toggle.innerHTML = "&#8942;";
 
         const menu = document.createElement("div");
-        menu.className = "friend-actions-menu"; // new class, mobile-only dropdown
+        menu.className = "friend-actions-menu";
         menu.setAttribute("role", "menu");
         menu.tabIndex = -1;
 
@@ -410,12 +416,11 @@ export const ProfileManager = {
         originalButtons.forEach((btn) => {
           const item = document.createElement("button");
           item.type = "button";
-          item.className = `menu-item ${btn.className}`; // preserve your action-* classes
-          item.textContent = btn.textContent;
+          item.className = `menu-item ${btn.className}`;
+          item.textContent = btn.textContent; // Initial text content is correct
           item.setAttribute("role", "menuitem");
 
-          // Store original text and action type
-          const originalText = btn.textContent;
+          // We only need the actionType here
           const parts = btn.className.split('-');
           const actionType = parts.length > 1 ? parts[1] : '';
 
@@ -424,15 +429,24 @@ export const ProfileManager = {
             e.stopPropagation();
 
             if (!actionType) return;
+            const currentT = (langMap[currentLang] || {});
+            const originalText = btn.textContent;
+
+            // Generate the confirmation text using the current language
+            const confirmWord = currentT.confirmQuestion || "Confirm ?"; // Get 'Confirm' translation
+            // const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+            const confirmationText = `${confirmWord}`;
+
 
             // If the item is already in confirmation state, proceed with action
             if (confirmationTimers[friendId] === actionType) {
 
               // Clear the timer and reset the state (on the original desktop button too)
-              clearTimeout(confirmationTimers[`timer-${friendId}`]);
+              clearTimeout(confirmationTimers[`timer-${friendId}`]); // 🎯 Use the stored timer ID
               confirmationTimers[friendId] = null;
+              confirmationTimers[`timer-${friendId}`] = null; // Clear the timer reference
 
-              // Reset both button texts/classes
+              // Reset both button texts/classes to the current language's original text
               btn.textContent = originalText;
               item.textContent = originalText;
               btn.classList.remove('confirming-action');
@@ -455,12 +469,9 @@ export const ProfileManager = {
                 }
               });
 
-              const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
-              const confirmText = `Confirm ${actionLabel}?`;
-
               // Set both button texts/classes
-              btn.textContent = confirmText;
-              item.textContent = confirmText;
+              btn.textContent = confirmationText; // 🎯 Use translated text
+              item.textContent = confirmationText; // 🎯 Use translated text
               btn.classList.add('confirming-action');
               item.classList.add('confirming-action');
 
@@ -471,11 +482,12 @@ export const ProfileManager = {
                 btn.classList.remove('confirming-action');
                 item.classList.remove('confirming-action');
                 confirmationTimers[friendId] = null;
+                confirmationTimers[`timer-${friendId}`] = null; // Clear timer reference
               }, 3000); // 3 seconds to confirm
 
               // Store the timer ID and the current action type
               confirmationTimers[friendId] = actionType;
-              confirmationTimers[`timer-${friendId}`] = timerId;
+              confirmationTimers[`timer-${friendId}`] = timerId; // 🎯 FIX 2: Store the actual timer ID
             }
           });
 
