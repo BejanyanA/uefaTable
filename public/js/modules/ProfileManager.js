@@ -6,7 +6,7 @@ import { showToast } from '../utils/toast.js';
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
   const username = friendsSearchInput.value.trim();
-
+  const translation = langMap[currentLang];
   resultsContainer.innerHTML = ''; // Clear old results
 
   if (username.length === 0) {
@@ -45,17 +45,19 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
       spacer.style.flexGrow = 1;
       item.appendChild(spacer);
 
+      const t = translation || {};
+
       // 4. Action Button (Will sit to the left of the Status Badge)
       if (status === "available") {
         const addButton = document.createElement("button");
         addButton.className = "action-add-friend";
-        addButton.textContent = "Add Friend";
+        addButton.textContent = t.addFriend || "+ Add Friend";
 
         addButton.addEventListener('click', async () => {
           const reqResponse = await apiPost("/add-friend", { userId: id }, token);
           if (reqResponse.success) {
             // Update UI to pending after request is sent
-            showToast(translation.friend_request_success || "Successfully Sent", "success");
+            showToast(t.friend_request_success || "Successfully Sent", "success");
             addButton.remove();
             getFriends.initGetAllFriendsStatuses();
             handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
@@ -70,10 +72,11 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
         // 5. Status Badge (Always the last element, guaranteed to be on the far right)
         const statusBadge = document.createElement("span");
         statusBadge.className = `status-badge ${status}`;
-        statusBadge.textContent = status;
+        statusBadge.dataset.statusKey = status;
+        const t = translation || {}; // Assuming translation is available here
+        statusBadge.textContent = t[status] || status;
+
         item.appendChild(statusBadge);
-
-
       }
       resultsContainer.appendChild(item);
 
@@ -84,9 +87,11 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
       toggleSearchIcon(true);
 
     } else {
-      // Handle user not found or other errors
-      resultsContainer.innerHTML = `<div class="search-result-item status-rejected">User "${username}" not found.</div>`;
-      // 🎯 FAILED SEARCH: Switch to X icon (since results are now present)
+      const t = translation || {};
+      const userNotFoundMsg = t.usersNotExist || "User not found.";
+      resultsContainer.innerHTML = `<div class="search-result-item status-rejected">${userNotFoundMsg}</div>`;
+
+      // FAILED SEARCH: Switch to X icon
       toggleSearchIcon(true);
     }
 

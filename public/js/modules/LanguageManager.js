@@ -91,6 +91,10 @@ export const langMap = {
     approve: "Approve",
     friendsSearchPlaceholder: "Search by Username....",
     confirmQuestion: "Confirm ?",
+    addFriend: "Add Friend",
+    approved: "Friend",
+    pending: "Pending",
+    rejected: "Rejected",
 
 
     //BE translations
@@ -206,6 +210,10 @@ export const langMap = {
     approve: "Ընդունել",
     friendsSearchPlaceholder: "Որոնել օգտանունով....",
     confirmQuestion: "Հաստատե՞լ",
+    addFriend: "Ավելացնել ընկեր",
+    approved: "Ընկեր",
+    pending: "Սպասվող",
+    rejected: "Մերժված",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -222,7 +230,7 @@ export const langMap = {
     league_create_success: "Մրցաշարը հաջողությամբ ստեղծվեց",
     league_creation_failed: "Մրցաշարի ստեղծումը ձախողվեց",
     no_countries_found: "Քաղաքներ չեն գտնվել",
-    friend_request_success: "Հրավերը ուղարկվել է",
+    friend_request_success: "Ընկերանալու հրավերը ուղարկվել է",
     friend_approved_success: "Ընկերությունը հաջողությամբ հաստատվել է",
     friend_rejected_success: "Օգտատերը հաջողությամբ մերժվել է",
     friend_deleted_success: "Օգտատերը հաջողությամբ ջնջվել է",
@@ -320,6 +328,10 @@ export const langMap = {
     approve: "Approuver",
     friendsSearchPlaceholder: "Rechercher par nom d’utilisateur....",
     confirmQuestion: "Confirmer ?",
+    addFriend: "Ajouter un ami",
+    approved: "Amis",
+    pending: "En attente",
+    rejected: "Rejeté",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -363,6 +375,7 @@ function changeLang(lang) {
   updateIconTitles();
   buttonsTranslate();
   placeholderTranslate();
+  friendStatusesAndSearch();
 
   const t = langMap[lang];
 
@@ -602,8 +615,45 @@ function buttonsTranslate() {
   document.querySelectorAll(".action-approve").forEach(button => {
     button.textContent = approveLabel;
   });
+
+  const { addFriend: addFriend = "Add Friend" } = langMap[currentLang] || {};
+  document.querySelectorAll(".action-add-friend").forEach(button => {
+    button.textContent = addFriend;
+  });
+
 }
 
+function friendStatusesAndSearch() {
+  const t = langMap[currentLang] || {};
+  let successfulResultFound = false;
+  document.querySelectorAll('.status-badge').forEach(badge => {
+    const rawStatus = badge.dataset.statusKey;
+
+    if (rawStatus) {
+      const translatedStatus = t[rawStatus] || rawStatus;
+      badge.textContent = translatedStatus;
+      successfulResultFound = true; 
+    }
+  });
+
+  const searchResultElements = document.querySelectorAll(".search-result-item");
+  const userSearchFailedKey = 'usersNotExist';
+  const searchUsernameResult = t[userSearchFailedKey] || "User not found.";
+
+  if (successfulResultFound) {
+    return;
+  }
+
+  searchResultElements.forEach(resultElement => {
+    if (resultElement && resultElement.classList.contains('status-rejected')) {
+      const isSimpleFailureMessage = resultElement.children.length === 0;
+
+      if (isSimpleFailureMessage) {
+        resultElement.innerHTML = searchUsernameResult;
+      }
+    }
+  });
+}
 
 function placeholderTranslate() {
   const { friendsSearchPlaceholder: searchUserByUsername = "Search or Enter Username..." } = langMap[currentLang] || {};
