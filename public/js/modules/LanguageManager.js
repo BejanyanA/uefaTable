@@ -376,6 +376,7 @@ function changeLang(lang) {
   buttonsTranslate();
   placeholderTranslate();
   friendStatusesAndSearch();
+  updateFriendActionButtonTranslations();
 
   const t = langMap[lang];
 
@@ -660,6 +661,51 @@ function placeholderTranslate() {
   document.querySelectorAll("#friendsSearchInput").forEach(inputElement => {
     inputElement.placeholder = searchUserByUsername;
   });
+}
+
+
+
+function updateFriendActionButtonTranslations() {
+    const t = langMap[currentLang] || {}; 
+
+    document.querySelectorAll('.friend-actions button, .friend-actions-menu button.menu-item').forEach(button => {
+
+        const desktopButton = button.closest('.friend-item')?.querySelector('.friend-actions button');
+        const labelKey = button.dataset.labelKey || desktopButton?.dataset.labelKey;
+        const fallback = button.dataset.fallback || desktopButton?.dataset.fallback;
+        
+        if (!labelKey) return; 
+
+        const friendId = button.closest('[data-friend-id]')?.dataset.friendId;
+        const actionType = button.className.match(/action-([a-z]+)/)?.[1];
+        
+        const newOriginalText = t[labelKey] || fallback;
+
+        if (button.classList.contains('confirming-action') && friendId) {
+            
+            if (confirmationTimers[`timer-${friendId}`]) {
+                clearTimeout(confirmationTimers[`timer-${friendId}`]);
+            }
+            const resetFunction = confirmationTimers[`reset-${friendId}`];
+            if (resetFunction) {
+                 resetFunction();
+                 const confirmWord = t.confirm || "Confirm";
+                 const newConfirmationText = `${confirmWord} ${actionType.charAt(0).toUpperCase() + actionType.slice(1)}?`;
+
+                 button.textContent = newConfirmationText;
+                 button.classList.add('confirming-action');
+                 confirmationTimers[friendId] = actionType;
+
+                 const newTimerId = setTimeout(resetFunction, 3000); 
+                 confirmationTimers[`timer-${friendId}`] = newTimerId;
+
+            }
+            
+
+        } else {
+            button.textContent = newOriginalText;
+        }
+    });
 }
 
 

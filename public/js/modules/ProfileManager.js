@@ -273,49 +273,41 @@ export const ProfileManager = {
 
               const friendId = friend.id;
               const currentT = (langMap[currentLang] || {});
-              const originalText = currentT[labelKey] || fallback; // Get the currently translated text for reset
-
-              // Generate the confirmation text using the current language's translation for "Confirm" (assuming you have one, or hardcode if not)
-              const confirmWord = currentT.confirmQuestion || "Confirm ?"; // 🚨 Ensure your langMap has a 'confirm' key
-              // const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+              const originalText = currentT[labelKey] || fallback;
+              const confirmWord = currentT.confirmQuestion || "Confirm ?";
               const confirmationText = `${confirmWord}`;
 
-
-              // If the button is already in confirmation state, proceed with action
               if (confirmationTimers[friendId] === actionType) {
-                // Clear the timer and reset the state
-                clearTimeout(confirmationTimers[`timer-${friendId}`]); // 🎯 FIX: Clear the stored timer ID
+                clearTimeout(confirmationTimers[`timer-${friendId}`]);
                 confirmationTimers[friendId] = null;
 
                 // Execute the API action
                 await handleFriendAction(friendId, actionType);
 
               } else {
-                // First click: Change text to confirmation
-
-                // Clear any other active confirmation timers for THIS friend
                 Object.keys(confirmationTimers).forEach(key => {
                   if (key === friendId && confirmationTimers[key]) {
-                    clearTimeout(confirmationTimers[`timer-${key}`]); // 🎯 FIX: Clear the stored timer ID
+                    clearTimeout(confirmationTimers[`timer-${key}`]);
                   }
                 });
 
-                // 🎯 Apply the translated confirmation text
                 b.textContent = confirmationText;
                 b.classList.add('confirming-action');
 
-                // Set a new timer
-                const timerId = setTimeout(() => {
-                  // 🎯 Reset using the correctly scoped originalText
-                  b.textContent = originalText;
+                const resetAction = () => {
+                  const resetT = (langMap[currentLang] || {});
+                  const resetOriginalText = resetT[labelKey] || fallback;
+
+                  b.textContent = resetOriginalText;
                   b.classList.remove('confirming-action');
                   confirmationTimers[friendId] = null;
-                  confirmationTimers[`timer-${friendId}`] = null; // Clear timer reference
-                }, 3000); // 3 seconds to confirm
+                  confirmationTimers[`timer-${friendId}`] = null;
+                };
 
-                // Store the timer ID and the current action type
+                const timerId = setTimeout(resetAction, 3000);
                 confirmationTimers[friendId] = actionType;
-                confirmationTimers[`timer-${friendId}`] = timerId; // Store the actual timer ID
+                confirmationTimers[`timer-${friendId}`] = timerId;
+                confirmationTimers[`reset-${friendId}`] = resetAction;
               }
             });
 
