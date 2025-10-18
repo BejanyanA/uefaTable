@@ -236,7 +236,7 @@
   padding: 8px 15px;
   border: none;
   border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.666);
   color: #fff;
   font-size: 16px;
   outline: none;
@@ -248,7 +248,7 @@
 }
 
 .add-friend-input:focus {
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.777);
   box-shadow: 0 0 0 2px #28a745;
   /* Light green border on focus */
 }

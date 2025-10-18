@@ -370,7 +370,15 @@ export const ProfileManager = {
 
             // Re-render UI and show success toast
             getFriends.initGetAllFriendsStatuses();
-            showToast(translation.friend_request_success || "Successfully updated friend status", "success");
+            if (actionType === 'approve') {
+              showToast(translation.friend_approved_success || "User successfully approved", "success");
+            } else if (actionType === 'reject') {
+              showToast(translation.friend_rejected_success || "User successfully rejected", "success");
+            } else if (actionType === 'delete') {
+              showToast(translation.friend_deleted_success || "User successfully deleted", "success");
+            } else {
+              showToast(translation.something_went_wrong || "Something went wrong");
+            }
 
           } else {
             console.error(`🔴 API action failed for ${actionType}:`, response);

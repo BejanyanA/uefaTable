@@ -89,6 +89,7 @@ export const langMap = {
     usersNotExist: "No users found",
     reject: "Reject",
     approve: "Approve",
+    friendsSearchPlaceholder: "Search by Username....",
 
 
     //BE translations
@@ -107,6 +108,9 @@ export const langMap = {
     league_creation_failed: "League Creation failed",
     no_countries_found: "No countries found",
     friend_request_success: "Friend Request Sent",
+    friend_approved_success: "User Approved Successfully",
+    friend_rejected_success: "User Rejected Successfully",
+    friend_deleted_success: "User Deleted Successfully",
   },
 
   am: {
@@ -199,6 +203,7 @@ export const langMap = {
     usersNotExist: "Օգտատերեր չեն գտնվել",
     reject: "Մերժել",
     approve: "Ընդունել",
+    friendsSearchPlaceholder: "Որոնել օգտանունով....",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -216,6 +221,9 @@ export const langMap = {
     league_creation_failed: "Մրցաշարի ստեղծումը ձախողվեց",
     no_countries_found: "Քաղաքներ չեն գտնվել",
     friend_request_success: "Հրավերը ուղարկվել է",
+    friend_approved_success: "Ընկերությունը հաջողությամբ հաստատվել է",
+    friend_rejected_success: "Օգտատերը հաջողությամբ մերժվել է",
+    friend_deleted_success: "Օգտատերը հաջողությամբ ջնջվել է",
   },
 
   fr: {
@@ -308,6 +316,7 @@ export const langMap = {
     usersNotExist: "Aucun utilisateur trouvé",
     reject: "Rejeter",
     approve: "Approuver",
+    friendsSearchPlaceholder: "Rechercher par nom d’utilisateur....",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -325,6 +334,9 @@ export const langMap = {
     league_creation_failed: "Échec de la création de la ligue",
     no_countries_found: "Aucun pays trouvé",
     friend_request_success: "Demande d’amitié envoyée",
+    friend_approved_success: "Utilisateur approuvé avec succès",
+    friend_rejected_success: "Utilisateur rejeté avec succès",
+    friend_deleted_success: "Utilisateur supprimé avec succès",
   }
 };
 
@@ -347,6 +359,7 @@ function changeLang(lang) {
   updateURLWithLang(lang);
   updateIconTitles();
   buttonsTranslate();
+  placeholderTranslate();
 
   const t = langMap[lang];
 
@@ -571,7 +584,6 @@ function updateIconTitles() {
 }
 
 
-
 function buttonsTranslate() {
   const { delete: deleteLabel = "Delete" } = langMap[currentLang] || {};
   document.querySelectorAll(".action-delete").forEach(button => {
@@ -586,6 +598,14 @@ function buttonsTranslate() {
   const { approve: approveLabel = "Approve" } = langMap[currentLang] || {};
   document.querySelectorAll(".action-approve").forEach(button => {
     button.textContent = approveLabel;
+  });
+}
+
+
+function placeholderTranslate() {
+  const { friendsSearchPlaceholder: searchUserByUsername = "Search or Enter Username..." } = langMap[currentLang] || {};
+  document.querySelectorAll("#friendsSearchInput").forEach(inputElement => {
+    inputElement.placeholder = searchUserByUsername;
   });
 }
 
