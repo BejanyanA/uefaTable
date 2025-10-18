@@ -272,9 +272,6 @@
   box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
 }
 
-
-
-
 .search-icon-symbol {
   font-size: 20px;
   /* Make the icon a bit bigger */
@@ -377,7 +374,7 @@
 
 /* Add Friend Button (only visible for 'available' status) */
 .action-add-friend {
-  background-color: #0056b3;
+  background-color: #09962a;
   /* Blue for primary action */
   color: white;
   border: none;
@@ -391,13 +388,48 @@
 }
 
 .action-add-friend:hover {
-  background-color: #007bff;
+  background-color: #28a745;
   transform: scale(1.06);
 }
 
+.friend-actions button.action-delete.confirming-action,
+.friend-actions-menu button.action-delete.confirming-action.menu-item {
+  background-color: #dc3545;
+  /* Strong Red */
+  color: white;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
 
+/* --- REJECT ACTION CONFIRMATION (ORANGE) --- */
+.friend-actions button.action-reject.confirming-action,
+.friend-actions-menu button.action-reject.confirming-action.menu-item {
+  background-color: #0a57fc;
+  /* Orange */
+  color: white;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
 
+/* --- APPROVE ACTION CONFIRMATION (GREEN) --- */
+.friend-actions button.action-approve.confirming-action,
+.friend-actions-menu button.action-approve.confirming-action.menu-item {
+  background-color: #28a745;
+  /* Green */
+  color: white;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+  /* Using pulse, or pulse-approve if defined */
+}
 
+/* * Optional: You might want to remove the default styles 
+* when the confirmation style is applied.
+*/
+.friend-actions button.confirming-action,
+.friend-actions-menu button.confirming-action {
+  border-color: transparent !important;
+  /* Hides default border if any */
+}
 
 
 
@@ -542,7 +574,7 @@
 
   /* Optional: per-action colors if your desktop had them */
   .menu-item.action-approve {
-    background: #2e7d32;
+    background: #28a745;
     /* green */
   }
 
@@ -552,7 +584,7 @@
   }
 
   .menu-item.action-delete {
-    background: #b71c1c;
+    background: #dc3545;
     /* gray delete */
   }
 
@@ -601,7 +633,7 @@
   }
 
   .add-friend-btn:hover {
-    background-color: #34b752;
+    background-color: #10922f;
     box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
   }
 
@@ -613,7 +645,7 @@
   }
 
   .action-add-friend {
-    background-color: #0056b3;
+    background-color: #0d7e27;
     /* Blue for primary action */
     color: white;
     border: none;
@@ -636,5 +668,44 @@
     border-radius: 6px;
     transition: background-color 0.3s ease;
     font-family: Arial, sans-serif;
+  }
+
+  .friend-actions button.action-delete.confirming-action,
+  .friend-actions-menu button.action-delete.confirming-action.menu-item {
+    background-color: #dc3545;
+    /* Strong Red */
+    color: white;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+  }
+
+  /* --- REJECT ACTION CONFIRMATION (ORANGE) --- */
+  .friend-actions button.action-reject.confirming-action,
+  .friend-actions-menu button.action-reject.confirming-action.menu-item {
+    background-color: #0a57fc;
+    /* Orange */
+    color: white;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+  }
+
+  /* --- APPROVE ACTION CONFIRMATION (GREEN) --- */
+  .friend-actions button.action-approve.confirming-action,
+  .friend-actions-menu button.action-approve.confirming-action.menu-item {
+    background-color: #28a745;
+    /* Green */
+    color: white;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+    /* Using pulse, or pulse-approve if defined */
+  }
+
+  /* * Optional: You might want to remove the default styles 
+* when the confirmation style is applied.
+*/
+  .friend-actions button.confirming-action,
+  .friend-actions-menu button.confirming-action {
+    border-color: transparent !important;
+    /* Hides default border if any */
   }
 }

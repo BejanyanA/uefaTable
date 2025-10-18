@@ -227,10 +227,17 @@ export const ProfileManager = {
       let friendsData = []; // will be set when the request returns
       let activeTab = "approved"; // default to Friends
 
+      // 🎯 NEW: Store confirmation timers for each friend ID
+      const confirmationTimers = {};
+
+
       // Render list items (id, username, status)
       function renderFriendsList(list) {
         const t = (langMap[currentLang] || {});
         rowContainer.querySelectorAll(".friend-item").forEach(n => n.remove());
+
+        // Clear any old timers when re-rendering
+        Object.values(confirmationTimers).forEach(timer => clearTimeout(timer));
 
         (list || []).forEach(friend => {
           const item = document.createElement("div");
@@ -252,14 +259,53 @@ export const ProfileManager = {
             const b = document.createElement("button");
             b.className = cls;
             b.textContent = t[labelKey] || fallback;
+            const originalText = b.textContent; // Store the original text
 
-            // 🎯 NEW: Add click listener here
-            const actionType = cls.split('-')[1]; // Extracts 'delete', 'reject', or 'approve'
+            // 1. Robustly extract the action type
+            const parts = cls.split('-');
+            const actionType = parts.length > 1 ? parts[1] : '';
 
-            // Attach the listener to the button
-            b.addEventListener('click', () => {
-              // Pass the friend ID and the action type
-              handleFriendAction(friend.id, actionType);
+            // 2. Attach the inline confirmation listener
+            b.addEventListener('click', async () => {
+
+              if (!actionType) return;
+
+              const friendId = friend.id;
+
+              // If the button is already in confirmation state, proceed with action
+              if (confirmationTimers[friendId] === actionType) {
+                // Clear the timer and reset the state
+                clearTimeout(confirmationTimers[friendId]);
+                confirmationTimers[friendId] = null;
+
+                // Execute the API action
+                await handleFriendAction(friendId, actionType);
+
+              } else {
+                // First click: Change text to confirmation
+
+                // Clear any other active confirmation timers for THIS friend
+                Object.keys(confirmationTimers).forEach(key => {
+                  if (key === friendId && confirmationTimers[key]) {
+                    clearTimeout(confirmationTimers[key]);
+                  }
+                });
+
+                const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+                b.textContent = `Confirm ${actionLabel}?`;
+                b.classList.add('confirming-action');
+
+                // Set a new timer
+                const timerId = setTimeout(() => {
+                  b.textContent = originalText;
+                  b.classList.remove('confirming-action');
+                  confirmationTimers[friendId] = null;
+                }, 3000); // 3 seconds to confirm
+
+                // Store the timer ID and the current action type
+                confirmationTimers[friendId] = actionType;
+                confirmationTimers[`timer-${friendId}`] = timerId;
+              }
             });
 
             return b;
@@ -268,7 +314,7 @@ export const ProfileManager = {
           if (friend.status === "approved") {
             actions.append(
               mkBtn("action-delete", "delete", "Delete"),
-              mkBtn("action-reject", "reject", "Reject") // Approved friends can be deleted or reverted to rejected by the user
+              mkBtn("action-reject", "reject", "Reject")
             );
           } else if (friend.status === "pending") {
 
@@ -279,7 +325,7 @@ export const ProfileManager = {
                 mkBtn("action-reject", "reject", "Reject"),
               );
             }
-            // Always show Reject and Delete for a pending request
+            // Always show Delete for a pending request
             actions.append(
               mkBtn("action-delete", "delete", "Delete")
             );
@@ -293,11 +339,12 @@ export const ProfileManager = {
           rowContainer.appendChild(item);
           enhanceActionsForMobile(actions);
         });
-      }
+      } // end renderFriendsList
 
+      // 🎯 MODIFIED: handleFriendAction is now the API executor
       async function handleFriendAction(friendId, actionType) {
         const token = localStorage.getItem("authToken");
-        const endpoint = `/user-${actionType}`; // e.g., /friends/approve
+        const endpoint = `/user-${actionType}`;
 
         try {
           const response = await apiPost(endpoint, { userId: friendId }, token);
@@ -321,8 +368,9 @@ export const ProfileManager = {
               }
             }
 
-            showToast(translation.friend_request_success || "Successfully Sent", "success");
+            // Re-render UI and show success toast
             getFriends.initGetAllFriendsStatuses();
+            showToast(translation.friend_request_success || "Successfully updated friend status", "success");
 
           } else {
             console.error(`🔴 API action failed for ${actionType}:`, response);
@@ -346,36 +394,87 @@ export const ProfileManager = {
         menu.setAttribute("role", "menu");
         menu.tabIndex = -1;
 
+        // Get friend ID from the parent div
+        const friendId = actionsDiv.dataset.friendId;
+
         // Clone existing action buttons into menu items
         const originalButtons = Array.from(actionsDiv.querySelectorAll("button"));
-        originalButtons.forEach((btn, i) => {
+        originalButtons.forEach((btn) => {
           const item = document.createElement("button");
           item.type = "button";
           item.className = `menu-item ${btn.className}`; // preserve your action-* classes
           item.textContent = btn.textContent;
           item.setAttribute("role", "menuitem");
 
-          // ✅ Add proper ID based on class
-          if (btn.classList.contains("action-delete")) {
-            item.id = "delete";
-          } else if (btn.classList.contains("action-approve")) {
-            item.id = "approve";
-          } else if (btn.classList.contains("action-reject")) {
-            item.id = "reject";
-          }
+          // Store original text and action type
+          const originalText = btn.textContent;
+          const parts = btn.className.split('-');
+          const actionType = parts.length > 1 ? parts[1] : '';
 
-          // When a menu item is clicked, trigger the original button’s click (so existing handlers keep working)
-          item.addEventListener("click", (e) => {
+          // ✅ MOBILE CONFIRMATION FIX: Apply the same 2-click logic here
+          item.addEventListener("click", async (e) => {
             e.stopPropagation();
-            btn.click();
-            menu.classList.remove("open");
-            toggle.setAttribute("aria-expanded", "false");
+
+            if (!actionType) return;
+
+            // If the item is already in confirmation state, proceed with action
+            if (confirmationTimers[friendId] === actionType) {
+
+              // Clear the timer and reset the state (on the original desktop button too)
+              clearTimeout(confirmationTimers[`timer-${friendId}`]);
+              confirmationTimers[friendId] = null;
+
+              // Reset both button texts/classes
+              btn.textContent = originalText;
+              item.textContent = originalText;
+              btn.classList.remove('confirming-action');
+              item.classList.remove('confirming-action');
+
+              // Close the menu
+              menu.classList.remove("open");
+              toggle.setAttribute("aria-expanded", "false");
+
+              // Execute the API action
+              await handleFriendAction(friendId, actionType);
+
+            } else {
+              // First click: Change text to confirmation
+
+              // Clear any other active confirmation timers for THIS friend
+              Object.keys(confirmationTimers).forEach(key => {
+                if (key === friendId && confirmationTimers[key]) {
+                  clearTimeout(confirmationTimers[`timer-${key}`]);
+                }
+              });
+
+              const actionLabel = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+              const confirmText = `Confirm ${actionLabel}?`;
+
+              // Set both button texts/classes
+              btn.textContent = confirmText;
+              item.textContent = confirmText;
+              btn.classList.add('confirming-action');
+              item.classList.add('confirming-action');
+
+              // Set a new timer
+              const timerId = setTimeout(() => {
+                btn.textContent = originalText;
+                item.textContent = originalText;
+                btn.classList.remove('confirming-action');
+                item.classList.remove('confirming-action');
+                confirmationTimers[friendId] = null;
+              }, 3000); // 3 seconds to confirm
+
+              // Store the timer ID and the current action type
+              confirmationTimers[friendId] = actionType;
+              confirmationTimers[`timer-${friendId}`] = timerId;
+            }
           });
 
           menu.appendChild(item);
         });
 
-        // Toggle logic
+        // Toggle logic (remains unchanged)
         toggle.addEventListener("click", (e) => {
           e.stopPropagation();
           const willOpen = !menu.classList.contains("open");
@@ -390,7 +489,7 @@ export const ProfileManager = {
           }
         });
 
-        // Close on outside click / Escape
+        // Close on outside click / Escape (remains unchanged)
         document.addEventListener("click", () => {
           if (menu.classList.contains("open")) {
             menu.classList.remove("open");
@@ -405,7 +504,7 @@ export const ProfileManager = {
         });
 
         // Mount right after the actionsDiv (so both exist in DOM)
-        const parent = actionsDiv.parentElement;              // .friend-item
+        const parent = actionsDiv.parentElement; 			// .friend-item
         parent.style.position = parent.style.position || "relative"; // for absolute menu positioning
         actionsDiv.after(toggle, menu);
       }
@@ -472,7 +571,6 @@ export const ProfileManager = {
       // Initialize the view (tabs visible immediately; content appears when data arrives)
       showFriendsTab(activeTab);
     });
-
   },
 
 
