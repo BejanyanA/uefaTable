@@ -36,6 +36,7 @@
    min-width: 120px;
    z-index: 9000;
    backdrop-filter: blur(8px);
+   animation: fadeOut 0.25s ease forwards;
    display: none;
 }
 
