@@ -1,18 +1,22 @@
 header {
+  position: fixed;
   color: white;
-  top: 15px;
-  padding: 2px 25px;
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: nowrap;
-  gap: 10px;
-  align-items: center;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.329);
+  top: 0;
   left: 0;
   right: 0;
-  position: fixed;
+  padding: 10px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* flex-wrap: nowrap; */
+  gap: 10px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.329);
   box-sizing: border-box;
+  overflow: visible;
+  height: 60px;
+  white-space: nowrap;
+  overflow-x: clip;
 }
 
 .header-username h2 {
@@ -26,20 +30,24 @@ header {
 @media (max-width: 480px) {
 
   header {
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     color: transparent;
     padding-left: 16px;
     padding-right: 16px;
     padding-top: 10px;
     padding-bottom: 10px;
     display: flex;
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+    justify-content: space-between;
     gap: 10px;
     align-items: center;
-    position: fixed;
     backdrop-filter: blur(6px);
-    max-height: 50px;
+    height: 60px;
+    overflow: visible;
+    white-space: nowrap;
+    overflow-x: clip;
   }
 
   .header-username h2 {

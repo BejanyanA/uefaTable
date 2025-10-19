@@ -1,9 +1,9 @@
 .profile-menu {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-inline-start: auto;
-    /* pushes it to the far right */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-start: auto;
+  /* pushes it to the far right */
 }
 
 /* 🌙 Dropdown container */
@@ -57,18 +57,17 @@
 
 /* Dropdown menu */
 .dropdown-content {
-  display: none;
   position: absolute;
+  top: 100%;
+  right: 0;
   background: rgba(43, 42, 42, 0.4);
   min-width: 160px;
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   z-index: 999;
   animation: fadeOut 0.25s ease forwards;
-  top: 35px;
   /* below icon */
-  right: 0;
+  display: none;
 }
 
 .dropdown-content.show {
@@ -124,15 +123,22 @@
     box-shadow: 0 0 10px rgba(235, 149, 50, 0.6);
   }
 
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
   .dropdown-trigger {
     font-size: 16px;
     padding: 10px 14px;
   }
 
   .dropdown-content {
+    top: 100%;
+    right: 0;
     min-width: 100px;
-    top: 30px;
     background: rgba(0, 0, 0, 0.9);
+    display: none;
   }
 
   .dropdown-content a {
