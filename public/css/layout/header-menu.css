@@ -65,6 +65,8 @@
   border-radius: 10px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   z-index: 999;
+  animation: fadeOut 0.25s ease forwards;
+  /* below icon */
   display: none;
 }
 
