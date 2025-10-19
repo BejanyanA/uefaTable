@@ -13,8 +13,8 @@ header {
   left: 0;
   right: 0;
   position: fixed;
-  --header-height: 30px;
-  height: var(--header-height);
+  overflow-y: hidden;
+  box-sizing: border-box;
 }
 
 .header-username h2 {
