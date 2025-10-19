@@ -5,8 +5,9 @@
 
 .profile-container {
   margin-top: 200px;
-  display: flex;
-  gap: 60px;
+  display: grid;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .tabs-container {
@@ -53,7 +54,7 @@
 /* The input field */
 .profile-item {
   /* width: 100%; */
-  width: 300px;
+  width: 400px;
   padding: 8px;
   background-color: #2a2a2a;
   color: #f0f0f0;
@@ -98,10 +99,11 @@
 .validation-error-message {
   color: red;
   font-size: 12px;
-  margin-top: 0px;
-  margin-bottom: 16px;
+  margin-top: -15px;
+  margin-bottom: 0px;
   align-self: flex-start;
   min-height: 18px;
+  padding-left: 4px;
 }
 
 #profileError-username {
@@ -144,7 +146,7 @@
   }
 
   #profileInput-id {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   .profile-row label {
@@ -153,6 +155,7 @@
     color: #dfd9d9;
     flex-shrink: 0;
     padding-bottom: 8px;
+    padding-top: 10px;
   }
 
   /* The container holding the input and the icon */
@@ -167,7 +170,7 @@
   /* The input field */
   .profile-item {
     min-width: 250px;
-    max-width: 350px;
+    max-width: 400px;
     padding: 8px;
     background-color: #2a2a2a;
     color: #f0f0f0;
@@ -211,7 +214,7 @@
 
   .validation-error-message {
     /* Align with the start of the input field, assuming label width is 150px + margin */
-    padding-left: 5px;
+    padding-left: 4px;
     margin-top: -6px;
     min-height: 18px;
     margin-bottom: 0px;
