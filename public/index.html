@@ -43,20 +43,6 @@
     <div class="language-auth-group">
       <div class="language-switcher">
         <img src="assets/flags/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
-        <div id="langDropdown" class="dropdown-menu">
-          <div class="language-option" onclick="setLanguage('en')">
-            <img src="assets/flags/en.svg" />
-            <span>English</span>
-          </div>
-          <div class="language-option" onclick="setLanguage('am')">
-            <img src="assets/flags/am.svg" />
-            <span>Հայերեն</span>
-          </div>
-          <div class="language-option" onclick="setLanguage('fr')">
-            <img src="assets/flags/fr.svg" />
-            <span>Français</span>
-          </div>
-        </div>
       </div>
       <div class="auth-buttons" style="display: none;" id="authButtons">
         <button onclick="openModal('loginModal')" id="loginBtn">Login</button>
@@ -73,14 +59,30 @@
         <div class="user-icon" id="userIcon" tabindex="0">
           <i class="fa fa-user"></i>
         </div>
-        <div class="dropdown-content" id="dropdownMenu">
-          <a href="#" id="profile">👤 Profile</a>
-          <a href="#" id="friends">🤝 Friends</a>
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
       </div>
     </div>
   </header>
+
+  <div id="langDropdown" class="dropdown-menu">
+    <div class="language-option" onclick="setLanguage('en')">
+      <img src="assets/flags/en.svg" />
+      <span>English</span>
+    </div>
+    <div class="language-option" onclick="setLanguage('am')">
+      <img src="assets/flags/am.svg" />
+      <span>Հայերեն</span>
+    </div>
+    <div class="language-option" onclick="setLanguage('fr')">
+      <img src="assets/flags/fr.svg" />
+      <span>Français</span>
+    </div>
+  </div>
+
+  <div class="dropdown-content" id="dropdownMenu">
+    <a href="#" id="profile">👤 Profile</a>
+    <a href="#" id="friends">🤝 Friends</a>
+    <a href="#" id="logoutBtn">🚪 Logout</a>
+  </div>
 
   <div class="root">
     <div class="content-wrapper">
