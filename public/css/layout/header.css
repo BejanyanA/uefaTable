@@ -1,19 +1,17 @@
 header {
   color: white;
-  margin-top: 15px;
-  padding: 6px 25px;
+  top: 15px;
+  padding: 2px 25px;
   display: flex;
   justify-content: flex-end;
   flex-wrap: nowrap;
   gap: 10px;
   align-items: center;
-  z-index: 2;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.329);
-  top: 0;
   left: 0;
   right: 0;
   position: fixed;
-  overflow-y: hidden;
   box-sizing: border-box;
 }
 
@@ -28,38 +26,24 @@ header {
 @media (max-width: 480px) {
 
   header {
-    color: transparent;
-    margin-top: 0px;
     top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    color: transparent;
     padding-left: 16px;
     padding-right: 16px;
     padding-top: 10px;
-    padding-bottom: 0px;
+    padding-bottom: 10px;
     display: flex;
     justify-content: flex-end;
     flex-wrap: nowrap;
     gap: 10px;
     align-items: center;
-    z-index: 2;
     position: fixed;
     backdrop-filter: blur(6px);
+    max-height: 50px;
   }
 
   .header-username h2 {
     font-size: 12px;
     color: #fff;
   }
-
-  .profile-menu {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-inline-start: auto;
-    /* pushes it to the far right */
-  }
-
-
 }

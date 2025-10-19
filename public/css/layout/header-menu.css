@@ -1,3 +1,11 @@
+.profile-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-inline-start: auto;
+    /* pushes it to the far right */
+}
+
 /* 🌙 Dropdown container */
 .user-icon {
   width: 30px;
