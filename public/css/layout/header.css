@@ -46,6 +46,7 @@ header {
     z-index: 2;
     position: fixed;
     backdrop-filter: blur(6px);
+    overflow: hidden;
   }
 
   .header-username h2 {

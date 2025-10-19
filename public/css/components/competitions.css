@@ -104,6 +104,7 @@
             margin-inline: 0;
             padding-top: 70px;
             width: 100%;
+            overflow: hidden;
         }
 
         #bannerContainerWrapper {
@@ -139,8 +140,6 @@
             justify-content: center;
             gap: 40px;
             padding-top: 20px;
-            /* flex-wrap: wrap; */
-            /* margin: 2%; */
             padding-bottom: 50px;
         }
 
