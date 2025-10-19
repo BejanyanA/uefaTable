@@ -242,24 +242,65 @@ export const ProfileManager = {
 
 
 /**
- * Renders the Personal Details view with editable fields.
+ * Renders the Personal Details view with editable fields and validation.
  * @param {object} userData - The user data object.
  * @param {HTMLElement} container - The element to render the content into.
  * @param {object} translation - The language map.
  * @param {object} stateHandlers - Object containing setActive and resetActive functions.
  */
 function renderPersonalDetails(userData, container, translation, stateHandlers) {
-  container.innerHTML = ''; // Ensure container is empty
+  container.innerHTML = '';
 
-  // Define Icon Paths (redundant if using global, but safer for standalone function)
+  // Define Icon Paths (for context)
   const ICON_EDIT = "assets/icons/edit.svg";
   const ICON_SAVE = "assets/icons/save_checkmark.svg";
+
+  // Assume helper functions are globally available:
+  // detectSpace(value), isValidEmail(value), setError(elementId, message), clearErrors(elementIds), apiPost(url, data, token), showToast(message, type)
 
   const fields = [
     { key: 'id', label: translation.id || 'ID', disabled: true },
     { key: 'username', label: translation.username || 'Username', disabled: false },
     { key: 'email', label: translation.email || 'Email', disabled: false }
   ];
+
+  // --- Core Validation Logic ---
+  const validateField = (key, value, errorEl) => {
+    // Clear previous errors for this field
+    if (typeof clearErrors === 'function') clearErrors([errorEl.id]);
+    errorEl.textContent = ""; // Clear visual text
+
+    let hasError = false;
+
+    if (key === 'username') {
+      if (!value.trim()) {
+        setError(errorEl.id, translation.required);
+        hasError = true;
+      } else if (value.trim().length < 3) {
+        setError(errorEl.id, translation.shortUsername);
+        hasError = true;
+      } else if (value.trim().length > 15) {
+        setError(errorEl.id, translation.longUsername);
+        hasError = true;
+      } else if (typeof detectSpace === 'function' && detectSpace(value.trim())) {
+        setError(errorEl.id, translation.no_spaces_allowed);
+        hasError = true;
+      }
+    }
+
+    if (key === 'email') {
+      if (!value.trim()) {
+        setError(errorEl.id, translation.required);
+        hasError = true;
+      } else if (typeof isValidEmail === 'function' && !isValidEmail(value)) {
+        setError(errorEl.id, translation.invalidEmail);
+        hasError = true;
+      }
+    }
+
+    return hasError;
+  };
+  // ---------------------------
 
   fields.forEach(({ key, label, disabled }) => {
     const row = document.createElement('div');
@@ -275,12 +316,11 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     const input = document.createElement('input');
     input.type = 'text';
-    input.id = key;
+    input.id = `profileInput-${key}`; // Unique ID for input
     input.value = userData[key];
-    input.dataset.originalValue = userData[key]; // Store original value
+    input.dataset.originalValue = userData[key];
     input.className = 'profile-item';
 
-    // --- IMPORTANT: Set initial state ---
     input.disabled = true;
     if (disabled) {
       input.disabled = true;
@@ -288,32 +328,31 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     inputContainer.appendChild(input);
 
+    // --- Error Element Creation (New) ---
+    const errorEl = document.createElement('div');
+    errorEl.id = `profileError-${key}`; // Unique ID for error message
+    errorEl.className = 'validation-error-message';
+    // Note: The error element is added outside the inputContainer for proper layout
+
     // --- Editable Field Logic ---
     if (!disabled) {
       const editIcon = document.createElement("img");
-      editIcon.src = ICON_EDIT; // Initial edit icon
+      editIcon.src = ICON_EDIT;
       editIcon.alt = "Edit";
       editIcon.className = 'edit-icon';
 
-      let hasChanged = false; // Tracks if input value is different from originalValue
+      let hasChanged = false;
 
       // Function to handle the icon click (Edit/Save)
-      const handleIconClick = () => {
+      const handleIconClick = async () => {
         if (input.disabled) {
-          // Case 1: Disabled (non-editable) -> Enable editing
-
-          // 1. Reset any other active editing field first
+          // Case 1: Disabled -> Enable editing
           stateHandlers.resetActive();
-
-          // 2. Set this field as the new active one
-          // 🎯 FIX: Explicitly set the active elements here
           stateHandlers.setActive(input, editIcon);
 
-          // 3. Enable the input
           input.disabled = false;
           input.focus();
 
-          // 4. Update the icon to 'Save' state
           editIcon.src = ICON_SAVE;
           editIcon.alt = translation.save || 'Save';
           editIcon.classList.add('save-icon');
@@ -321,53 +360,103 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
         } else if (hasChanged) {
           // Case 2: Enabled AND has changed -> Save action 
 
-          // ... (API CALL HERE) ...
+          const currentValue = input.value;
 
-          // 1. Reset state
+          // 1. Run client-side validation
+          const validationFailed = validateField(key, currentValue, errorEl);
+          if (validationFailed) {
+            // Stop the save process if validation fails
+            return;
+          }
+
+          // 2. Disable input temporarily while sending
           input.disabled = true;
-          input.dataset.originalValue = input.value;
-          hasChanged = false;
 
-          // 2. Revert icon to 'Edit' state
+          try {
+            const token = localStorage.getItem("authToken");
+
+            // 3. Send API request only for the field being edited
+            const payload = { [key]: currentValue };
+            const updateData = await apiPost("/user-update", payload, token); // Assuming a generic update endpoint
+
+            if (updateData.success) {
+              showToast(translation.updated_success || "Successfully Updated", "success");
+
+              // 4. Final Reset State (Success)
+              input.dataset.originalValue = currentValue;
+              hasChanged = false;
+
+            } else {
+              // 5. Handle Server Errors (e.g., username/email exists)
+              const errors = updateData.errors;
+
+              if (errors && errors[key]) {
+                // Specific field error returned by API
+                setError(errorEl.id, errors[key] === "exists" ? translation[`${key}_exists`] : errors[key]);
+                hasChanged = true; // Keep state active to allow correction
+                input.disabled = false; // Re-enable for correction
+                input.focus();
+                return;
+              } else {
+                showToast(updateData.message || translation.update_failed, "error");
+              }
+
+              // Re-enable input if update failed for a general reason
+              input.disabled = false;
+              input.focus();
+              return;
+            }
+          } catch (err) {
+            showToast(translation.something_went_wrong, "error");
+            console.error("Update Error:", err);
+            input.disabled = false; // Re-enable on failure
+            input.focus();
+            return;
+          }
+
+          // 6. Final UI Reset after successful save
           editIcon.src = ICON_EDIT;
           editIcon.alt = translation.edit || 'Edit';
           editIcon.classList.remove('save-icon');
-
-          // 3. Clear active elements after saving
           stateHandlers.setActive(null, null);
 
         } else {
-          // Case 3: Enabled but NO changes -> Disable editing (Tapping the edit icon again)
+          // Case 3: Enabled but NO changes -> Disable editing 
           input.disabled = true;
 
-          // Revert icon to 'Edit' state
+          // Clear any lingering errors if the user didn't change anything
+          if (typeof clearErrors === 'function') clearErrors([errorEl.id]);
+          errorEl.textContent = "";
+
           editIcon.src = ICON_EDIT;
           editIcon.alt = translation.edit || 'Edit';
           editIcon.classList.remove('save-icon');
 
-          // Clear active elements
           stateHandlers.setActive(null, null);
         }
       };
 
-      // Input change listener: only changes the icon state if the text changes
+      // Input change listener: turn icon to save state if text changes
       input.addEventListener('input', () => {
         const changed = input.value !== input.dataset.originalValue;
 
+        // Clear errors on change if the input is valid again
+        if (typeof clearErrors === 'function') clearErrors([errorEl.id]);
+        errorEl.textContent = "";
+
         if (changed && !hasChanged) {
           hasChanged = true;
-          editIcon.src = ICON_SAVE; // Show save icon
+          editIcon.src = ICON_SAVE;
           editIcon.alt = translation.save || 'Save';
           editIcon.classList.add('save-icon');
         } else if (!changed && hasChanged) {
           hasChanged = false;
-          editIcon.src = ICON_EDIT; // Show edit icon
+          editIcon.src = ICON_EDIT;
           editIcon.alt = translation.edit || 'Edit';
           editIcon.classList.remove('save-icon');
         }
       });
 
-      // Set up initial click behavior
       editIcon.addEventListener('click', handleIconClick);
 
       inputContainer.appendChild(editIcon);
@@ -375,5 +464,10 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     row.appendChild(inputContainer);
     container.appendChild(row);
+
+    // Add error element below the input row for better visibility
+    if (!disabled) {
+      container.appendChild(errorEl);
+    }
   });
 }

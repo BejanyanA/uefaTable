@@ -6,7 +6,7 @@ import { handleAddFriends, handleDeleteFriend, handleRejectFriend, handleApprove
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
 import { handleGetApprovedFriends, handleGetAllFriendsStatuses, handleSearchFriendByUsername } from './routes_endpoints/get_friends.js';
 
-import { handleUserDetails } from './routes_endpoints/get_user_data.js';
+import { handleGetUserDetails, handleUpdateUserDetails } from './routes_endpoints/user_data.js';
 
 
 // Club
@@ -53,7 +53,8 @@ const routeRegistry = {
   "/user-reject": { POST: handleRejectFriend },
   "/user-approve": { POST: handleApproveFriends },
 
-  "/user-details": { GET: handleUserDetails },
+  "/user-details": { GET: handleGetUserDetails },
+  "/user-update": { POST: handleUpdateUserDetails },
 
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
