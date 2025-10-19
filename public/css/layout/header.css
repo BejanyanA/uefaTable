@@ -16,7 +16,6 @@ header {
   overflow: visible;
   height: 60px;
   white-space: nowrap;
-  overflow-x: clip;
 }
 
 .header-username h2 {
@@ -47,7 +46,6 @@ header {
     height: 60px;
     overflow: visible;
     white-space: nowrap;
-    overflow-x: clip;
   }
 
   .header-username h2 {
