@@ -140,6 +140,7 @@ export const FriendManager = {
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
             document.getElementById("friendsContainer").style.display = "none";
+            document.getElementById("profileContainer").style.display = "none";
           } else {
             localStorage.removeItem("authToken");
             if (authButtons) authButtons.style.display = "flex";
@@ -152,12 +153,13 @@ export const FriendManager = {
         }
       });
 
-      section.appendChild(homeButton); // Add Back button
+      section.appendChild(homeButton); 
 
 
       document.getElementById("headerUsername").style.display = "block";
       document.getElementById("profileMenu").style.display = "block";
       document.getElementById("friendsContainer").style.display = "block";
+      document.getElementById("profileContainer").style.display = "none";
       document.getElementById("bannerContainer").style.display = "none";
       document.getElementById("stageContainer").style.display = "none";
       document.getElementById("leagueType1").style.display = "none";

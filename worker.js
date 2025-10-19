@@ -2,9 +2,12 @@ import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
-import { handleGetApprovedFriends, handleGetAllFriendsStatuses, handleSearchFriendByUsername } from './routes_endpoints/get_friends.js';
 import { handleAddFriends, handleDeleteFriend, handleRejectFriend, handleApproveFriends } from './routes_endpoints/friend_actions.js';
 import { handleLeagues, handleLeaguesCreate, handleCreateRoundKnockouts, handleLeaguesEdit, handleLeaguesDelete } from './routes_endpoints/leagues.js';
+import { handleGetApprovedFriends, handleGetAllFriendsStatuses, handleSearchFriendByUsername } from './routes_endpoints/get_friends.js';
+
+import { handleUserDetails } from './routes_endpoints/get_user_data.js';
+
 
 // Club
 import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/leagues/attach_player.js';
@@ -49,6 +52,8 @@ const routeRegistry = {
   "/user-delete": { POST: handleDeleteFriend },
   "/user-reject": { POST: handleRejectFriend },
   "/user-approve": { POST: handleApproveFriends },
+
+  "/user-details": { GET: handleUserDetails },
 
   "/leagues": { POST: handleLeagues },
   "/create-leagues": { POST: handleLeaguesCreate },
