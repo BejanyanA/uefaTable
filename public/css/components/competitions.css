@@ -1,109 +1,34 @@
-#banner-wrap {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    margin: 20px auto;
-}
-
-#banner-title {
-    display: block;
-    font-size: 24px;
-    color: white;
-    margin-left: 10px;
-    width: 100%;
-    max-width: 100%;
-    text-align: center;
-    margin-bottom: -15px;
-    background-color: rgba(48, 47, 47, 0.342);
-    border-radius: 10px;
-}
-
-#bannerContainerWrapper {
-    display: flex;
-    justify-content: center;
-}
-
-#competition-types {
-    font-size: 36px;
-    color: white;
-    width: fit-content;
-    margin-top: 30px;
-    padding: 80px 20px 20px;
-    text-align: center;
-}
-
-.banner {
-    height: 300px;
-    width: 430px;
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 10px;
-    /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); */
-    flex-direction: column;
-    justify-content: end;
-    align-items: center;
-    transition: transform 0.3s ease-in-out;
-}
-
-.banner:hover {
-    transform: scale(1.05);
-    /* Slight zoom on hover */
-}
-
-.banner-wrap {
-
-    flex-direction: row;
-    position: relative;
-    display: flex;
-    margin-left: 30px;
-    margin-right: 15px;
-
-}
-
-#banner1 {
-
-    background-image: url('../../assets/images/champLeaOnlyCup.png');
-}
-
-#banner2 {
-
-    background-image: url('../../assets/images/eur2OnlyCup.png');
-}
-
-#banner3 {
-
-    background-image: url('../../assets/images/europ3OnlyCup.png');
-}
-
-#banner4 {
-
-    background-image: url('../../assets/images/wrld4OnlyCup.png');
-}
-
-
-
-
-/* Mobile */
-@media (max-width: 480px) {
-
-    #banner-title {
-        display: block;
-        text-align: center;
-        font-size: 16px;
-        margin-left: 10px;
-        /* max-width: 100%; */
+    .banner-container {
+        margin-inline: 0;
+        padding-top: 100px;
         width: 100%;
     }
 
-    .banner-container {
-        margin-inline: 0;
-        padding-top: 70px;
-        /* padding: 10px 10px; */
+    .banner-wrap {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        padding: 20px auto;
+        flex-direction: row;
+        position: relative;
+        display: flex;
+        padding-left: 15px;
+        padding-right: 15px;
+
+    }
+
+    #banner-title {
+        display: block;
+        font-size: 24px;
+        color: white;
+        padding-left: 10px;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: -15px;
+        background-color: rgba(48, 47, 47, 0.342);
+        border-radius: 10px;
     }
 
     #bannerContainerWrapper {
@@ -112,59 +37,131 @@
     }
 
     #competition-types {
-        font-size: 25px;
+        font-size: 36px;
         color: white;
         width: fit-content;
-        padding: 5px 20px;
+        padding: 80px 20px;
         text-align: center;
-        margin-top: 10px;
+        margin: 0px;
     }
 
     .banner {
+        height: 300px;
+        width: 430px;
+        cursor: pointer;
+        position: relative;
         display: flex;
-        margin-bottom: 20px;
-        height: 150px;
-        width: 300px;
-        justify-content: flex-start;
-        /* left alignment */
-        flex-direction: column;
-        align-items: center;
-        justify-content: end;
-        align-items: flex-end;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        margin-top: 15px;
+        border-radius: 10px;
+        /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); */
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        transition: transform 0.3s ease-in-out;
     }
 
-    #banner-wrap {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        padding-bottom: 10px;
-        /* flex-wrap: wrap; */
-        /* margin: 2%; */
-        margin-bottom: 50px;
+    .banner:hover {
+        transform: scale(1.05);
+        /* Slight zoom on hover */
     }
-
 
     #banner1 {
 
-        background-image: url('../../assets/images/champLeaMobOnlyCup.png') !important;
+        background-image: url('../../assets/images/champLeaOnlyCup.png');
     }
 
     #banner2 {
 
-        background-image: url('../../assets/images/eur2MobOnlyCup.png') !important;
+        background-image: url('../../assets/images/eur2OnlyCup.png');
     }
 
     #banner3 {
 
-        background-image: url('../../assets/images/europ3MobOnlyCup.png') !important;
+        background-image: url('../../assets/images/europ3OnlyCup.png');
     }
 
     #banner4 {
 
-        background-image: url('../../assets/images/wrld4MobOnlyCup.png') !important;
+        background-image: url('../../assets/images/wrld4OnlyCup.png');
     }
-}
+
+
+
+
+    /* Mobile */
+    @media (max-width: 480px) {
+
+        #banner-title {
+            display: block;
+            text-align: center;
+            font-size: 16px;
+            padding-left: 10px;
+        }
+
+        .banner-container {
+            margin-inline: 0;
+            padding-top: 70px;
+            width: 100%;
+        }
+
+        #bannerContainerWrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        #competition-types {
+            font-size: 25px;
+            color: white;
+            width: fit-content;
+            padding: 20px 10px;
+            text-align: center;
+        }
+
+        .banner {
+            display: flex;
+            height: 150px;
+            width: 300px;
+            justify-content: flex-start;
+            /* left alignment */
+            flex-direction: column;
+            align-items: center;
+            justify-content: end;
+            align-items: flex-end;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .banner-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding-top: 20px;
+            /* flex-wrap: wrap; */
+            /* margin: 2%; */
+            padding-bottom: 50px;
+        }
+
+
+        #banner1 {
+
+            background-image: url('../../assets/images/champLeaMobOnlyCup.png') !important;
+        }
+
+        #banner2 {
+
+            background-image: url('../../assets/images/eur2MobOnlyCup.png') !important;
+        }
+
+        #banner3 {
+
+            background-image: url('../../assets/images/europ3MobOnlyCup.png') !important;
+        }
+
+        #banner4 {
+
+            background-image: url('../../assets/images/wrld4MobOnlyCup.png') !important;
+        }
+    }
