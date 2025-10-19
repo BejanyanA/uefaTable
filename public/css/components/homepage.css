@@ -1,0 +1,45 @@
+#homeButton {
+  top: 87px;
+  left: 25px;
+  z-index: 1;
+  color: white;
+  background: #1d1d1d;
+  padding: 6px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+  white-space: nowrap;
+  width: auto;
+  text-align: center;
+  box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  position: fixed;
+}
+
+#homeButton:hover {
+  background: black;
+}
+
+#homeButton:active {
+  transform: scale(0.96);
+}
+
+
+
+@media (max-width: 480px) {
+
+  #homeButton {
+    font-size: 12px;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s, transform 0.1s;
+    white-space: nowrap;
+    width: auto;
+    text-align: center;
+    box-sizing: content-box;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    position: fixed;
+    margin-top: -17px;
+    margin-left: -11px;
+  }
+}

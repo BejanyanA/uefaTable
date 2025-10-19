@@ -106,7 +106,7 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
 
 
-export const ProfileManager = {
+export const FriendManager = {
 
   openFriends: async function () {
     const translation = langMap[currentLang];
@@ -204,7 +204,7 @@ export const ProfileManager = {
       tabsHeader.appendChild(rejectedTabBtn);
       section.appendChild(tabsHeader);
 
-      ProfileManager.addFriends();
+      FriendManager.addFriends();
 
       // Container row for items
       const rowContainer = document.createElement("div");
