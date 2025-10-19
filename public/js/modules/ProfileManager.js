@@ -390,16 +390,36 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
               // 5. Handle Server Errors (e.g., username/email exists)
               const errors = updateData.errors;
 
-              if (errors && errors[key]) {
-                // Specific field error returned by API
-                setError(errorEl.id, errors[key] === "exists" ? translation[`${key}_exists`] : errors[key]);
-                hasChanged = true; // Keep state active to allow correction
-                input.disabled = false; // Re-enable for correction
-                input.focus();
-                return;
+              // --- 🎯 MODIFIED BLOCK START ---
+              if (errors) {
+                let fieldError = null;
+
+                if (key === 'username' && errors.username) {
+                  fieldError = translation.username_exists;
+                } else if (key === 'email' && errors.email) {
+                  fieldError = translation.email_exists;
+                }
+                // Note: Password error is irrelevant here as it's not being edited
+
+                if (fieldError) {
+                  // Error is specific to the field being edited
+                  setError(errorEl.id, fieldError);
+
+                  // Keep field open for user correction
+                  hasChanged = true;
+                  input.disabled = false;
+                  input.focus();
+                  return;
+                } else {
+                  // Generic update failure or error for a different field
+                  showToast(updateData.message || translation.update_failed || "Update failed", "error");
+                }
+
               } else {
-                showToast(updateData.message || translation.update_failed, "error");
+                // Fallback for a non-json/non-error response from API
+                showToast(translation.update_failed || "Update failed", "error");
               }
+              // --- 🎯 MODIFIED BLOCK END ---
 
               // Re-enable input if update failed for a general reason
               input.disabled = false;
