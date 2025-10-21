@@ -56,7 +56,7 @@ export async function handleGetUserDetails(request, env) {
 
 export async function handleUpdateUserDetails(request, env) {
     try {
-        // 1) Auth
+        // 1️⃣ Auth check
         const authHeader = request.headers.get("Authorization");
         if (!authHeader?.startsWith("Bearer ")) {
             return jsonResponse({ success: false, message: "Unauthorized" }, 401);
@@ -66,107 +66,154 @@ export async function handleUpdateUserDetails(request, env) {
         if (!payload) {
             return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
         }
+
         const loggedInUserId = payload.id;
 
-        // 2) Parse JSON body (defensive)
+        // 2️⃣ Parse JSON body
         let body;
         try {
             body = await request.json();
         } catch {
             return jsonResponse({ success: false, message: "invalid_json" }, 400);
         }
-        const hasUsername = Object.prototype.hasOwnProperty.call(body, "username");
-        const hasEmail = Object.prototype.hasOwnProperty.call(body, "email");
-        const hasPassword = Object.prototype.hasOwnProperty.call(body, "password");
 
-        if (!hasUsername && !hasEmail && !hasPassword) {
+        const hasUsername = "username" in body;
+        const hasEmail = "email" in body;
+        const hasPasswordChange = "currentPassword" in body && "newPassword" in body;
+
+        if (!hasUsername && !hasEmail && !hasPasswordChange) {
             return jsonResponse({ success: false, message: "no_fields_to_update" }, 400);
         }
 
         const username = hasUsername ? (body.username ?? "") : undefined;
         const email = hasEmail ? (body.email ?? "") : undefined;
-        const password = hasPassword ? (body.password ?? "") : undefined;
+        const currentPassword = hasPasswordChange ? (body.currentPassword ?? "") : undefined;
+        const newPassword = hasPasswordChange ? (body.newPassword ?? "") : undefined;
 
-        // 3) Validations (same rules as registration, but only for provided fields)
+        // 3️⃣ Validations (same as registration)
         const errors = {};
+
         if (hasUsername) {
             if (!username) errors.username = "Username is required";
-            else if (username.length > 15) errors.username = "Username must not exceed 15 characters";
+            else if (username.length > 15)
+                errors.username = "Username must not exceed 15 characters";
         }
+
         if (hasEmail) {
             if (!email) errors.email = "Email is required";
-            // keep same behavior as registration (no format regex), add if you want
         }
-        if (hasPassword) {
-            if (!password) errors.password = "Password is required";
-            else if (password.length > 30) errors.password = "Password must not exceed 30 characters";
+
+        if (hasPasswordChange) {
+            if (!currentPassword) errors.currentPassword = "Current password is required";
+            if (!newPassword) errors.newPassword = "New password is required";
+            else if (newPassword.length > 30)
+                errors.newPassword = "Password must not exceed 30 characters";
+            else if (currentPassword === newPassword)
+                errors.newPassword = "New password must be different from current password";
         }
+
         if (Object.keys(errors).length > 0) {
             return jsonResponse({ success: false, errors }, 400);
         }
 
-        // 4) Uniqueness (exclude self)
+        // 4️⃣ Uniqueness checks
         if (hasEmail) {
             const existingEmail = await env.core_data
                 .prepare(`SELECT id FROM users WHERE email = ? AND id != ?`)
                 .bind(email, loggedInUserId)
                 .first();
             if (existingEmail) {
-                return jsonResponse({ success: false, errors: { email: "email_exists" } }, 409);
+                return jsonResponse(
+                    { success: false, errors: { email: "email_exists" } },
+                    409
+                );
             }
         }
+
         if (hasUsername) {
             const existingUsername = await env.core_data
                 .prepare(`SELECT id FROM users WHERE username = ? AND id != ?`)
                 .bind(username, loggedInUserId)
                 .first();
             if (existingUsername) {
-                return jsonResponse({ success: false, errors: { username: "username_exists" } }, 409);
+                return jsonResponse(
+                    { success: false, errors: { username: "username_exists" } },
+                    409
+                );
             }
         }
 
-        // 5) Helper: hashWithSalt (in case it wasn't imported)
+        // 5️⃣ Helper for hashing
         async function hashWithSalt(pw, saltHex) {
             const enc = new TextEncoder();
             const data = enc.encode(pw + saltHex);
             const buf = await crypto.subtle.digest("SHA-256", data);
             const hashArray = Array.from(new Uint8Array(buf));
-            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+            return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
         }
 
-        // 6) Build dynamic UPDATE
+        // 6️⃣ Build dynamic UPDATE
         const sets = [];
         const binds = [];
+
         if (hasUsername) {
             sets.push(`username = ?`);
             binds.push(username.trim());
         }
+
         if (hasEmail) {
             sets.push(`email = ?`);
             binds.push(email.trim());
         }
-        if (hasPassword) {
-            const saltArray = crypto.getRandomValues(new Uint8Array(16));
-            const salt = Array.from(saltArray).map(b => b.toString(16).padStart(2, "0")).join("");
-            const password_hash = await hashWithSalt(password, salt);
+
+        // 7️⃣ Handle password change
+        if (hasPasswordChange) {
+            // Fetch user's current password hash + salt
+            const user = await env.core_data
+                .prepare(`SELECT password_hash, salt FROM users WHERE id = ?`)
+                .bind(loggedInUserId)
+                .first();
+
+            if (!user) {
+                return jsonResponse({ success: false, message: "user_not_found" }, 404);
+            }
+
+            // Verify current password
+            const currentHash = await hashWithSalt(currentPassword, user.salt);
+            if (currentHash !== user.password_hash) {
+                return jsonResponse(
+                    { success: false, errors: { currentPassword: "invalid_current_password" } },
+                    400
+                );
+            }
+
+            // Hash new password with new salt
+            const newSaltArray = crypto.getRandomValues(new Uint8Array(16));
+            const newSalt = Array.from(newSaltArray)
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
+            const newPasswordHash = await hashWithSalt(newPassword, newSalt);
+
             sets.push(`password_hash = ?`);
-            binds.push(password_hash);
+            binds.push(newPasswordHash);
             sets.push(`salt = ?`);
-            binds.push(salt);
-        }
-        // Ensure we’re not executing an empty SET (shouldn’t happen due to earlier check)
-        sets.push(`updated_at = CURRENT_TIMESTAMP`);
-
-        const sql = `UPDATE users SET ${sets.join(", ")} WHERE id = ?`;
-        binds.push(loggedInUserId);
-
-        const res = await env.core_data.prepare(sql).bind(...binds).run();
-        if (res.rowsAffected === 0) {
-            return jsonResponse({ success: false, message: "user_not_found" }, 404);
+            binds.push(newSalt);
         }
 
-        // 7) Return fresh record
-        const user = await env.core_data
+        // 8️⃣ Add updated_at if exists
+        if (sets.length > 0 && await columnExists(env, "users", "updated_at")) {
+            sets.push(`updated_at = CURRENT_TIMESTAMP`);
+        }
+
+        // 9️⃣ Execute update
+        if (sets.length > 0) {
+            const sql = `UPDATE users SET ${sets.join(", ")} WHERE id = ?`;
+            binds.push(loggedInUserId);
+            await env.core_data.prepare(sql).bind(...binds).run();
+        }
+
+        // 🔟 Return fresh data
+        const updatedUser = await env.core_data
             .prepare(`SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?`)
             .bind(loggedInUserId)
             .first();
@@ -175,18 +222,24 @@ export async function handleUpdateUserDetails(request, env) {
             success: true,
             data: {
                 user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    created_at: user.created_at,
-                    updated_at: user.updated_at
-                }
-            }
+                    id: updatedUser.id,
+                    username: updatedUser.username,
+                    email: updatedUser.email,
+                    created_at: updatedUser.created_at,
+                    updated_at: updatedUser.updated_at ?? null,
+                },
+            },
         }, 200);
-
     } catch (err) {
-        // Last-chance guard with minimal leak
-        // Optionally log more details to a private logger here
+        console.error("Update user error:", err);
         return jsonResponse({ success: false, message: "update_failed" }, 500);
     }
+}
+
+// Helper — checks if column exists (safe for older DBs)
+async function columnExists(env, table, column) {
+    const res = await env.core_data.prepare(
+        `PRAGMA table_info(${table})`
+    ).all();
+    return res.results.some((r) => r.name === column);
 }

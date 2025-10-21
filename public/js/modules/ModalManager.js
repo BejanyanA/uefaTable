@@ -58,6 +58,6 @@ export const ModalManager = {
 
     const isPassword = input.type === "password";
     input.type = isPassword ? "text" : "password";
-    iconElement.src = isPassword ? "assets/icons/eye-off.png" : "assets/icons/eye.png";
+    iconElement.src = isPassword ? "assets/icons/eye.png" : "assets/icons/eye-off.png";
   }
 };

@@ -655,11 +655,11 @@ function renderPasswordDetails(userData, container, translation) {
       } else if (newPassValue === usernameValue) {
         setError(errorEls.newPassword.id, translation.passMatchUsername);
         hasError = true;
-      } else if (typeof isValidPassword === 'function' && !isValidPassword(newPassValue)) {
-        setError(errorEls.newPassword.id, translation.invalidPassword);
-        hasError = true;
       } else if (newPassValue.length > 30) {
         setError(errorEls.newPassword.id, translation.longPassword);
+        hasError = true;
+      } else if (typeof isValidPassword === 'function' && !isValidPassword(newPassValue)) {
+        setError(errorEls.newPassword.id, translation.invalidPassword);
         hasError = true;
       } else if (typeof detectSpace === 'function' && detectSpace(newPassValue)) {
         setError(errorEls.newPassword.id, translation.no_spaces_allowed);
@@ -692,7 +692,8 @@ function renderPasswordDetails(userData, container, translation) {
     try {
       const token = localStorage.getItem("authToken");
       const payload = {
-        password: inputs.newPassword.value
+        currentPassword: inputs.currentPassword.value,
+        newPassword: inputs.newPassword.value,
       };
 
       const updateData = await apiPost("/user-update", payload, token); // Assuming new API endpoint
@@ -713,7 +714,9 @@ function renderPasswordDetails(userData, container, translation) {
         const errors = updateData.errors;
 
         if (errors && errors.currentPassword) {
-          setError(errorEls.currentPassword.id, translation.incorrect_current_password || "Incorrect current password.");
+          setError(errorEls.currentPassword.id, translation.wrong_current_password || "Current password is wrong");
+        } else if (errors && errors.newPassword) {
+          setError(errorEls.newPassword.id, translation.new_password_natch_current_password || "New password matches current password");
         } else {
           showToast(updateData.message || translation.password_update_failed || "Password update failed.", "error");
         }

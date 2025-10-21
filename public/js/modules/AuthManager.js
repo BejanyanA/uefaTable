@@ -146,11 +146,11 @@ export const AuthManager = {
       } else if (regPasswordInput.value === regUsernameInput.value) {
         setError("regPasswordError", translation.passMatchUsername);
         hasError = true;
-      } else if (!isValidPassword(regPasswordInput.value.trim())) {
-        setError("regPasswordError", translation.invalidPassword);
-        hasError = true;
       } else if (regPasswordInput.value.trim().length > 30) {
         setError("regPasswordError", translation.longPassword);
+        hasError = true;
+      } else if (!isValidPassword(regPasswordInput.value.trim())) {
+        setError("regPasswordError", translation.invalidPassword);
         hasError = true;
       } else if (detectSpace(regPasswordInput.value.trim())) {
         setError("regPasswordError", translation.no_spaces_allowed);
