@@ -41,6 +41,7 @@ export const ProfileManager = {
     // Define Icon Paths
     const ICON_EDIT = "assets/icons/edit.svg";
     const ICON_SAVE = "assets/icons/save_checkmark.svg"; // Your checkmark SVG/Image
+
     // -----------------------------------------------------------
 
     // Helper function to reset the editing state
@@ -173,18 +174,28 @@ export const ProfileManager = {
     section.appendChild(tabsHeader);
 
     // Container for tab content
-    const contentContainer = document.createElement("div");
-    contentContainer.className = "profile-container";
-    contentContainer.id = "profileContainer";
-    section.appendChild(contentContainer);
+    const contentWrapper = document.createElement("div");
+    contentWrapper.className = "profile-container";
+    contentWrapper.id = "profileContent"; // The flex container for the two columns
+    section.appendChild(contentWrapper);
 
-    // 🎯 State Update: Force activeTab to "personal" and remove localStorage access
-    let activeTab = "personal"; // ALWAYS starts on Personal Details
+    // 1. Column for Personal Info (Left)
+    const personalInfoColumn = document.createElement("div");
+    personalInfoColumn.className = "profile-column";
+    personalInfoColumn.id = "personalInfoColumn";
+    contentWrapper.appendChild(personalInfoColumn);
 
-    // 🎯 Tab Switching Logic
+    // 2. Column for Password Change (Right)
+    const passwordChangeColumn = document.createElement("div");
+    passwordChangeColumn.className = "profile-column";
+    passwordChangeColumn.id = "passwordChangeColumn";
+    contentWrapper.appendChild(passwordChangeColumn);
+
+    let activeTab = "personal";
+
+    // 🎯 Tab Switching Logic - NOW MANAGES COLUMN VISIBILITY
     const showProfileTab = (tabName) => {
       activeTab = tabName;
-      // localStorage.setItem("activeProfileTab", tabName); <-- REMOVED
 
       // Set active class on buttons
       [personalTabBtn, achievementTabBtn].forEach(btn => {
@@ -195,17 +206,18 @@ export const ProfileManager = {
         }
       });
 
-      // Render content based on active tab
-      contentContainer.innerHTML = ''; // Clear previous content
-
       if (tabName === "personal") {
-        // Fetch data for Personal Details tab
+        personalInfoColumn.style.display = 'block';
+        passwordChangeColumn.style.display = 'block';
+        personalInfoColumn.innerHTML = '';
+        passwordChangeColumn.innerHTML = ''; // Clear right column initially
         getUserData.initGetUserPersonalDetailes();
-        contentContainer.innerHTML = `<p>${translation.loading || 'Loading personal details...'}</p>`;
 
       } else if (tabName === "achievements") {
-        // Achievements tab content (skipped for now)
-        contentContainer.textContent = translation.achievementsContent || 'Achievements content goes here.';
+        personalInfoColumn.style.display = 'none';
+        passwordChangeColumn.style.display = 'none';
+        // Display achievements content directly in the main contentWrapper (or create a new container)
+        contentWrapper.innerHTML = `<div style="flex-basis: 100%;">${translation.achievementsContent || 'Achievements content goes here.'}</div>`;
       }
     };
 
@@ -225,15 +237,11 @@ export const ProfileManager = {
       const userData = payload?.data?.user;
 
       if (userData && activeTab === "personal") {
-        // Pass the active element tracking objects to renderPersonalDetails
-        // Use resetActiveEditingState directly
-        renderPersonalDetails(userData, contentContainer, translation, {
-          setActive: (input, icon) => {
-            activeInput = input;
-            activeIcon = icon;
-          },
-          resetActive: resetActiveEditingState
-        });
+        // Render Left Column (ID, Username, Email)
+        renderPersonalDetails(userData, personalInfoColumn, translation, { setActive: (input, icon) => { activeInput = input; activeIcon = icon; }, resetActive: resetActiveEditingState });
+
+        // Render Right Column (Password Fields)
+        renderPasswordDetails(userData, passwordChangeColumn, translation);
       }
     };
   }, // end _renderProfileView
@@ -306,16 +314,18 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
     const row = document.createElement('div');
     row.className = 'profile-row';
 
+    // --- 1. Label Element (Goes into 'label' area) ---
     const labelEl = document.createElement('label');
-    labelEl.textContent = label;
-    labelEl.htmlFor = key;
-    row.appendChild(labelEl);
+    labelEl.textContent = label + ':'; // Added colon for visual separation
+    labelEl.htmlFor = `profileInput-${key}`;
+    row.appendChild(labelEl); // Append label first
 
+    // --- 2. Input Container (Goes into 'input-group' area) ---
     const inputContainer = document.createElement('div');
     inputContainer.className = 'profile-row-item';
 
     const input = document.createElement('input');
-    input.type = 'text';
+    input.type = (key === 'email' ? 'email' : 'text'); // Better practice for email
     input.id = `profileInput-${key}`; // Unique ID for input
     input.value = userData[key];
     input.dataset.originalValue = userData[key];
@@ -328,7 +338,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     inputContainer.appendChild(input);
 
-    // --- Error Element Creation (New) ---
+    // --- 3. Error Element (Goes into 'error' area) ---
     const errorEl = document.createElement('div');
     errorEl.id = `profileError-${key}`; // Unique ID for error message
     errorEl.className = 'validation-error-message';
@@ -483,11 +493,226 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
     }
 
     row.appendChild(inputContainer);
-    container.appendChild(row);
 
     // Add error element below the input row for better visibility
     if (!disabled) {
-      container.appendChild(errorEl);
+      row.appendChild(errorEl);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+/**
+ * Renders the Password Change section.
+ * @param {object} userData - The user data object (for context/API).
+ * @param {HTMLElement} container - The column element to render the content into (Right Column).
+ * @param {object} translation - The language map.
+ */
+function renderPasswordDetails(userData, container, translation) {
+  container.innerHTML = ''; // Clear the container
+
+  const ICON_EYE = "assets/icons/eye.png";
+  const ICON_EYE_OFF = "assets/icons/eye-off.png";
+
+  function createVisibilityToggle(inputElement) {
+    const icon = document.createElement('img');
+    icon.src = ICON_EYE_OFF; // Start with the 'off' icon (password hidden)
+    icon.alt = 'Toggle Password Visibility';
+    icon.className = 'visibility-toggle-icon'; // Use a new class for styling
+
+    // 🎯 Toggling Functionality
+    icon.addEventListener('click', () => {
+      if (inputElement.type === 'password') {
+        inputElement.type = 'text';
+        icon.src = ICON_EYE;
+      } else {
+        inputElement.type = 'password';
+        icon.src = ICON_EYE_OFF;
+      }
+    });
+
+    return icon;
+  }
+
+  // 1. Define fields (no edit icon needed for the password block, it's one atomic action)
+  const fields = [
+    { key: 'currentPassword', label: translation.current_password || 'Current Password', type: 'password', required: true },
+    { key: 'newPassword', label: translation.new_password || 'New Password', type: 'password', required: true, dependent: true },
+    { key: 'confirmNewPassword', label: translation.confirm_password || 'Confirm New Password', type: 'password', required: true, dependent: true }
+  ];
+
+  // Create a centralized button element that will handle the save action for this whole block
+  const saveButton = document.createElement('button');
+  saveButton.textContent = translation.change_password || 'Change Password';
+  saveButton.className = 'profile-save-button';
+
+  // Store references for conditional enabling and validation
+  const inputs = {};
+  const errorEls = {};
+
+  // --- Render Fields ---
+  fields.forEach(({ key, label, type, dependent }) => {
+    const row = document.createElement('div');
+    row.className = 'profile-row password-row'; // Use a special class for password rows
+
+    const labelEl = document.createElement('label');
+    labelEl.textContent = label + ':';
+    labelEl.htmlFor = key;
+    row.appendChild(labelEl);
+
+    // --- Error Element Creation ---
+    const errorEl = document.createElement('div');
+    errorEl.id = `profileError-${key}`;
+    errorEl.className = 'validation-error-message';
+    row.appendChild(errorEl);
+    errorEls[key] = errorEl; // Store reference
+
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'profile-row-item';
+
+    const input = document.createElement('input');
+    input.type = 'password'; // Use 'password' type
+    input.id = `profileInput-${key}`;
+    input.className = 'profile-item';
+
+    const toggleIcon = createVisibilityToggle(input);
+
+    // Initial state: Disable new/confirm fields
+    if (dependent) {
+      input.disabled = true;
+    }
+
+    inputContainer.appendChild(input);
+    inputContainer.appendChild(toggleIcon);
+    row.appendChild(inputContainer);
+    container.appendChild(row);
+
+    inputs[key] = input; // Store reference
+  });
+
+  // Append the Save Button
+  container.appendChild(saveButton);
+
+  // --- 4. Conditional Enabling Logic (Current Password) ---
+  const updateDependentFields = () => {
+    const currentPassValue = inputs.currentPassword.value.trim();
+    const enable = currentPassValue.length > 0;
+
+    inputs.newPassword.disabled = !enable;
+    inputs.confirmNewPassword.disabled = !enable;
+
+    // Clear new/confirm fields and errors if disabling
+    if (!enable) {
+      inputs.newPassword.value = '';
+      inputs.confirmNewPassword.value = '';
+      if (typeof clearErrors === 'function') {
+        clearErrors([errorEls.newPassword.id, errorEls.confirmNewPassword.id]);
+        errorEls.newPassword.textContent = '';
+        errorEls.confirmNewPassword.textContent = '';
+      }
+    }
+  };
+
+  // Attach listener to the current password field
+  inputs.currentPassword.addEventListener('input', updateDependentFields);
+
+
+  // --- 5. Validation and Submission Logic (Save Button) ---
+  saveButton.addEventListener('click', async () => {
+    if (typeof clearErrors === 'function') {
+      clearErrors([errorEls.currentPassword.id, errorEls.newPassword.id, errorEls.confirmNewPassword.id]);
+    }
+
+    let hasError = false;
+
+    // Validation for the Current Password
+    if (!inputs.currentPassword.value.trim()) {
+      setError(errorEls.currentPassword.id, translation.required);
+      hasError = true;
+    }
+
+    // Only validate New/Confirm if Current Password is provided
+    if (!hasError && inputs.currentPassword.value.trim().length > 0) {
+
+      // Validation for New Password
+      const newPassValue = inputs.newPassword.value.trim();
+      const confirmPassValue = inputs.confirmNewPassword.value.trim();
+      const usernameValue = userData.username; // Get username for match check
+
+      if (!newPassValue) {
+        setError(errorEls.newPassword.id, translation.required);
+        hasError = true;
+      } else if (newPassValue === usernameValue) {
+        setError(errorEls.newPassword.id, translation.passMatchUsername);
+        hasError = true;
+      } else if (typeof isValidPassword === 'function' && !isValidPassword(newPassValue)) {
+        setError(errorEls.newPassword.id, translation.invalidPassword);
+        hasError = true;
+      } else if (newPassValue.length > 30) {
+        setError(errorEls.newPassword.id, translation.longPassword);
+        hasError = true;
+      } else if (typeof detectSpace === 'function' && detectSpace(newPassValue)) {
+        setError(errorEls.newPassword.id, translation.no_spaces_allowed);
+        hasError = true;
+      }
+
+      // Validation for Confirm New Password (Only if New Password validation passed)
+      if (!hasError) {
+        if (!confirmPassValue) {
+          setError(errorEls.confirmNewPassword.id, translation.required);
+          hasError = true;
+        } else if (newPassValue !== confirmPassValue) {
+          setError(errorEls.confirmNewPassword.id, translation.mismatch);
+          hasError = true;
+        } else if (confirmPassValue.length > 30) {
+          setError(errorEls.confirmNewPassword.id, translation.longPassword);
+          hasError = true;
+        } else if (typeof detectSpace === 'function' && detectSpace(confirmPassValue)) {
+          setError(errorEls.confirmNewPassword.id, translation.no_spaces_allowed);
+          hasError = true;
+        }
+      }
+    }
+
+    if (hasError) return;
+
+    // Attempt API submission
+    saveButton.disabled = true; // Prevent double submission
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const payload = {
+        currentPassword: inputs.currentPassword.value,
+        newPassword: inputs.newPassword.value,
+        confirmNewPassword: inputs.confirmNewPassword.value // API might not need this, but good to include
+      };
+
+      const updateData = await apiPost("/change-password", payload, token); // Assuming new API endpoint
+
+      if (updateData.success) {
+        showToast(translation.password_updated_success || "Password successfully changed", "success");
+
+        // Clear all fields on success
+        inputs.currentPassword.value = '';
+        inputs.newPassword.value = '';
+        inputs.confirmNewPassword.value = '';
+        updateDependentFields(); // Will disable new/confirm fields
+
+      } else {
+        const errors = updateData.errors;
+
+        if (errors && errors.currentPassword) {
+          setError(errorEls.currentPassword.id, translation.incorrect_current_password || "Incorrect current password.");
+        } else {
+          showToast(updateData.message || translation.password_update_failed || "Password update failed.", "error");
+        }
+      }
+    } catch (err) {
+      showToast(translation.something_went_wrong, "error");
+      console.error("Password Update Error:", err);
+    } finally {
+      saveButton.disabled = false;
     }
   });
 }
