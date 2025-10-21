@@ -4,6 +4,7 @@ import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
 import { isValidEmail, isValidPassword, detectSpace } from '../utils/validators.js';
 import { setError, clearErrors } from '../utils/helper.js';
+import { logout } from '../modules/MeHomepage.js'
 
 const ACTIVE_CLASS = "active-tab";
 
@@ -191,6 +192,13 @@ export const ProfileManager = {
     passwordChangeColumn.id = "passwordChangeColumn";
     contentWrapper.appendChild(passwordChangeColumn);
 
+    const achievementsContainer = document.createElement("div");
+    achievementsContainer.id = "achievementsContentContainer";
+    achievementsContainer.className = "profile-column"; // Use profile-column for styling/sizing
+    achievementsContainer.style.display = 'none'; // Initially hidden
+    achievementsContainer.innerHTML = `<div>${translation.achievementsContent || 'Achievements content goes here.'}</div>`;
+    contentWrapper.appendChild(achievementsContainer);
+
     let activeTab = "personal";
 
     // 🎯 Tab Switching Logic - NOW MANAGES COLUMN VISIBILITY
@@ -209,15 +217,16 @@ export const ProfileManager = {
       if (tabName === "personal") {
         personalInfoColumn.style.display = 'block';
         passwordChangeColumn.style.display = 'block';
+        achievementsContainer.style.display = 'none';
         personalInfoColumn.innerHTML = '';
         passwordChangeColumn.innerHTML = ''; // Clear right column initially
         getUserData.initGetUserPersonalDetailes();
 
       } else if (tabName === "achievements") {
+        // Hide Personal/Password columns, Show Achievements container
         personalInfoColumn.style.display = 'none';
         passwordChangeColumn.style.display = 'none';
-        // Display achievements content directly in the main contentWrapper (or create a new container)
-        contentWrapper.innerHTML = `<div style="flex-basis: 100%;">${translation.achievementsContent || 'Achievements content goes here.'}</div>`;
+        achievementsContainer.style.display = 'block';
       }
     };
 
@@ -683,12 +692,10 @@ function renderPasswordDetails(userData, container, translation) {
     try {
       const token = localStorage.getItem("authToken");
       const payload = {
-        currentPassword: inputs.currentPassword.value,
-        newPassword: inputs.newPassword.value,
-        confirmNewPassword: inputs.confirmNewPassword.value // API might not need this, but good to include
+        password: inputs.newPassword.value
       };
 
-      const updateData = await apiPost("/change-password", payload, token); // Assuming new API endpoint
+      const updateData = await apiPost("/user-update", payload, token); // Assuming new API endpoint
 
       if (updateData.success) {
         showToast(translation.password_updated_success || "Password successfully changed", "success");
@@ -698,6 +705,9 @@ function renderPasswordDetails(userData, container, translation) {
         inputs.newPassword.value = '';
         inputs.confirmNewPassword.value = '';
         updateDependentFields(); // Will disable new/confirm fields
+        setTimeout(() => {
+          logout();
+        }, 2500);
 
       } else {
         const errors = updateData.errors;
