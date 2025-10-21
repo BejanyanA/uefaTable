@@ -1,3 +1,14 @@
+function forcePasswordIconReset(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+
+  if (input && icon && input.type === 'text') {
+    input.type = 'password';
+    icon.src = "assets/icons/eye-off.png";
+  }
+}
+
+
 export const ModalManager = {
   open(id) {
     document.querySelectorAll(".modal").forEach(modal => {
@@ -20,6 +31,18 @@ export const ModalManager = {
   close(id) {
     const modal = document.getElementById(id);
     if (!modal) return;
+
+    if (id === 'loginModal') {
+      // Reset fields specific to the Login Modal
+      forcePasswordIconReset("loginPassword", "loginEyeToggle");
+
+    } else if (id === 'registerModal') { // Assuming your registration modal ID is 'registrationModal'
+      // Reset fields specific to the Registration Modal
+      forcePasswordIconReset("regPassword", "regEyeToggle");
+      forcePasswordIconReset("regConfirmPassword", "regConfirmEyeToggle");
+    }
+
+    // ------------------------------------------
 
     modal.style.display = "none";
 

@@ -136,7 +136,13 @@
 
   /* Remove any margin that was pushing it away */
   margin-left: 0;
+  opacity: 0.7;
   /* <--- IMPORTANT: Clear previous margin */
+}
+
+.edit-icon:hover,
+.save-icon:hover {
+  opacity: 1;
 }
 
 .save-icon {
@@ -159,8 +165,13 @@
   height: 22px;
   /* Define icon size */
   cursor: pointer;
+  opacity: 0.7;
   z-index: 5;
   /* Ensure it is on top of the input text */
+}
+
+.visibility-toggle-icon:hover {
+  opacity: 1;
 }
 
 .profile-save-button {
@@ -298,6 +309,7 @@
     height: 20px;
     cursor: pointer;
     z-index: 2;
+    opacity: unset;
     /* Ensure it is on top of the input text */
   }
 
@@ -308,6 +320,7 @@
     transform: translateY(-50%) scale(1.1);
     /* Keep vertical centering */
     box-shadow: 0 0 8px rgba(76, 175, 79, 0);
+    opacity: unset;
   }
 
 
@@ -326,6 +339,7 @@
     /* Set icon size */
     cursor: pointer;
     z-index: 3;
+    opacity: unset;
     /* Ensure it is on top of the input text and other icons */
   }
 

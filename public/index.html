@@ -140,7 +140,7 @@
               <input type="password" id="loginPassword" placeholder=" " />
               <label for="loginPassword" id="loginPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" onclick="togglePassword('loginPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle" onclick="togglePassword('loginPassword', this)" />
           </div>
           <div class="error" id="loginPasswordError"></div>
 
@@ -172,7 +172,7 @@
               <input type="password" id="regPassword" placeholder=" " />
               <label for="regPassword" id="regPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" onclick="togglePassword('regPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle" onclick="togglePassword('regPassword', this)" />
           </div>
           <div class="error" id="regPasswordError"></div>
 
@@ -181,8 +181,7 @@
               <input type="password" id="regConfirmPassword" placeholder=" " />
               <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password"
-              onclick="togglePassword('regConfirmPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle" onclick="togglePassword('regConfirmPassword', this)" />
           </div>
           <div class="error" id="regConfirmPasswordError"></div>
 
