@@ -316,7 +316,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     // --- 1. Label Element (Goes into 'label' area) ---
     const labelEl = document.createElement('label');
-    labelEl.textContent = label + ':'; // Added colon for visual separation
+    labelEl.textContent = label; // Added colon for visual separation
     labelEl.htmlFor = `profileInput-${key}`;
     row.appendChild(labelEl); // Append label first
 
@@ -557,7 +557,7 @@ function renderPasswordDetails(userData, container, translation) {
     row.className = 'profile-row password-row'; // Use a special class for password rows
 
     const labelEl = document.createElement('label');
-    labelEl.textContent = label + ':';
+    labelEl.textContent = label;
     labelEl.htmlFor = key;
     row.appendChild(labelEl);
 

@@ -70,17 +70,22 @@
 /* The container holding the input and the icon */
 .profile-row-item {
   grid-area: input-group;
-  /* Assign to the 'input-group' area */
   display: flex;
-  /* Keep flex to align input and its icon horizontally */
   align-items: center;
   flex-grow: 1;
+
+  /* 🎯 KEY: Set the positioning context */
+  position: relative;
+
+  /* Ensure nothing sticks out of the container boundary */
+  overflow: hidden;
+  width: 400px;
 }
 
 /* The input field */
 .profile-item {
   /* width: 100%; */
-  width: 400px;
+  width: 100%;
   padding: 8px;
   background-color: #2a2a2ad2;
   color: #f0f0f0;
@@ -88,7 +93,8 @@
   border-radius: 4px;
   font-size: 16px;
   transition: border-color 0.2s, background-color 0.2s;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.521)
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.521);
+  padding-right: 40px;
 }
 
 /* Style for disabled fields (like ID) */
@@ -109,21 +115,52 @@
   margin-bottom: 20px;
 }
 
-.edit-icon {
-  margin-left: 10px;
+.edit-icon,
+.save-icon {
+  /* 🎯 KEY: Take the icon out of the normal flow */
+  position: absolute;
+
+  /* Position it inside the right edge of the input field */
+  right: 10px;
+  /* Adjust distance from the right edge */
+  top: 50%;
+  /* Start at half height */
+  transform: translateY(-50%);
+  /* Center vertically */
+
   height: 22px;
+  /* Define icon size */
   cursor: pointer;
+  z-index: 5;
+  /* Ensure it is on top of the input text */
+
+  /* Remove any margin that was pushing it away */
+  margin-left: 0;
+  /* <--- IMPORTANT: Clear previous margin */
 }
 
-/* Style for the 'V' (Save) icon when changes are pending */
 .save-icon {
-  opacity: 1;
-  height: 30px;
-  /* Ensure full visibility for the checkmark */
-  /* No filter needed if the image itself is green */
-  /* You could add a subtle animation or shadow here if desired */
-  transform: scale(1.1);
-  box-shadow: 0 0 8px rgba(76, 175, 79, 0);
+  height: 28px;
+  /* Example: if save icon is larger */
+}
+
+.visibility-toggle-icon {
+  /* 🎯 KEY: Take the icon out of the normal flow and position it */
+  position: absolute;
+
+  /* Position it inside the right edge of the input field */
+  right: 10px;
+  /* Adjust distance from the right edge */
+  top: 50%;
+  /* Start at half height */
+  transform: translateY(-50%);
+  /* Center vertically */
+
+  height: 22px;
+  /* Define icon size */
+  cursor: pointer;
+  z-index: 5;
+  /* Ensure it is on top of the input text */
 }
 
 .profile-save-button {
@@ -220,6 +257,7 @@
 
     /* Ensure the icon doesn't stick out of the input's shadow/border area */
     overflow: hidden;
+    width: 100%;
   }
 
   /* The input field */
@@ -257,7 +295,7 @@
     /* Reset mobile layout properties */
     margin-left: 0;
     /* Remove horizontal margin */
-    height: 22px;
+    height: 20px;
     cursor: pointer;
     z-index: 2;
     /* Ensure it is on top of the input text */
@@ -266,7 +304,7 @@
   /* Style for the 'V' (Save) icon when changes are pending */
   .save-icon {
     opacity: 1;
-    height: 30px;
+    height: 26px;
     transform: translateY(-50%) scale(1.1);
     /* Keep vertical centering */
     box-shadow: 0 0 8px rgba(76, 175, 79, 0);
