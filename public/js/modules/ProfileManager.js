@@ -207,11 +207,11 @@ export const ProfileManager = {
 
       // Set active class on buttons
       [personalTabBtn, achievementTabBtn].forEach(btn => {
-        if (btn.dataset.tab === tabName) {
-          btn.classList.add(this.ACTIVE);
-        } else {
-          btn.classList.remove(this.ACTIVE);
-        }
+        const isActive = btn.dataset.tab === tabName;
+
+        btn.classList.toggle(this.ACTIVE, isActive);
+        btn.disabled = isActive;     // ✅ Disable the active one
+        if (!isActive) btn.disabled = false; // ✅ Re-enable others
       });
 
       if (tabName === "personal") {
@@ -233,7 +233,7 @@ export const ProfileManager = {
     // Click handlers for tabs
     [personalTabBtn, achievementTabBtn].forEach(btn => {
       btn.addEventListener("click", () => {
-        if (btn.classList.contains(this.ACTIVE)) return;
+        if (btn.disabled) return;
         showProfileTab(btn.dataset.tab);
       });
     });

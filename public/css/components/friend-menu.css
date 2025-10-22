@@ -41,16 +41,6 @@
   color: #ffffff;
 }
 
-.status-tabs-container {
-  display: flex;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 5px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  margin-bottom: 25px;
-  z-index: 1;
-}
-
 /* 1. APPROVED/FRIENDS Tab (Green) */
 .tab-btn.active-tab[data-tab="approved"] {
   background-color: white;
