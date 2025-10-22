@@ -97,6 +97,8 @@ export const langMap = {
     rejected: "Rejected",
     newPassword: "New Password",
     confirmNewPassword: "Confirm New Password",
+    personalDetails: "Personal Details",
+    achievements: "Achievements",
 
 
     //BE translations
@@ -218,6 +220,8 @@ export const langMap = {
     rejected: "Մերժված",
     newPassword: "Նոր գաղտնաբառ",
     confirmNewPassword: "Հաստատել նոր գաղտնաբառը",
+    personalDetails: "Անձնական տվյալներ",
+    achievements: "Նվաճումներ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -338,6 +342,8 @@ export const langMap = {
     rejected: "Rejeté",
     newPassword: "Nouveau mot de passe",
     confirmNewPassword: "Confirmer le nouveau mot de passe",
+    personalDetails: "Détails personnels",
+     achievements: "Succès",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -661,6 +667,16 @@ function buttonsTranslate() {
   const { update: update = "Update" } = langMap[currentLang] || {};
   document.querySelectorAll(".profile-save-button").forEach(button => {
     button.textContent = update;
+  });
+
+  const { personalDetails: personalDetails = "Personal Details" } = langMap[currentLang] || {};
+  document.querySelectorAll("#personalDetailsBtn").forEach(button => {
+    button.textContent = personalDetails;
+  });
+
+  const { achievements: achievements = "Achievements" } = langMap[currentLang] || {};
+  document.querySelectorAll("#achievementsBtn").forEach(button => {
+    button.textContent = achievements;
   });
 
 }
