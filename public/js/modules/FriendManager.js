@@ -153,7 +153,7 @@ export const FriendManager = {
         }
       });
 
-      section.appendChild(homeButton); 
+      section.appendChild(homeButton);
 
 
       document.getElementById("headerUsername").style.display = "block";
@@ -170,9 +170,6 @@ export const FriendManager = {
       localStorage.removeItem("currentBannerId");
       localStorage.removeItem("leagueId");
       localStorage.removeItem("selectedStageType");
-
-      getFriends.initGetAllFriendsStatuses();
-
 
       // ✅ Tabs header (always shown now since we have some data)
       const tabsHeader = document.createElement("div");
@@ -387,6 +384,7 @@ export const FriendManager = {
 
             // Re-render UI and show success toast
             getFriends.initGetAllFriendsStatuses();
+
             if (actionType === 'approve') {
               showToast(translation.friend_approved_success || "User successfully approved", "success");
             } else if (actionType === 'reject') {
@@ -548,8 +546,9 @@ export const FriendManager = {
         actionsDiv.after(toggle, menu);
       }
 
-      // Show/hide per tab
-      function showFriendsTab(tab) {
+
+
+      function filterFriendsList(tab) {
         activeTab = tab;
 
         // buttons visual (mirror your tab logic)
@@ -557,15 +556,16 @@ export const FriendManager = {
           b.classList.remove(ACTIVE);
           b.classList.remove("active");
         });
+
         if (tab === "approved") friendsTabBtn.classList.add(ACTIVE);
         if (tab === "pending") pendingTabBtn.classList.add(ACTIVE);
         if (tab === "rejected") rejectedTabBtn.classList.add(ACTIVE);
 
         // Filter visibility
-        const items = rowContainer.querySelectorAll(".friend-item"); // ← use new class
+        const items = rowContainer.querySelectorAll(".friend-item");
         let visibleCount = 0;
         items.forEach(el => {
-          if (!el.dataset.status) { // placeholders handled below
+          if (!el.dataset.status) {
             el.style.display = "none";
             return;
           }
@@ -580,10 +580,20 @@ export const FriendManager = {
         emptyRejected.style.display = (tab === "rejected" && visibleCount === 0) ? "" : "none";
       }
 
+         // Show/hide per tab
+      function showFriendsTab(tab) {
+        // Only set active tab here if you want the filter logic to use it
+        activeTab = tab;
+
+        getFriends.initGetAllFriendsStatuses();
+
+        filterFriendsList(tab);
+      }
+
       // Click handlers — same pattern as your tabs
       [friendsTabBtn, pendingTabBtn, rejectedTabBtn].forEach(btn => {
         btn.addEventListener("click", () => {
-          if (btn.classList.contains(ACTIVE)) return;
+          // This now triggers the fetch inside showFriendsTab
           showFriendsTab(btn.dataset.tab);
         });
       });
@@ -595,7 +605,9 @@ export const FriendManager = {
         const list = (payload && payload.friends) || [];
         friendsData = list;
         renderFriendsList(friendsData);
-        showFriendsTab(activeTab);
+
+        // ✅ FIX: Use the filtering function instead of the fetching function
+        filterFriendsList(activeTab);
       };
 
       // 2) Or, if your fetcher dispatches an event instead, we support it too:
@@ -604,7 +616,9 @@ export const FriendManager = {
         const list = (detail && detail.friends) || [];
         friendsData = list;
         renderFriendsList(friendsData);
-        showFriendsTab(activeTab);
+
+        // This part was already correct
+        filterFriendsList(activeTab);
       });
 
       // Initialize the view (tabs visible immediately; content appears when data arrives)
