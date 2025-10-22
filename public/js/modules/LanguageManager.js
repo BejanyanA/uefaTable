@@ -95,6 +95,8 @@ export const langMap = {
     approved: "Friend",
     pending: "Pending",
     rejected: "Rejected",
+    newPassword: "New Password",
+    confirmNewPassword: "Confirm New Password",
 
 
     //BE translations
@@ -214,6 +216,8 @@ export const langMap = {
     approved: "Ընկեր",
     pending: "Սպասվող",
     rejected: "Մերժված",
+    newPassword: "Նոր գաղտնաբառ",
+    confirmNewPassword: "Հաստատել նոր գաղտնաբառը",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -332,6 +336,8 @@ export const langMap = {
     approved: "Amis",
     pending: "En attente",
     rejected: "Rejeté",
+    newPassword: "Nouveau mot de passe",
+    confirmNewPassword: "Confirmer le nouveau mot de passe",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -407,6 +413,7 @@ function changeLang(lang) {
     opt.textContent = selectUser;
   });
 
+
   // Tabs
   const groupTabButton = langMap[currentLang].groupStageTitle || "Group Stage";
   document.querySelectorAll("#groupStageTitle").forEach(opt => {
@@ -416,6 +423,7 @@ function changeLang(lang) {
   document.querySelectorAll("#knockoutStageTitle").forEach(opt => {
     opt.textContent = knockoutTabButton;
   });
+
 
   // Knockout rounds
   const round16Round = langMap[currentLang].round16 || "Round of 16";
@@ -442,6 +450,7 @@ function changeLang(lang) {
   document.querySelectorAll("#rightSFWinner").forEach(opt => {
     opt.textContent = rightSFWinner;
   });
+
 
   // Back Buttons
   const backButton1 = langMap[currentLang].backButton || "< Back";
@@ -501,6 +510,33 @@ function changeLang(lang) {
   document.querySelectorAll("#approve").forEach(opt => {
     opt.textContent = approveOption;
   });
+
+  const username = langMap[currentLang].username || "Username";
+  document.querySelectorAll("#username").forEach(opt => {
+    opt.textContent = username;
+  });
+
+  const email = langMap[currentLang].email || "Email";
+  document.querySelectorAll("#email").forEach(opt => {
+    opt.textContent = email;
+  });
+
+  const currentPassword = langMap[currentLang].password || "Password";
+  document.querySelectorAll("#currentPassword").forEach(opt => {
+    opt.textContent = currentPassword;
+  });
+
+  const newPassword = langMap[currentLang].newPassword || "New Password";
+  document.querySelectorAll("#newPassword").forEach(opt => {
+    opt.textContent = newPassword;
+  });
+
+
+  const confirmNewPassword = langMap[currentLang].confirmNewPassword || "Confirm New Password";
+  document.querySelectorAll("#confirmNewPassword").forEach(opt => {
+    opt.textContent = confirmNewPassword;
+  });
+
 
   const dynamicLabels = {
 
@@ -622,7 +658,13 @@ function buttonsTranslate() {
     button.textContent = addFriend;
   });
 
+  const { update: update = "Update" } = langMap[currentLang] || {};
+  document.querySelectorAll(".profile-save-button").forEach(button => {
+    button.textContent = update;
+  });
+
 }
+
 
 function friendStatusesAndSearch() {
   const t = langMap[currentLang] || {};
@@ -633,7 +675,7 @@ function friendStatusesAndSearch() {
     if (rawStatus) {
       const translatedStatus = t[rawStatus] || rawStatus;
       badge.textContent = translatedStatus;
-      successfulResultFound = true; 
+      successfulResultFound = true;
     }
   });
 
@@ -666,46 +708,46 @@ function placeholderTranslate() {
 
 
 function updateFriendActionButtonTranslations() {
-    const t = langMap[currentLang] || {}; 
+  const t = langMap[currentLang] || {};
 
-    document.querySelectorAll('.friend-actions button, .friend-actions-menu button.menu-item').forEach(button => {
+  document.querySelectorAll('.friend-actions button, .friend-actions-menu button.menu-item').forEach(button => {
 
-        const desktopButton = button.closest('.friend-item')?.querySelector('.friend-actions button');
-        const labelKey = button.dataset.labelKey || desktopButton?.dataset.labelKey;
-        const fallback = button.dataset.fallback || desktopButton?.dataset.fallback;
-        
-        if (!labelKey) return; 
+    const desktopButton = button.closest('.friend-item')?.querySelector('.friend-actions button');
+    const labelKey = button.dataset.labelKey || desktopButton?.dataset.labelKey;
+    const fallback = button.dataset.fallback || desktopButton?.dataset.fallback;
 
-        const friendId = button.closest('[data-friend-id]')?.dataset.friendId;
-        const actionType = button.className.match(/action-([a-z]+)/)?.[1];
-        
-        const newOriginalText = t[labelKey] || fallback;
+    if (!labelKey) return;
 
-        if (button.classList.contains('confirming-action') && friendId) {
-            
-            if (confirmationTimers[`timer-${friendId}`]) {
-                clearTimeout(confirmationTimers[`timer-${friendId}`]);
-            }
-            const resetFunction = confirmationTimers[`reset-${friendId}`];
-            if (resetFunction) {
-                 resetFunction();
-                 const confirmWord = t.confirm || "Confirm";
-                 const newConfirmationText = `${confirmWord} ${actionType.charAt(0).toUpperCase() + actionType.slice(1)}?`;
+    const friendId = button.closest('[data-friend-id]')?.dataset.friendId;
+    const actionType = button.className.match(/action-([a-z]+)/)?.[1];
 
-                 button.textContent = newConfirmationText;
-                 button.classList.add('confirming-action');
-                 confirmationTimers[friendId] = actionType;
+    const newOriginalText = t[labelKey] || fallback;
 
-                 const newTimerId = setTimeout(resetFunction, 2000); 
-                 confirmationTimers[`timer-${friendId}`] = newTimerId;
+    if (button.classList.contains('confirming-action') && friendId) {
 
-            }
-            
+      if (confirmationTimers[`timer-${friendId}`]) {
+        clearTimeout(confirmationTimers[`timer-${friendId}`]);
+      }
+      const resetFunction = confirmationTimers[`reset-${friendId}`];
+      if (resetFunction) {
+        resetFunction();
+        const confirmWord = t.confirm || "Confirm";
+        const newConfirmationText = `${confirmWord} ${actionType.charAt(0).toUpperCase() + actionType.slice(1)}?`;
 
-        } else {
-            button.textContent = newOriginalText;
-        }
-    });
+        button.textContent = newConfirmationText;
+        button.classList.add('confirming-action');
+        confirmationTimers[friendId] = actionType;
+
+        const newTimerId = setTimeout(resetFunction, 2000);
+        confirmationTimers[`timer-${friendId}`] = newTimerId;
+
+      }
+
+
+    } else {
+      button.textContent = newOriginalText;
+    }
+  });
 }
 
 

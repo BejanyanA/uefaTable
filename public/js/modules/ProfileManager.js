@@ -326,6 +326,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
     // --- 1. Label Element (Goes into 'label' area) ---
     const labelEl = document.createElement('label');
     labelEl.textContent = label; // Added colon for visual separation
+    labelEl.id = `${key}`;
     labelEl.htmlFor = `profileInput-${key}`;
     row.appendChild(labelEl); // Append label first
 
@@ -335,7 +336,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     const input = document.createElement('input');
     input.type = (key === 'email' ? 'email' : 'text'); // Better practice for email
-    input.id = `profileInput-${key}`; // Unique ID for input
+    input.id = `${key}`; 
     input.value = userData[key];
     input.dataset.originalValue = userData[key];
     input.className = 'profile-item';
@@ -546,14 +547,14 @@ function renderPasswordDetails(userData, container, translation) {
 
   // 1. Define fields (no edit icon needed for the password block, it's one atomic action)
   const fields = [
-    { key: 'currentPassword', label: translation.current_password || 'Current Password', type: 'password', required: true },
+    { key: 'currentPassword', label: translation.password || 'Current Password', type: 'password', required: true },
     { key: 'newPassword', label: translation.new_password || 'New Password', type: 'password', required: true, dependent: true },
     { key: 'confirmNewPassword', label: translation.confirm_password || 'Confirm New Password', type: 'password', required: true, dependent: true }
   ];
 
   // Create a centralized button element that will handle the save action for this whole block
   const saveButton = document.createElement('button');
-  saveButton.textContent = translation.change_password || 'Change Password';
+  saveButton.textContent = translation.update || 'Change Password';
   saveButton.className = 'profile-save-button';
 
   // Store references for conditional enabling and validation
@@ -568,6 +569,7 @@ function renderPasswordDetails(userData, container, translation) {
     const labelEl = document.createElement('label');
     labelEl.textContent = label;
     labelEl.htmlFor = key;
+    labelEl.id = `${key}`;
     row.appendChild(labelEl);
 
     // --- Error Element Creation ---
@@ -581,8 +583,8 @@ function renderPasswordDetails(userData, container, translation) {
     inputContainer.className = 'profile-row-item';
 
     const input = document.createElement('input');
-    input.type = 'password'; // Use 'password' type
-    input.id = `profileInput-${key}`;
+    input.type = type
+    input.id = `profileInput${key}`;
     input.className = 'profile-item';
 
     const toggleIcon = createVisibilityToggle(input);
