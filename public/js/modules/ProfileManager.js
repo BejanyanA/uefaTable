@@ -547,7 +547,7 @@ function renderPasswordDetails(userData, container, translation) {
 
   // 1. Define fields (no edit icon needed for the password block, it's one atomic action)
   const fields = [
-    { key: 'currentPassword', label: translation.password || 'Current Password', type: 'password', required: true },
+    { key: 'password', label: translation.password || 'Current Password', type: 'password', required: true },
     { key: 'newPassword', label: translation.new_password || 'New Password', type: 'password', required: true, dependent: true },
     { key: 'confirmNewPassword', label: translation.confirm_password || 'Confirm New Password', type: 'password', required: true, dependent: true }
   ];

@@ -83,7 +83,7 @@
   border-radius: 4px;
   font-size: 16px;
   transition: border-color 0.2s, background-color 0.2s;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.521);
+  /* box-shadow: 0 0 10px rgba(255, 255, 255, 0.521); */
   padding-right: 40px;
 }
 
@@ -101,8 +101,8 @@
   outline: none;
 }
 
-#profileInput-id {
-  margin-bottom: 20px;
+.profile-row-item #id {
+  margin-bottom: 22px;
 }
 
 .edit-icon,
