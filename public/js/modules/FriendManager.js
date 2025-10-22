@@ -555,11 +555,17 @@ export const FriendManager = {
         [friendsTabBtn, pendingTabBtn, rejectedTabBtn].forEach(b => {
           b.classList.remove(ACTIVE);
           b.classList.remove("active");
+          b.disabled = false; // ← reset state each time
         });
 
         if (tab === "approved") friendsTabBtn.classList.add(ACTIVE);
         if (tab === "pending") pendingTabBtn.classList.add(ACTIVE);
         if (tab === "rejected") rejectedTabBtn.classList.add(ACTIVE);
+
+        // ❌ disable the currently active tab (make unclickable)
+        if (tab === "approved") friendsTabBtn.disabled = true;
+        if (tab === "pending") pendingTabBtn.disabled = true;
+        if (tab === "rejected") rejectedTabBtn.disabled = true;
 
         // Filter visibility
         const items = rowContainer.querySelectorAll(".friend-item");
@@ -580,7 +586,7 @@ export const FriendManager = {
         emptyRejected.style.display = (tab === "rejected" && visibleCount === 0) ? "" : "none";
       }
 
-         // Show/hide per tab
+      // Show/hide per tab
       function showFriendsTab(tab) {
         // Only set active tab here if you want the filter logic to use it
         activeTab = tab;
@@ -622,7 +628,11 @@ export const FriendManager = {
       });
 
       // Initialize the view (tabs visible immediately; content appears when data arrives)
-      showFriendsTab(activeTab);
+      filterFriendsList(activeTab);
+
+      // 2. Manually start the fetch (the callback, window.__setFriendsStatuses, will handle rendering)
+      // We don't show a loading indicator here because the empty screen IS the loading screen for now.
+      getFriends.initGetAllFriendsStatuses();
     });
   },
 
