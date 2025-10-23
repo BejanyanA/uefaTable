@@ -45,46 +45,46 @@
     <div class="language-auth-group">
       <div class="language-switcher">
         <img src="assets/flags/en.svg" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
+        <div id="langDropdown" class="dropdown-menu">
+          <div class="language-option" onclick="setLanguage('en')">
+            <img src="assets/flags/en.svg" />
+            <span>English</span>
+          </div>
+          <div class="language-option" onclick="setLanguage('am')">
+            <img src="assets/flags/am.svg" />
+            <span>Հայերեն</span>
+          </div>
+          <div class="language-option" onclick="setLanguage('fr')">
+            <img src="assets/flags/fr.svg" />
+            <span>Français</span>
+          </div>
+        </div>
       </div>
       <div class="auth-buttons" style="display: none;" id="authButtons">
         <button onclick="openModal('loginModal')" id="loginBtn">Login</button>
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
     </div>
+    
 
     <div class="header-username" id="headerUsername" style="display: none;">
       <h2 id="headerUsernameTitle">Test123</h2>
     </div>
+
 
     <div class="profile-menu" id="profileMenu" style="display: none;">
       <div class="dropdown">
         <div class="user-icon" id="userIcon" tabindex="0">
           <i class="fa fa-user"></i>
         </div>
+        <div class="dropdown-content" id="dropdownMenu">
+          <a href="#" id="profile">👤 Profile</a>
+          <a href="#" id="friends">🤝 Friends</a>
+          <a href="#" id="logoutBtn">🚪 Logout</a>
+        </div>
       </div>
     </div>
   </header>
-
-  <div id="langDropdown" class="dropdown-menu">
-    <div class="language-option" onclick="setLanguage('en')">
-      <img src="assets/flags/en.svg" />
-      <span>English</span>
-    </div>
-    <div class="language-option" onclick="setLanguage('am')">
-      <img src="assets/flags/am.svg" />
-      <span>Հայերեն</span>
-    </div>
-    <div class="language-option" onclick="setLanguage('fr')">
-      <img src="assets/flags/fr.svg" />
-      <span>Français</span>
-    </div>
-  </div>
-
-  <div class="dropdown-content" id="dropdownMenu">
-    <a href="#" id="profile">👤 Profile</a>
-    <a href="#" id="friends">🤝 Friends</a>
-    <a href="#" id="logoutBtn">🚪 Logout</a>
-  </div>
 
   <div class="root">
     <div id="overlay" class="overlay"></div>
@@ -140,7 +140,8 @@
               <input type="password" id="loginPassword" placeholder=" " />
               <label for="loginPassword" id="loginPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle" onclick="togglePassword('loginPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
+              onclick="togglePassword('loginPassword', this)" />
           </div>
           <div class="error" id="loginPasswordError"></div>
 
@@ -172,7 +173,8 @@
               <input type="password" id="regPassword" placeholder=" " />
               <label for="regPassword" id="regPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle" onclick="togglePassword('regPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle"
+              onclick="togglePassword('regPassword', this)" />
           </div>
           <div class="error" id="regPasswordError"></div>
 
@@ -181,7 +183,8 @@
               <input type="password" id="regConfirmPassword" placeholder=" " />
               <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle" onclick="togglePassword('regConfirmPassword', this)" />
+            <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle"
+              onclick="togglePassword('regConfirmPassword', this)" />
           </div>
           <div class="error" id="regConfirmPasswordError"></div>
 
@@ -318,9 +321,9 @@
       <div class="tab-content" data-content="standings"></div>
       <div class="tab-content hidden" data-content="matches"></div>
     </section>
-    
 
-<!--  Profile -->
+
+    <!--  Profile -->
     <section id="profileContainer" style="display: none;">
       <!-- Populated dynamically -->
     </section>

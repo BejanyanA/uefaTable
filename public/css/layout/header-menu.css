@@ -58,12 +58,13 @@
 /* Dropdown menu */
 .dropdown-content {
   position: absolute;
-  top: 44px;
-  right: 30px;
-  background-color: rgba(43, 42, 42, 0.4);
+  top: 100%;
+  right: 0;
+  background: rgba(43, 42, 42, 0.4);
   min-width: 160px;
   border-radius: 10px;
-  z-index: 9000;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 999;
   animation: fadeOut 0.25s ease forwards;
   /* below icon */
   display: none;
@@ -133,8 +134,8 @@
   }
 
   .dropdown-content {
-    top: 44px;
-    right: 20px;
+    top: 100%;
+    right: 0;
     min-width: 100px;
     background: rgba(0, 0, 0, 0.9);
     display: none;

@@ -4,7 +4,7 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  padding: 2px 25px;
+  padding: 10px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -13,8 +13,8 @@ header {
   z-index: 1000;
   background: rgba(0, 0, 0, 0.329);
   box-sizing: border-box;
-  overflow: hidden;
-  height: 50px;
+  overflow: visible;
+  height: 60px;
   white-space: nowrap;
 }
 
@@ -44,7 +44,7 @@ header {
     align-items: center;
     backdrop-filter: blur(6px);
     height: 50px;
-    overflow: hidden;
+    overflow: visible;
     white-space: nowrap;
   }
 
