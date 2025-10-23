@@ -400,7 +400,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
             const updateData = await apiPost("/user-update", payload, token); // Assuming a generic update endpoint
 
             if (updateData.success) {
-              showToast(translation.updated_success || "Successfully Updated", "success");
+              showToast(translation.update_success || "Successfully Updated", "success");
 
               // 4. Final Reset State (Success)
               input.dataset.originalValue = currentValue;
