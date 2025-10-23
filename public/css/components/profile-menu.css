@@ -196,7 +196,7 @@
 @media (max-width: 480px) {
 
   #profileContainer {
-    padding: 14px 18px;
+    padding: 14px;
     margin-bottom: 40px;
     overflow-y: auto;
   }
