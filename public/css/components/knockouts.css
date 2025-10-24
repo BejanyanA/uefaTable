@@ -43,9 +43,9 @@
 #knockoutTab .cup-image{max-width:138px;height:auto;opacity:.95}
 
 /* Cards */
-#knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12.5px; width: 350px;  min-width: 350px;
+#knockoutTab .ko-card{background:rgba(0, 0, 0, 0.700);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;margin-bottom:6px;box-shadow:0 0 8px rgba(255, 255, 255, 0.514);font-size:12.5px; width: 350px;  min-width: 350px;
   max-width: 350px;}
-#knockoutTab .ko-placeholder{border:1px dashed rgba(255,255,255,.22);color:#f8f8f8}
+#knockoutTab .ko-placeholder{background:rgba(0, 0, 0, 0.5); border:1px dashed rgba(255,255,255,.22);color:#f8f8f8}
 #knockoutTab .ko-placeholder-row{padding:6px;text-align:center}
 
 /* Two-row compact tie */
@@ -304,7 +304,7 @@
 
   #knockoutTab .bracket-frame{margin-top: 65px; margin-bottom: 25px;-webkit-overflow-scrolling: touch;}
 
-  #knockoutTab .ko-card{background:rgb(20, 20, 20);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:12px}
+  #knockoutTab .ko-card{background:rgba(0, 0, 0, 0.700);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 0 8px rgba(255, 255, 255, 0.2);font-size:12px}
   #knockoutTab .ko-row-2{display:grid;gap:10px}
 
 
