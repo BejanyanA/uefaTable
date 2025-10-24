@@ -164,7 +164,7 @@
 }
 
 .profile-save-button {
-  margin-left: auto;
+  margin-left: 272px;
   /* Give some space above the button */
   padding: 10px 20px;
   background-color: #4CAF50;
@@ -219,6 +219,13 @@
     min-width: unset;
     padding-right: unset;
     margin-top: 30px;
+  }
+
+
+  #passwordChangeColumn {
+    /* Create the vertical line on the left side of the right column */
+    border-top: 3px solid #ffffff;
+    border-radius: 8px;
   }
 
 
@@ -335,8 +342,9 @@
 
   .profile-save-button {
     /* Give some space above the button */
-    align-items: center;
-    justify-content: center;
+    /* align-items: center;
+    justify-content: center; */
+    margin-left: 110px;
     padding: 10px 20px;
     background-color: #4CAF50;
     /* Example button style */
