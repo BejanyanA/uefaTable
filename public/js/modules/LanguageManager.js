@@ -349,7 +349,7 @@ export const langMap = {
     newPassword: "Nouveau mot de passe",
     confirmNewPassword: "Confirmer le nouveau mot de passe",
     personalDetails: "Détails personnels",
-     achievements: "Succès",
+    achievements: "Succès",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -387,7 +387,10 @@ function updateURLWithLang(lang) {
   window.history.replaceState(null, "", url);
 }
 
-function changeLang(lang) {
+window.__APP_BOOTING__ = true;
+
+function changeLang(lang, opts = {}) {
+  const { silent = false } = opts;
   currentLang = lang;
   updateURLWithLang(lang);
   updateIconTitles();
@@ -395,6 +398,13 @@ function changeLang(lang) {
   placeholderTranslate();
   friendStatusesAndSearch();
   updateFriendActionButtonTranslations();
+
+  // 🔹 Notify all modules that language changed
+ if (!window.__APP_BOOTING__ && !silent) {
+    document.dispatchEvent(new CustomEvent('app:language-changed', { detail: { lang } }));
+  };
+
+
 
   const t = langMap[lang];
 
@@ -780,4 +790,5 @@ window.langMap = langMap;
 window.currentLang = currentLang;
 
 // Immediately apply
-changeLang(currentLang);
+changeLang(currentLang, { silent: true });
+window.__APP_BOOTING__ = false;

@@ -17,9 +17,11 @@ export const ProfileManager = {
 
   openProfile: async function () {
     const profileLink = document.getElementById("profile");
-    // Ensure the click handler is attached only once to prevent multiple executions
     if (!profileLink.__profile_view_initialized) {
       profileLink.__profile_view_initialized = true;
+
+      // 🔹 ensure we react to future language changes
+      this.installLanguageReset();
 
       profileLink.addEventListener("click", () => {
         this._renderProfileView();
@@ -27,8 +29,103 @@ export const ProfileManager = {
     }
   },
 
+  // Add inside ProfileManager (same object)
+  __langResetInstalled: false,
+
+  /** Clears all validation messages by id or class */
+  __clearAllProfileErrors() {
+    // specific error ids we know we render
+    const errorIds = [
+      'profileError-username',
+      'profileError-email',
+      'profileError-currentPassword',
+      'profileError-newPassword',
+      'profileError-confirmNewPassword'
+    ];
+    if (typeof clearErrors === 'function') clearErrors(errorIds);
+    errorIds.forEach(id => {
+      const n = document.getElementById(id);
+      if (n) n.textContent = '';
+    });
+    // safety net: remove any stray messages with the common class
+    document.querySelectorAll('.validation-error-message').forEach(n => n.textContent = '');
+  },
+
+  /** Resets personal details (username/email) and icons back to "edit" */
+  __resetPersonalInputs() {
+    // inputs you create in renderPersonalDetails have class 'profile-item'
+    document.querySelectorAll('#profileContent #personalInfoColumn .profile-item').forEach(inp => {
+      // revert to original value if we have it
+      if (inp.dataset && typeof inp.dataset.originalValue !== 'undefined') {
+        inp.value = inp.dataset.originalValue;
+      }
+      inp.disabled = true;
+    });
+
+    // restore edit icons
+    document.querySelectorAll('#profileContent #personalInfoColumn .edit-icon').forEach(icon => {
+      icon.src = 'assets/icons/edit.svg';
+      icon.alt = (langMap[currentLang]?.edit) || 'Edit';
+      icon.classList.remove('save-icon');
+    });
+
+    // also nuke any globally tracked active editor state, if present
+    if (window && typeof window === 'object') {
+      // your code keeps these in closure; we defensively clear globals if you exposed them
+      window.__activeProfileInput = null;
+      window.__activeProfileIcon = null;
+    }
+  },
+
+  /** Clears password block fields & re-applies dependent disabling */
+  __resetPasswordBlock() {
+    const cur = document.getElementById('profileInputcurrentPassword');
+    const n1 = document.getElementById('profileInputnewPassword');
+    const n2 = document.getElementById('profileInputconfirmNewPassword');
+
+    if (cur) cur.value = '';
+    if (n1) n1.value = '';
+    if (n2) n2.value = '';
+
+    // disable dependents when no current password
+    if (n1) n1.disabled = true;
+    if (n2) n2.disabled = true;
+  },
+
+  /** Public method: fully reset UI state + re-render to pick up new translations */
+  resetProfileUIState() {
+    this.__clearAllProfileErrors();
+    this.__resetPersonalInputs();
+    this.__resetPasswordBlock();
+
+    // Re-render to re-apply translated labels & buttons reliably
+    // (safe: your code guards the outside-click listener with a flag)
+    this._renderProfileView();
+  },
+
+  /** Install one-time listener for language changes */
+  installLanguageReset() {
+    if (this.__langResetInstalled) return;
+    this.__langResetInstalled = true;
+
+    document.addEventListener('app:language-changed', () => {
+      // Skip if logged out
+      if (!localStorage.getItem("authToken")) return;
+
+      // Skip if profile page is not currently active/visible
+      const profileEl = document.getElementById("profileContainer");
+      const isVisible = profileEl && getComputedStyle(profileEl).display !== "none";
+      if (!isVisible) return;
+
+      // Now it's safe to reset/re-render
+      this.resetProfileUIState();
+    });
+  },
+
   // New method to encapsulate the core rendering logic for the Profile page
   _renderProfileView: function () {
+    this.installLanguageReset();
+
     const translation = langMap[currentLang];
     const section = document.getElementById("profileContainer");
 
@@ -201,8 +298,32 @@ export const ProfileManager = {
 
     let activeTab = "personal";
 
+    // ✅ Define the global callback FIRST (so fetches can call it immediately)
+    window.__setPersonalDetails = function (payload) {
+      const userData = payload?.data?.user;
+      if (!userData || activeTab !== "personal") return;
+
+      // guard against DOM not ready (e.g., user switched tab fast)
+      const leftCol = document.getElementById("personalInfoColumn");
+      const rightCol = document.getElementById("passwordChangeColumn");
+      if (!leftCol || !rightCol) return;
+
+      const translation = langMap[currentLang];
+      renderPersonalDetails(
+        userData,
+        leftCol,
+        translation,
+        {
+          setActive: (input, icon) => { /* keep your state hook if needed */ },
+          resetActive: () => { /* no-op, handled in new reset */ }
+        }
+      );
+      renderPasswordDetails(userData, rightCol, translation);
+    };
+
     // 🎯 Tab Switching Logic - NOW MANAGES COLUMN VISIBILITY
     const showProfileTab = (tabName) => {
+      ProfileManager.__clearAllProfileErrors();
       activeTab = tabName;
 
       // Set active class on buttons
@@ -336,7 +457,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
 
     const input = document.createElement('input');
     input.type = (key === 'email' ? 'email' : 'text'); // Better practice for email
-    input.id = `${key}`; 
+    input.id = `${key}`;
     input.value = userData[key];
     input.dataset.originalValue = userData[key];
     input.className = 'profile-item';
@@ -548,8 +669,8 @@ function renderPasswordDetails(userData, container, translation) {
   // 1. Define fields (no edit icon needed for the password block, it's one atomic action)
   const fields = [
     { key: 'currentPassword', label: translation.password || 'Current Password', type: 'password', required: true },
-    { key: 'newPassword', label: translation.new_password || 'New Password', type: 'password', required: true, dependent: true },
-    { key: 'confirmNewPassword', label: translation.confirm_password || 'Confirm New Password', type: 'password', required: true, dependent: true }
+    { key: 'newPassword', label: translation.newPassword || 'New Password', type: 'password', required: true, dependent: true },
+    { key: 'confirmNewPassword', label: translation.confirmNewPassword || 'Confirm New Password', type: 'password', required: true, dependent: true }
   ];
 
   // Create a centralized button element that will handle the save action for this whole block
