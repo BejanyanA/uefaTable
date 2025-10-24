@@ -20,9 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
    FriendManager.openFriends();
    ProfileManager.openProfile();
    changeLang(currentLang);
-   
+
    checkLoggedIn();
    window.logout = logout;
+
+   const action = sessionStorage.getItem("postLogoutAction");
+   if (action === "openLogin") {
+      sessionStorage.removeItem("postLogoutAction");
+      // make sure openModal is available by now
+      openModal("loginModal");
+   }
 });
 
 // 🔹 Language Dropdown

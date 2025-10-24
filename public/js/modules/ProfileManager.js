@@ -768,6 +768,7 @@ function renderPasswordDetails(userData, container, translation) {
     if (!hasError && inputs.currentPassword.value.trim().length > 0) {
 
       // Validation for New Password
+      const currentPassValue = inputs.currentPassword.value.trim();
       const newPassValue = inputs.newPassword.value.trim();
       const confirmPassValue = inputs.confirmNewPassword.value.trim();
       const usernameValue = userData.username; // Get username for match check
@@ -786,6 +787,9 @@ function renderPasswordDetails(userData, container, translation) {
         hasError = true;
       } else if (typeof detectSpace === 'function' && detectSpace(newPassValue)) {
         setError(errorEls.newPassword.id, translation.no_spaces_allowed);
+        hasError = true;
+      } else if (newPassValue === currentPassValue) {
+        setError(errorEls.newPassword.id, translation.new_password_match_current);
         hasError = true;
       }
 
@@ -830,16 +834,17 @@ function renderPasswordDetails(userData, container, translation) {
         inputs.confirmNewPassword.value = '';
         updateDependentFields(); // Will disable new/confirm fields
         setTimeout(() => {
-          logout();
+          sessionStorage.setItem("postLogoutAction", "openLogin"); // handoff flag
+          logout(); // this reloads the page
         }, 2500);
 
       } else {
         const errors = updateData.errors;
 
-        if (errors && errors.currentPassword) {
+        if (errors && errors.currentPassword === "invalid_current_password") {
           setError(errorEls.currentPassword.id, translation.wrong_current_password || "Current password is wrong");
         } else if (errors && errors.newPassword) {
-          setError(errorEls.newPassword.id, translation.new_password_natch_current_password || "New password matches current password");
+          setError(errorEls.newPassword.id, translation.new_password_match_current || "New password matches current password");
         } else {
           showToast(updateData.message || translation.password_update_failed || "Password update failed.", "error");
         }

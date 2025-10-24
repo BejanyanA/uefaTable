@@ -101,6 +101,7 @@ export const langMap = {
     confirmNewPassword: "Confirm New Password",
     personalDetails: "Personal Details",
     achievements: "Achievements",
+    new_password_match_current: "New password matches current password",
 
 
     //BE translations
@@ -122,6 +123,7 @@ export const langMap = {
     friend_approved_success: "User Approved Successfully",
     friend_rejected_success: "User Rejected Successfully",
     friend_deleted_success: "User Deleted Successfully",
+    wrong_current_password: "Current password is wrong",
   },
 
   am: {
@@ -226,6 +228,7 @@ export const langMap = {
     confirmNewPassword: "Հաստատել նոր գաղտնաբառը",
     personalDetails: "Անձնական տվյալներ",
     achievements: "Նվաճումներ",
+    new_password_match_current: "Նոր գաղտնաբառը համընկնում է ընթացիկի հետ",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -246,6 +249,7 @@ export const langMap = {
     friend_approved_success: "Ընկերությունը հաջողությամբ հաստատվել է",
     friend_rejected_success: "Օգտատերը հաջողությամբ մերժվել է",
     friend_deleted_success: "Օգտատերը հաջողությամբ ջնջվել է",
+    wrong_current_password: "Ընթացիկ գաղտնաբառը սխալ է",
   },
 
   fr: {
@@ -350,6 +354,7 @@ export const langMap = {
     confirmNewPassword: "Confirmer le nouveau mot de passe",
     personalDetails: "Détails personnels",
     achievements: "Succès",
+    new_password_match_current: "Nouveau mot de passe identique à l’actuel",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -370,6 +375,7 @@ export const langMap = {
     friend_approved_success: "Utilisateur approuvé avec succès",
     friend_rejected_success: "Utilisateur rejeté avec succès",
     friend_deleted_success: "Utilisateur supprimé avec succès",
+    wrong_current_password: "Mot de passe actuel erroné",
   }
 };
 
@@ -400,7 +406,7 @@ function changeLang(lang, opts = {}) {
   updateFriendActionButtonTranslations();
 
   // 🔹 Notify all modules that language changed
- if (!window.__APP_BOOTING__ && !silent) {
+  if (!window.__APP_BOOTING__ && !silent) {
     document.dispatchEvent(new CustomEvent('app:language-changed', { detail: { lang } }));
   };
 
