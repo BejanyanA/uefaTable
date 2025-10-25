@@ -2,7 +2,8 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
-import { markSeenIfUnread } from './NotificationManager.js';
+import { API_BASE } from '../services/config.js';
+import { markSeenIfUnread, handleBellClick } from './NotificationManager.js';
 
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
@@ -56,7 +57,7 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
         addButton.textContent = t.addFriend || "+ Add Friend";
 
         addButton.addEventListener('click', async () => {
-          const reqResponse = await apiPost("/add-friend", { userId: id }, token);
+          const reqResponse = await apiPost("/add-friend", { userId: id });
           if (reqResponse.success) {
             // Update UI to pending after request is sent
             showToast(t.friend_request_success || "Successfully Sent", "success");
@@ -109,6 +110,31 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
 
 export const FriendManager = {
+
+  handleNotificationClick: async function () {
+    // 1. Mark notifications as seen
+    // NOTE: This relies on markSeenIfUnread doing the API call and UI update.
+    markSeenIfUnread();
+    handleBellClick();
+    console.warn("sssssssssssssssssssssssssssssss");
+
+    // 2. Open the friends view (This builds the entire DOM including the tabs)
+    // Since openFriends returns a Promise, await it to ensure the DOM is built.
+    await this.openFriends();
+
+    // 3. Immediately switch to the pending tab.
+    // openFriends has completed, so the elements should exist.
+    const pendingTabBtn = document.getElementById("pendingUsersTab");
+
+    if (pendingTabBtn) {
+      // Simulate a click on the button element. 
+      // This triggers the click listener defined locally inside openFriends,
+      // which handles calling showFriendsTab("pending") and initiating the data fetch.
+      pendingTabBtn.click();
+    } else {
+      console.warn("Pending tab button not found after opening friends view.");
+    }
+  },
 
   openFriends: async function () {
     const translation = langMap[currentLang];

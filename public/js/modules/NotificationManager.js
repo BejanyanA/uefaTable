@@ -116,7 +116,6 @@ export async function initNotifications() {
 export async function markSeenIfUnread() {
     // Check the global count variable managed by updateNotificationBadge
     if (currentUnreadCount === 0) {
-        console.log("No unread notifications to mark as seen.");
         return; // Exit early if nothing to mark
     }
 
@@ -125,8 +124,6 @@ export async function markSeenIfUnread() {
         const response = await apiPost("/notifications/mark-seen", {}, loaderOff);
 
         if (response.success) {
-            console.log("Notifications marked as seen (Pending tab opened). Re-fetching count...");
-
             // 2. Synchronize the count to 0 (This is fetchAndDisplayCount)
             await fetchAndDisplayCount();
         }
@@ -137,7 +134,7 @@ export async function markSeenIfUnread() {
 
 // Keep the original handleBellClick if it's referenced externally,
 // but update its internal logic to use the new function.
-async function handleBellClick() {
+export async function handleBellClick() {
     await markSeenIfUnread();
 }
 
