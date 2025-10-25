@@ -2,6 +2,7 @@
 
 import { jsonResponse, parseBody } from '../utils/helper.js';
 import { verifyToken } from '../utils/jwt.js';
+import { getSeenAt, getUnreadCount, publishToUser } from '../worker.js';
 
 export async function handleAddFriends(request, env) {
     const authHeader = request.headers.get("Authorization");
@@ -88,9 +89,13 @@ export async function handleAddFriends(request, env) {
 
     // 6) Create new pending request
     const insert = await env.core_data.prepare(`
-    INSERT INTO friends (user_id, friend_id, status, created_at)
-    VALUES (?, ?, 'pending', datetime('now'))
-  `).bind(loggedInUserId, targetUserId).run();
+  INSERT INTO friends (user_id, friend_id, status, created_at, updated_at)
+  VALUES (?, ?, 'pending', datetime('now'), datetime('now'))
+`).bind(loggedInUserId, targetUserId).run();
+
+    const seenAt = await getSeenAt(env, targetUserId);
+    const unread = await getUnreadCount(env, targetUserId, seenAt);
+    await publishToUser(env, targetUserId, { type: "friend_requests", count: unread });
 
     return jsonResponse({
         success: true,
@@ -101,119 +106,107 @@ export async function handleAddFriends(request, env) {
 }
 
 export async function handleApproveFriends(request, env) {
+    // 1) Auth
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
-
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
-
     if (!payload) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
+    const receiverId = Number(payload.id);
 
-    const loggedInUserId = payload.id;
-
-    // 2) Input validation
+    // 2) Input: sender user id (the one who sent the request to me)
     const { userId } = await parseBody(request);
-    const senderUserId = Number(userId);
-
-    if (!senderUserId || Number.isNaN(senderUserId)) {
+    const requesterId = Number(userId);
+    if (!requesterId || Number.isNaN(requesterId)) {
         return jsonResponse({ success: false, message: "invalid_user_id" }, 400);
     }
-    if (senderUserId === loggedInUserId) {
+    if (requesterId === receiverId) {
         return jsonResponse({ success: false, message: "cannot_approve_self" }, 400);
     }
 
-    // 3) Ensure sender exists
+    // 3) Sender must exist (optional but nice)
     const sender = await env.core_data
         .prepare(`SELECT id, username FROM users WHERE id = ?`)
-        .bind(senderUserId)
+        .bind(requesterId)
         .first();
     if (!sender) {
         return jsonResponse({ success: false, message: "user_not_found" }, 404);
     }
 
-    // 4) Find pending friend request from sender → you
+    // 4) Must be a *pending* incoming request: requester -> me
     const pending = await env.core_data.prepare(`
     SELECT id, status
     FROM friends
     WHERE user_id = ? AND friend_id = ?
     ORDER BY datetime(created_at) DESC
     LIMIT 1
-  `).bind(senderUserId, loggedInUserId).first();
+  `).bind(requesterId, receiverId).first();
 
     if (!pending) {
-        return jsonResponse({
-            success: false,
-            message: "no_pending_request_found"
-        }, 404);
+        return jsonResponse({ success: false, message: "no_pending_request_found" }, 404);
     }
-
     if (pending.status !== "pending") {
-        return jsonResponse({
-            success: false,
-            message: `cannot_approve_status_${pending.status}`
-        }, 409);
+        return jsonResponse({ success: false, message: `cannot_approve_status_${pending.status}` }, 409);
     }
 
-    // 5) Approve the request
+    // 5) Approve + timestamp
     await env.core_data.prepare(`
     UPDATE friends
-    SET status = 'approved'
+    SET status = 'approved', updated_at = datetime('now')
     WHERE id = ?
   `).bind(pending.id).run();
 
-    // 6) Response
+    // 6) Notify requester instantly over SSE
+    await publishToUser(env, requesterId, {
+        type: "friend_status_update",
+        userId: receiverId,
+        status: "approved"
+    });
+
+    // 7) Response
     return jsonResponse({
         success: true,
-        data: {
-            message: "user_approved_success"
-        }
+        data: { message: "user_approved_success" }
     }, 200);
 }
 
 export async function handleRejectFriend(request, env) {
     // 1) Auth
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
-
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
-
     if (!payload) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
+    const receiverId = Number(payload.id);
 
-    const loggedInUserId = payload.id;
-
-    // 2) Input
+    // 2) Input: requester user id (the one who sent to me)
     const { userId } = await parseBody(request);
-    const targetUserId = Number(userId);
-
-    if (!targetUserId || Number.isNaN(targetUserId)) {
+    const requesterId = Number(userId);
+    if (!requesterId || Number.isNaN(requesterId)) {
         return jsonResponse({ success: false, message: "invalid_user_id" }, 400);
     }
-    if (targetUserId === loggedInUserId) {
+    if (requesterId === receiverId) {
         return jsonResponse({ success: false, message: "cannot_reject_self" }, 400);
     }
 
-    // 3) Check if target exists
+    // 3) Requester must exist (optional)
     const target = await env.core_data
         .prepare(`SELECT id, username FROM users WHERE id = ?`)
-        .bind(targetUserId)
+        .bind(requesterId)
         .first();
-
     if (!target) {
         return jsonResponse({ success: false, message: "user_not_found" }, 404);
     }
 
-    // 4) Find existing relation (either direction)
+    // 4) Must be a *pending* incoming request: requester -> me
     const relation = await env.core_data.prepare(`
     SELECT id, user_id, friend_id, status
     FROM friends
@@ -221,35 +214,34 @@ export async function handleRejectFriend(request, env) {
        OR (user_id = ? AND friend_id = ?)
     ORDER BY datetime(created_at) DESC
     LIMIT 1
-  `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).first();
+  `).bind(requesterId, receiverId, receiverId, requesterId).first();
 
     if (!relation) {
-        return jsonResponse({
-            success: false,
-            message: "no_relation_found"
-        }, 404);
+        return jsonResponse({ success: false, message: "no_pending_request_found" }, 404);
     }
-
     if (relation.status === "rejected") {
-        return jsonResponse({
-            success: false,
-            message: "already_rejected"
-        }, 409);
+        // If you want to allow rejecting approved to mean "unfriend", change this to allow and update to 'rejected'.
+        return jsonResponse({ success: false, message: `cannot_reject_status_${relation.status}` }, 409);
     }
 
-    // 5) Reject any existing relation (pending / approved / blocked / etc.)
+    // 5) Reject + timestamp
     await env.core_data.prepare(`
     UPDATE friends
-    SET status = 'rejected'
+    SET status = 'rejected', updated_at = datetime('now')
     WHERE id = ?
   `).bind(relation.id).run();
 
-    // 6) Return consistent response
+    // 6) Notify requester instantly over SSE
+    await publishToUser(env, requesterId, {
+        type: "friend_status_update",
+        userId: receiverId,
+        status: "rejected"
+    });
+
+    // 7) Response
     return jsonResponse({
         success: true,
-        data: {
-            message: "user_rejected_success"
-        }
+        data: { message: "user_rejected_success" }
     }, 200);
 }
 

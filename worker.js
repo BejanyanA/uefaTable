@@ -210,14 +210,14 @@ export default {
 export { NotificationHub } from './routes_endpoints/NotificationHub.js';
 
 
-async function getSeenAt(env, userId) {
+export async function getSeenAt(env, userId) {
   const row = await env.core_data
     .prepare(`SELECT updated_at AS seenAt FROM user_notification_state WHERE user_id = ?`)
     .bind(userId).first();
   return row?.seenAt || null;
 }
 
-async function markSeenNow(env, userId) {
+export async function markSeenNow(env, userId) {
   await env.core_data.prepare(
     `INSERT INTO user_notification_state (user_id, updated_at)
        VALUES (?, datetime('now'))
@@ -225,7 +225,7 @@ async function markSeenNow(env, userId) {
   ).bind(userId).run();
 }
 
-async function getUnreadCount(env, userId, seenAt) {
+export async function getUnreadCount(env, userId, seenAt) {
   if (!seenAt) {
     const { results } = await env.core_data.prepare(
       `SELECT COUNT(*) AS cnt FROM friends WHERE friend_id = ? AND status = 'pending'`
@@ -241,7 +241,7 @@ async function getUnreadCount(env, userId, seenAt) {
   return Number(results?.[0]?.cnt || 0);
 }
 
-async function publishToUser(env, userId, payload) {
+export async function publishToUser(env, userId, payload) {
   const id = env.NOTIF_HUB.idFromName("hub");
   const stub = env.NOTIF_HUB.get(id);
   const u = new URL("https://internal/notifications/publish");
