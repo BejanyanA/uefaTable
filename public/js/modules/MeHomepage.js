@@ -1,4 +1,5 @@
 import { apiGet } from '../services/api.js';
+import { initNotifications } from './NotificationManager.js';
 
 // 🔹 JWT Check on Load
 export async function checkLoggedIn() {
@@ -9,6 +10,8 @@ export async function checkLoggedIn() {
    if (!token) {
       if (authButtons) authButtons.style.display = "flex";
       return;
+   } else {
+      initNotifications();
    }
 
    try {
@@ -17,6 +20,7 @@ export async function checkLoggedIn() {
          // document.getElementById("logoutButtn").style.display = "block";
          document.getElementById("homePage").style.display = "block";
          document.getElementById("headerUsername").style.display = "block";
+         document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
          localStorage.setItem('user', JSON.stringify(data.user));
          localStorage.removeItem("lastActiveLeagueTab");
@@ -36,6 +40,7 @@ export async function checkLoggedIn() {
          localStorage.removeItem("currentBannerId");
          localStorage.removeItem("leagueId");
          localStorage.removeItem("selectedStageType");
+         document.getElementById("notificationBell").style.display = "none";
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
@@ -59,6 +64,7 @@ export function logout() {
    location.reload();
 
    document.getElementById("homePage").style.display = "none";
+   document.getElementById("notificationBell").style.display = "none";
    document.getElementById("welcomeUser").innerText = "";
 
    document.getElementById("loginBtn").style.display = "inline-block";

@@ -15,3 +15,14 @@ enabled = true
 binding = "core_data"
 database_name = "core-db"
 database_id = "09b42559-8b10-4ee0-b3b0-af0d5a5f3609"
+
+
+[[durable_objects.bindings]]
+name = "NOTIF_HUB"
+class_name = "NotificationHub"
+
+
+# Each time you add/rename a DO class, add a NEW [[migrations]] entry with a new tag.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["NotificationHub"]

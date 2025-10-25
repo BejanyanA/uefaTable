@@ -1,4 +1,5 @@
 import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
+import { verifyToken } from './utils/jwt.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe } from './routes_endpoints/me.js';
@@ -154,7 +155,98 @@ export async function onRequest(context) {
 }
 
 export default {
-  fetch(request, env, ctx) {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // === SSE subscribe (forward to Durable Object) ===
+    if (url.pathname === "/notifications/stream" && request.method === "GET") {
+      const t = url.searchParams.get("t");
+      const payload = t ? await verifyToken(t, env.JWT_SECRET) : null;
+      if (!payload) return new Response("Unauthorized", { status: 401 });
+
+      const id = env.NOTIF_HUB.idFromName("hub");
+      const stub = env.NOTIF_HUB.get(id);
+      url.searchParams.set("action", "subscribe");
+      url.searchParams.set("userId", String(payload.id));
+      return stub.fetch(url.toString(), { method: "GET" });
+    }
+
+    // === Get unread count ===
+    if (url.pathname === "/notifications/count" && request.method === "GET") {
+      const auth = request.headers.get("Authorization");
+      if (!auth?.startsWith("Bearer "))
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+
+      const token = auth.split(" ")[1];
+      const me = await verifyToken(token, env.JWT_SECRET);
+      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+
+      const seenAt = await getSeenAt(env, me.id);
+      const count = await getUnreadCount(env, me.id, seenAt);
+      return jsonResponse({ success: true, data: { pendingFriendRequests: count, seenAt } });
+    }
+
+    // === Mark notifications as seen ===
+    if (url.pathname === "/notifications/mark-seen" && request.method === "POST") {
+      const auth = request.headers.get("Authorization");
+      if (!auth?.startsWith("Bearer "))
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+
+      const token = auth.split(" ")[1];
+      const me = await verifyToken(token, env.JWT_SECRET);
+      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+
+      await markSeenNow(env, me.id);
+      await publishToUser(env, me.id, { type: "friend_requests", count: 0 });
+      return jsonResponse({ success: true });
+    }
+
+    // === Fallback to your existing router ===
     return onRequest({ request, env, ctx });
   }
 };
+
+
+export { NotificationHub } from './routes_endpoints/NotificationHub.js';
+
+
+async function getSeenAt(env, userId) {
+  const row = await env.core_data
+    .prepare(`SELECT updated_at AS seenAt FROM user_notification_state WHERE user_id = ?`)
+    .bind(userId).first();
+  return row?.seenAt || null;
+}
+
+async function markSeenNow(env, userId) {
+  await env.core_data.prepare(
+    `INSERT INTO user_notification_state (user_id, updated_at)
+       VALUES (?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET updated_at = excluded.updated_at`
+  ).bind(userId).run();
+}
+
+async function getUnreadCount(env, userId, seenAt) {
+  if (!seenAt) {
+    const { results } = await env.core_data.prepare(
+      `SELECT COUNT(*) AS cnt FROM friends WHERE friend_id = ? AND status = 'pending'`
+    ).bind(userId).all();
+    return Number(results?.[0]?.cnt || 0);
+  }
+  const { results } = await env.core_data.prepare(
+    `SELECT COUNT(*) AS cnt
+     FROM friends
+     WHERE friend_id = ? AND status = 'pending'
+       AND datetime(COALESCE(created_at, updated_at, '1970-01-01')) > datetime(?)`
+  ).bind(userId, seenAt).all();
+  return Number(results?.[0]?.cnt || 0);
+}
+
+async function publishToUser(env, userId, payload) {
+  const id = env.NOTIF_HUB.idFromName("hub");
+  const stub = env.NOTIF_HUB.get(id);
+  const u = new URL("https://internal/notifications/publish");
+  u.searchParams.set("action", "publish");
+  u.searchParams.set("userId", String(userId));
+  for (const [k, v] of Object.entries(payload)) u.searchParams.set(k, String(v));
+  await stub.fetch(u.toString(), { method: "POST" });
+}

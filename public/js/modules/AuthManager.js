@@ -3,6 +3,7 @@ import { isValidEmail, isValidPassword, detectSpace } from '../utils/validators.
 import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { apiPost, apiGet } from '../services/api.js';
+import { initNotifications } from './NotificationManager.js';
 
 export const AuthManager = {
   initLogin: function () {
@@ -62,10 +63,12 @@ export const AuthManager = {
           if (me.success) {
             document.getElementById("homePage").style.display = "block";
             document.getElementById("headerUsername").style.display = "block";
+            document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
             localStorage.setItem('user', JSON.stringify(me.user));
+            initNotifications();
 
             // ✅ Immediately update the username in header
             const usernameEl = document.getElementById("headerUsernameTitle");

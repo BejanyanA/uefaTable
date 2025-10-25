@@ -34,8 +34,9 @@
   <link rel="stylesheet" href="css/components/homepage.css">
   <link rel="stylesheet" href="css/components/profile-menu.css">
   <link rel="stylesheet" href="css/components/friend-menu.css">
+  <link rel="stylesheet" href="css/components/notification-bell.css">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
@@ -65,12 +66,16 @@
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
     </div>
-    
+
 
     <div class="header-username" id="headerUsername" style="display: none;">
       <h2 id="headerUsernameTitle">Test123</h2>
     </div>
 
+    <div class="notification-bell" id="notificationBell" style="display: none;">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notification-badge" id="notificationBadge" style="display: none;">3</span>
+    </div>
 
     <div class="profile-menu" id="profileMenu" style="display: none;">
       <div class="dropdown">
