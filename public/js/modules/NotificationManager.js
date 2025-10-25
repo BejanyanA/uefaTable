@@ -39,7 +39,7 @@ async function fetchAndDisplayCount() {
 
         if (response.success && response.data) {
             // Your BE field name is 'pendingFriendRequests' for the count
-            updateNotificationBadge(response.data.pendingFriendRequests);
+            updateNotificationBadge(response.data.requestsCount);
         }
     } catch (error) {
         console.error("Failed to fetch notification count:", error);

@@ -166,7 +166,7 @@ export default {
 
       const id = env.NOTIF_HUB.idFromName("hub");
       const stub = env.NOTIF_HUB.get(id);
-      
+
       url.searchParams.set("action", "subscribe");
       url.searchParams.set("userId", String(payload.id));
 
@@ -195,7 +195,7 @@ export default {
 
       const seenAt = await getSeenAt(env, me.id);
       const count = await getUnreadCount(env, me.id, seenAt);
-      return jsonResponse({ success: true, data: { pendingFriendRequests: count, seenAt } });
+      return jsonResponse({ success: true, data: { requestsCount: count, seenAt } });
     }
 
     // === Mark notifications as seen ===
