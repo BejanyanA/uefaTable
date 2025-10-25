@@ -16,9 +16,10 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
     return;
   }
 
+  const loaderOff = { showLoading: false };
+
   try {
-    const token = localStorage.getItem("authToken");
-    const response = await apiPost("/search-user", { username: username }, token);
+    const response = await apiPost("/search-user", { username: username }, loaderOff);
 
     // CONFIRMED SUCCESS CHECK: response.data.user
     if (response.success && response.data && response.data.user) {
@@ -114,6 +115,8 @@ export const FriendManager = {
     const section = document.getElementById("friendsContainer");
     section.innerHTML = ""; // Clear previous content
     section.style.display = "block";
+
+    const loaderOff = { showLoading: false };
 
     // 🔹 Friends click logic
     const friendsLink = document.getElementById("friends");

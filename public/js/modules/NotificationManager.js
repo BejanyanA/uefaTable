@@ -1,8 +1,8 @@
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
+import { FriendManager } from './FriendManager.js';
 
 const loaderOff = { showLoading: false };
-
 
 // 1. References to DOM elements
 const notificationBellEl = document.getElementById('notificationBell');
@@ -119,9 +119,6 @@ export async function markSeenIfUnread() {
         console.log("No unread notifications to mark as seen.");
         return; // Exit early if nothing to mark
     }
-
-    const token = localStorage.getItem("authToken");
-    if (!token) return;
 
     try {
         // 1. Call the backend to mark seen
