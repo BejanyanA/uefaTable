@@ -1,103 +1,155 @@
-// NotificationManager.js
+import { apiGet, apiPost } from '../services/api.js';
+import { API_BASE } from '../services/config.js';
 
-// 1. References to DOM elements (Assumes they exist in index.html)
+// 1. References to DOM elements
 const notificationBellEl = document.getElementById('notificationBell');
 const notificationBadgeEl = document.getElementById('notificationBadge');
-const userInteractionsEl = document.querySelector('.user-interactions'); // Use this to control bell visibility
 
-// Assuming apiGet and showToast are available globally or imported here
-// import { apiGet } from './api.js'; 
+let eventSource = null; // To hold the SSE connection object
+let currentUnreadCount = 0;
 
-let isBellInitialized = false; // Flag to prevent multiple initializations
+// You must export your apiPost function or ensure it's globally available
+// import { apiGet, apiPost } from './api.js'; 
+
 
 /**
- * Updates the notification badge count and visibility.
  * @param {number} count - The number of unread notifications.
  */
-export function updateNotificationBadge(count) {
-    const unreadCount = parseInt(count, 10);
+function updateNotificationBadge(count) {
+    currentUnreadCount = parseInt(count, 10);
 
-    if (unreadCount > 0) {
-        notificationBadgeEl.textContent = unreadCount;
+    if (currentUnreadCount > 0) {
+        notificationBadgeEl.textContent = currentUnreadCount;
         notificationBadgeEl.style.display = 'block';
         notificationBadgeEl.classList.add('new-notifications');
+        // You might want to play a sound or trigger a small animation here
     } else {
         notificationBadgeEl.style.display = 'none';
         notificationBadgeEl.classList.remove('new-notifications');
     }
 }
 
+async function fetchAndDisplayCount() {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+        // The BE returns a format like: { success: true, data: { pendingFriendRequests: count, seenAt } }
+        const response = await apiGet("/notifications/count", token);
+
+        if (response.success && response.data) {
+            // Your BE field name is 'pendingFriendRequests' for the count
+            updateNotificationBadge(response.data.pendingFriendRequests);
+        }
+    } catch (error) {
+        console.error("Failed to fetch notification count:", error);
+    }
+}
+
 /**
- * Fetches the current unread count from the server.
+ * 1. Initial REST call to get the current unread count.
+ * 2. Starts the real-time SSE stream.
  */
+export async function initNotifications() {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        cleanupNotifications();
+        return;
+    }
 
-const MOCK_UNREAD_COUNT = 5;
-export function fetchNotificationCount() {
-    // We prevent the actual async API call for now.
-    // const token = localStorage.getItem("authToken");
-    // if (!token) return;
+    // --- A. Initial Count Fetch ---
+    // ⭐ Use the new reusable function
+    await fetchAndDisplayCount();
 
-    // // Simulate network delay if desired
-    // setTimeout(() => {
 
-    // --- MOCK API RESPONSE ---
-    const response = {
-        success: true,
-        unreadCount: MOCK_UNREAD_COUNT // ⭐ Use the hardcoded value
+    if (eventSource) {
+        eventSource.close(); // Close existing connection if any
+    }
+
+    // The BE endpoint is /notifications/stream?t=<token>
+    const streamUrl = `${API_BASE}/notifications/stream?t=${encodeURIComponent(token)}`;
+
+    // Initialize the EventSource connection
+    eventSource = new EventSource(streamUrl);
+
+
+    // Listen for generic messages (sent by the server without an 'event' field)
+    eventSource.onmessage = function (event) {
+        // The BE logic isn't sending generic messages, but it's good practice.
+        console.log("Generic SSE Message:", event.data);
     };
 
-    if (response.success) {
-        updateNotificationBadge(response.unreadCount);
-    }
+    // Listen for custom events named 'friend_requests'
+    // The BE's publishToUser sends: { type: "friend_requests", count: 0 }
+    eventSource.onmessage = function (event) {
+        console.log("Generic SSE Message received:", event.data);
 
-    // }, 500); // Simulate 500ms delay
+        // ⭐ ADD PROCESSING LOGIC HERE ⭐
+        try {
+            // Attempt to parse the data as JSON
+            const data = JSON.parse(event.data);
 
-    // If you plan to use setInterval later, keep the interval logic in initNotifications
+            // Check if it's the notification count update we care about
+            if (data.type === 'friend_requests' && typeof data.count === 'number') {
+                updateNotificationBadge(data.count);
+                console.log("Generic SSE processed and count updated:", data.count);
+            }
 
-}
+        } catch (e) {
+            // This will catch non-JSON messages (like your initial 'ready' message)
+            console.warn("Could not process generic message as JSON:", event.data, e);
+        }
+    };
+    // Handle errors (automatic reconnect happens by default)
+    eventSource.onerror = function (error) {
+        console.error("SSE Error occurred. Attempting to reconnect...", error);
+    };
 
-/**
- * Handles the click event on the notification bell.
- */
-function handleBellClick() {
-    // 1. Placeholder for opening a dropdown/modal
-    console.log("Notification bell clicked. Opening dropdown...");
-
-    // 2. Logic to mark notifications as read (optional, can be done on dropdown close)
-    // markAllAsRead(); 
-}
-
-/**
- * Initializes the notification bell functionality.
- * This should be called once when the user logs in.
- */
-export function initNotifications() {
-    if (isBellInitialized) return;
-
-    // Show the bell icon in the header
+    // Show the bell icon
     if (notificationBellEl) {
-        notificationBellEl.style.display = 'flex'; // Use flex if the badge is inline
+        notificationBellEl.style.display = 'flex';
         notificationBellEl.addEventListener('click', handleBellClick);
     }
-
-    // Start fetching the count immediately
-    fetchNotificationCount();
-
-    // Set up polling (e.g., fetch the count every 60 seconds)
-    setInterval(fetchNotificationCount, 60000);
-
-    isBellInitialized = true;
 }
+
+/**
+ * Handles the click event on the notification bell (to mark notifications as seen).
+ */
+async function handleBellClick() {
+    if (currentUnreadCount === 0) return;
+
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+        const response = await apiPost("/notifications/mark-seen", {}, token);
+
+        if (response.success) {
+            console.log("Notifications marked as seen. Re-fetching count...");
+
+            // ⭐ CRITICAL CHANGE: Call the count endpoint again for synchronization
+            await fetchAndDisplayCount();
+        }
+    } catch (error) {
+        console.error("Failed to mark notifications as seen:", error);
+    }
+}
+
 
 /**
  * Cleans up and hides the bell when the user logs out.
  */
 export function cleanupNotifications() {
+    // 1. Close the SSE connection
+    if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+    }
+
+    // 2. Hide the UI elements and remove listener
     if (notificationBellEl) {
         notificationBellEl.style.display = 'none';
         notificationBellEl.removeEventListener('click', handleBellClick);
     }
-    updateNotificationBadge(0); // Clear the badge
-    isBellInitialized = false;
-    // You may also need to clear the setInterval if you stored the timer ID
+    updateNotificationBadge(0); // Clear the badge count
 }
