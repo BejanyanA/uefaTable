@@ -1,6 +1,9 @@
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
 
+const loaderOff = { showLoading: false };
+
+
 // 1. References to DOM elements
 const notificationBellEl = document.getElementById('notificationBell');
 const notificationBadgeEl = document.getElementById('notificationBadge');
@@ -30,12 +33,10 @@ function updateNotificationBadge(count) {
 }
 
 async function fetchAndDisplayCount() {
-    const token = localStorage.getItem("authToken");
-    if (!token) return;
 
     try {
         // The BE returns a format like: { success: true, data: { pendingFriendRequests: count, seenAt } }
-        const response = await apiGet("/notifications/count", token);
+        const response = await apiGet("/notifications/count", loaderOff);
 
         if (response.success && response.data) {
             // Your BE field name is 'pendingFriendRequests' for the count
@@ -100,10 +101,7 @@ export async function initNotifications() {
             console.warn("Could not process generic message as JSON:", event.data, e);
         }
     };
-    // Handle errors (automatic reconnect happens by default)
-    eventSource.onerror = function (error) {
-        console.error("SSE Error occurred. Attempting to reconnect...", error);
-    };
+
 
     // Show the bell icon
     if (notificationBellEl) {
@@ -115,24 +113,35 @@ export async function initNotifications() {
 /**
  * Handles the click event on the notification bell (to mark notifications as seen).
  */
-async function handleBellClick() {
-    if (currentUnreadCount === 0) return;
+export async function markSeenIfUnread() {
+    // Check the global count variable managed by updateNotificationBadge
+    if (currentUnreadCount === 0) {
+        console.log("No unread notifications to mark as seen.");
+        return; // Exit early if nothing to mark
+    }
 
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
     try {
-        const response = await apiPost("/notifications/mark-seen", {}, token);
+        // 1. Call the backend to mark seen
+        const response = await apiPost("/notifications/mark-seen", {}, loaderOff);
 
         if (response.success) {
-            console.log("Notifications marked as seen. Re-fetching count...");
+            console.log("Notifications marked as seen (Pending tab opened). Re-fetching count...");
 
-            // ⭐ CRITICAL CHANGE: Call the count endpoint again for synchronization
+            // 2. Synchronize the count to 0 (This is fetchAndDisplayCount)
             await fetchAndDisplayCount();
         }
     } catch (error) {
         console.error("Failed to mark notifications as seen:", error);
     }
+}
+
+// Keep the original handleBellClick if it's referenced externally,
+// but update its internal logic to use the new function.
+async function handleBellClick() {
+    await markSeenIfUnread();
 }
 
 

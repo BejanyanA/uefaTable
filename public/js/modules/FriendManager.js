@@ -2,6 +2,7 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
+import { markSeenIfUnread } from './NotificationManager.js';
 
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
@@ -601,6 +602,9 @@ export const FriendManager = {
         btn.addEventListener("click", () => {
           // This now triggers the fetch inside showFriendsTab
           showFriendsTab(btn.dataset.tab);
+          if (btn === pendingTabBtn) {
+            markSeenIfUnread();
+          }
         });
       });
 
