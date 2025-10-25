@@ -25,7 +25,7 @@
   /* Position above the bell */
   right: -8px;
   /* Position to the right of the bell */
-  background-color: #ff4d4d;
+  background-color: #ff0000;
   /* Red color for alerts */
   color: white;
   border-radius: 50%;
@@ -74,8 +74,8 @@
     padding: 2px 2px;
     font-size: 0.5em;
     /* Smaller text in the badge */
-    top: -3px;
-    right: -5px;
+    top: -5px;
+    right: -7px;
   }
 
 }
