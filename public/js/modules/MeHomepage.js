@@ -40,7 +40,6 @@ export async function checkLoggedIn() {
          localStorage.removeItem("currentBannerId");
          localStorage.removeItem("leagueId");
          localStorage.removeItem("selectedStageType");
-         document.getElementById("notificationBell").style.display = "none";
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
@@ -65,7 +64,6 @@ export function logout() {
 
    document.getElementById("homePage").style.display = "none";
    document.getElementById("notificationBell").style.display = "none";
-   document.getElementById("welcomeUser").innerText = "";
 
    document.getElementById("loginBtn").style.display = "inline-block";
    document.getElementById("registerBtn").style.display = "inline-block";

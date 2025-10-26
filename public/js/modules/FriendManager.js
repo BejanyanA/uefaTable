@@ -109,20 +109,6 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
 export const FriendManager = {
 
-  handleNotificationClick: async function () {
-
-    await this.openFriends();
-
-
-    const pendingTabBtn = document.getElementById("pendingUsersTab");
-    if (pendingTabBtn) {
-
-      pendingTabBtn.click();
-    } else {
-      console.warn("Pending tab button not found after opening friends view.");
-    }
-  },
-
   openFriends: async function () {
     const translation = langMap[currentLang];
     const section = document.getElementById("friendsContainer");
