@@ -651,7 +651,6 @@ export const FriendManager = {
       // We don't show a loading indicator here because the empty screen IS the loading screen for now.
       getFriends.initGetAllFriendsStatuses();
     });
-    friendsLink.click();
   },
 
 
