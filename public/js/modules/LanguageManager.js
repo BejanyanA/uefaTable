@@ -102,8 +102,8 @@ export const langMap = {
     personalDetails: "Personal Details",
     achievements: "Achievements",
     new_password_match_current: "New password matches current password",
-    friend_request_rejected: "Your Friend Request Rejected",
-    friend_request_approved: "Your Friend Request Approved",
+    friend_request_rejected: "Friendship Rejected",
+    friend_request_approved: "Friendship Approved",
 
 
     //BE translations
@@ -231,8 +231,8 @@ export const langMap = {
     personalDetails: "Անձնական տվյալներ",
     achievements: "Նվաճումներ",
     new_password_match_current: "Նոր գաղտնաբառը համընկնում է ընթացիկի հետ",
-    friend_request_rejected: "Ձեր ընկերանալու հայտը մերժվել է",
-    friend_request_approved: "Ձեր ընկերանալու հայտը հաստատվել է",
+    friend_request_rejected: "Ձեր ընկերությունը մերժվել է",
+    friend_request_approved: "Ձեր ընկերությունը հաստատվել է",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -359,8 +359,8 @@ export const langMap = {
     personalDetails: "Détails personnels",
     achievements: "Succès",
     new_password_match_current: "Nouveau mot de passe identique à l’actuel",
-    friend_request_rejected: "Demande d’amitié rejetée",
-    wrong_current_password: "Ընթացիկ գաղտնաբառը սխալ է",
+    friend_request_rejected: "Amitié rejetée",
+    friend_request_approved: "Demande d’amitié approuvée",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -381,7 +381,7 @@ export const langMap = {
     friend_approved_success: "Utilisateur approuvé avec succès",
     friend_rejected_success: "Utilisateur rejeté avec succès",
     friend_deleted_success: "Utilisateur supprimé avec succès",
-    wrong_current_password: "Mot de passe actuel erroné",
+    wrong_current_password: "Amitié approuvée",
   }
 };
 
