@@ -136,6 +136,7 @@ export async function markSeenIfUnread() {
 // but update its internal logic to use the new function.
 export async function handleBellClick() {
     await markSeenIfUnread();
+    await FriendManager.handleNotificationClick()
 }
 
 

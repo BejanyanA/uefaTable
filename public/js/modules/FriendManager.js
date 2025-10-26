@@ -2,8 +2,7 @@ import { langMap, currentLang } from './LanguageManager.js';
 import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
-import { API_BASE } from '../services/config.js';
-import { markSeenIfUnread, handleBellClick } from './NotificationManager.js';
+import { markSeenIfUnread } from './NotificationManager.js';
 
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
@@ -108,28 +107,16 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
 
 
 
-
 export const FriendManager = {
 
   handleNotificationClick: async function () {
-    // 1. Mark notifications as seen
-    // NOTE: This relies on markSeenIfUnread doing the API call and UI update.
-    markSeenIfUnread();
-    handleBellClick();
-    console.warn("sssssssssssssssssssssssssssssss");
 
-    // 2. Open the friends view (This builds the entire DOM including the tabs)
-    // Since openFriends returns a Promise, await it to ensure the DOM is built.
     await this.openFriends();
 
-    // 3. Immediately switch to the pending tab.
-    // openFriends has completed, so the elements should exist.
-    const pendingTabBtn = document.getElementById("pendingUsersTab");
 
+    const pendingTabBtn = document.getElementById("pendingUsersTab");
     if (pendingTabBtn) {
-      // Simulate a click on the button element. 
-      // This triggers the click listener defined locally inside openFriends,
-      // which handles calling showFriendsTab("pending") and initiating the data fetch.
+
       pendingTabBtn.click();
     } else {
       console.warn("Pending tab button not found after opening friends view.");
@@ -421,7 +408,7 @@ export const FriendManager = {
               showToast(translation.friend_rejected_success || "User successfully rejected", "success");
             } else if (actionType === 'delete') {
               showToast(translation.friend_deleted_success || "User successfully deleted", "success");
-            } 
+            }
           } else {
             showToast(translation.something_went_wrong, "error");
           }
@@ -664,6 +651,7 @@ export const FriendManager = {
       // We don't show a loading indicator here because the empty screen IS the loading screen for now.
       getFriends.initGetAllFriendsStatuses();
     });
+    friendsLink.click();
   },
 
 
