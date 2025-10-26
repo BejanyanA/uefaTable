@@ -15,17 +15,22 @@ export async function handleRegister(request, env) {
     return jsonResponse({ success: false, errors }, 400);
   }
 
-  const existingEmail = await env.core_data
-    .prepare(`SELECT * FROM users WHERE email = ?`)
-    .bind(email)
-    .first();
+  // 🔹 Normalize to lowercase for case-insensitive lookup
+  const normalizedUsername = username.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
 
+  // 🔹 Check existing username/email ignoring case
   const existingUsername = await env.core_data
-    .prepare(`SELECT * FROM users WHERE username = ?`)
-    .bind(username)
+    .prepare(`SELECT id FROM users WHERE LOWER(username) = ?`)
+    .bind(normalizedUsername)
     .first();
 
-  if (existingEmail || existingUsername) {
+  const existingEmail = await env.core_data
+    .prepare(`SELECT id FROM users WHERE LOWER(email) = ?`)
+    .bind(normalizedEmail)
+    .first();
+
+  if (existingUsername || existingEmail) {
     if (existingUsername) errors.username = "username_exists";
     if (existingEmail) errors.email = "email_exists";
     return jsonResponse({ success: false, errors }, 409);
@@ -41,7 +46,8 @@ export async function handleRegister(request, env) {
         `INSERT INTO users (username, email, password_hash, salt, created_at)
          VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
       )
-      .bind(username, email, password_hash, salt)
+      // store original case for display but email normalized if you prefer
+      .bind(username.trim(), email.trim(), password_hash, salt)
       .run();
 
     return jsonResponse({ success: true, message: "registration_success" }, 201);
