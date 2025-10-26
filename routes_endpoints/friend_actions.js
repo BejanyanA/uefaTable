@@ -163,7 +163,7 @@ export async function handleApproveFriends(request, env) {
     // 6) Notify requester instantly over SSE
     await publishToUser(env, requesterId, {
         type: "friend_status_update",
-        userId: receiverId,
+        userId: requesterId,
         status: "approved"
     });
 
@@ -234,7 +234,7 @@ export async function handleRejectFriend(request, env) {
     // 6) Notify requester instantly over SSE
     await publishToUser(env, requesterId, {
         type: "friend_status_update",
-        userId: receiverId,
+        userId: requesterId,
         status: "rejected"
     });
 
