@@ -421,12 +421,9 @@ export const FriendManager = {
               showToast(translation.friend_rejected_success || "User successfully rejected", "success");
             } else if (actionType === 'delete') {
               showToast(translation.friend_deleted_success || "User successfully deleted", "success");
-            } else {
-              showToast(translation.something_went_wrong || "Something went wrong");
-            }
-
+            } 
           } else {
-            console.error(`🔴 API action failed for ${actionType}:`, response);
+            showToast(translation.something_went_wrong, "error");
           }
         } catch (error) {
           console.error(`🔴 API Error during ${actionType}:`, error);

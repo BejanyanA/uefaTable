@@ -299,6 +299,7 @@ export async function handleDeleteFriend(request, env) {
          OR (user_id = ? AND friend_id = ?)
     `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).run();
     }
+    await publishToUser(env, targetUserId, { type: "friend_requests", count: 0 });
 
     // 6) Return idempotent success (OK even if nothing was there)
     return jsonResponse({
