@@ -246,19 +246,23 @@ export async function handleRejectFriend(request, env) {
 }
 
 export async function handleDeleteFriend(request, env) {
+    // 1) Auth
     const authHeader = request.headers.get("Authorization");
+
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
 
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
+
     if (!payload) {
         return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
     }
 
     const loggedInUserId = payload.id;
 
+    // 2) Input
     const { userId } = await parseBody(request);
     const targetUserId = Number(userId);
     if (!targetUserId || Number.isNaN(targetUserId)) {
@@ -268,16 +272,16 @@ export async function handleDeleteFriend(request, env) {
         return jsonResponse({ success: false, message: "cannot_delete_self_relation" }, 400);
     }
 
-    // Ensure target exists (optional)
+    // 3) (Optional) ensure target exists
     const target = await env.core_data
-        .prepare(`SELECT id FROM users WHERE id = ?`)
+        .prepare(`SELECT id, username FROM users WHERE id = ?`)
         .bind(targetUserId)
         .first();
     if (!target) {
         return jsonResponse({ success: false, message: "user_not_found" }, 404);
     }
 
-    // Count existing relations (either direction)
+    // 4) Count existing relations (either direction)
     const countRow = await env.core_data.prepare(`
     SELECT COUNT(*) AS cnt
     FROM friends
@@ -287,7 +291,7 @@ export async function handleDeleteFriend(request, env) {
 
     const toDelete = Number(countRow?.cnt || 0);
 
-    // Delete friendship rows (any status, any direction)
+    // 5) Delete permanently (either direction), regardless of status
     if (toDelete > 0) {
         await env.core_data.prepare(`
       DELETE FROM friends
@@ -296,14 +300,11 @@ export async function handleDeleteFriend(request, env) {
     `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).run();
     }
 
-    await env.core_data.prepare(`
-    DELETE FROM user_notification_state
-    WHERE user_id = ?
-       OR user_id = ? 
-  `).bind(loggedInUserId, targetUserId).run();
-
+    // 6) Return idempotent success (OK even if nothing was there)
     return jsonResponse({
         success: true,
-        data: { message: "user_deleted_success" }
+        data: {
+            message: "user_deleted_success"
+        }
     }, 200);
 }
