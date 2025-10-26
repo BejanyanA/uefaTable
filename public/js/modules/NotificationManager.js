@@ -3,8 +3,11 @@ import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
 import { FriendManager } from './FriendManager.js';
+import { showToast } from '../utils/toast.js';
+import { logout } from '../modules/MeHomepage.js'
 
 const loaderOff = { showLoading: false };
+const translation = langMap[currentLang];
 
 // 1. References to DOM elements
 const notificationBellEl = document.getElementById('notificationBell');
@@ -129,24 +132,27 @@ export async function initNotifications() {
 
     // Listen for generic messages (sent by the server without an 'event' field)
     eventSource.onmessage = function (event) {
-        // The BE logic isn't sending generic messages, but it's good practice.
-        console.log("Generic SSE Message:", event.data);
     };
 
     // Listen for custom events named 'friend_requests'
     // The BE's publishToUser sends: { type: "friend_requests", count: 0 }
     eventSource.onmessage = function (event) {
-        console.log("Generic SSE Message received:", event.data);
 
-        // ⭐ ADD PROCESSING LOGIC HERE ⭐
         try {
-            // Attempt to parse the data as JSON
             const data = JSON.parse(event.data);
 
             // Check if it's the notification count update we care about
             if (data.type === 'friend_requests' && typeof data.count === 'number') {
                 updateNotificationBadge(data.count);
-                console.log("Generic SSE processed and count updated:", data.count);
+            }
+
+            if (data.type === 'friend_status_update' && data.status === 'rejected') {
+                showToast(translation.friend_request_rejected || "Friend Request Rejected", "error");
+
+            }
+
+            if (data.type === 'friend_status_update' && data.status === 'approved') {
+                showToast(translation.friend_request_approved || "Friend Request Approved", "success");
             }
 
         } catch (e) {
@@ -161,8 +167,7 @@ async function handleBellClick() {
     notificationBellEl.addEventListener("click", () => {
 
         if (currentUnreadCount === 0) {
-            console.log("Notification bell click ignored: Count is zero.");
-            return; // Stop here if there's nothing to do
+            return;
         }
 
         markSeenIfUnread();
