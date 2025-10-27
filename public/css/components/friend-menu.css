@@ -262,7 +262,7 @@
 
 #searchResultsContainer {
   max-width: 600px;
-  margin: 260px auto 0;
+  margin: 260px 0 0;
   padding: 0;
 }
 
@@ -273,7 +273,6 @@
   border: none;
   border-radius: 6px;
   background-color: rgba(15, 16, 19, 0.966);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 14px;
   outline: none;
