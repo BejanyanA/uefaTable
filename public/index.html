@@ -135,14 +135,14 @@
         <h2 id="loginTitle">Login</h2>
         <form id="loginForm">
           <div class="input-group input-league-name">
-            <input type="text" id="loginEmail" placeholder=" " />
+            <input type="text" id="loginEmail" placeholder=" " autocomplete="current-email"/>
             <label for="loginEmail" id="loginEmailLabel"></label>
           </div>
           <div class="error" id="loginEmailError"></div>
 
           <div class="input-league-name">
             <div class="input-group submit-button">
-              <input type="password" id="loginPassword" placeholder=" " />
+              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password"/>
               <label for="loginPassword" id="loginPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
@@ -162,20 +162,20 @@
         <h2 id="registerTitle">Register</h2>
         <form id="registerForm">
           <div class="input-group input-league-name">
-            <input type="text" id="regUsername" placeholder=" " />
+            <input type="text" id="regUsername" placeholder=" " autocomplete="new-username"/>
             <label for="regUsername" id="regUsernameLabel"></label>
           </div>
           <div class="error" id="regUsernameError"></div>
 
           <div class="input-group input-league-name">
-            <input type="text" id="regEmail" placeholder=" " />
+            <input type="text" id="regEmail" placeholder=" " autocomplete="new-email"/>
             <label for="regEmail" id="regEmailLabel"></label>
           </div>
           <div class="error" id="regEmailError"></div>
 
           <div class="input-league-name">
             <div class="input-group">
-              <input type="password" id="regPassword" placeholder=" " />
+              <input type="password" id="regPassword" placeholder=" " autocomplete="new-password"/>
               <label for="regPassword" id="regPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle"
@@ -185,7 +185,7 @@
 
           <div class="input-league-name">
             <div class="input-group">
-              <input type="password" id="regConfirmPassword" placeholder=" " />
+              <input type="password" id="regConfirmPassword" placeholder=" " autocomplete="new-password"/>
               <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle"
