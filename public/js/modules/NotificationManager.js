@@ -7,7 +7,6 @@ import { showToast } from '../utils/toast.js';
 import { logout } from '../modules/MeHomepage.js'
 
 const loaderOff = { showLoading: false };
-const translation = langMap[currentLang];
 
 // 1. References to DOM elements
 const notificationBellEl = document.getElementById('notificationBell');
@@ -140,6 +139,8 @@ export async function initNotifications() {
 
         try {
             const data = JSON.parse(event.data);
+
+            const translation = langMap[currentLang];
 
             // Check if it's the notification count update we care about
             if (data.type === 'friend_requests' && typeof data.count === 'number') {
