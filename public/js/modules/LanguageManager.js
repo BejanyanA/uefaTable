@@ -360,7 +360,7 @@ export const langMap = {
     achievements: "Succès",
     new_password_match_current: "Nouveau mot de passe identique à l’actuel",
     friend_request_rejected: "Amitié rejetée",
-    friend_request_approved: "Demande d’amitié approuvée",
+    friend_request_approved: "Amitié approuvée",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
@@ -381,7 +381,7 @@ export const langMap = {
     friend_approved_success: "Utilisateur approuvé avec succès",
     friend_rejected_success: "Utilisateur rejeté avec succès",
     friend_deleted_success: "Utilisateur supprimé avec succès",
-    wrong_current_password: "Amitié approuvée",
+    wrong_current_password: "Mot de passe actuel erroné",
   }
 };
 
