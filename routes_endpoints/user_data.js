@@ -250,7 +250,6 @@ export async function handleAchievements(request, env) {
     if (!authHeader?.startsWith("Bearer ")) {
         return jsonResponse({ success: false, message: "Unauthorized" }, 401);
     }
-
     const token = authHeader.split(" ")[1];
     const payload = await verifyToken(token, env.JWT_SECRET);
     if (!payload) {
@@ -258,10 +257,9 @@ export async function handleAchievements(request, env) {
     }
     const loggedInUserId = payload.id;
 
+    // Optional self-only userId (forbid others)
     const url = new URL(request.url);
     const rawUserId = url.searchParams.get("userId");
-
-    // Self-only (optional userId, but must equal logged-in user)
     let targetUserId = loggedInUserId;
     if (rawUserId != null) {
         if (!/^\d+$/.test(rawUserId)) {
@@ -273,9 +271,6 @@ export async function handleAchievements(request, env) {
         }
     }
 
-    // Robust finals filter:
-    // - handles 'final', 'Final', 'Finals', trailing spaces
-    // - ensures winner exists
     const sql = `
 WITH finals AS (
   /* club: league_knockouts */
@@ -341,9 +336,28 @@ SELECT
   l.name             AS league_name,
   l.banner_id,
   l.created_by_user_id,
-  l.created_at
+  l.created_at,
+  f.winner_team_id   AS team_id,
+
+  /* pick correct catalog based on banner_id; use real column names */
+  COALESCE(c.club_name, cn.country_name) AS team_name,
+
+  /* OPTIONAL: expose crest/flag if you want */
+  COALESCE(c.logo_url, cn.logo_url)      AS team_logo_url
+
 FROM finals f
 JOIN leagues l ON l.id = f.league_id
+
+/* clubs when banner_id in (1,2) */
+LEFT JOIN all_clubs c
+  ON c.id = f.winner_team_id
+ AND l.banner_id IN (1, 2)
+
+/* countries when banner_id in (3,4) */
+LEFT JOIN all_countries cn
+  ON cn.id = f.winner_team_id
+ AND l.banner_id IN (3, 4)
+
 WHERE f.my_team_id IS NOT NULL
   AND f.winner_team_id = f.my_team_id
 ORDER BY l.created_at DESC;
@@ -361,7 +375,8 @@ ORDER BY l.created_at DESC;
         }
 
         return jsonResponse({ success: true, data: { achievements } }, 200);
-    } catch {
+    } catch (err) {
+        // console.error("handleAchievements error:", err);
         return jsonResponse({ success: false, message: "internal_error" }, 500);
     }
-}
+}                         
