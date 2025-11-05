@@ -243,3 +243,125 @@ async function columnExists(env, table, column) {
     ).all();
     return res.results.some((r) => r.name === column);
 }
+
+export async function handleAchievements(request, env) {
+    // --- Auth (your exact pattern) ---
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+    }
+
+    const token = authHeader.split(" ")[1];
+    const payload = await verifyToken(token, env.JWT_SECRET);
+    if (!payload) {
+        return jsonResponse({ success: false, message: "Invalid or expired token" }, 401);
+    }
+    const loggedInUserId = payload.id;
+
+    const url = new URL(request.url);
+    const rawUserId = url.searchParams.get("userId");
+
+    // Self-only (optional userId, but must equal logged-in user)
+    let targetUserId = loggedInUserId;
+    if (rawUserId != null) {
+        if (!/^\d+$/.test(rawUserId)) {
+            return jsonResponse({ success: false, message: "invalid_user_id" }, 400);
+        }
+        targetUserId = Number(rawUserId);
+        if (targetUserId !== loggedInUserId) {
+            return jsonResponse({ success: false, message: "forbidden" }, 403);
+        }
+    }
+
+    // Robust finals filter:
+    // - handles 'final', 'Final', 'Finals', trailing spaces
+    // - ensures winner exists
+    const sql = `
+WITH finals AS (
+  /* club: league_knockouts */
+  SELECT 'league_knockouts' AS src,
+         lk.league_id,
+         lk.winner_team_id,
+         CASE
+           WHEN lk.team1_user_id = ? THEN lk.team1_id
+           WHEN lk.team2_user_id = ? THEN lk.team2_id
+         END AS my_team_id
+  FROM league_knockouts lk
+  WHERE lk.winner_team_id IS NOT NULL
+    AND LOWER(TRIM(lk.round)) IN ('final','finals')
+    AND (lk.team1_user_id = ? OR lk.team2_user_id = ?)
+
+  UNION ALL
+
+  /* national: national_knockouts */
+  SELECT 'national_knockouts' AS src,
+         nk.league_id,
+         nk.winner_team_id,
+         CASE
+           WHEN nk.team1_user_id = ? THEN nk.team1_id
+           WHEN nk.team2_user_id = ? THEN nk.team2_id
+         END AS my_team_id
+  FROM national_knockouts nk
+  WHERE nk.winner_team_id IS NOT NULL
+    AND LOWER(TRIM(nk.round)) IN ('final','finals')
+    AND (nk.team1_user_id = ? OR nk.team2_user_id = ?)
+
+  UNION ALL
+
+  /* club (round-only): round_knockouts */
+  SELECT 'round_knockouts' AS src,
+         rk.league_id,
+         rk.winner_team_id,
+         CASE
+           WHEN rk.team1_user_id = ? THEN rk.team1_id
+           WHEN rk.team2_user_id = ? THEN rk.team2_id
+         END AS my_team_id
+  FROM round_knockouts rk
+  WHERE rk.winner_team_id IS NOT NULL
+    AND LOWER(TRIM(rk.round)) IN ('final','finals')
+    AND (rk.team1_user_id = ? OR rk.team2_user_id = ?)
+
+  UNION ALL
+
+  /* national (round-only): national_round_knockouts */
+  SELECT 'national_round_knockouts' AS src,
+         nrk.league_id,
+         nrk.winner_team_id,
+         CASE
+           WHEN nrk.team1_user_id = ? THEN nrk.team1_id
+           WHEN nrk.team2_user_id = ? THEN nrk.team2_id
+         END AS my_team_id
+  FROM national_round_knockouts nrk
+  WHERE nrk.winner_team_id IS NOT NULL
+    AND LOWER(TRIM(nrk.round)) IN ('final','finals')
+    AND (nrk.team1_user_id = ? OR nrk.team2_user_id = ?)
+)
+SELECT
+  l.id               AS league_id,
+  l.name             AS league_name,
+  l.banner_id,
+  l.created_by_user_id,
+  l.created_at
+FROM finals f
+JOIN leagues l ON l.id = f.league_id
+WHERE f.my_team_id IS NOT NULL
+  AND f.winner_team_id = f.my_team_id
+ORDER BY l.created_at DESC;
+`;
+
+    const u = targetUserId;
+    const binds = [u, u, u, u, u, u, u, u, u, u, u, u, u, u, u, u];
+
+    try {
+        const res = await env.core_data.prepare(sql).bind(...binds).all();
+        const achievements = res?.results || [];
+
+        if (!achievements.length) {
+            return jsonResponse({ success: false, message: "no_achievements_found" }, 404);
+        }
+
+        return jsonResponse({ success: true, data: { achievements } }, 200);
+    } catch {
+        return jsonResponse({ success: false, message: "internal_error" }, 500);
+    }
+}
