@@ -348,6 +348,7 @@ export const ProfileManager = {
         personalInfoColumn.style.display = 'none';
         passwordChangeColumn.style.display = 'none';
         achievementsContainer.style.display = 'block';
+        ProfileManager.showAchievementsTab(translation);
       }
     };
 
@@ -856,4 +857,187 @@ function renderPasswordDetails(userData, container, translation) {
       saveButton.disabled = false;
     }
   });
+
+  const BANNER_MAP = [
+    { id: 1, name: "Champions League", trophyUrl: 'assets/images/champLeaOnlyCup.png' },
+    { id: 2, name: "Europe League", trophyUrl: 'assets/images/eur2OnlyCup.png' },
+    { id: 3, name: "EURO Cup", trophyUrl: 'assets/images/europ3OnlyCup.png' },
+    { id: 4, name: "World Cup", trophyUrl: 'assets/images/wrld4OnlyCup.png' }
+  ];
+
+  function renderAchievementBanners(userAchievements, translation) {
+    const trophyGrid = document.getElementById("trophyGrid");
+    if (!trophyGrid) return;
+    trophyGrid.innerHTML = '';
+
+    const groupedAchievements = userAchievements.reduce((acc, ach) => {
+      const id = ach.banner_id;
+      (acc[id] ||= []).push(ach);
+      return acc;
+    }, {});
+
+    // helper that works with or without a global ProfileManager
+    const openAchievements = (id, list) => {
+      if (typeof ProfileManager !== 'undefined' && ProfileManager.showAchievementList) {
+        ProfileManager.showAchievementList(id, list);
+      } else if (typeof showAchievementList === 'function') {
+        showAchievementList(id, list);
+      } else {
+        console.warn('showAchievementList not found');
+      }
+    };
+
+    BANNER_MAP.forEach(banner => {
+      const achievements = groupedAchievements[banner.id] || [];
+      const count = achievements.length;
+
+      let achievementDetailsHTML = '';
+      let bannerClass = 'achievement-card empty-state';
+
+      if (count > 0) {
+        achievementDetailsHTML = `
+          <div class="golden-star-summary" data-banner-id="${banner.id}">
+            <span class="star-icon">⭐</span>
+            <p class="win-count">${count} ${translation.wins || 'Wins'}!</p>
+          </div>
+        `;
+      } else {
+        achievementDetailsHTML = `
+        <div class="empty-message">
+          <p>${translation.aimForTheStars || 'Aim for the stars!'}</p>
+          <p>${translation.winFirstTitle || 'Win your first'} ${banner.name} ${translation.title || 'title'}.</p>
+        </div>
+      `;
+      }
+
+      const bannerCard = document.createElement('div');
+      bannerCard.id = `banner${banner.id}`;
+      bannerCard.className = bannerClass;
+
+      // background image (make it bullet-proof)
+      bannerCard.style.setProperty('background-image', `url('${banner.trophyUrl}')`, 'important');
+      // bannerCard.style.setProperty('background-repeat', 'no-repeat', 'important');
+      // bannerCard.style.setProperty('background-position', 'center 80%', 'important');
+      // bannerCard.style.setProperty('background-size', 'contain', 'important');
+
+      bannerCard.innerHTML = `
+  ${achievementDetailsHTML}
+  <div class="trophy-visual">
+      <p class="trophy-name">${banner.name}</p>
+  </div>
+   `;
+
+      // make the summary block clickable too (when present)
+      const summary = bannerCard.querySelector('.golden-star-summary');
+      if (summary) {
+        summary.addEventListener('click', () => openAchievements(banner.id, achievements));
+      }
+
+      trophyGrid.appendChild(bannerCard);
+    });
+  }
+
+  /**
+   * Fetches the user's achievement data using the global apiGet utility.
+   * Assumes apiGet handles the base URL, authentication, and returns a promise
+   * that resolves to the parsed JSON or handles errors/404s gracefully.
+   * * @returns {Promise<Object>} The API response object.
+   */
+  async function fetchUserAchievements() {
+    try {
+      // Assuming apiGet('/user-achievements') returns the full API response object
+      const response = await apiGet('/user-achievements');
+
+      // If apiGet handles 404 by resolving with an empty/error payload, 
+      // we ensure we return a structure the renderer can use.
+      if (response && response.success && response.data && response.data.achievements) {
+        return response;
+      } else {
+        // Handle successful API call but no data, or a standard failure response
+        return { success: true, data: { achievements: [] } };
+      }
+    } catch (error) {
+      console.error("Fetch achievements failed via apiGet:", error);
+      // On hard failure (e.g., network error), return empty structure
+      return { success: false, data: { achievements: [] } };
+    }
+  }
+
+  /**
+   * Displays a modal listing all achievements for a specific banner type.
+   * This is triggered by clicking the Golden Star or "+X More" button.
+   * * @param {number} bannerId - The ID of the competition (1, 2, 3, 4).
+   * @param {Array<Object>} achievements - The list of achievement objects for this banner.
+   */
+  ProfileManager.showAchievementList = function (bannerId, achievements) {
+    if (!achievements || achievements.length === 0) return;
+
+    // 1. Get competition name for modal title
+    const banner = BANNER_MAP.find(b => b.id === bannerId);
+    const title = banner ? `${banner.name} Wins` : 'Achievements List';
+
+    // 2. Build the list content HTML
+    let listItemsHtml = achievements.map(ach => {
+      // Sort achievements by year descending (most recent first)
+      const year = ach.created_at ? new Date(ach.created_at).getFullYear() : 'N/A';
+      const teamLogo = ach.team_logo_url || '';
+
+      return `
+            <li class="achievement-list-item">
+                <span class="achievement-year">${year}</span>
+                <img src="${teamLogo}" alt="${ach.team_name} logo" class="list-team-logo">
+                <span class="achievement-text">${ach.team_name} - ${ach.league_name}</span>
+            </li>
+        `;
+    }).join('');
+
+    // 3. Create the modal structure
+    const modalHtml = `
+        <div id="achievementModal" class="achievement-modal-overlay">
+            <div class="achievement-modal-content">
+                <button class="close-btn" onclick="document.getElementById('achievementModal').remove()">&times;</button>
+                <h3>${title} (${achievements.length} Total)</h3>
+                <ul class="achievement-list">
+                    ${listItemsHtml}
+                </ul>
+            </div>
+        </div>
+    `;
+
+    // 4. Append modal to the body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  ProfileManager.showAchievementsTab = async function (translation) {
+    const container = document.getElementById("achievementsContentContainer");
+
+    // 1. Initial Content Setup
+    container.innerHTML = `
+        <div id="trophyGrid" class="trophy-grid"></div>
+        <div id="loadingSpinner" class="loading-spinner">Loading achievements...</div>
+    `;
+
+    // 2. Data Fetch
+    try {
+      const response = await fetchUserAchievements();
+
+      // Remove loading spinner
+      const spinner = document.getElementById("loadingSpinner");
+      if (spinner) spinner.remove();
+
+      if (response && response.success && response.data.achievements) {
+        // Success: PASS the translation object
+        renderAchievementBanners(response.data.achievements, translation);
+      } else {
+        // Empty Data/Soft Failure: PASS the translation object
+        renderAchievementBanners([], translation);
+      }
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+      const spinner = document.getElementById("loadingSpinner");
+      if (spinner) spinner.textContent = "Error loading achievements. Please try again.";
+      // Hard Failure: PASS the translation object
+      renderAchievementBanners([], translation);
+    }
+  };
 }
