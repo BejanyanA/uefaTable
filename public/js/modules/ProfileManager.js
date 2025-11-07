@@ -895,19 +895,24 @@ function renderPasswordDetails(userData, container, translation) {
       let bannerClass = 'achievement-card empty-state';
 
       if (count > 0) {
+        const winLabel =
+          count === 1
+            ? (translation.winCup || "Win")
+            : (translation.winCups || "Wins");
+
         achievementDetailsHTML = `
-          <div class="golden-star-summary" data-banner-id="${banner.id}">
-            <span class="star-icon">⭐</span>
-            <p class="win-count">${count} ${translation.wins || 'Wins'}!</p>
-          </div>
-        `;
+    <div class="golden-star-summary" data-banner-id="${banner.id}">
+      <span class="star-icon">⭐</span>
+      <p class="win-count">${count} ${winLabel}!</p>
+    </div>
+           `;
       } else {
         achievementDetailsHTML = `
-        <div class="empty-message">
-          <p>${translation.aimForTheStars || 'Aim for the stars!'}</p>
-          <p>${translation.winFirstTitle || 'Win your first'} ${banner.name} ${translation.title || 'title'}.</p>
-        </div>
-      `;
+    <div class="empty-message">
+      <p>${translation.aimForTheStars || "Aim for the stars!"}</p>
+      <p>${translation.winFirstTitle || "Win your first"} ${banner.name} ${translation.title || "title"}.</p>
+    </div>
+           `;
       }
 
       const bannerCard = document.createElement('div');
@@ -916,9 +921,6 @@ function renderPasswordDetails(userData, container, translation) {
 
       // background image (make it bullet-proof)
       bannerCard.style.setProperty('background-image', `url('${banner.trophyUrl}')`, 'important');
-      // bannerCard.style.setProperty('background-repeat', 'no-repeat', 'important');
-      // bannerCard.style.setProperty('background-position', 'center 80%', 'important');
-      // bannerCard.style.setProperty('background-size', 'contain', 'important');
 
       bannerCard.innerHTML = `
   ${achievementDetailsHTML}
