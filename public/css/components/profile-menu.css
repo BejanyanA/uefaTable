@@ -203,7 +203,7 @@
   padding: 20px auto;
   flex-direction: row;
   position: relative;
-  padding-left: 15px;
+  /* padding-left: 15px; */
   padding-right: 15px;
 }
 
@@ -212,7 +212,7 @@
    =============================== */
 .achievement-card {
   height: 420px;
-    width: 380px;
+  width: 380px;
   cursor: pointer;
   position: relative;
   display: flex;
@@ -266,7 +266,6 @@
   color: #fff;
   text-align: center;
   z-index: 3;
-  /* background: rgba(0, 0, 0, 0.55); */
   padding: 4px 16px;
   border-radius: 6px;
 
@@ -294,6 +293,14 @@
   align-items: center;
 }
 
+.achievement-modal-content h3 {
+  text-align: center;
+  /* centers text horizontally */
+  margin: 0 0 20px 0;
+  /* spacing below the heading */
+  font-size: 1.5em;
+}
+
 .achievement-details .team-logo {
   width: 35px;
   height: 35px;
@@ -303,17 +310,14 @@
   object-fit: cover;
 }
 
-.achievement-details .team-name {
-  font-weight: 700;
-  color: #ffd700;
-  font-size: 1.1em;
-  line-height: 1.2;
+.achievement-team {
+  font-weight: 600;
+  color: #3bf502;
 }
 
-.achievement-details .league-name {
-  font-size: .9em;
+.achievement-leagueName {
+  font-size: 0.9em;
   color: #bbb;
-  margin-top: 2px;
 }
 
 
@@ -335,12 +339,12 @@
   transition: transform 0.25s, box-shadow 0.25s;
 }
 
-.golden-star-summary:hover {
+/* .golden-star-summary:hover {
   transform: translateX(-50%) scale(1.05);
-}
+} */
 
 .golden-star-summary .star-icon {
-  font-size: 3em;
+  font-size: 2em;
   display: block;
   line-height: 1;
   color: gold;
@@ -354,9 +358,24 @@
   margin-top: 6px;
 }
 
-.golden-star-summary .view-all {
-  font-size: 0.9em;
-  color: #ddd;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Apply the animation when new notifications are present */
+.golden-star-summary .star-icon,
+.golden-star-summary .win-count {
+  animation: pulse 1s infinite;
 }
 
 /* ===============================
@@ -373,7 +392,7 @@
 }
 
 .achievement-modal-content {
-  background-color: #222;
+  background-color: rgba(0, 0, 0, 0.8);
   padding: 30px;
   border-radius: 10px;
   max-width: 720px;
@@ -395,6 +414,16 @@
   color: #fff;
   cursor: pointer;
 }
+
+.close-btn:hover {
+  transform: scale(1.3);
+  color: #ff4d4d;
+}
+
+.close-btn:active {
+  transform: scale(1.05);
+}
+
 
 .achievement-list {
   list-style: none;
@@ -659,6 +688,26 @@
 
   .achievement-modal-content {
     padding: 22px;
-    max-width: 94%;
+    max-width: 80%;
+    font-size: 12px;
   }
+
+  .achievement-list-item .achievement-year {
+    font-weight: 1000;
+    color: gold;
+    min-width: 30px;
+  }
+
+  .achievement-modal-content h3 {
+    text-align: center;
+    /* centers text horizontally */
+    margin: 0 0 20px 0;
+    /* spacing below the heading */
+    font-size: 1.3em;
+  }
+
+  .close-btn {
+  top: 6px;
+  right: 10px;
+}
 }

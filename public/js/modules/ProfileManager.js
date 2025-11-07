@@ -976,7 +976,7 @@ function renderPasswordDetails(userData, container, translation) {
 
     // 1. Get competition name for modal title
     const banner = BANNER_MAP.find(b => b.id === bannerId);
-    const title = banner ? `${banner.name} Wins` : 'Achievements List';
+    const title = banner ? `${banner.name}` : 'Achievements List';
 
     // 2. Build the list content HTML
     let listItemsHtml = achievements.map(ach => {
@@ -988,8 +988,11 @@ function renderPasswordDetails(userData, container, translation) {
             <li class="achievement-list-item">
                 <span class="achievement-year">${year}</span>
                 <img src="${teamLogo}" alt="${ach.team_name} logo" class="list-team-logo">
-                <span class="achievement-text">${ach.team_name} - ${ach.league_name}</span>
-            </li>
+                <div class="achievement-info">
+                     <span class="achievement-team">${ach.team_name}</span>
+                     <span class="achievement-leagueName">- ${ach.league_name}</span>
+                </div>
+             </li>
         `;
     }).join('');
 
@@ -998,7 +1001,7 @@ function renderPasswordDetails(userData, container, translation) {
         <div id="achievementModal" class="achievement-modal-overlay">
             <div class="achievement-modal-content">
                 <button class="close-btn" onclick="document.getElementById('achievementModal').remove()">&times;</button>
-                <h3>${title} (${achievements.length} Total)</h3>
+                <h3>⭐ ${title} ⭐</h3>
                 <ul class="achievement-list">
                     ${listItemsHtml}
                 </ul>
