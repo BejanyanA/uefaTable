@@ -910,7 +910,7 @@ function renderPasswordDetails(userData, container, translation) {
         achievementDetailsHTML = `
     <div class="empty-message">
       <p>${translation.aimForTheStars || "Aim for the stars!"}</p>
-      <p>${translation.winFirstTitle || "Win your first"} ${banner.name} ${translation.title || "title"}.</p>
+      <p>${translation.winFirstTitle || "Win your first"}</p>
     </div>
            `;
       }

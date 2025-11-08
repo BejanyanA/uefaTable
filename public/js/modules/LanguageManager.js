@@ -104,6 +104,10 @@ export const langMap = {
     new_password_match_current: "New password matches current password",
     friend_request_rejected: "Friendship Rejected",
     friend_request_approved: "Friendship Approved",
+    winCup: "Win",
+    winCups: "Wins",
+    aimForTheStars: "Aim for the stars!",
+    winFirstTitle: "Win your first Cup!",
 
 
     //BE translations
@@ -233,6 +237,10 @@ export const langMap = {
     new_password_match_current: "Նոր գաղտնաբառը համընկնում է ընթացիկի հետ",
     friend_request_rejected: "Ձեր ընկերությունը մերժվել է",
     friend_request_approved: "Ձեր ընկերությունը հաստատվել է",
+    winCup: "Հաղթանակ",
+    winCups: "Հաղթանակ",
+    aimForTheStars: "Ձգտիր աստղերին!",
+    winFirstTitle: "Հաղթիր քո առաջին գավաթը!",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -361,6 +369,10 @@ export const langMap = {
     new_password_match_current: "Nouveau mot de passe identique à l’actuel",
     friend_request_rejected: "Amitié rejetée",
     friend_request_approved: "Amitié approuvée",
+    winCup: "Victoire",
+    winCups: "Victoires",
+    aimForTheStars: "Vise les étoiles !",
+    winFirstTitle: "Gagne ta première coupe !",
 
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
