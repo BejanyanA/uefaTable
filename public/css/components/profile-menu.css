@@ -664,7 +664,7 @@
     border-radius: 8px;
     z-index: 3;
     width: 90%;
-    max-width: 220px;
+    max-width: 260px;
   }
 
   .golden-star-summary {
@@ -709,5 +709,13 @@
   .close-btn {
   top: 6px;
   right: 10px;
+}
+
+.golden-star-summary .win-count {
+  /* flex-wrap: wrap; */
+display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;     
 }
 }

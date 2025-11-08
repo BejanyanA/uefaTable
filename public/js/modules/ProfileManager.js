@@ -901,11 +901,14 @@ function renderPasswordDetails(userData, container, translation) {
             : (translation.winCups || "Wins");
 
         achievementDetailsHTML = `
-    <div class="golden-star-summary" data-banner-id="${banner.id}">
-      <span class="star-icon">⭐</span>
-      <p class="win-count">${count} ${winLabel}!</p>
-    </div>
-           `;
+      <div class="golden-star-summary" data-banner-id="${banner.id}">
+          <span class="star-icon">⭐</span>
+          <p class="win-count">
+          <span class="win-number">${count}</span>
+          <span class="win-label">${winLabel}!</span>
+          </p>
+      </div>
+              `;
       } else {
         achievementDetailsHTML = `
     <div class="empty-message">
