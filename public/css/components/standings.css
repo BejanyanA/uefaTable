@@ -331,6 +331,7 @@
     flex-direction: column;
     gap: 5px;
     padding-left: 10px;
+    padding-bottom: 5px;
     scrollbar-width: thin;
   }
 
@@ -346,6 +347,7 @@
   .stats-scroll-row {
     display: flex;
     gap: 8px;
+    padding-bottom: 5px;
   }
 
   .stat-head,

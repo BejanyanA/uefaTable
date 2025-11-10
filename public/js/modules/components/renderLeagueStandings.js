@@ -108,9 +108,10 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
           </tr>
         </thead>
         <tbody>
-          ${standings.map((team, index) => `
-            <tr>
-              <td>${index + 1}. ${team.club_name}</td>
+          ${standings.map((team, index) => {
+      const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+      return `<tr>
+              <td>${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.club_name}</td>
               <td>${team.played ?? 0}</td>
               <td>${team.wins ?? 0}</td>
               <td>${team.draws ?? 0}</td>
@@ -120,7 +121,7 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
               <td>${team.goal_difference ?? 0}</td>
               <td>${team.points ?? 0}</td>
             </tr>
-          `).join("")}
+          `}).join("")}
         </tbody>
       </table>
 
@@ -129,9 +130,11 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
   <div class="scroll-layout">
     <div class="fixed-clubs">
       <div class="club-header" id="teamMobile">${translation.teams || "Teams"}</div>
-      ${standings.map((team, index) => `
-        <div class="club-name">${index + 1}. ${team.club_name}</div>
-      `).join("")}
+      ${standings.map((team, index) => {
+        const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        return `
+        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.club_name}</div>
+      `}).join("")}
     </div>
 
     <div class="stats-scroll-wrapper">

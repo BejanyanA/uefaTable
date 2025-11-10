@@ -39,7 +39,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
 
   loadTabContent("standings");
 
-const ACTIVE_CLASS = "active";
+  const ACTIVE_CLASS = "active";
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       if (btn.classList.contains(ACTIVE_CLASS)) return;
@@ -108,9 +108,11 @@ const ACTIVE_CLASS = "active";
           </tr>
         </thead>
         <tbody>
-          ${standings.map((team, index) => `
+          ${standings.map((team, index) => {
+      const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+      return `
             <tr>
-              <td>${index + 1}. ${team.country_name}</td>
+              <td>${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.country_name}</td>
               <td>${team.played ?? 0}</td>
               <td>${team.wins ?? 0}</td>
               <td>${team.draws ?? 0}</td>
@@ -120,7 +122,7 @@ const ACTIVE_CLASS = "active";
               <td>${team.goal_difference ?? 0}</td>
               <td>${team.points ?? 0}</td>
             </tr>
-          `).join("")}
+          `}).join("")}
         </tbody>
       </table>
 
@@ -129,9 +131,11 @@ const ACTIVE_CLASS = "active";
   <div class="scroll-layout">
     <div class="fixed-clubs">
       <div class="club-header" id="teamMobile">${translation.teams || "Teams"}</div>
-      ${standings.map((team, index) => `
-        <div class="club-name">${index + 1}. ${team.country_name}</div>
-      `).join("")}
+      ${standings.map((team, index) => {
+        const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        return `
+        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.country_name}</div>
+      `}).join("")}
     </div>
 
     <div class="stats-scroll-wrapper">
