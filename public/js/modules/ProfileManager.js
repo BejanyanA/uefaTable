@@ -985,7 +985,7 @@ function renderPasswordDetails(userData, container, translation) {
     let listItemsHtml = achievements.map(ach => {
       // Sort achievements by year descending (most recent first)
       const year = ach.created_at ? new Date(ach.created_at).getFullYear() : 'N/A';
-      const teamLogo = ach.team_logo_url || 'https://uefaresults.com/assets/favicon-48x48.png';
+      const teamLogo = ach.team_logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
 
       return `
             <li class="achievement-list-item">
