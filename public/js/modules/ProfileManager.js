@@ -990,7 +990,7 @@ function renderPasswordDetails(userData, container, translation) {
       return `
             <li class="achievement-list-item">
                 <span class="achievement-year">${year}</span>
-                <img src="${teamLogo}" alt="${ach.team_name} logo" class="list-team-logo">
+                <img src="${teamLogo}" class="list-team-logo">
                 <div class="achievement-info">
                      <span class="achievement-team">${ach.team_name}</span>
                      <span class="achievement-leagueName">- ${ach.league_name}</span>
