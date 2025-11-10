@@ -55,7 +55,7 @@ export async function handleSearchWorldCountries(request, env) {
     }
 
     const searchResult = await env.core_data.prepare(`
-  SELECT id, country_name
+  SELECT id, country_name, logo_url
   FROM all_countries
   WHERE LOWER(country_name) LIKE '%' || LOWER(?) || '%'
 `).bind(search).all();
@@ -69,9 +69,10 @@ export async function handleSearchWorldCountries(request, env) {
         data: {
             countries: searchResult.results
                 .sort((a, b) => b.country_name - a.country_name)
-                .map(({ id, country_name }) => ({
+                .map(({ id, country_name, logo_url }) => ({
                     id,
-                    country_name
+                    country_name,
+                    logo_url
                 }))
         }
     }, 200);
@@ -131,7 +132,7 @@ export async function handleSearchEuropeCountries(request, env) {
     }
 
     const searchResult = await env.core_data.prepare(`
-    SELECT id, country_name
+    SELECT id, country_name, logo_url
     FROM all_countries
     WHERE is_europe = TRUE AND LOWER(country_name) LIKE '%' || LOWER(?) || '%'
     `).bind(search).all();
@@ -145,9 +146,10 @@ export async function handleSearchEuropeCountries(request, env) {
         data: {
             countries: searchResult.results
                 .sort((a, b) => b.country_name - a.country_name)
-                .map(({ id, country_name }) => ({
+                .map(({ id, country_name, logo_url }) => ({
                     id,
-                    country_name
+                    country_name, 
+                    logo_url
                 }))
         }
     }, 200);

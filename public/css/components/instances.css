@@ -124,6 +124,15 @@
     object-fit: cover;
 }
 
+.team-logo-create_search {
+    width: 20x;
+    height: 20px;
+    margin-bottom: 1px;
+    margin-right: 1px;
+    margin-left: 3px;
+    object-fit: cover;
+}
+
 
 @media (max-width: 480px) {
 

@@ -28,11 +28,14 @@ export const getClubs = {
 
             if (response.success && response.data?.clubs?.length) {
                 response.data.clubs.forEach(club => {
+
+                    const teamLogo = club.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
                     const label = document.createElement("label");
                     label.className = "club-checkbox-checkbox";
                     label.innerHTML = `
-                        <input type="checkbox" class="club-checkbox" value="${club.id}" />
-                        <span class="club-checkbox-name">${club.club_name}</span>
+                    <input type="checkbox" class="club-checkbox" value="${club.id}" />
+                    <img src="${teamLogo}" class="team-logo-create_search">
+                    <span class="club-checkbox-name">${club.club_name}</span>
                     `;
                     container.appendChild(label);
                 });
@@ -111,12 +114,15 @@ export const getClubs = {
                 const clubs = resp?.data?.clubs ?? [];
                 if (resp?.success && clubs.length) {
                     clubs.forEach(club => {
+                        
+                        const teamLogo = club.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
                         const label = document.createElement("label");
                         label.className = "club-checkbox-checkbox";
                         label.innerHTML = `
-              <input type="checkbox" class="club-checkbox" value="${club.id}" id="club-${club.id}" />
-              <span class="club-checkbox-name">${club.club_name}</span>
-            `;
+                        <input type="checkbox" class="club-checkbox" value="${club.id}" id="club-${club.id}" />
+                        <img src="${teamLogo}" class="team-logo-create_search">
+                        <span class="club-checkbox-name">${club.club_name}</span>
+                        `;
                         container.appendChild(label);
 
                         const cb = label.querySelector("input");

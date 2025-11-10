@@ -28,10 +28,13 @@ export const getCountries = {
 
             if (response.success && response.data?.countries?.length) {
                 response.data.countries.forEach(country => {
+
+                    const teamLogo = country.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
                     const label = document.createElement("label");
                     label.className = "club-checkbox-checkbox";
                     label.innerHTML = `
                         <input type="checkbox" class="club-checkbox" value="${country.id}" />
+                        <img src="${teamLogo}" class="team-logo-create_search">
                         <span class="club-checkbox-name">${country.country_name}</span>
                     `;
                     container.appendChild(label);
@@ -94,12 +97,15 @@ export const getCountries = {
             container.innerHTML = "";
 
             countries.forEach(country => {
+
+                const teamLogo = country.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
                 const label = document.createElement("label");
                 label.className = "club-checkbox-checkbox";
                 label.innerHTML = `
-          <input type="checkbox" class="club-checkbox" value="${country.id}" id="country-${country.id}" />
-          <span class="club-checkbox-name">${country.country_name}</span>
-        `;
+                <input type="checkbox" class="club-checkbox" value="${country.id}" id="country-${country.id}" />
+                <img src="${teamLogo}" class="team-logo-create_search">
+                <span class="club-checkbox-name">${country.country_name}</span>
+                `;
                 container.appendChild(label);
 
                 const checkbox = label.querySelector("input");

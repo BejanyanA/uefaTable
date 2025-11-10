@@ -55,7 +55,7 @@ export async function handleSearchClubs(request, env) {
     }
 
     const searchResult = await env.core_data.prepare(`
-  SELECT id, club_name
+  SELECT id, club_name, logo_url
   FROM all_clubs
   WHERE LOWER(club_name) LIKE '%' || LOWER(?) || '%'
 `).bind(search).all();
@@ -69,9 +69,10 @@ export async function handleSearchClubs(request, env) {
         data: {
             clubs: searchResult.results
                 .sort((a, b) => b.club_name - a.club_name)
-                .map(({ id, club_name }) => ({
+                .map(({ id, club_name, logo_url}) => ({
                     id,
-                    club_name
+                    club_name,
+                    logo_url
                 }))
         }
     }, 200);

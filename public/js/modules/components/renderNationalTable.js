@@ -377,22 +377,15 @@ export function renderNationalInstances(instanceData) {
         groupDiv.dataset.groupName = groupName;
 
         groupDiv.innerHTML = `
-          <h3>${groupName}</h3>
-          <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
-            ${groupData.countries.map((country, index) => `<li>${index + 1}.&nbsp;&nbsp;${country.name}</li>`).join("")}
-          </ul>
+        <h3>${groupName}</h3>
+        <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
+        ${groupData.countries.map((country, index) => {
+          const teamLogo = country.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team-logo"> ${country.name}</li>`;
+        })
+            .join("")}
+        </ul>
         `;
-
-        // groupDiv.innerHTML = `
-        // <h3>${groupName}</h3>
-        // <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
-        // ${groupData.countries.map((country, index) => {
-        //   const teamLogo = country.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-        //   return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team-logo"> ${country.name}</li>`;
-        // })
-        //     .join("")}
-        // </ul>
-        // `;
 
         groupDiv.addEventListener("click", () => {
           const leagueId = parseInt(localStorage.getItem("leagueId"));
