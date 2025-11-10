@@ -120,6 +120,7 @@
     width: 20x;
     height: 20px;
     margin-bottom: -2px;
+    margin-right: 2px;
     object-fit: cover;
 }
 
