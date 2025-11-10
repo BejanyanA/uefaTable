@@ -63,7 +63,7 @@ export async function handleNationalInstances(request, env) {
   if (instanceIds.length > 0) {
     const placeholders = instanceIds.map(() => '?').join(', ');
     const groupRows = await env.core_data.prepare(`
-    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id, ac.country_name
+    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id, ac.country_name, ac.logo_url
     FROM league_groups lg
     JOIN country_group_standings gs ON gs.group_id = lg.id
     JOIN all_countries ac ON ac.id = gs.team_id
@@ -81,7 +81,7 @@ export async function handleNationalInstances(request, env) {
           countries: []
         };
       }
-      groupData[row.league_instance_id][row.group_name].countries.push({ id: row.team_id, name: row.country_name });
+      groupData[row.league_instance_id][row.group_name].countries.push({ id: row.team_id, name: row.country_name, logo: row.logo_url || null });
     });
   }
 
