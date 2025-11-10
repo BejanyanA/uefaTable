@@ -61,7 +61,7 @@ export async function handleNationalStandings(request, env) {
 
     // Step 3: Fetch standings for the group
     const standings = await env.core_data.prepare(`
-  SELECT gs.*, ac.country_name
+  SELECT gs.*, ac.country_name, ac.logo_url
   FROM country_group_standings gs
   JOIN all_countries ac ON ac.id = gs.team_id
   WHERE gs.group_id = ?

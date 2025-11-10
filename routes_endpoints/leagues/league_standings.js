@@ -61,7 +61,7 @@ export async function handleLeagueStandings(request, env) {
 
     // Step 3: Fetch standings for the group
     const standings = await env.core_data.prepare(`
-  SELECT gs.*, ac.club_name
+  SELECT gs.*, ac.club_name, ac.logo_url
   FROM group_standings gs
   JOIN all_clubs ac ON ac.id = gs.team_id
   WHERE gs.group_id = ?
