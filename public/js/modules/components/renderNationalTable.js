@@ -388,7 +388,7 @@ export function renderNationalInstances(instanceData) {
         // <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
         // ${groupData.countries.map((country, index) => {
         //   const teamLogo = country.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-        //   return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" alt="${country.name} logo" class="team-logo"> ${country.name}</li>`;
+        //   return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team-logo"> ${country.name}</li>`;
         // })
         //     .join("")}
         // </ul>
