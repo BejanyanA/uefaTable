@@ -372,10 +372,14 @@ export function renderLeagueInstances(instanceData) {
         groupDiv.dataset.groupName = groupName;
 
         groupDiv.innerHTML = `
-          <h3>${groupName}</h3>
-          <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
-            ${groupData.clubs.map((club, index) => `<li>${index + 1}.&nbsp;&nbsp;${club.name}</li>`).join("")}
-          </ul>
+        <h3>${groupName}</h3>
+        <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
+        ${groupData.clubs.map((club, index) => {
+          const teamLogo = club.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" alt="${club.name} logo" class="team-logo"> ${club.name}</li>`;
+        })
+        .join("")}
+        </ul>
         `;
 
         groupDiv.addEventListener("click", () => {

@@ -63,7 +63,7 @@ export async function handleLeagueInstances(request, env) {
   if (instanceIds.length > 0) {
     const placeholders = instanceIds.map(() => '?').join(', ');
     const groupRows = await env.core_data.prepare(`
-    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id, ac.club_name
+    SELECT lg.league_instance_id, lg.id AS group_id, lg.group_name, gs.team_id, ac.club_name, ac.logo_url
     FROM league_groups lg
     JOIN group_standings gs ON gs.group_id = lg.id
     JOIN all_clubs ac ON ac.id = gs.team_id
@@ -81,7 +81,7 @@ export async function handleLeagueInstances(request, env) {
           clubs: []
         };
       }
-      groupData[row.league_instance_id][row.group_name].clubs.push({ id: row.team_id, name: row.club_name });
+      groupData[row.league_instance_id][row.group_name].clubs.push({ id: row.team_id, name: row.club_name, logo: row.logo_url || null });
     });
   }
 
