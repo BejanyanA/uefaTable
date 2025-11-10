@@ -1004,7 +1004,7 @@ function renderPasswordDetails(userData, container, translation) {
         <div id="achievementModal" class="achievement-modal-overlay">
             <div class="achievement-modal-content">
                 <button class="close-btn" onclick="document.getElementById('achievementModal').remove()">&times;</button>
-                <h3>⭐ ${title} ⭐</h3>
+                <h3> ${title} </h3>
                 <ul class="achievement-list">
                     ${listItemsHtml}
                 </ul>
