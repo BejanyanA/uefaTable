@@ -446,7 +446,9 @@
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  margin: 0 10px;
+  margin-left: 10px;
+  margin-right: 3px;
+  margin-bottom: 4px;
   object-fit: cover;
 }
 
@@ -717,5 +719,15 @@ display: flex;
   justify-content: center;
   align-items: baseline;
   gap: 6px;     
+}
+
+.achievement-list-item .list-team-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: 12px;
+  margin-right: 2px;
+  margin-bottom: 4px;
+  object-fit: cover;
 }
 }
