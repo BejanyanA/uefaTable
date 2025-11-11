@@ -195,24 +195,27 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
         </tr>
       </thead>
       <tbody>
-        ${matches.map(match => `
+        ${matches.map(match => {
+        const team1Logo = match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        const team2Logo = match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        return `<tr>
           <tr data-match-id="${match.id}">
             <td>
               <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
                 <option value="">${match.team1_username || "Select user"}</option>
               </select>
             </td>
-            <td>${match.team1_name}</td>
+            <td><img src="${team1Logo}" class="team-logo"> ${match.team1_name}</td>
             <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
             <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
-            <td>${match.team2_name}</td>
+            <td><img src="${team2Logo}" class="team-logo"> ${match.team2_name}</td>
             <td>
               <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
                 <option value="">${match.team2_username || "Select user"}</option>
               </select>
             </td>
           </tr>
-        `).join("")}
+        `}).join("")}
       </tbody>
     `;
 
@@ -226,20 +229,22 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
         const matchWrapper = document.createElement("div");
         matchWrapper.className = "match-block";
         matchWrapper.dataset.matchId = match.id;
+        const team1Logo = match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        const team2Logo = match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
 
         matchWrapper.innerHTML = `
         <div class="match-line">
           <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
             <option value="">${match.team1_username || "Select Player"}</option>
           </select>
-          <div class="team-name">${match.team1_name}</div>
+          <div class="team-name"><img src="${team1Logo}" class="team-logo"> ${match.team1_name}</div>
           <input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}>
         </div>
         <div class="match-line">
           <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
             <option value="">${match.team2_username || "Select Player"}</option>
           </select>
-          <div class="team-name">${match.team2_name}</div>
+          <div class="team-name"><img src="${team2Logo}" class="team-logo"> ${match.team2_name}</div>
           <input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}>
         </div>
       `;
