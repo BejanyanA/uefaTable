@@ -52,7 +52,9 @@ export async function handleOnlyKnockoutMatches(request, env) {
       lk.updated_user_id, lk.updated_at,
       lk.winner_team_id,
       ac1.club_name AS team1_name,
-      ac2.club_name AS team2_name
+      ac1.logo_url AS team1_logo_url,
+      ac2.club_name AS team2_name,
+      ac2.logo_url AS team2_logo_url
     FROM round_knockouts lk
     LEFT JOIN all_clubs ac1 ON ac1.id = lk.team1_id
     LEFT JOIN all_clubs ac2 ON ac2.id = lk.team2_id
@@ -68,8 +70,8 @@ export async function handleOnlyKnockoutMatches(request, env) {
     const leg = {
       id: r.id,
       matchType: r.match_type,
-      team1: { id: r.team1_id, name: r.team1_name, userId: r.team1_user_id },
-      team2: { id: r.team2_id, name: r.team2_name, userId: r.team2_user_id },
+      team1: { id: r.team1_id, name: r.team1_name, logo_url: r.team1_logo_url, userId: r.team1_user_id },
+      team2: { id: r.team2_id, name: r.team2_name, logo_url: r.team2_logo_url, userId: r.team2_user_id },
       score: { team1: r.team1_score, team2: r.team2_score },
       isVsComputer: r.is_vs_computer,
       computerTeam: r.computer_team,

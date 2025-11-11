@@ -52,7 +52,9 @@ export async function handleNationalOnlyKnockoutMatches(request, env) {
       nk.updated_user_id, nk.updated_at,
       nk.winner_team_id,
       ac1.country_name AS team1_name,
-      ac2.country_name AS team2_name
+      ac1.logo_url AS team1_logo_url,
+      ac2.country_name AS team2_name,
+      ac2.logo_url AS team2_logo_url
     FROM national_round_knockouts nk
     LEFT JOIN all_countries ac1 ON ac1.id = nk.team1_id
     LEFT JOIN all_countries ac2 ON ac2.id = nk.team2_id
@@ -65,8 +67,8 @@ export async function handleNationalOnlyKnockoutMatches(request, env) {
 
   // flat list of single-leg neutral matches (no tie grouping)
   const matches = (rows.results || []).map(r => {
-    const team1 = { id: r.team1_id, name: r.team1_name, userId: r.team1_user_id };
-    const team2 = { id: r.team2_id, name: r.team2_name, userId: r.team2_user_id };
+    const team1 = { id: r.team1_id, name: r.team1_name, logo_url: r.team1_logo_url, userId: r.team1_user_id };
+    const team2 = { id: r.team2_id, name: r.team2_name, logo_url: r.team2_logo_url, userId: r.team2_user_id };
 
     let winnerTeamName = null;
     let winnerUserId = null;

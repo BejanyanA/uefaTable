@@ -68,7 +68,9 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
       nk.winner_team_id,
 
       ac1.country_name AS team1_name,
+      ac1.logo_url AS team1_logo_url,
       ac2.country_name AS team2_name,
+      ac2.logo_url AS team2_logo_url,
 
       tg1.group_id   AS team1_group_id,
       tg1.group_name AS team1_group_name,
@@ -89,11 +91,11 @@ export async function handleNationalGroupKnockoutMatches(request, env) {
 
   const matches = (rows.results || []).map(r => {
     const team1 = {
-      id: r.team1_id, name: r.team1_name, userId: r.team1_user_id,
+      id: r.team1_id, name: r.team1_name, logo_url: r.team1_logo_url, userId: r.team1_user_id,
       groupId: r.team1_group_id ?? null, groupName: r.team1_group_name ?? null
     };
     const team2 = {
-      id: r.team2_id, name: r.team2_name, userId: r.team2_user_id,
+      id: r.team2_id, name: r.team2_name, logo_url: r.team2_logo_url, userId: r.team2_user_id,
       groupId: r.team2_group_id ?? null, groupName: r.team2_group_name ?? null
     };
 
