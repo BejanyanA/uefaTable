@@ -193,7 +193,7 @@
 }
 
 #knockoutTab .center-final .ko-team-row {
-  grid-template-columns: var(--userW) minmax(175px, max-content) 32px 24px;
+  grid-template-columns: var(--userW) minmax(185px, max-content) 32px 24px;
   /* removes the "away" score column */
 }
 
@@ -335,7 +335,7 @@
 
 /* 2) Slightly rebalance the row grid so checkbox stays inside */
 :root {
-  --userW: 112px;   /* same as we used before, tweak if needed */
+  --userW: 100px;   /* same as we used before, tweak if needed */
 }
 
 /* LEFT rows: [User][Team][Home][Away][CB] */
