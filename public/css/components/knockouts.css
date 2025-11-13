@@ -60,7 +60,7 @@
 /* Inputs/selects compact */
 #knockoutTab .user-dropdown,#knockoutTab .score-input{height:24px;width:100%;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;padding:0 6px;font-size:12.5px}
 #knockoutTab .user-dropdown:disabled{opacity:.6;cursor:not-allowed}
-#knockoutTab .score-input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;padding:0;height: 20px; width: 30px;font-size: 12px;}
+#knockoutTab .score-input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;padding:0;height: 20px; width: 28px;font-size: 12px;}
 #knockoutTab .score-input::-webkit-outer-spin-button,#knockoutTab .score-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 #knockoutTab .score-input[type="number"]{-moz-appearance:textfield}
 
@@ -317,26 +317,6 @@
   display: block;
 }
 
-/* 2) Give the Team column a bit more room */
-#knockoutTab .ko-team-row{
-  grid-template-columns: var(--userW) minmax(150px,1fr) 34px 34px 18px;
-}
-#knockoutTab .ko-team-row.right{
-  grid-template-columns: 18px 34px 34px minmax(150px,1fr) var(--userW);
-}
-
-/* Single-leg layouts */
-#knockoutTab .ko-team-row.single-leg.left{
-  grid-template-columns: var(--userW) minmax(150px,1fr) 34px 18px;
-}
-#knockoutTab .ko-team-row.single-leg.right{
-  grid-template-columns: 18px 34px minmax(150px,1fr) var(--userW);
-}
-
-/* 3) (Optional) Slightly narrower player dropdown to free space */
-:root { --userW: 112px; }  /* was 120px; tweak to taste */
-
-
 
 
 /* 1) Widen knockout cards so all columns fit inside */
@@ -366,8 +346,8 @@
 
 /* RIGHT rows: [CB][Home][Away][Team][User] */
 #knockoutTab .ko-team-row.right {
-  gap: 4px;
-  grid-template-columns: 18px 30px 30px minmax(150px,1fr) var(--userW);
+  gap: 6px;
+  grid-template-columns: 18px 28px 16px minmax(150px,1fr) var(--userW);
 }
 
 /* Single-leg variants stay consistent */
@@ -377,6 +357,7 @@
 
 #knockoutTab .ko-team-row.single-leg.right {
   grid-template-columns: 18px 34px minmax(150px,1fr) var(--userW);
+  gap: 10px;
 }
 
 .team-logo-knockout {

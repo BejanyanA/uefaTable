@@ -639,7 +639,7 @@ export async function renderLeagueKnockoutsStage(leagueId, rootEl) {
         const teamLogo = teamObj?.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
 
         if (name) {
-          d.innerHTML = `<img src="${teamLogo}" alt="${name} logo" class="team-logo-knockout"> ${name}`;
+          d.innerHTML = `<img src="${teamLogo}" class="team-logo-knockout"> ${name}`;
         } else if (useGroupFallback && grp) {
           d.textContent = `${grp} Team ${position}`;
           d.classList.add("placeholder-text");
@@ -1361,8 +1361,15 @@ export async function renderLeagueOnlyKnockouts(leagueId, rootEl) {
         const d = document.createElement("div");
         d.className = "team-name";
         const name = teamObj?.name && String(teamObj.name).trim() ? teamObj.name : null;
-        d.textContent = name || (t.tbd || "TBD");
-        if (!name) d.classList.add("placeholder-text");
+        const teamLogo = teamObj?.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+
+        if (name) {
+          d.innerHTML = `<img src="${teamLogo}" class="team-logo-knockout"> ${name}`;
+        } else {
+          d.textContent = t.tbd || "TBD";
+          d.classList.add("placeholder-text");
+        }
+
         return d;
       };
 
