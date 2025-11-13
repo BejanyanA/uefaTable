@@ -8,7 +8,7 @@ export async function handleRegister(request, env) {
   if (!username) errors.username = "Username is required";
   if (!email) errors.email = "Email is required";
   if (!password) errors.password = "Password is required";
-  if (username.length > 15) errors.username = "Username must not exceed 15 characters";
+  if (username.length > 10) errors.username = "Username must not exceed 10 characters";
   if (password.length > 30) errors.password = "Password must not exceed 30 characters";
 
   if (Object.keys(errors).length > 0) {

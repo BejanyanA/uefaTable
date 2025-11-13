@@ -95,8 +95,8 @@ export async function handleUpdateUserDetails(request, env) {
 
         if (hasUsername) {
             if (!username) errors.username = "Username is required";
-            else if (username.length > 15)
-                errors.username = "Username must not exceed 15 characters";
+            else if (username.length > 10)
+                errors.username = "Username must not exceed 10 characters";
         }
 
         if (hasEmail) {

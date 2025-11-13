@@ -418,7 +418,7 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
       } else if (value.trim().length < 3) {
         setError(errorEl.id, translation.shortUsername);
         hasError = true;
-      } else if (value.trim().length > 15) {
+      } else if (value.trim().length > 10) {
         setError(errorEl.id, translation.longUsername);
         hasError = true;
       } else if (typeof detectSpace === 'function' && detectSpace(value.trim())) {
