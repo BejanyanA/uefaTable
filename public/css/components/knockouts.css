@@ -193,7 +193,7 @@
 }
 
 #knockoutTab .center-final .ko-team-row {
-  grid-template-columns: var(--userW) minmax(160px, max-content) 24px 24px;
+  grid-template-columns: var(--userW) minmax(175px, max-content) 32px 24px;
   /* removes the "away" score column */
 }
 
@@ -280,7 +280,7 @@
 
 
 
-:root { --rightRailOffset: 20px; }  /* try 24–60px to taste */
+:root { --rightRailOffset: 25px; }  /* try 24–60px to taste */
 
 #knockoutTab .right-side {
   margin-left: var(--rightRailOffset);
@@ -292,6 +292,99 @@
 
 #knockoutTab .left-side {
   margin-right: var(--leftRailOffset);
+}
+
+
+
+/* 1) Make team name hold logo + text nicely */
+#knockoutTab .team-name{
+  display: inline-flex;            /* logo + text on one line */
+  align-items: center;             /* vertical center */
+  gap: 6px;                        /* space between logo and text */
+  justify-content: center;         /* keep centered like before */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;                    /* allow ellipsis inside grid */
+}
+
+/* Logo sizing inside knockout rows */
+#knockoutTab .team-name .list-team-logo{
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 18px;                  /* do not shrink the icon */
+  display: block;
+}
+
+/* 2) Give the Team column a bit more room */
+#knockoutTab .ko-team-row{
+  grid-template-columns: var(--userW) minmax(150px,1fr) 34px 34px 18px;
+}
+#knockoutTab .ko-team-row.right{
+  grid-template-columns: 18px 34px 34px minmax(150px,1fr) var(--userW);
+}
+
+/* Single-leg layouts */
+#knockoutTab .ko-team-row.single-leg.left{
+  grid-template-columns: var(--userW) minmax(150px,1fr) 34px 18px;
+}
+#knockoutTab .ko-team-row.single-leg.right{
+  grid-template-columns: 18px 34px minmax(150px,1fr) var(--userW);
+}
+
+/* 3) (Optional) Slightly narrower player dropdown to free space */
+:root { --userW: 112px; }  /* was 120px; tweak to taste */
+
+
+
+
+/* 1) Widen knockout cards so all columns fit inside */
+:root {
+  --koW: 355px;   /* was 350px */
+  --koH: 68px;    /* keep your existing height */
+}
+
+/* Apply the new width to cards/placeholders */
+#knockoutTab .ko-card,
+#knockoutTab .ko-placeholder {
+  width: var(--koW);
+  min-width: var(--koW);
+  max-width: var(--koW);
+}
+
+/* 2) Slightly rebalance the row grid so checkbox stays inside */
+:root {
+  --userW: 112px;   /* same as we used before, tweak if needed */
+}
+
+/* LEFT rows: [User][Team][Home][Away][CB] */
+#knockoutTab .ko-team-row {
+  gap: 4px;  /* was 6px – frees a bit of space */
+  grid-template-columns: var(--userW) minmax(150px,1fr) 30px 30px 18px;
+}
+
+/* RIGHT rows: [CB][Home][Away][Team][User] */
+#knockoutTab .ko-team-row.right {
+  gap: 4px;
+  grid-template-columns: 18px 30px 30px minmax(150px,1fr) var(--userW);
+}
+
+/* Single-leg variants stay consistent */
+#knockoutTab .ko-team-row.single-leg.left {
+  grid-template-columns: var(--userW) minmax(150px,1fr) 34px 18px;
+}
+
+#knockoutTab .ko-team-row.single-leg.right {
+  grid-template-columns: 18px 34px minmax(150px,1fr) var(--userW);
+}
+
+.team-logo-knockout {
+    width: 20x;
+    height: 20px;
+    margin-bottom: 0px;
+    margin-right: -2px;
+    object-fit: cover;
 }
 
 
@@ -308,10 +401,30 @@
   #knockoutTab .ko-row-2{display:grid;gap:10px}
 
 
-  :root { --rightRailOffset: 10px; }  /* try 24–60px to taste */
+  :root { --rightRailOffset: 15px; }  /* try 24–60px to taste */
 
-#knockoutTab .right-side {
+  #knockoutTab .right-side {
   margin-left: var(--rightRailOffset);
 }
 
+
+
+  #knockoutTab .team-name .list-team-logo{
+    width: 16px;
+    height: 16px;
+  }
+  /* keep a bit more room for names on small screens */
+  #knockoutTab .ko-team-row{
+    grid-template-columns: var(--userW) minmax(140px,1fr) 34px 34px 18px;
+  }
+  #knockoutTab .ko-team-row.right{
+    grid-template-columns: 18px 34px 34px minmax(140px,1fr) var(--userW);
+  }
+  #knockoutTab .ko-team-row.single-leg.left{
+    grid-template-columns: var(--userW) minmax(140px,1fr) 34px 18px;
+  }
+  #knockoutTab .ko-team-row.single-leg.right{
+    grid-template-columns: 18px 34px minmax(140px,1fr) var(--userW);
+  }
 }
+
