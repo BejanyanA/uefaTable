@@ -347,9 +347,13 @@ export const FriendManager = {
               mkBtn("action-delete", "delete", "Delete")
             );
           } else if (friend.status === "rejected") {
-            actions.append(
-              mkBtn("action-delete", "delete", "Delete")
-            );
+
+            // Show Delete button only for the user who rejected 
+            if (friend.byMe !== true) {
+              actions.append(
+                mkBtn("action-delete", "delete", "Delete")
+              );
+            }
           }
 
           item.appendChild(actions);
