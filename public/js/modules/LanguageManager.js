@@ -671,7 +671,7 @@ function updateIconTitles() {
     const isDisabled = icon.classList.contains("icon-disabled");
     icon.title = isDisabled
       ? translation.owner_edit || "Only the owner can edit"
-      : translation.edit || "Edit League";
+      : translation.edit_league_title || "Edit League";
   });
 
   document.querySelectorAll(".league-delete-icon").forEach(icon => {
