@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
-    margin: 12px 0 10px;
+    margin: 80px 10px 10px;
 }
 
 .homeOptions {
@@ -38,22 +38,13 @@
     transform: scale(0.96);
 }
 
-
-
-
-@media (max-width: 820px) {
-    .choiceGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .choiceCard {
     appearance: none;
     border: 0;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    padding: 16px 16px 12px;
+    padding: 50px 30px 50px;
     border-radius: 18px;
     color: #fff;
     overflow: hidden;
@@ -133,6 +124,15 @@
 }
 
 
+@media (max-width: 820px) {
+    .choiceGrid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-top: 50px
+    }
+}
+
+
 @media (max-width: 480px) {
 
     .homeOptions {
@@ -154,5 +154,20 @@
         margin-top: -17px;
         margin-left: -11px;
         position: fixed;
+    }
+
+    .choiceCard {
+        appearance: none;
+        border: 0;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        padding: 30px 30px 30px;
+        border-radius: 18px;
+        color: #fff;
+        overflow: hidden;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, .16);
+        transform: translateY(0);
+        transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
     }
 }
