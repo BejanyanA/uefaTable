@@ -5,6 +5,8 @@ import { FriendManager } from './modules/FriendManager.js';
 import { ProfileManager } from './modules/ProfileManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
+import { initHomeOptionButtons } from './modules/HomeOptions.js';
+
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -22,11 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
    changeLang(currentLang);
 
    checkLoggedIn();
+   initHomeOptionButtons();
    window.logout = logout;
 
    const action = sessionStorage.getItem("postLogoutAction");
    if (action === "openLogin") {
       sessionStorage.removeItem("postLogoutAction");
+      sessionStorage.removeItem("postLoginAction");
       // make sure openModal is available by now
       openModal("loginModal");
    }

@@ -3,6 +3,7 @@ import { getFriends } from './GetFriends.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
 import { markSeenIfUnread } from './NotificationManager.js';
+import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
@@ -133,6 +134,10 @@ export const FriendManager = {
         try {
           const response = await apiGet("/me", token);
           if (response.success && response.user) {
+            
+            setHomeOptionsVisible(true);
+            setCustomCompetitionVisible(false);
+
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("homePage").style.display = "block";
@@ -162,6 +167,7 @@ export const FriendManager = {
       document.getElementById("headerUsername").style.display = "block";
       document.getElementById("profileMenu").style.display = "block";
       document.getElementById("friendsContainer").style.display = "block";
+      document.getElementById("homeOptionsBlock").style.display = "none";
       document.getElementById("profileContainer").style.display = "none";
       document.getElementById("bannerContainer").style.display = "none";
       document.getElementById("stageContainer").style.display = "none";

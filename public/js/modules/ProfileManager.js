@@ -5,6 +5,7 @@ import { showToast } from '../utils/toast.js';
 import { isValidEmail, isValidPassword, detectSpace } from '../utils/validators.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
+import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 
 const ACTIVE_CLASS = "active-tab";
 
@@ -200,6 +201,9 @@ export const ProfileManager = {
         const response = await apiGet("/me", token);
         if (response.success && response.user) {
           // Start of first required block logic
+          setHomeOptionsVisible(true);
+          setCustomCompetitionVisible(false);
+
           document.getElementById("headerUsername").style.display = "block";
           document.getElementById("profileMenu").style.display = "block";
           document.getElementById("homePage").style.display = "block";
@@ -231,6 +235,7 @@ export const ProfileManager = {
     document.getElementById("headerUsername").style.display = "block";
     document.getElementById("profileMenu").style.display = "block";
     document.getElementById("profileContainer").style.display = "block";
+    document.getElementById("homeOptionsBlock").style.display = "none";
     document.getElementById("friendsContainer").style.display = "none";
     document.getElementById("bannerContainer").style.display = "none";
     document.getElementById("stageContainer").style.display = "none";

@@ -4,6 +4,7 @@ import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { apiPost, apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
+import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 
 export const AuthManager = {
   initLogin: function () {
@@ -76,6 +77,20 @@ export const AuthManager = {
               usernameEl.textContent = me.user.username;
             }
           }
+
+          const post = sessionStorage.getItem("postLoginAction");
+
+          // default: show homepage options after login
+          setHomeOptionsVisible(true);
+          setCustomCompetitionVisible(false);
+
+          if (post === "openCustom") {
+            // user came here by clicking Custom League
+            setHomeOptionsVisible(false);
+            setCustomCompetitionVisible(true);
+          }
+
+          sessionStorage.removeItem("postLoginAction");
 
           closeModal("loginModal");
         } else {

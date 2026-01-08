@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="css/components/notification-bell.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/components/homepage-options.css">
 </head>
 
 <body>
@@ -135,14 +136,14 @@
         <h2 id="loginTitle">Login</h2>
         <form id="loginForm">
           <div class="input-group input-league-name">
-            <input type="text" id="loginEmail" placeholder=" " autocomplete="current-email"/>
+            <input type="text" id="loginEmail" placeholder=" " autocomplete="current-email" />
             <label for="loginEmail" id="loginEmailLabel"></label>
           </div>
           <div class="error" id="loginEmailError"></div>
 
           <div class="input-league-name">
             <div class="input-group submit-button">
-              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password"/>
+              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" />
               <label for="loginPassword" id="loginPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
@@ -162,20 +163,20 @@
         <h2 id="registerTitle">Register</h2>
         <form id="registerForm">
           <div class="input-group input-league-name">
-            <input type="text" id="regUsername" placeholder=" " autocomplete="new-username"/>
+            <input type="text" id="regUsername" placeholder=" " autocomplete="new-username" />
             <label for="regUsername" id="regUsernameLabel"></label>
           </div>
           <div class="error" id="regUsernameError"></div>
 
           <div class="input-group input-league-name">
-            <input type="text" id="regEmail" placeholder=" " autocomplete="new-email"/>
+            <input type="text" id="regEmail" placeholder=" " autocomplete="new-email" />
             <label for="regEmail" id="regEmailLabel"></label>
           </div>
           <div class="error" id="regEmailError"></div>
 
           <div class="input-league-name">
             <div class="input-group">
-              <input type="password" id="regPassword" placeholder=" " autocomplete="new-password"/>
+              <input type="password" id="regPassword" placeholder=" " autocomplete="new-password" />
               <label for="regPassword" id="regPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle"
@@ -185,7 +186,7 @@
 
           <div class="input-league-name">
             <div class="input-group">
-              <input type="password" id="regConfirmPassword" placeholder=" " autocomplete="new-password"/>
+              <input type="password" id="regConfirmPassword" placeholder=" " autocomplete="new-password" />
               <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
             </div>
             <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle"
@@ -199,25 +200,69 @@
     </div>
 
     <!-- 🔹 Home Page Banners -->
-    <div class="homePage" id="homePage" style="display: none; ">
-      <div class="banner-container" id="bannerContainer">
+    <div class="homePage" id="homePage" style="display: block;">
+
+      <!-- ✅ Separate block: Live / Custom options -->
+      <div class="homeOptions" id="homeOptionsBlock" style="display: none;">
+        <div class="choiceGrid" id="homePageOptions">
+          <button id="btnLiveData" class="choiceCard choiceCard--live" type="button">
+            <div class="choiceTop">
+              <div class="choiceIcon">⚡</div>
+              <div class="choiceTitles">
+                <div class="choiceTitle">Live Data</div>
+                <div class="choiceSub">Live scores, fixtures, standings</div>
+              </div>
+            </div>
+            <div class="choiceBottom">
+              <span class="choiceHint">Open live football</span>
+              <span class="choiceArrow">→</span>
+            </div>
+          </button>
+
+          <button id="btnCustomData" class="choiceCard choiceCard--custom" type="button">
+            <div class="choiceTop">
+              <div class="choiceIcon">🏆</div>
+              <div class="choiceTitles">
+                <div class="choiceTitle">Custom League</div>
+                <div class="choiceSub">Create & manage your own leagues</div>
+              </div>
+            </div>
+            <div class="choiceBottom">
+              <span class="choiceHint">Go to competition types</span>
+              <span class="choiceArrow">→</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ✅ Your existing banner container stays separate and unchanged -->
+      <div class="banner-container" id="bannerContainer" style="display:none;">
+
         <div id="bannerContainerWrapper">
-          <h2 id="competition-types">Competition Types</h2>
-        </div>
-        <div class="banner-wrap" id="banner-wrap">
-          <div id="banner1" class="banner" banner-id="1">
-            <h2 id="banner-title">Champions League</h2>
-          </div>
-          <div id="banner2" class="banner" banner-id="2">
-            <h2 id="banner-title">Europe League</h2>
-          </div>
-          <div id="banner3" class="banner" banner-id="3">
-            <h2 id="banner-title">EURO Cup</h2>
-          </div>
-          <div id="banner4" class="banner" banner-id="4">
-            <h2 id="banner-title">WORLD Cup</h2>
+          <!-- We will show this only when logged in + clicked Custom -->
+          <div id="customCompetitionBlock" style="display:none;">
+            <button class="bannerBackBtn" id="bannerBackBtn">⬅ Back</button>
+            <h2 id="competition-types">Competition Types</h2>
           </div>
         </div>
+
+        <div id="customCompetitionBlockBanners" style="display:none;">
+          <div class="banner-wrap" id="banner-wrap">
+            <div id="banner1" class="banner" banner-id="1">
+              <h2 id="banner-title">Champions League</h2>
+            </div>
+            <div id="banner2" class="banner" banner-id="2">
+              <h2 id="banner-title">Europe League</h2>
+            </div>
+            <div id="banner3" class="banner" banner-id="3">
+              <h2 id="banner-title">EURO Cup</h2>
+            </div>
+            <div id="banner4" class="banner" banner-id="4">
+              <h2 id="banner-title">WORLD Cup</h2>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

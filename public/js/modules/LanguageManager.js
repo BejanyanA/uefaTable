@@ -511,6 +511,10 @@ function changeLang(lang, opts = {}) {
   document.querySelectorAll("#nationalBackBtn").forEach(opt => {
     opt.innerText = backButton3;
   });
+  const backButton4 = langMap[currentLang].backButton || "< Back";
+  document.querySelectorAll("#bannerBackBtn").forEach(opt => {
+    opt.innerText = backButton4;
+  });
   const homeButton = langMap[currentLang].homeButton || "< Home";
   document.querySelectorAll("#homeButton").forEach(opt => {
     opt.innerText = homeButton;
