@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/components/homepage-options.css">
+  <link rel="stylesheet" href="css/components/live-data.css">
 </head>
 
 <body>
@@ -263,6 +264,23 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+
+    <!-- 🔹 Live Data -->
+    <div class="liveDataPage" id="liveDataPage" style="display:none;">
+      <div class="liveHeader">
+        <button id="btnBackFromLive" class="liveBackBtn">← Back</button>
+        <h2 class="liveTitle">Live Data</h2>
+      </div>
+
+      <div class="liveWidgetCard">
+        <!-- <h3 class="liveCardTitle">Leagues</h3> -->
+
+        <div id="leaguesWidgetContainer">
+          <!-- widget stays here forever -->
+        </div>
       </div>
     </div>
 
@@ -494,6 +512,9 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+
+
+  <script type="module" src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
 
 </body>
 

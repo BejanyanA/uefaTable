@@ -68,6 +68,7 @@ export const AuthManager = {
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
+            document.getElementById("liveDataPage").style.display = "none";
             localStorage.setItem('user', JSON.stringify(me.user));
             initNotifications();
 
