@@ -62,7 +62,7 @@ export function logout() {
    localStorage.removeItem("selectedStageType");
    location.reload();
 
-   document.getElementById("homePage").style.display = "none";
+   // document.getElementById("homePage").style.display = "none";
    document.getElementById("notificationBell").style.display = "none";
 
    document.getElementById("loginBtn").style.display = "inline-block";

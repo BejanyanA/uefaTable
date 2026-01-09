@@ -110,6 +110,13 @@ export const langMap = {
     winFirstTitle: "Win your first Cup!",
 
 
+    // Live Data 
+    live_empty_games: "No games available",
+    live_direct_games: "Live",
+    live_all_games: "All",
+    live_finished_games: "Finished",
+    live_scheduled_games: "Upcoming",
+
     //BE translations
     username_exists: "Username already exists",
     email_exists: "Email already exists",
@@ -241,6 +248,14 @@ export const langMap = {
     winCups: "Հաղթանակ",
     aimForTheStars: "Ձգտիր աստղերին!",
     winFirstTitle: "Հաղթիր քո առաջին գավաթը!",
+
+
+    // Live Data 
+    live_empty_games: "Խաղեր գոյություն չունեն",
+    live_direct_games: "Ուղիղ",
+    live_all_games: "Բոլորը",
+    live_finished_games: "Ավարտված",
+    live_scheduled_games: "Սպասվող",
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -374,6 +389,15 @@ export const langMap = {
     aimForTheStars: "Vise les étoiles !",
     winFirstTitle: "Gagne ta première coupe !",
 
+
+    // Live Data 
+    live_empty_games: "Aucun jeu disponible",
+    live_direct_games: "En direct",
+    live_all_games: "Tous",
+    live_finished_games: "Terminé",
+    live_scheduled_games: "À venir",
+
+
     //BE translations
     username_exists: "Le nom d'utilisateur existe déjà",
     email_exists: "L’adresse e-mail existe déjà",
@@ -422,6 +446,9 @@ function changeLang(lang, opts = {}) {
   placeholderTranslate();
   friendStatusesAndSearch();
   updateFriendActionButtonTranslations();
+
+  // Live Translation
+  liveDataTranslation();
 
   // 🔹 Notify all modules that language changed
   if (!window.__APP_BOOTING__ && !silent) {
@@ -515,6 +542,10 @@ function changeLang(lang, opts = {}) {
   document.querySelectorAll("#bannerBackBtn").forEach(opt => {
     opt.innerText = backButton4;
   });
+  const backButton5 = langMap[currentLang].backButton || "< Back";
+  document.querySelectorAll("#btnBackFromLive").forEach(opt => {
+    opt.innerText = backButton5;
+  });
   const homeButton = langMap[currentLang].homeButton || "< Home";
   document.querySelectorAll("#homeButton").forEach(opt => {
     opt.innerText = homeButton;
@@ -544,7 +575,6 @@ function changeLang(lang, opts = {}) {
   document.querySelectorAll("#usersNotExist").forEach(opt => {
     opt.textContent = noUsersFound;
   });
-
 
   const deleteOption = langMap[currentLang].delete || "Delete";
   document.querySelectorAll("#delete").forEach(opt => {
@@ -809,6 +839,36 @@ function updateFriendActionButtonTranslations() {
     }
   });
 }
+
+
+// Live Data
+function liveDataTranslation() {
+  const { live_empty_games: liveEmptyGames = "No games available" } = langMap[currentLang] || {};
+  document.querySelectorAll(".empty-result").forEach(element => {
+    element.textContent = liveEmptyGames;
+  });
+
+  const { live_direct_games: liveDirectGames = "Live" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="live"]').forEach(element => {
+    element.textContent = liveDirectGames;
+  });
+
+  const { live_all_games: liveAllGames = "All" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="all"]').forEach(element => {
+    element.textContent = liveAllGames;
+  });
+
+  const { live_finished_games: liveFinishedGames = "Finished" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="finished"]').forEach(element => {
+    element.textContent = liveFinishedGames;
+  });
+
+  const { live_scheduled_games: liveScheduledGames = "Scheduled" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="scheduled"]').forEach(element => {
+    element.textContent = liveScheduledGames;
+  });
+}
+
 
 
 // Export + global registration
