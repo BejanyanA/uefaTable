@@ -52,7 +52,7 @@
   margin-bottom: 5px;
 }
 
-.btn-widget {
+/* .btn-widget {
   color: #121212;
   background-color: #ffffff;
 }
@@ -78,7 +78,7 @@ date-picker button.next-day {
 :where(api-sports-widget.initialized:not([data-type=config])) .widget-header .widget-toolbar .search-filter-button,
 .modal-widget .widget-header .widget-toolbar .search-filter-button {
   color: #03c0fa;
-}
+} */
 
 
 /* Live Data Tabs */
