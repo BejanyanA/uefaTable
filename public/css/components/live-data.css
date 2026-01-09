@@ -81,15 +81,6 @@ date-picker button.next-day {
 }
 
 
-/* api-sports-widget [data-action="all"],
-api-sports-widget [data-action="all"] * {
-  display: none !important;
-  visibility: hidden !important;
-} */
-
-
-
-
 /* Live Data Tabs */
 .liveTabs {
   display: flex;
@@ -144,4 +135,5 @@ api-sports-widget [data-action="all"] * {
     display: flex;
     align-items: center;
   }
+
 }
