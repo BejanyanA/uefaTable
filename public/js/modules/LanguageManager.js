@@ -109,6 +109,17 @@ export const langMap = {
     aimForTheStars: "Aim for the stars!",
     winFirstTitle: "Win your first Cup!",
 
+    // Homepage Card
+    liveFootball: "Live Football",
+    liveFootballTitle: "Live scores, Upcoming matches, Results",
+    liveFootballDescription: "Stay connected with live matches, real-time scores, and instant game updates from leagues around the world. Everything updates automatically as the action happens.",
+    openLiveFootball: "Open Live Football",
+
+    customLeague: "Custom League",
+    customLeagueTitle: "Create & Manage your own leagues",
+    customLeagueDescription: "Build your own league, invite friends, assign teams, and track standings and matches in one place. You control the rules, results, and competition format.",
+    openCustomleague: "Open Custom Leagues",
+
 
     // Live Data 
     live_empty_games: "No games available",
@@ -116,6 +127,8 @@ export const langMap = {
     live_all_games: "All",
     live_finished_games: "Finished",
     live_scheduled_games: "Upcoming",
+    liveTitleFootball: "All About Football",
+
 
     //BE translations
     username_exists: "Username already exists",
@@ -249,6 +262,17 @@ export const langMap = {
     aimForTheStars: "Ձգտիր աստղերին!",
     winFirstTitle: "Հաղթիր քո առաջին գավաթը!",
 
+    // Homepage Card
+    liveFootball: "Լայվ Ֆուտբոլ",
+    liveFootballTitle: "Ֆուտբոլային հաշիվներ, Սպասվող խաղեր, Արդյունքներ",
+    liveFootballDescription: "Մնացեք կապի մեջ ուղիղ խաղերի, իրական ժամանակում թարմացվող հաշիվների և ակնթարթային խաղային նորությունների հետ աշխարհի տարբեր լիգաներից։ Ամեն ինչ թարմացվում է ավտոմատ՝ խաղի ընթացքին համընթաց։",
+    openLiveFootball: "Բացել լայվ ֆուտբոլ",
+
+    customLeague: "Անհատական լիգա",
+    customLeagueTitle: "Ստեղծեք և կառավարեք ձեր սեփական լիգաները",
+    customLeagueDescription: "Ստեղծեք ձեր սեփական լիգան, հրավիրեք ընկերներին, նշանակեք թիմեր և մեկ վայրում հետևեք վարկանիշին ու խաղերին։ Դուք եք վերահսկում կանոնները, արդյունքները և մրցաշարի ձևաչափը։",
+    openCustomleague: "Բացել անհատական լիգաները",
+
 
     // Live Data 
     live_empty_games: "Խաղեր գոյություն չունեն",
@@ -256,6 +280,8 @@ export const langMap = {
     live_all_games: "Բոլորը",
     live_finished_games: "Ավարտված",
     live_scheduled_games: "Սպասվող",
+    liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
+
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -389,6 +415,17 @@ export const langMap = {
     aimForTheStars: "Vise les étoiles !",
     winFirstTitle: "Gagne ta première coupe !",
 
+    // Homepage Card
+    liveFootball: "Football en direct",
+    liveFootballTitle: "Scores en direct, Matchs à venir, Résultats",
+    liveFootballDescription: "Restez connecté avec des matchs en direct, des scores en temps réel et des mises à jour instantanées des matchs des ligues du monde entier. Tout se met à jour automatiquement au fil de l’action.",
+    openLiveFootball: "Accéder au football en direct",
+
+    customLeague: "Ligue personnalisée",
+    customLeagueTitle: "Créez et gérez vos propres ligues",
+    customLeagueDescription: "Créez votre propre ligue, invitez des amis, assignez des équipes et suivez les classements et les matchs en un seul endroit. Vous contrôlez les règles, les résultats et le format de la compétition.",
+    openCustomleague: "Ouvrir les ligues personnalisées",
+
 
     // Live Data 
     live_empty_games: "Aucun jeu disponible",
@@ -396,6 +433,7 @@ export const langMap = {
     live_all_games: "Tous",
     live_finished_games: "Terminé",
     live_scheduled_games: "À venir",
+    liveTitleFootball: "Tout sur le football",
 
 
     //BE translations
@@ -449,6 +487,9 @@ function changeLang(lang, opts = {}) {
 
   // Live Translation
   liveDataTranslation();
+
+  // Homepage Card
+  hompageCardTranslations();
 
   // 🔹 Notify all modules that language changed
   if (!window.__APP_BOOTING__ && !silent) {
@@ -867,8 +908,56 @@ function liveDataTranslation() {
   document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="scheduled"]').forEach(element => {
     element.textContent = liveScheduledGames;
   });
+
+  const { liveTitleFootball: allAboutFootball = "All About Football" } = langMap[currentLang] || {};
+  document.querySelectorAll("#liveTitleFootball").forEach(element => {
+    element.textContent = allAboutFootball;
+  });
 }
 
+
+// Homepage Cards
+function hompageCardTranslations() {
+  const { liveFootball: live_Football = "Live Football" } = langMap[currentLang] || {};
+  document.querySelectorAll("#liveFootball").forEach(element => {
+    element.textContent = live_Football;
+  });
+
+  const { liveFootballTitle: live_FootballTitle = "Live scores, Upcoming matches, Results" } = langMap[currentLang] || {};
+  document.querySelectorAll("#liveFootballTitle").forEach(element => {
+    element.textContent = live_FootballTitle;
+  });
+
+  const { liveFootballDescription: live_FootballDescription = "Stay connected with live matches, real-time scores, and instant game updates from leagues around the world. Everything updates automatically as the action happens." } = langMap[currentLang] || {};
+  document.querySelectorAll("#liveFootballDescription").forEach(element => {
+    element.textContent = live_FootballDescription;
+  });
+
+  const { openLiveFootball: live_FootballOpen = "Open Live Football" } = langMap[currentLang] || {};
+  document.querySelectorAll("#openLiveFootball").forEach(element => {
+    element.textContent = live_FootballOpen;
+  });
+
+  const { customLeague: custome_league = "Custom League" } = langMap[currentLang] || {};
+  document.querySelectorAll("#customLeague").forEach(element => {
+    element.textContent = custome_league;
+  });
+
+  const { customLeagueTitle: custome_leagueTitle = "Create & Manage your own leagues" } = langMap[currentLang] || {};
+  document.querySelectorAll("#customLeagueTitle").forEach(element => {
+    element.textContent = custome_leagueTitle;
+  });
+
+  const { customLeagueDescription: custome_leagueDescription = "Build your own league, invite friends, assign teams, and track standings and matches in one place. You control the rules, results, and competition format." } = langMap[currentLang] || {};
+  document.querySelectorAll("#customLeagueDescription").forEach(element => {
+    element.textContent = custome_leagueDescription;
+  });
+
+  const { openCustomleague: custome_leagueOpen = "Open Custom Leagues" } = langMap[currentLang] || {};
+  document.querySelectorAll("#openCustomleague").forEach(element => {
+    element.textContent = custome_leagueOpen;
+  });
+}
 
 
 // Export + global registration
