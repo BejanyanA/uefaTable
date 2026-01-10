@@ -890,8 +890,13 @@ function liveDataTranslation() {
   });
 
   const { live_direct_games: liveDirectGames = "Live" } = langMap[currentLang] || {};
-  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="live"]').forEach(element => {
+  document.querySelectorAll("#live_direct_games").forEach(element => {
     element.textContent = liveDirectGames;
+  });
+
+  const { standings: liveStanding = "Standings" } = langMap[currentLang] || {};
+  document.querySelectorAll("#live_standings").forEach(element => {
+    element.textContent = liveStanding;
   });
 
   const { live_all_games: liveAllGames = "All" } = langMap[currentLang] || {};
