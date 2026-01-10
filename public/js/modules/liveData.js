@@ -218,13 +218,21 @@ function initStandingsPickerOnce() {
       const btn = e.target.closest(".standingsLeagueBtn");
       if (!btn) return;
 
-      // active UI
+      // ✅ Prevent clicking the already active league
+      if (btn.classList.contains("active")) {
+         return;
+      }
+
+      // Remove active from others
       document.querySelectorAll(".standingsLeagueBtn").forEach((b) => {
-         b.classList.toggle("active", b === btn);
+         b.classList.remove("active");
       });
 
+      btn.classList.add("active");
+
       const leagueId = btn.dataset.leagueId;
-      const leagueName = (btn.textContent || "").trim();
+      const leagueName = btn.textContent.trim();
+
       renderStandingsWidget(leagueId, leagueName);
    });
 }
