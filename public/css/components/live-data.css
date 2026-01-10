@@ -34,7 +34,7 @@
   box-sizing: content-box;
   position: fixed;
   white-space: nowrap;
-  width: 80px;
+  width: 60px;
 }
 
 .liveWidgetCard {
@@ -320,7 +320,7 @@ api-sports-widget .navtab-header {
   .liveBackBtn {
     left: 3px;
     top: 60px;
-    width: 50px;
+    width: 40px;
   }
 
   .liveTitle {
@@ -356,7 +356,7 @@ api-sports-widget .navtab-header {
   .liveBackBtn {
     left: 3px;
     top: 60px;
-    width: 50px;
+    width: 40px;
   }
 
   .liveTitle {
