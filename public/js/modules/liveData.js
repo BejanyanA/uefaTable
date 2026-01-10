@@ -1,8 +1,93 @@
 import { langMap, currentLang } from "./LanguageManager.js";
+import { apiGet } from "../services/api.js";
 
 let widgetsBootstrapped = false;
 let currentTab = "allGames";
 const API_KEY = "14108d2decc4cfb2cb970d4e9f28d479";
+let leagueLogosMap = null;
+
+// ---------- logos ----------
+async function loadLeagueLogos() {
+   if (leagueLogosMap) return leagueLogosMap;
+
+   try {
+      const res = await apiGet("/league-logos");
+      if (!res?.success || !res?.data?.clubs) return {};
+
+      leagueLogosMap = {};
+      res.data.clubs.forEach((club) => {
+         leagueLogosMap[club.league_name.toLowerCase()] = club.logo_url;
+      });
+
+      return leagueLogosMap;
+   } catch (err) {
+      console.error("Failed to load league logos", err);
+      return {};
+   }
+}
+
+async function injectLeagueLogos() {
+   const logos = await loadLeagueLogos();
+   if (!logos) return;
+
+   document.querySelectorAll(".standingsLeagueBtn").forEach((btn) => {
+      const nameEl = btn.querySelector(".leagueName");
+      if (!nameEl) return;
+
+      const leagueName = nameEl.textContent.trim().toLowerCase();
+      const logoUrl = logos[leagueName];
+      if (!logoUrl) return;
+
+      // Prevent duplicate logos
+      if (btn.querySelector("img.leagueLogo")) return;
+
+      const img = document.createElement("img");
+      img.className = "leagueLogo";
+      img.src = logoUrl;
+      img.alt = leagueName;
+
+      btn.prepend(img);
+   });
+}
+
+async function updateStandingsTitle(leagueName) {
+   const title = document.getElementById("standingsTitle");
+   if (!title) return;
+
+   // Ensure text span exists
+   let titleText = document.getElementById("standingsTitleText");
+   if (!titleText) {
+      titleText = document.createElement("span");
+      titleText.id = "standingsTitleText";
+      title.appendChild(titleText);
+   }
+
+   // Ensure logo img exists
+   let titleLogo = document.getElementById("standingsTitleLogo");
+   if (!titleLogo) {
+      titleLogo = document.createElement("img");
+      titleLogo.id = "standingsTitleLogo";
+      titleLogo.className = "standingsTitleLogo";
+      titleLogo.alt = "";
+      title.prepend(titleLogo);
+   }
+
+   const logos = await loadLeagueLogos();
+   const logoUrl = logos?.[leagueName.toLowerCase()];
+
+   if (logoUrl) {
+      titleLogo.src = logoUrl;
+      titleLogo.alt = leagueName;
+      titleLogo.style.display = "block";
+   } else {
+      titleLogo.style.display = "none";
+   }
+}
+
+
+
+
+
 
 // ---------- visibility ----------
 function setLiveDataVisible(isVisible) {
@@ -61,51 +146,51 @@ function renderTab(tab) {
       <!-- LEFT: leagues list -->
       <div class="standingsLeft" id="standingsLeaguesList">
         <button class="standingsLeagueBtn active" type="button" data-league-id="140">
-          La Liga
+          <span class="leagueName">La Liga</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="61">
-          Ligue 1
+          <span class="leagueName">Ligue 1</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="39">
-          Premier League
+          <span class="leagueName">Premier League</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="135">
-          Serie A
+          <span class="leagueName">Serie A</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="78">
-          Bundesliga
+          <span class="leagueName">Bundesliga</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="88">
-          Eredivisie
+          <span class="leagueName">Eredivisie</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="2">
-          Champions League
+          <span class="leagueName">Champions League</span>
         </button>
         
         <button class="standingsLeagueBtn" type="button" data-league-id="3">
-          Europa League
+          <span class="leagueName">Europa League</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="1">
-          FIFA World Cup
+          <span class="leagueName">FIFA World Cup</span>
         </button>
         
         <button class="standingsLeagueBtn" type="button" data-league-id="5">
-          EURO
+          <span class="leagueName">EURO</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="4">
-          Conference League
+          <span class="leagueName">Conference League</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="6">
-          Nations League
+          <span class="leagueName">Nations League</span>
         </button>
 
 
@@ -114,7 +199,12 @@ function renderTab(tab) {
 
       <!-- RIGHT: standings data -->
       <div class="standingsRight" id="standingsDataPane">
-        <div class="standingsTitle" id="standingsTitle">UEFA Champions League</div>
+        <div class="standingsTitle" id="standingsTitle">
+         <img id="standingsTitleLogo" class="standingsTitleLogo" alt="">
+         <span id="standingsTitleText">La Liga</span>
+        </div>
+
+
         <div id="standingsWidgetHost"></div>
       </div>
 
@@ -123,6 +213,7 @@ function renderTab(tab) {
 
       initStandingsPickerOnce();     // bind click once
       loadStandingsWidgetOnce();     // load default selected league
+      injectLeagueLogos();
       return;
    }
 
@@ -196,6 +287,8 @@ function renderStandingsWidget(leagueId, leagueName) {
       data-favorite="false"
       ></api-sports-widget>
   `;
+
+   updateStandingsTitle(leagueName);
 
    // Remove "Goals For : Against"
    removeColumnByHeader(

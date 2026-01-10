@@ -162,14 +162,6 @@ date-picker button.next-day {
   overflow: hidden;
 }
 
-.standingsTitle {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #fff;
-  text-align: center;
-}
-
 .standingsHint {
   margin-top: 10px;
   font-size: 12px;
@@ -204,6 +196,38 @@ api-sports-widget .group-title {
   background: linear-gradient(50deg, #2d7cff, #1b56d6);
   color: #ffffff;
   box-shadow: 0 6px 16px rgba(45, 124, 255, 0.35);
+}
+
+.standingsLeagueBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leagueLogo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.standingsTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #fff;
+}
+
+.standingsTitleLogo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 
@@ -333,5 +357,15 @@ api-sports-widget .group-title {
 
   .liveTitle {
     margin-top: 30px;
+  }
+
+  .leagueLogo {
+    width: 18px;
+    height: 18px;
+  }
+
+  .standingsTitleLogo {
+    width: 20px;
+    height: 20px;
   }
 }
