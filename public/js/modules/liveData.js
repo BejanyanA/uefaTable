@@ -380,30 +380,6 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
    setTimeout(apply, 1500);
 }
 
-function removeNavTabSpacing(root) {
-  if (!root) return;
-
-  const apply = () => {
-    root.querySelectorAll(".navtab-header").forEach(el => {
-      const parent = el.parentElement;
-      el.remove();
-
-      if (parent) {
-        parent.style.marginTop = "0";
-        parent.style.paddingTop = "0";
-        parent.style.minHeight = "0";
-      }
-    });
-  };
-
-  apply();
-
-  if (root.__navtabSpacingObserver) return;
-
-  const obs = new MutationObserver(apply);
-  obs.observe(root, { childList: true, subtree: true });
-  root.__navtabSpacingObserver = obs;
-}
 
 
 
