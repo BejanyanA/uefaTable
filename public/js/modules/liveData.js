@@ -1,7 +1,7 @@
 import { langMap, currentLang } from "./LanguageManager.js";
 
 let widgetsBootstrapped = false;
-let currentTab = "live";
+let currentTab = "allGames";
 const API_KEY = "14108d2decc4cfb2cb970d4e9f28d479";
 
 // ---------- visibility ----------
@@ -30,14 +30,14 @@ function renderTab(tab) {
    const container = document.getElementById("leaguesWidgetContainer");
    if (!container) return;
 
-   if (tab === "live") {
+   if (tab === "allGames") {
       container.innerHTML = `
       <api-sports-widget
         data-type="games"
         data-target-game="modal"
         data-games-style="2"
         data-refresh="15"
-        data-show-toolbar="false"
+        data-show-toolbar="true"
         data-tab="live"
       ></api-sports-widget>
 
@@ -80,6 +80,10 @@ function renderTab(tab) {
           Bundesliga
         </button>
 
+        <button class="standingsLeagueBtn" type="button" data-league-id="88">
+          Eredivisie
+        </button>
+
         <button class="standingsLeagueBtn" type="button" data-league-id="2">
           Champions League
         </button>
@@ -103,8 +107,6 @@ function renderTab(tab) {
         <button class="standingsLeagueBtn" type="button" data-league-id="6">
           Nations League
         </button>
-
-
 
 
 
@@ -295,8 +297,11 @@ const widgetTranslations = {
    "No games available for this date.": (t) => t.live_empty_games,
    "Live": (t) => t.live_direct_games,
    "All": (t) => t.live_all_games,
+   "Home": (t) => t.live_home_games,
+   "Away": (t) => t.live_away_games,
    "Finished": (t) => t.live_finished_games,
    "Scheduled": (t) => t.live_scheduled_games,
+   "No standings available for this league.": (t) => t.live_empty_standings,
 };
 
 function translateWidgetTexts() {
@@ -353,7 +358,7 @@ export function openLiveData() {
    initWidgetTranslationObserver();
    translateWidgetTexts();
 
-   setActiveTab("live");
+   setActiveTab("allGames");
 }
 
 export function closeLiveData() {

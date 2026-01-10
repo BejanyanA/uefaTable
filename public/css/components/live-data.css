@@ -163,9 +163,11 @@ date-picker button.next-day {
 }
 
 .standingsTitle {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 10px;
+  color: #fff;
+  text-align: center;
 }
 
 .standingsHint {
@@ -187,6 +189,10 @@ api-sports-widget .team-form {
 api-sports-widget th[data-title="Form"],
 api-sports-widget th[data-title="FORM"],
 api-sports-widget th[data-title="Last 5 games"] {
+  display: none !important;
+}
+
+api-sports-widget .group-title {
   display: none !important;
 }
 
@@ -266,7 +272,7 @@ api-sports-widget th[data-title="Last 5 games"] {
   }
 
   .standingsTitle {
-    font-size: 15px;
+    font-size: 14px;
     margin-bottom: 8px;
   }
 
@@ -284,7 +290,7 @@ api-sports-widget th[data-title="Last 5 games"] {
   }
 
   .liveBackBtn {
-    left: 5px;
+    left: 3px;
     top: 60px;
     width: 50px;
   }
@@ -320,7 +326,7 @@ api-sports-widget th[data-title="Last 5 games"] {
   }
 
   .liveBackBtn {
-    left: 5px;
+    left: 3px;
     top: 60px;
     width: 50px;
   }

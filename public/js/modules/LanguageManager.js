@@ -125,9 +125,13 @@ export const langMap = {
     live_empty_games: "No games available",
     live_direct_games: "Live",
     live_all_games: "All",
+    live_home_games: "Home",
+    live_away_games: "Away",
     live_finished_games: "Finished",
     live_scheduled_games: "Upcoming",
     liveTitleFootball: "All About Football",
+    live_empty_standings: "No standings available for this league",
+
 
 
     //BE translations
@@ -278,9 +282,12 @@ export const langMap = {
     live_empty_games: "Խաղեր գոյություն չունեն",
     live_direct_games: "Ուղիղ",
     live_all_games: "Բոլորը",
+    live_home_games: "Տանը",
+    live_away_games: "Դրսում",
     live_finished_games: "Ավարտված",
     live_scheduled_games: "Սպասվող",
     liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
+    live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
 
 
     //BE translations
@@ -431,9 +438,13 @@ export const langMap = {
     live_empty_games: "Aucun jeu disponible",
     live_direct_games: "En direct",
     live_all_games: "Tous",
+    live_home_games: "Accueil",
+    live_away_games: "Extérieur",
     live_finished_games: "Terminé",
     live_scheduled_games: "À venir",
     liveTitleFootball: "Tout sur le football",
+    live_empty_standings: "Aucun classement disponible pour cette ligue",
+
 
 
     //BE translations
@@ -884,14 +895,32 @@ function updateFriendActionButtonTranslations() {
 
 // Live Data
 function liveDataTranslation() {
-  const { live_empty_games: liveEmptyGames = "No games available" } = langMap[currentLang] || {};
-  document.querySelectorAll(".empty-result").forEach(element => {
-    element.textContent = liveEmptyGames;
+  const t = langMap[currentLang] || {};
+  const liveEmptyGames = t.live_empty_games || "No games available for this date.";
+
+  document.querySelectorAll(".empty-result").forEach((el) => {
+    const text = el.textContent.replace(/\s+/g, " ").trim();
+
+    // ✅ Only translate LIVE empty games
+    if (text.includes("No games available")) {
+      el.textContent = liveEmptyGames;
+    }
   });
 
-  const { live_direct_games: liveDirectGames = "Live" } = langMap[currentLang] || {};
-  document.querySelectorAll("#live_direct_games").forEach(element => {
-    element.textContent = liveDirectGames;
+  const liveEmptyStandings = t.live_empty_standings || "No standings available for this league.";
+
+  document.querySelectorAll(".empty-result").forEach((el) => {
+    const text = el.textContent.replace(/\s+/g, " ").trim();
+
+    // ✅ Only translate LIVE empty games
+    if (text.includes("No standings available")) {
+      el.textContent = liveEmptyStandings;
+    }
+  });
+
+  const { live_all_games: liveAllMatches = "All" } = langMap[currentLang] || {};
+  document.querySelectorAll("#live_all_matches").forEach(element => {
+    element.textContent = liveAllMatches;
   });
 
   const { standings: liveStanding = "Standings" } = langMap[currentLang] || {};
@@ -903,6 +932,22 @@ function liveDataTranslation() {
   document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="all"]').forEach(element => {
     element.textContent = liveAllGames;
   });
+
+  const { live_direct_games: liveDirectGames = "Live" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="live"]').forEach(element => {
+    element.textContent = liveDirectGames;
+  });
+
+  const { live_home_games: liveHomeGames = "Home" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="home"]').forEach(element => {
+    element.textContent = liveHomeGames;
+  });
+
+  const { live_away_games: liveAwayGames = "Away" } = langMap[currentLang] || {};
+  document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="away"]').forEach(element => {
+    element.textContent = liveAwayGames;
+  });
+
 
   const { live_finished_games: liveFinishedGames = "Finished" } = langMap[currentLang] || {};
   document.querySelectorAll('api-sports-widget button.btn-widget-link[data-action="finished"]').forEach(element => {
