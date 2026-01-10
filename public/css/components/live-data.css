@@ -192,6 +192,9 @@ api-sports-widget .navtab-header {
   display: none !important;
 }
 
+api-sports-widget .header {
+  display: none !important;
+}
 
 .standingsLeagueBtn.active {
   cursor: default;
