@@ -9,6 +9,8 @@ import { handleGetApprovedFriends, handleGetAllFriendsStatuses, handleSearchFrie
 
 import { handleGetUserDetails, handleUpdateUserDetails, handleAchievements } from './routes_endpoints/user_data.js';
 
+import { handleGetAllLeaguelogos } from './routes_endpoints/get_leagues.js';
+
 
 // Club
 import { handleAttachPlayers, handleAttachKnockPlayers, handleAttachOnlyKnockPlayers } from './routes_endpoints/leagues/attach_player.js';
@@ -63,6 +65,9 @@ const routeRegistry = {
   "/create-knockouts": { POST: handleCreateRoundKnockouts },
   "/update-leagues": { POST: handleLeaguesEdit },
   "/delete-league": { POST: handleLeaguesDelete },
+
+  "/league-logos": { GET: handleGetAllLeaguelogos },
+
 
   // Club
   "/clubs": { GET: handleGetAllClubs },
