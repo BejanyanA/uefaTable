@@ -188,6 +188,10 @@ api-sports-widget .group-title {
   display: none !important;
 }
 
+api-sports-widget .navtab-header {
+  display: none !important;
+}
+
 
 .standingsLeagueBtn.active {
   cursor: default;

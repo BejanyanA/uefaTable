@@ -145,16 +145,21 @@ function renderTab(tab) {
 
       <!-- LEFT: leagues list -->
       <div class="standingsLeft" id="standingsLeaguesList">
-        <button class="standingsLeagueBtn active" type="button" data-league-id="140">
-          <span class="leagueName">La Liga</span>
+
+        <button class="standingsLeagueBtn active" type="button" data-league-id="2">
+          <span class="leagueName">Champions League</span>
         </button>
 
-        <button class="standingsLeagueBtn" type="button" data-league-id="61">
-          <span class="leagueName">Ligue 1</span>
+        <button class="standingsLeagueBtn" type="button" data-league-id="140">
+          <span class="leagueName">La Liga</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="39">
           <span class="leagueName">Premier League</span>
+        </button>
+
+        <button class="standingsLeagueBtn" type="button" data-league-id="61">
+          <span class="leagueName">Ligue 1</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="135">
@@ -167,10 +172,6 @@ function renderTab(tab) {
 
         <button class="standingsLeagueBtn" type="button" data-league-id="88">
           <span class="leagueName">Eredivisie</span>
-        </button>
-
-        <button class="standingsLeagueBtn" type="button" data-league-id="2">
-          <span class="leagueName">Champions League</span>
         </button>
         
         <button class="standingsLeagueBtn" type="button" data-league-id="3">
@@ -201,7 +202,7 @@ function renderTab(tab) {
       <div class="standingsRight" id="standingsDataPane">
         <div class="standingsTitle" id="standingsTitle">
          <img id="standingsTitleLogo" class="standingsTitleLogo" alt="">
-         <span id="standingsTitleText">La Liga</span>
+         <span id="standingsTitleText">Champions League</span>
         </div>
 
 
@@ -291,16 +292,12 @@ function renderStandingsWidget(leagueId, leagueName) {
    updateStandingsTitle(leagueName);
 
    // Remove "Goals For : Against"
-   removeColumnByHeader(
-      host,
-      'th[data-title="Goals For : Against"]'
-   );
-
-   // Remove "Form / Last 5 games"
-   removeColumnByHeader(
-      host,
-      'th[data-title="Last 5 games"], th[data-title="Form"], th[data-title="FORM"]'
-   );
+   removeColumnsByHeaders(host, [
+      'th[data-title="Goals For : Against"]',
+      'th[data-title="Last 5 games"]',
+      'th[data-title="Form"]',
+      'th[data-title="FORM"]',
+   ]);
 }
 
 let standingsPickerBound = false;
@@ -343,39 +340,42 @@ function loadStandingsWidgetOnce() {
 
 
 
-function removeColumnByHeader(widgetRoot, headerSelector) {
-   if (!widgetRoot) return;
+function removeColumnsByHeaders(scopeRoot, headerSelectors) {
+   if (!scopeRoot) return;
 
    const apply = () => {
-      const header = widgetRoot.querySelector(headerSelector);
-      if (!header) return false;
+      const table = scopeRoot.querySelector("table");
+      if (!table) return false;
 
-      const index =
-         Array.from(header.parentElement.children).indexOf(header);
+      const headers = Array.from(table.querySelectorAll("th"))
+         .filter((th) => headerSelectors.some((sel) => th.matches(sel)));
 
-      // Remove header cell
-      header.remove();
+      if (!headers.length) return false;
 
-      // Remove all td cells in that column
-      widgetRoot.querySelectorAll("tr").forEach((tr) => {
-         const cell = tr.children[index];
-         if (cell) cell.remove();
+      const indexes = [...new Set(
+         headers.map((th) => Array.from(th.parentElement.children).indexOf(th))
+      )].sort((a, b) => b - a);
+
+      indexes.forEach((idx) => {
+         table.querySelectorAll("tr").forEach((tr) => {
+            const cell = tr.children[idx];
+            if (cell) cell.remove();
+         });
       });
 
       return true;
    };
 
-   // Try immediately
+   // Try now
    if (apply()) return;
 
-   // Observe until table is rendered
+   // Observe until content appears
    const obs = new MutationObserver(() => {
       if (apply()) obs.disconnect();
    });
 
-   obs.observe(widgetRoot, { childList: true, subtree: true });
+   obs.observe(scopeRoot, { childList: true, subtree: true });
 
-   // Fallback retries
    setTimeout(apply, 300);
    setTimeout(apply, 800);
    setTimeout(apply, 1500);
