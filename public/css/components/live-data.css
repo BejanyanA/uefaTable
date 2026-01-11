@@ -284,7 +284,6 @@ api-sports-widget .header {
 .matchMenuParentBtn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -318,12 +317,17 @@ api-sports-widget .header {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
+  color: #fff;
 }
 
 .matchesTitleLogo {
   width: 24px;
   height: 24px;
   object-fit: contain;
+}
+
+.matchMenuChevron {
+  margin-left: auto;
 }
 
 
@@ -490,9 +494,14 @@ api-sports-widget .header {
     font-size: 14px;
   }
 
+  .standingsTitleLogo {
+    width: 22px;
+    height: 22px;
+  }
+
   .matchesTitleLogo {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -537,6 +546,11 @@ api-sports-widget .header {
   }
 
   .standingsTitleLogo {
+    width: 20px;
+    height: 20px;
+  }
+
+  .matchesTitleLogo {
     width: 20px;
     height: 20px;
   }

@@ -424,7 +424,7 @@ const MATCHES_MENU = [
    {
       key: "spain",
       title: "Spain",
-      logoLeagueName: "La Liga",
+      logoLeagueName: "Spain",
       options: [
          {
             title: "La Liga",
@@ -446,7 +446,7 @@ const MATCHES_MENU = [
    {
       key: "england",
       title: "England",
-      logoLeagueName: "Premier League",
+      logoLeagueName: "England",
       options: [
          {
             title: "Premier League",
@@ -468,7 +468,7 @@ const MATCHES_MENU = [
    {
       key: "france",
       title: "France",
-      logoLeagueName: "Ligue 1",
+      logoLeagueName: "France",
       options: [
          {
             title: "Ligue 1",
@@ -490,7 +490,7 @@ const MATCHES_MENU = [
    {
       key: "italy",
       title: "Italy",
-      logoLeagueName: "Serie A",
+      logoLeagueName: "Italy",
       options: [
          {
             title: "Serie A",
@@ -512,7 +512,7 @@ const MATCHES_MENU = [
    {
       key: "germany",
       title: "Germany",
-      logoLeagueName: "Bundesliga",
+      logoLeagueName: "Germany",
       options: [
          {
             title: "Bundesliga",
@@ -534,7 +534,7 @@ const MATCHES_MENU = [
    {
       key: "netherlands",
       title: "Netherlands",
-      logoLeagueName: "Eredivisie",
+      logoLeagueName: "Netherlands",
       options: [
          {
             title: "Eredivisie",
@@ -586,10 +586,10 @@ function renderMatchesMenu() {
       if (item.options?.length) {
          return `
         <div class="matchMenuGroup" data-key="${item.key}">
-          <button class="matchMenuParentBtn" type="button" data-action="toggle">
-            <span class="matchMenuParentText">${item.title}</span>
-            <span class="matchMenuChevron">▾</span>
-          </button>
+<button class="matchMenuParentBtn" type="button" data-action="toggle" data-logo-name="${item.logoLeagueName || item.title}">
+  <span class="matchMenuParentText">${item.title}</span>
+  <span class="matchMenuChevron">▾</span>
+</button>
 
           <div class="matchMenuChildren" style="display:none;">
             ${item.options
@@ -712,23 +712,23 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
 }
 
 
-async function updateMatchesTitle(title, logoLeagueName) {
+async function updateMatchesTitle(title, logoName) {
    const text = document.getElementById("matchesTitleText");
    const logo = document.getElementById("matchesTitleLogo");
 
    if (text) text.textContent = title;
 
-   const logos = await loadLeagueLogos(); // from your existing /league-logos logic
-   const url = logos?.[(logoLeagueName || title).toLowerCase()];
+   const logos = await loadLeagueLogos();
+   const url = logos?.[(logoName || title).toLowerCase()];
 
-   if (logo) {
-      if (url) {
-         logo.src = url;
-         logo.alt = title;
-         logo.style.display = "block";
-      } else {
-         logo.style.display = "none";
-      }
+   if (!logo) return;
+
+   if (url) {
+      logo.src = url;
+      logo.alt = title;
+      logo.style.display = "block";
+   } else {
+      logo.style.display = "none";
    }
 }
 
@@ -736,18 +736,33 @@ async function injectMatchesLogos() {
    const logos = await loadLeagueLogos();
    if (!logos) return;
 
-   document.querySelectorAll(".matchMenuSingleBtn").forEach((btn) => {
-      const name = (btn.dataset.logoName || btn.textContent || "").trim().toLowerCase();
-      const url = logos[name];
+   const applyToBtn = (btn) => {
+      const logoName =
+         (btn.dataset.logoName || btn.querySelector(".matchBtnText")?.textContent || btn.textContent || "")
+            .trim()
+            .toLowerCase();
+
+      const url = logos[logoName];
       if (!url) return;
+
       if (btn.querySelector("img.matchLogo")) return;
 
       const img = document.createElement("img");
       img.className = "matchLogo";
       img.src = url;
-      img.alt = name;
+      img.alt = logoName;
+
       btn.prepend(img);
-   });
+   };
+
+   // ✅ Singles
+   document.querySelectorAll(".matchMenuSingleBtn").forEach(applyToBtn);
+
+   // ✅ Dropdown children
+   document.querySelectorAll(".matchMenuChildBtn").forEach(applyToBtn);
+
+   // ✅ Dropdown parents (Spain/England/etc.)
+   document.querySelectorAll(".matchMenuParentBtn").forEach(applyToBtn);
 }
 
 function openDefaultMatches() {
