@@ -424,11 +424,23 @@ const MATCHES_MENU = [
    {
       key: "spain",
       title: "Spain",
-      logoLeagueName: "La Liga", // used to reuse /league-logos
+      logoLeagueName: "La Liga",
       options: [
-         { title: "La Liga", leagueId: 140 },
-         { title: "Super Cup", leagueId: 556 }, // <-- replace with correct id
-         { title: "Copa del Rey", leagueId: 143 }, // <-- replace with correct id
+         {
+            title: "La Liga",
+            leagueId: 140,
+            logoName: "La Liga",
+         },
+         {
+            title: "Super Cup",
+            leagueId: 556,
+            logoName: "Spain Super Cup",
+         },
+         {
+            title: "Copa del Rey",
+            leagueId: 143,
+            logoName: "Copa del Rey",
+         },
       ],
    },
    {
@@ -436,9 +448,21 @@ const MATCHES_MENU = [
       title: "England",
       logoLeagueName: "Premier League",
       options: [
-         { title: "Premier League", leagueId: 39 },
-         { title: "Community Shield", leagueId: 528 }, // <-- replace
-         { title: "FA Cup", leagueId: 45 }, // <-- replace
+         {
+            title: "Premier League",
+            leagueId: 39,
+            logoName: "Premier League",
+         },
+         {
+            title: "Community Shield",
+            leagueId: 528,
+            logoName: "Community Shield",
+         },
+         {
+            title: "FA Cup",
+            leagueId: 45,
+            logoName: "FA Cup",
+         },
       ],
    },
    {
@@ -446,19 +470,43 @@ const MATCHES_MENU = [
       title: "France",
       logoLeagueName: "Ligue 1",
       options: [
-         { title: "Ligue 1", leagueId: 61 },
-         { title: "Trophee des Champions", leagueId: 526 }, // <-- replace
-         { title: "Coupe de France", leagueId: 66 }, // <-- replace
+         {
+            title: "Ligue 1",
+            leagueId: 61,
+            logoName: "Ligue 1",
+         },
+         {
+            title: "Trophée des Champions",
+            leagueId: 526,
+            logoName: "Trophée des Champions",
+         },
+         {
+            title: "Coupe de France",
+            leagueId: 66,
+            logoName: "Coupe de France",
+         },
       ],
    },
    {
       key: "italy",
       title: "Italy",
-      logoLeagueName: "Seria A",
+      logoLeagueName: "Serie A",
       options: [
-         { title: "Seria A", leagueId: 135 },
-         { title: "Super Cup", leagueId: 547 }, // <-- replace
-         { title: "Coppa Italia", leagueId: 137 }, // <-- replace
+         {
+            title: "Serie A",
+            leagueId: 135,
+            logoName: "Serie A",
+         },
+         {
+            title: "Super Cup",
+            leagueId: 547,
+            logoName: "Italy Super Cup",
+         },
+         {
+            title: "Coppa Italia",
+            leagueId: 137,
+            logoName: "Coppa Italia",
+         },
       ],
    },
    {
@@ -466,9 +514,21 @@ const MATCHES_MENU = [
       title: "Germany",
       logoLeagueName: "Bundesliga",
       options: [
-         { title: "Bundesliga", leagueId: 78 },
-         { title: "Super Cup", leagueId: 529 }, // <-- replace
-         { title: "DFB Cup", leagueId: 81 }, // <-- replace
+         {
+            title: "Bundesliga",
+            leagueId: 78,
+            logoName: "Bundesliga",
+         },
+         {
+            title: "Super Cup",
+            leagueId: 529,
+            logoName: "Germany Super Cup",
+         },
+         {
+            title: "DFB Pokal",
+            leagueId: 81,
+            logoName: "DFB Pokal",
+         },
       ],
    },
    {
@@ -476,30 +536,42 @@ const MATCHES_MENU = [
       title: "Netherlands",
       logoLeagueName: "Eredivisie",
       options: [
-         { title: "Eredivisie", leagueId: 88 },
-         { title: "Super Cup", leagueId: 543 }, // <-- replace
-         { title: "KNVB Beker", leagueId: 90 }, // <-- replace
+         {
+            title: "Eredivisie",
+            leagueId: 88,
+            logoName: "Eredivisie",
+         },
+         {
+            title: "Super Cup",
+            leagueId: 543,
+            logoName: "Johan Cruyff Shield",
+         },
+         {
+            title: "KNVB Beker",
+            leagueId: 90,
+            logoName: "KNVB Beker",
+         },
       ],
    },
 
-   // Singles (no dropdown)
+   // ✅ Singles (no dropdown)
    {
       key: "ucl",
       title: "Champions League",
-      logoLeagueName: "Champions League",
-      leagueId: 2, // <-- replace with your correct UCL id
+      leagueId: 2,
+      logoName: "Champions League",
    },
    {
       key: "uel",
       title: "Europa League",
-      logoLeagueName: "Europa League",
-      leagueId: 3, // <-- replace
+      leagueId: 3,
+      logoName: "Europa League",
    },
    {
       key: "uecl",
       title: "Conference League",
-      logoLeagueName: "Conference League",
-      leagueId: 4, // <-- replace
+      leagueId: 4,
+      logoName: "Conference League",
    },
 ];
 
@@ -529,7 +601,7 @@ function renderMatchesMenu() {
                   data-action="open"
                   data-league-id="${opt.leagueId}"
                   data-league-title="${opt.title}"
-                  data-logo-name="${item.logoLeagueName || opt.title}"
+                  data-logo-name="${opt.logoName || opt.title}"
                 >
                   ${opt.title}
                 </button>
