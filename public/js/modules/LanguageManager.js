@@ -38,7 +38,7 @@ export const langMap = {
     player_success_assigned: "Player assigned successfully",
     player_success_unassigned: "Player unassigned successfully",
     player_assign_failed: "Failed to assign Player",
-    standings: "Standings",
+    standings: "Standing",
     matches: "Matches",
     teams: "Teams",
     played: "P",
@@ -131,6 +131,7 @@ export const langMap = {
     live_scheduled_games: "Upcoming",
     liveTitleFootball: "All About Football",
     live_empty_standings: "No standings available for this league",
+    live_standings: "Standings",
     live_fixtures: "Matches",
 
 
@@ -289,6 +290,7 @@ export const langMap = {
     live_scheduled_games: "Սպասվող",
     liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
     live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
+    live_standings: "Աղյուսակներ",
     live_fixtures: "Խաղացանկ",
 
 
@@ -446,6 +448,7 @@ export const langMap = {
     live_scheduled_games: "À venir",
     liveTitleFootball: "Tout sur le football",
     live_empty_standings: "Aucun classement disponible pour cette ligue",
+    live_standings: "Classements",
     live_fixtures: "Rencontres",
 
 
@@ -931,7 +934,7 @@ function liveDataTranslation() {
     element.textContent = liveDirectMatches;
   });
 
-  const { standings: liveStanding = "Standings" } = langMap[currentLang] || {};
+  const { live_standings: liveStanding = "Standings" } = langMap[currentLang] || {};
   document.querySelectorAll("#live_standings").forEach(element => {
     element.textContent = liveStanding;
   });
