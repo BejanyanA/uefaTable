@@ -554,4 +554,9 @@ api-sports-widget .header {
     width: 20px;
     height: 20px;
   }
+
+  .matchLogo {
+    width: 18px;
+    height: 18px;
+  }
 }
