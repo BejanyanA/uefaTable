@@ -218,6 +218,33 @@ function renderTab(tab) {
       return;
    }
 
+   if (tab === "matches") {
+      container.innerHTML = `
+    <div class="matchesLayout">
+
+      <!-- LEFT: Countries/Competitions list -->
+      <div class="matchesLeft" id="matchesList"></div>
+
+      <!-- RIGHT: Matches data -->
+      <div class="matchesRight">
+        <div class="matchesTitle" id="matchesTitle">
+          <img id="matchesTitleLogo" class="matchesTitleLogo" alt="">
+          <span id="matchesTitleText">Matches</span>
+        </div>
+
+        <div id="matchesWidgetHost"></div>
+      </div>
+
+    </div>
+  `;
+
+      renderMatchesMenu();          // builds left list (with dropdowns)
+      initMatchesMenuClickOnce();   // binds clicks once
+      openDefaultMatches();         // loads default league
+      injectMatchesLogos();         // optional: uses /league-logos like standings
+      return;
+   }
+
    container.innerHTML = `<div>Unknown tab</div>`;
 }
 
@@ -260,6 +287,10 @@ function getCurrentSeasonYear() {
    return month < 7 ? year - 1 : year; // Jan-Jun => previous year
 }
 
+
+
+
+//// Standings
 function renderStandingsWidget(leagueId, leagueName) {
    const host = document.getElementById("standingsWidgetHost");
    const title = document.getElementById("standingsTitle");
@@ -337,8 +368,6 @@ function loadStandingsWidgetOnce() {
    renderStandingsWidget(first.dataset.leagueId, (first.textContent || "").trim());
 }
 
-
-
 function removeColumnsByHeaders(scopeRoot, headerSelectors) {
    if (!scopeRoot) return;
 
@@ -379,6 +408,305 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
    setTimeout(apply, 800);
    setTimeout(apply, 1500);
 }
+
+
+
+
+
+//// Matches
+const DEFAULT_MATCH_LEAGUE = {
+   leagueId: "140",           // La Liga (API-Football)
+   leagueTitle: "La Liga",
+   logoName: "La Liga",
+};
+
+const MATCHES_MENU = [
+   {
+      key: "spain",
+      title: "Spain",
+      logoLeagueName: "La Liga", // used to reuse /league-logos
+      options: [
+         { title: "La Liga", leagueId: 140 },
+         { title: "Super Cup", leagueId: 556 }, // <-- replace with correct id
+         { title: "Copa del Rey", leagueId: 143 }, // <-- replace with correct id
+      ],
+   },
+   {
+      key: "england",
+      title: "England",
+      logoLeagueName: "Premier League",
+      options: [
+         { title: "Premier League", leagueId: 39 },
+         { title: "Super Cup", leagueId: 528 }, // <-- replace
+      ],
+   },
+   {
+      key: "italy",
+      title: "Italy",
+      logoLeagueName: "Seria A",
+      options: [
+         { title: "Seria A", leagueId: 135 },
+         { title: "Super Cup", leagueId: 547 }, // <-- replace
+      ],
+   },
+   {
+      key: "germany",
+      title: "Germany",
+      logoLeagueName: "Bundesliga",
+      options: [
+         { title: "Bundesliga", leagueId: 78 },
+         { title: "Super Cup", leagueId: 529 }, // <-- replace
+      ],
+   },
+   {
+      key: "france",
+      title: "France",
+      logoLeagueName: "Ligue 1",
+      options: [
+         { title: "Ligue 1", leagueId: 61 },
+         { title: "Super Cup", leagueId: 526 }, // <-- replace
+      ],
+   },
+
+   // Singles (no dropdown)
+   {
+      key: "ucl",
+      title: "Champions League",
+      logoLeagueName: "Champions League",
+      leagueId: 2, // <-- replace with your correct UCL id
+   },
+   {
+      key: "uel",
+      title: "Europa League",
+      logoLeagueName: "Europa League",
+      leagueId: 3, // <-- replace
+   },
+   {
+      key: "uecl",
+      title: "Conference League",
+      logoLeagueName: "Conference League",
+      leagueId: 4, // <-- replace
+   },
+];
+
+
+
+function renderMatchesMenu() {
+   const list = document.getElementById("matchesList");
+   if (!list) return;
+
+   const html = MATCHES_MENU.map((item) => {
+      // Dropdown (country -> 2 options)
+      if (item.options?.length) {
+         return `
+        <div class="matchMenuGroup" data-key="${item.key}">
+          <button class="matchMenuParentBtn" type="button" data-action="toggle">
+            <span class="matchMenuParentText">${item.title}</span>
+            <span class="matchMenuChevron">▾</span>
+          </button>
+
+          <div class="matchMenuChildren" style="display:none;">
+            ${item.options
+               .map(
+                  (opt) => `
+                <button
+                  class="matchMenuChildBtn"
+                  type="button"
+                  data-action="open"
+                  data-league-id="${opt.leagueId}"
+                  data-league-title="${opt.title}"
+                  data-logo-name="${item.logoLeagueName || opt.title}"
+                >
+                  ${opt.title}
+                </button>
+              `
+               )
+               .join("")}
+          </div>
+        </div>
+      `;
+      }
+
+      // Single item (no dropdown)
+      return `
+      <button
+        class="matchMenuSingleBtn"
+        type="button"
+        data-action="open"
+        data-league-id="${item.leagueId}"
+        data-league-title="${item.title}"
+        data-logo-name="${item.logoLeagueName || item.title}"
+      >
+        ${item.title}
+      </button>
+    `;
+   }).join("");
+
+   list.innerHTML = html;
+}
+
+
+let matchesMenuBound = false;
+
+function initMatchesMenuClickOnce() {
+   if (matchesMenuBound) return;
+   matchesMenuBound = true;
+
+   document.addEventListener("click", (e) => {
+      // Toggle dropdown
+      const parentBtn = e.target.closest(".matchMenuParentBtn");
+      if (parentBtn) {
+         const group = parentBtn.closest(".matchMenuGroup");
+         const children = group?.querySelector(".matchMenuChildren");
+         if (!children) return;
+
+         const isOpen = children.style.display === "block";
+         closeAllMatchDropdowns(group); // ✅ close others
+
+         children.style.display = isOpen ? "none" : "block";
+         return;
+      }
+
+      // Open matches
+      const openBtn = e.target.closest('[data-action="open"]');
+      if (!openBtn) return;
+
+      const leagueId = openBtn.dataset.leagueId;
+      const leagueTitle = openBtn.dataset.leagueTitle || "Matches";
+      const logoName = openBtn.dataset.logoName || leagueTitle;
+
+      // prevent reloading same selection
+      if (openBtn.classList.contains("active")) return;
+
+      // active state (only within matches left)
+      document.querySelectorAll(".matchMenuChildBtn, .matchMenuSingleBtn").forEach((b) => {
+         b.classList.remove("active");
+      });
+      openBtn.classList.add("active");
+
+      renderMatchesWidget(leagueId, leagueTitle, logoName);
+   });
+}
+
+
+function renderMatchesWidget(leagueId, leagueTitle, logoName) {
+   const host = document.getElementById("matchesWidgetHost");
+   if (!host) return;
+
+   // Title
+   updateMatchesTitle(leagueTitle, logoName);
+
+   // Widget
+   const season = getCurrentSeasonYear();
+   host.innerHTML = `
+      <api-sports-widget
+        data-type="games"
+        data-target-game="modal"
+        data-games-style="2"
+        data-refresh="15"
+        data-league="${leagueId}"
+        data-show-toolbar="true"
+        data-tab="all"
+      ></api-sports-widget>
+
+      <api-sports-widget
+        data-type="config"
+        data-key="${API_KEY}"
+        data-sport="football"
+        data-lang="en"
+        data-theme="dark"
+        data-show-logos="true"
+        data-favorite="false"
+      ></api-sports-widget>
+    `;
+
+}
+
+
+async function updateMatchesTitle(title, logoLeagueName) {
+   const text = document.getElementById("matchesTitleText");
+   const logo = document.getElementById("matchesTitleLogo");
+
+   if (text) text.textContent = title;
+
+   const logos = await loadLeagueLogos(); // from your existing /league-logos logic
+   const url = logos?.[(logoLeagueName || title).toLowerCase()];
+
+   if (logo) {
+      if (url) {
+         logo.src = url;
+         logo.alt = title;
+         logo.style.display = "block";
+      } else {
+         logo.style.display = "none";
+      }
+   }
+}
+
+async function injectMatchesLogos() {
+   const logos = await loadLeagueLogos();
+   if (!logos) return;
+
+   document.querySelectorAll(".matchMenuSingleBtn").forEach((btn) => {
+      const name = (btn.dataset.logoName || btn.textContent || "").trim().toLowerCase();
+      const url = logos[name];
+      if (!url) return;
+      if (btn.querySelector("img.matchLogo")) return;
+
+      const img = document.createElement("img");
+      img.className = "matchLogo";
+      img.src = url;
+      img.alt = name;
+      btn.prepend(img);
+   });
+}
+
+function openDefaultMatches() {
+   // 1️⃣ Try to find Spain → La Liga button explicitly
+   const defaultBtn = document.querySelector(
+      '.matchMenuChildBtn[data-league-id="' + DEFAULT_MATCH_LEAGUE.leagueId + '"]'
+   );
+
+   if (defaultBtn) {
+      defaultBtn.classList.add("active");
+
+      renderMatchesWidget(
+         DEFAULT_MATCH_LEAGUE.leagueId,
+         DEFAULT_MATCH_LEAGUE.leagueTitle,
+         DEFAULT_MATCH_LEAGUE.logoName
+      );
+
+      // Ensure parent dropdown (Spain) is open
+      const group = defaultBtn.closest(".matchMenuGroup");
+      const children = group?.querySelector(".matchMenuChildren");
+      if (children) children.style.display = "block";
+
+      return;
+   }
+
+   // 2️⃣ Fallback (in case something changes)
+   const fallback =
+      document.querySelector(".matchMenuChildBtn") ||
+      document.querySelector(".matchMenuSingleBtn");
+
+   if (!fallback) return;
+
+   fallback.classList.add("active");
+   renderMatchesWidget(
+      fallback.dataset.leagueId,
+      fallback.dataset.leagueTitle || fallback.textContent.trim(),
+      fallback.dataset.logoName || fallback.textContent.trim()
+   );
+}
+
+function closeAllMatchDropdowns(exceptGroup = null) {
+   document.querySelectorAll(".matchMenuGroup .matchMenuChildren").forEach((el) => {
+      if (exceptGroup && exceptGroup.contains(el)) return;
+      el.style.display = "none";
+   });
+}
+
+
 
 
 
