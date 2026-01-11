@@ -437,7 +437,18 @@ const MATCHES_MENU = [
       logoLeagueName: "Premier League",
       options: [
          { title: "Premier League", leagueId: 39 },
-         { title: "Super Cup", leagueId: 528 }, // <-- replace
+         { title: "Community Shield", leagueId: 528 }, // <-- replace
+         { title: "FA Cup", leagueId: 45 }, // <-- replace
+      ],
+   },
+   {
+      key: "france",
+      title: "France",
+      logoLeagueName: "Ligue 1",
+      options: [
+         { title: "Ligue 1", leagueId: 61 },
+         { title: "Trophee des Champions", leagueId: 526 }, // <-- replace
+         { title: "Coupe de France", leagueId: 66 }, // <-- replace
       ],
    },
    {
@@ -447,6 +458,7 @@ const MATCHES_MENU = [
       options: [
          { title: "Seria A", leagueId: 135 },
          { title: "Super Cup", leagueId: 547 }, // <-- replace
+         { title: "Coppa Italia", leagueId: 137 }, // <-- replace
       ],
    },
    {
@@ -456,15 +468,17 @@ const MATCHES_MENU = [
       options: [
          { title: "Bundesliga", leagueId: 78 },
          { title: "Super Cup", leagueId: 529 }, // <-- replace
+         { title: "DFB Cup", leagueId: 81 }, // <-- replace
       ],
    },
    {
-      key: "france",
-      title: "France",
-      logoLeagueName: "Ligue 1",
+      key: "netherlands",
+      title: "Netherlands",
+      logoLeagueName: "Eredivisie",
       options: [
-         { title: "Ligue 1", leagueId: 61 },
-         { title: "Super Cup", leagueId: 526 }, // <-- replace
+         { title: "Eredivisie", leagueId: 88 },
+         { title: "Super Cup", leagueId: 543 }, // <-- replace
+         { title: "KNVB Beker", leagueId: 90 }, // <-- replace
       ],
    },
 
