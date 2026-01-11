@@ -571,6 +571,9 @@ function initMatchesMenuClickOnce() {
       const openBtn = e.target.closest('[data-action="open"]');
       if (!openBtn) return;
 
+      const clickedInsideDropdown = !!openBtn.closest(".matchMenuChildren");
+      if (!clickedInsideDropdown) closeAllMatchDropdowns();
+
       const leagueId = openBtn.dataset.leagueId;
       const leagueTitle = openBtn.dataset.leagueTitle || "Matches";
       const logoName = openBtn.dataset.logoName || leagueTitle;
@@ -705,6 +708,7 @@ function closeAllMatchDropdowns(exceptGroup = null) {
       el.style.display = "none";
    });
 }
+
 
 
 

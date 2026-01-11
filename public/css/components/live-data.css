@@ -274,6 +274,11 @@ api-sports-widget .header {
 .matchMenuChildBtn.active {
   background: #1f1f1f;
   cursor: default;
+  pointer-events: none;
+  opacity: 0.85;
+  background: linear-gradient(30deg, #2d7cff, #1b56d6);
+  color: #ffffff;
+  box-shadow: 0 6px 6px rgba(45, 124, 255, 0.35);
 }
 
 .matchMenuParentBtn {
