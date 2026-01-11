@@ -189,7 +189,7 @@ api-sports-widget .group-title {
   display: none !important;
 }
 
-api-sports-widget .navtab-header {
+api-sports-widget[data-type="standings"] .navtab-header {
   display: none !important;
 }
 
