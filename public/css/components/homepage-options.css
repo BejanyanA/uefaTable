@@ -90,6 +90,29 @@
     font-size: 22px;
 }
 
+#choiceiconLive {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(248, 34, 34);
+    /* Apply the animation */
+    animation: flash-animation 1.8s infinite;
+}
+
+/* Define the flashing effect */
+@keyframes flash-animation {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 .choiceTitle {
     font-size: 18px;
     font-weight: 800;
@@ -185,6 +208,6 @@
     }
 
     .choiceBottom {
-    font-size: 13px;
-}
+        font-size: 13px;
+    }
 }
