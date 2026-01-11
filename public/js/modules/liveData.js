@@ -828,15 +828,102 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 
 // ---------- translations ----------
 const widgetTranslations = {
-   "No games available for this date.": (t) => t.live_empty_games,
+   "No games available for this date": (t) => t.live_empty_games,
    "Live": (t) => t.live_direct_games,
    "All": (t) => t.live_all_games,
    "Home": (t) => t.live_home_games,
    "Away": (t) => t.live_away_games,
    "Finished": (t) => t.live_finished_games,
    "Scheduled": (t) => t.live_scheduled_games,
-   "No standings available for this league.": (t) => t.live_empty_standings,
+   "No standings available for this league": (t) => t.live_empty_standings,
 };
+
+function setActionButtonLabelGlobal(action, translatedText) {
+   const buttons = document.querySelectorAll(
+      `button.btn-widget-link[data-action="${action}"]`
+   );
+
+   let changed = false;
+
+   buttons.forEach((btn) => {
+      // Create label span once
+      let label = btn.querySelector(":scope > span.btnLabel");
+      if (!label) {
+         label = document.createElement("span");
+         label.className = "btnLabel";
+         btn.appendChild(label);
+      }
+
+      // Update label text
+      if (label.textContent !== translatedText) {
+         label.textContent = translatedText;
+         changed = true;
+      }
+
+      // Remove only loose text nodes (keep SVG)
+      Array.from(btn.childNodes).forEach((node) => {
+         if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+            node.textContent = " ";
+         }
+      });
+   });
+
+   return changed;
+}
+
+function translatePopupActionsNow() {
+   const t = langMap[currentLang] || {};
+
+   setActionButtonLabelGlobal("events", t.live_events || "Events");
+   setActionButtonLabelGlobal("statistics", t.live_statistics || "Statistics");
+   setActionButtonLabelGlobal("lineups", t.live_lineups || "Lineups");
+}
+
+// Fast burst translator for async popup rendering
+function burstTranslatePopupActions(durationMs = 1500, intervalMs = 50) {
+   const start = Date.now();
+   const timer = setInterval(() => {
+      translatePopupActionsNow();
+
+      if (Date.now() - start >= durationMs) {
+         clearInterval(timer);
+      }
+   }, intervalMs);
+}
+
+let popupTranslateInitDone = false;
+
+function initPopupTranslationHooks() {
+   if (popupTranslateInitDone) return;
+   popupTranslateInitDone = true;
+
+   // 1) Any click inside the widget likely opens the popup => burst translate
+   document.addEventListener("click", (e) => {
+      if (e.target.closest("api-sports-widget")) {
+         burstTranslatePopupActions(1500, 50);
+      }
+   });
+
+   // 2) Observe body because popup is often appended to BODY
+   const obs = new MutationObserver(() => {
+      translatePopupActionsNow();
+   });
+
+   obs.observe(document.body, { childList: true, subtree: true });
+
+   // 3) Initial run
+   translatePopupActionsNow();
+
+   // 4) On language change (instant)
+   window.addEventListener("lang:changed", () => {
+      translatePopupActionsNow();
+      burstTranslatePopupActions(800, 50);
+   });
+}
+
+
+
+
 
 function translateWidgetTexts() {
    const t = langMap[currentLang];
@@ -890,6 +977,7 @@ export function openLiveData() {
    ensureConfigWidget();
 
    initWidgetTranslationObserver();
+   initPopupTranslationHooks();
    translateWidgetTexts();
 
    setActiveTab("allGames");

@@ -133,6 +133,9 @@ export const langMap = {
     live_empty_standings: "No standings available for this league",
     live_standings: "Standings",
     live_fixtures: "Matches",
+    live_events: "Events",
+    live_statistics: "Statistics",
+    live_lineups: "Lineups",
 
 
 
@@ -292,6 +295,9 @@ export const langMap = {
     live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
     live_standings: "Աղյուսակներ",
     live_fixtures: "Խաղացանկ",
+    live_events: "Իրադարձություններ",
+    live_statistics: "Տվյալներ",
+    live_lineups: "Կազմեր",
 
 
     //BE translations
@@ -450,6 +456,9 @@ export const langMap = {
     live_empty_standings: "Aucun classement disponible pour cette ligue",
     live_standings: "Classements",
     live_fixtures: "Rencontres",
+    live_events: "Événements",
+    live_statistics: "Statistiques",
+    live_lineups: "Compositions",
 
 
 
@@ -901,28 +910,6 @@ function updateFriendActionButtonTranslations() {
 
 // Live Data
 function liveDataTranslation() {
-  const t = langMap[currentLang] || {};
-  const liveEmptyGames = t.live_empty_games || "No games available for this date.";
-
-  document.querySelectorAll(".empty-result").forEach((el) => {
-    const text = el.textContent.replace(/\s+/g, " ").trim();
-
-    // ✅ Only translate LIVE empty games
-    if (text.includes("No games available")) {
-      el.textContent = liveEmptyGames;
-    }
-  });
-
-  const liveEmptyStandings = t.live_empty_standings || "No standings available for this league.";
-
-  document.querySelectorAll(".empty-result").forEach((el) => {
-    const text = el.textContent.replace(/\s+/g, " ").trim();
-
-    // ✅ Only translate LIVE empty games
-    if (text.includes("No standings available")) {
-      el.textContent = liveEmptyStandings;
-    }
-  });
 
   const { live_all_games: liveAllMatches = "All" } = langMap[currentLang] || {};
   document.querySelectorAll("#live_all_matches").forEach(element => {
@@ -1035,3 +1022,9 @@ window.currentLang = currentLang;
 // Immediately apply
 changeLang(currentLang, { silent: true });
 window.__APP_BOOTING__ = false;
+
+window.addEventListener("lang:changed", () => {
+  translateWidgetActionButtons();
+  requestAnimationFrame(translateWidgetActionButtons);
+  setTimeout(translateWidgetActionButtons, 200);
+});
