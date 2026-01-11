@@ -7,23 +7,33 @@ const API_KEY = "14108d2decc4cfb2cb970d4e9f28d479";
 let leagueLogosMap = null;
 
 // ---------- logos ----------
-async function loadLeagueLogos() {
-   if (leagueLogosMap) return leagueLogosMap;
+let leagueLogosCache = null;
+let leagueLogosPromise = null;
 
-   try {
-      const res = await apiGet("/league-logos");
-      if (!res?.success || !res?.data?.clubs) return {};
+export async function loadLeagueLogos() {
+   // ✅ return cached results
+   if (leagueLogosCache) return leagueLogosCache;
 
-      leagueLogosMap = {};
-      res.data.clubs.forEach((club) => {
-         leagueLogosMap[club.league_name.toLowerCase()] = club.logo_url;
+   // ✅ if a request is already running, await it (prevents double fetch)
+   if (leagueLogosPromise) return leagueLogosPromise;
+
+   leagueLogosPromise = (async () => {
+      const res = await apiGet("/league-logos"); // your existing apiGet
+      const list = res?.data?.clubs || [];
+
+      // normalize to map: "la liga" -> url
+      const map = {};
+      list.forEach((x) => {
+         if (!x?.league_name || !x?.logo_url) return;
+         map[String(x.league_name).trim().toLowerCase()] = x.logo_url;
       });
 
-      return leagueLogosMap;
-   } catch (err) {
-      console.error("Failed to load league logos", err);
-      return {};
-   }
+      leagueLogosCache = map;
+      leagueLogosPromise = null;
+      return leagueLogosCache;
+   })();
+
+   return leagueLogosPromise;
 }
 
 async function injectLeagueLogos() {
