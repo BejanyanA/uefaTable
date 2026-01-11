@@ -197,6 +197,10 @@ api-sports-widget .header {
   display: none !important;
 }
 
+api-sports-widget[data-type="game"] [data-action="players"] {
+  display: none !important;
+}
+
 .standingsLeagueBtn.active {
   cursor: default;
   pointer-events: none;

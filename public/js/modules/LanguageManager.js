@@ -131,6 +131,7 @@ export const langMap = {
     live_scheduled_games: "Upcoming",
     liveTitleFootball: "All About Football",
     live_empty_standings: "No standings available for this league",
+    live_fixtures: "Matches",
 
 
 
@@ -288,6 +289,7 @@ export const langMap = {
     live_scheduled_games: "Սպասվող",
     liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
     live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
+    live_fixtures: "Խաղացանկ",
 
 
     //BE translations
@@ -444,6 +446,7 @@ export const langMap = {
     live_scheduled_games: "À venir",
     liveTitleFootball: "Tout sur le football",
     live_empty_standings: "Aucun classement disponible pour cette ligue",
+    live_fixtures: "Rencontres",
 
 
 
@@ -923,9 +926,19 @@ function liveDataTranslation() {
     element.textContent = liveAllMatches;
   });
 
+  const { live_direct_games: liveDirectMatches = "Live" } = langMap[currentLang] || {};
+  document.querySelectorAll("#live_direct_matches").forEach(element => {
+    element.textContent = liveDirectMatches;
+  });
+
   const { standings: liveStanding = "Standings" } = langMap[currentLang] || {};
   document.querySelectorAll("#live_standings").forEach(element => {
     element.textContent = liveStanding;
+  });
+
+  const { live_fixtures: liveMatches = "Matches" } = langMap[currentLang] || {};
+  document.querySelectorAll("#live_matches").forEach(element => {
+    element.textContent = liveMatches;
   });
 
   const { live_all_games: liveAllGames = "All" } = langMap[currentLang] || {};
