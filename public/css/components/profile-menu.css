@@ -301,7 +301,7 @@
   font-size: 1.5em;
 }
 
-.achievement-details .team-logo {
+.achievement-details .team_logo {
   width: 35px;
   height: 35px;
   border-radius: 50%;

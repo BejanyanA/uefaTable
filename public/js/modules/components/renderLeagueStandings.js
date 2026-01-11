@@ -111,7 +111,7 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
           ${standings.map((team, index) => {
       const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
       return `<tr>
-              <td>${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.club_name}</td>
+              <td>${index + 1}. <img src="${teamLogo}" class="team_logo"> ${team.club_name}</td>
               <td>${team.played ?? 0}</td>
               <td>${team.wins ?? 0}</td>
               <td>${team.draws ?? 0}</td>
@@ -133,7 +133,7 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
       ${standings.map((team, index) => {
         const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
         return `
-        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team-logo"> ${team.club_name}</div>
+        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team_logo"> ${team.club_name}</div>
       `}).join("")}
     </div>
 
@@ -205,10 +205,10 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
                 <option value="">${match.team1_username || "Select user"}</option>
               </select>
             </td>
-            <td><img src="${team1Logo}" class="team-logo"> ${match.team1_name}</td>
+            <td><img src="${team1Logo}" class="team_logo"> ${match.team1_name}</td>
             <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
             <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
-            <td><img src="${team2Logo}" class="team-logo"> ${match.team2_name}</td>
+            <td><img src="${team2Logo}" class="team_logo"> ${match.team2_name}</td>
             <td>
               <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
                 <option value="">${match.team2_username || "Select user"}</option>
@@ -237,14 +237,14 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
           <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
             <option value="">${match.team1_username || "Select Player"}</option>
           </select>
-          <div class="team-name"><img src="${team1Logo}" class="team-logo"> ${match.team1_name}</div>
+          <div class="team-name"><img src="${team1Logo}" class="team_logo"> ${match.team1_name}</div>
           <input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}>
         </div>
         <div class="match-line">
           <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
             <option value="">${match.team2_username || "Select Player"}</option>
           </select>
-          <div class="team-name"><img src="${team2Logo}" class="team-logo"> ${match.team2_name}</div>
+          <div class="team-name"><img src="${team2Logo}" class="team_logo"> ${match.team2_name}</div>
           <input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}>
         </div>
       `;
