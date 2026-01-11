@@ -503,6 +503,21 @@ api-sports-widget .header {
     width: 22px;
     height: 22px;
   }
+
+
+  .standingsRight {
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 12px 0px 0px;
+    overflow: hidden;
+  }
+
+  .matchesRight {
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 12px 0px 0px;
+    overflow: hidden;
+  }
 }
 
 
@@ -558,5 +573,19 @@ api-sports-widget .header {
   .matchLogo {
     width: 18px;
     height: 18px;
+  }
+
+  .standingsRight {
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 12px 0px 0px;
+    overflow: hidden;
+  }
+
+  .matchesRight {
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 12px 0px 0px;
+    overflow: hidden;
   }
 }
