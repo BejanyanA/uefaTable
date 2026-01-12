@@ -216,6 +216,7 @@ async function handleBellClick() {
         document.getElementById("headerUsername").style.display = "block";
         document.getElementById("profileMenu").style.display = "block";
         document.getElementById("friendsContainer").style.display = "block";
+        document.getElementById("homePage").style.display = "none";
         document.getElementById("profileContainer").style.display = "none";
         document.getElementById("bannerContainer").style.display = "none";
         document.getElementById("stageContainer").style.display = "none";
