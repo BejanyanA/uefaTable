@@ -1,5 +1,5 @@
 footer.page-footer {
-  position: relative;
+  position: fixed;
   left: 0;
   right: 0;
   top: 10;
@@ -9,7 +9,7 @@ footer.page-footer {
   color: white;
   text-align: center;
   padding: 6px;
-  margin-top: auto;
+  margin-top: 10px;
   font-size: x-small;
   z-index: 1000;          /* above content, below modals if needed */
 }
