@@ -64,6 +64,8 @@ export function logout() {
 
    // document.getElementById("homePage").style.display = "none";
    document.getElementById("notificationBell").style.display = "none";
+   document.getElementById("headerUsername").style.display = "none";
+   document.getElementById("profileMenu").style.display = "none";
 
    document.getElementById("loginBtn").style.display = "inline-block";
    document.getElementById("registerBtn").style.display = "inline-block";
