@@ -110,7 +110,7 @@ export const langMap = {
     winFirstTitle: "Win your first Cup!",
 
     // Homepage Card
-    liveFootball: "Live Football",
+    liveFootball: "Scores & Standings",
     liveFootballTitle: "Live scores, Upcoming matches, Results",
     liveFootballDescription: "Stay connected with live matches, real-time scores, and instant game updates from leagues around the world. Everything updates automatically as the action happens.",
     openLiveFootball: "Open Live Football",
@@ -272,8 +272,8 @@ export const langMap = {
     winFirstTitle: "Հաղթիր քո առաջին գավաթը!",
 
     // Homepage Card
-    liveFootball: "Լայվ Ֆուտբոլ",
-    liveFootballTitle: "Ֆուտբոլային հաշիվներ, Սպասվող խաղեր, Արդյունքներ",
+    liveFootball: "Հաշիվներ և Աղյուսակներ",
+    liveFootballTitle: "Հաշիվներ, Սպասվող խաղեր, Արդյունքներ",
     liveFootballDescription: "Մնացեք կապի մեջ ուղիղ խաղերի, իրական ժամանակում թարմացվող հաշիվների և ակնթարթային խաղային նորությունների հետ աշխարհի տարբեր լիգաներից։ Ամեն ինչ թարմացվում է ավտոմատ՝ խաղի ընթացքին համընթաց։",
     openLiveFootball: "Բացել լայվ ֆուտբոլ",
 
@@ -433,7 +433,7 @@ export const langMap = {
     winFirstTitle: "Gagne ta première coupe !",
 
     // Homepage Card
-    liveFootball: "Football en direct",
+    liveFootball: "Scores & Classement",
     liveFootballTitle: "Scores en direct, Matchs à venir, Résultats",
     liveFootballDescription: "Restez connecté avec des matchs en direct, des scores en temps réel et des mises à jour instantanées des matchs des ligues du monde entier. Tout se met à jour automatiquement au fil de l’action.",
     openLiveFootball: "Accéder au football en direct",

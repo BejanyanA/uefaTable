@@ -95,7 +95,7 @@
     font-weight: bold;
     color: rgb(248, 34, 34);
     /* Apply the animation */
-    animation: flash-animation 1.8s infinite;
+    animation: flash-animation 1.5s infinite;
 }
 
 /* Define the flashing effect */
@@ -199,6 +199,12 @@
         box-shadow: 0 10px 26px rgba(0, 0, 0, .16);
         transform: translateY(0);
         transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    }
+
+    .choiceSub {
+        margin-top: 6px;
+        font-size: 12px;
+        opacity: .92;
     }
 
     .choiceSubDescr {
