@@ -22,6 +22,9 @@ body {
   min-height: 100vh;
   min-height: 100dvh; 
   padding-bottom: var(--footer-height);
+
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
