@@ -17,6 +17,7 @@ export function setCustomCompetitionVisible(visible) {
 export function setHomeOptionsVisible(visible) {
    const el = document.getElementById("homeOptionsBlock");
    if (el) el.style.display = visible ? "grid" : "none";
+   document.getElementById("homePage").style.display = "block";
    document.getElementById("bannerContainer").style.display = "none";
 }
 
@@ -32,6 +33,7 @@ function hideHomePage() {
    setHomeOptionsVisible(false);
    setCustomCompetitionVisible(false);
    document.getElementById("bannerContainer").style.display = "none";
+   document.getElementById("homePage").style.display = "none";
 }
 
 export function initHomeOptionButtons() {
@@ -61,6 +63,7 @@ export function initHomeOptionButtons() {
 
       setHomeOptionsVisible(false);
       setCustomCompetitionVisible(true);
+      document.getElementById("homePage").style.display = "none";
    });
 
    // Banner back (custom league back)
@@ -71,6 +74,7 @@ export function initHomeOptionButtons() {
       backBtn.addEventListener("click", () => {
          setCustomCompetitionVisible(false);
          setHomeOptionsVisible(true);
+         document.getElementById("homePage").style.display = "block";
          document.getElementById("bannerContainer").style.display = "none";
       });
    }

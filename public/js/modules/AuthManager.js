@@ -62,7 +62,6 @@ export const AuthManager = {
 
           const me = await apiGet("/me");
           if (me.success) {
-            document.getElementById("homePage").style.display = "block";
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
@@ -84,11 +83,13 @@ export const AuthManager = {
           // default: show homepage options after login
           setHomeOptionsVisible(true);
           setCustomCompetitionVisible(false);
+          document.getElementById("homePage").style.display = "block";
 
           if (post === "openCustom") {
             // user came here by clicking Custom League
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
+            document.getElementById("homePage").style.display = "none";
           }
 
           sessionStorage.removeItem("postLoginAction");
