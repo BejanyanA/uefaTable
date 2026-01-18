@@ -129,6 +129,8 @@
       #knockoutStage-title,
       #groupStage-title {
           font-size: 14px;
+          padding-top: 8px;
+          padding-bottom: 8px;
       }
 
       #stage-types {
@@ -143,7 +145,6 @@
       .stageBanner {
           text-align: center;
           display: flex;
-          margin-bottom: 3px;
           height: 200px;
           width: 360px;
           justify-content: flex-start;
@@ -156,9 +157,9 @@
       #stageBanner-wrap {
           display: flex;
           justify-content: center;
-          gap: 30px;
+          gap: 20px;
           flex-wrap: wrap;
-          margin: 2%;
+          margin: 8px auto;
       }
 
       #stageBackBtn {
