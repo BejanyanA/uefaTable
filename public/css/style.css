@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  background: transparent; 
 }
 
 .root {
@@ -22,9 +23,6 @@ body {
   min-height: 100vh;
   min-height: 100dvh; 
   padding-bottom: var(--footer-height);
-
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
@@ -87,6 +85,5 @@ input:-webkit-autofill:active {
     background: url('../assets/images/mobileBack.png') center / cover no-repeat fixed;
     background-size: cover;
     z-index: -1;
-    /* sit behind all content */
   }
 }
