@@ -1,102 +1,56 @@
-/* =========================
-   Global reset & base
-========================= */
-html,
-body {
+/* Reset */
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow-x: hidden;
-  background: transparent; /* important: no white canvas */
 }
 
-/* =========================
-   Global background layer
-   (covers Safari top/bottom)
-========================= */
-html::before {
-  content: "";
+/* REAL background layer */
+#app-background {
   position: fixed;
   inset: 0;
-  background: url('../assets/images/desktopBack.png') center / cover no-repeat;
   z-index: -1;
-  transform: translateZ(0); /* iOS repaint fix */
+
+  background-image: url('../assets/images/desktopBack.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  /* iOS repaint fix */
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-/* =========================
-   Body (content only)
-========================= */
+/* Mobile background */
+@media (max-width: 480px) {
+  #app-background {
+    background-image: url('../assets/images/mobileBack.png');
+  }
+}
+
+/* Body */
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: transparent;
+
   font-family: Arial, sans-serif;
   color: rgb(95, 95, 95);
 
   display: flex;
   flex-direction: column;
-
-  min-height: 100vh;
-  min-height: 100dvh;
-
-  background: transparent; /* background is on html::before */
-  padding-bottom: var(--footer-height);
 }
 
-/* =========================
-   Root container
-========================= */
+/* Root */
 .root {
   display: flex;
   flex-direction: column;
 }
 
-/* =========================
-   Modal lock
-========================= */
-.body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
+/* Modal lock */
+․body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
   pointer-events: none;
   user-select: none;
   filter: blur(3px);
-  transition: filter 0.3s ease;
-}
-
-/* =========================
-   Inputs & autofill
-========================= */
-.input-league-name {
-  position: relative;
-  width: 100%;
-}
-
-input,
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  background-color: rgba(255, 255, 255, 0.03) !important;
-  color: #ffffff !important;
-  border: 1px solid #444 !important;
-  border-radius: 6px !important;
-
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff !important;
-
-  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
-  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
-
-  transition: background-color 9999s ease-in-out 0s !important;
-}
-
-/* =========================
-   Mobile adjustments
-========================= */
-@media (max-width: 480px) {
-
-  body {
-    overscroll-behavior-y: contain;
-    scroll-behavior: smooth;
-  }
-
-  /* Swap background image for mobile */
-  html::before {
-    background-image: url('../assets/images/mobileBack.png');
-  }
 }
