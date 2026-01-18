@@ -1,56 +1,89 @@
-/* Reset */
-html, body {
+html,
+body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  height: 100%;
   overflow-x: hidden;
 }
 
-/* REAL background layer */
-#app-background {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-
-  background-image: url('../assets/images/desktopBack.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  /* iOS repaint fix */
-  transform: translateZ(0);
-  will-change: transform;
-}
-
-/* Mobile background */
-@media (max-width: 480px) {
-  #app-background {
-    background-image: url('../assets/images/mobileBack.png');
-  }
-}
-
-/* Body */
-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: transparent;
-
-  font-family: Arial, sans-serif;
-  color: rgb(95, 95, 95);
-
-  display: flex;
-  flex-direction: column;
-}
-
-/* Root */
 .root {
-  display: flex;
   flex-direction: column;
 }
 
-/* Modal lock */
-․body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url('../assets/images/desktopBack.png') center / cover no-repeat fixed;
+  background-size: cover;
+  color: rgb(95, 95, 95);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh; 
+  padding-bottom: var(--footer-height);
+}
+
+.body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
   pointer-events: none;
+  /* disable all interaction */
   user-select: none;
+  /* prevent selection */
   filter: blur(3px);
+  transition: filter 0.3s ease;
+}
+
+.input-league-name {
+  position: relative;
+  width: 100%;
+}
+
+input,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
+  border-radius: 6px !important;
+
+  /* --- KEY PART: force text color persistence --- */
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+
+  /* --- Remove Chrome yellow flash & animation --- */
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
+  transition: background-color 9999s ease-in-out 0s !important;
+}
+
+
+
+/* Mobile */
+@media (max-width: 480px) {
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh; 
+    position: relative;
+    /* -webkit-overflow-scrolling: touch;  */
+    overscroll-behavior-y: contain;
+    /* prevent “bounce” chaining */
+    scroll-behavior: smooth;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../assets/images/mobileBack.png') center / cover no-repeat fixed;
+    background-size: cover;
+    z-index: -1;
+    /* sit behind all content */
+  }
 }
