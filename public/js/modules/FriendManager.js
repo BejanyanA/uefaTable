@@ -766,4 +766,8 @@ export const FriendManager = {
     // Initialize state (must be loop icon)
     toggleSearchIcon(false);
   },
+
+  closeFriends: function () {
+  document.getElementById("friendsContainer").style.display = "none";;
+}
 };

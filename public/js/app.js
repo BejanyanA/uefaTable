@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
    LeagueManager.initCreate();
    LeagueManager.initOpen();
    FriendManager.openFriends();
+   FriendManager.closeFriends();
    ProfileManager.openProfile();
    changeLang(currentLang);
 
