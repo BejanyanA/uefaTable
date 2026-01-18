@@ -51,7 +51,7 @@ body {
 /* =========================
    Modal lock
 ========================= */
-body.modal-open > *:not(.modal):not(#toast-container):not(#loader) {
+.body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
   pointer-events: none;
   user-select: none;
   filter: blur(3px);
