@@ -14,12 +14,13 @@ body {
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: url('../assets/images/desktopBack.png') no-repeat center center fixed;
+  background: url('../assets/images/desktopBack.png') center / cover no-repeat fixed;
   background-size: cover;
   color: rgb(95, 95, 95);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh; 
   padding-bottom: var(--footer-height);
 }
 
@@ -65,6 +66,7 @@ input:-webkit-autofill:active {
     margin: 0;
     font-family: Arial, sans-serif;
     min-height: 100vh;
+    min-height: 100dvh; 
     position: relative;
     /* -webkit-overflow-scrolling: touch;  */
     overscroll-behavior-y: contain;
@@ -79,7 +81,7 @@ input:-webkit-autofill:active {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../assets/images/mobileBack.png') no-repeat center center;
+    background: url('../assets/images/mobileBack.png') center / cover no-repeat fixed;
     background-size: cover;
     z-index: -1;
     /* sit behind all content */
