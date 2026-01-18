@@ -17,18 +17,21 @@ export function setCustomCompetitionVisible(visible) {
 export function setHomeOptionsVisible(visible) {
    const el = document.getElementById("homeOptionsBlock");
    if (el) el.style.display = visible ? "grid" : "none";
+   document.getElementById("bannerContainer").style.display = "none";
 }
 
 function showHomePage() {
    document.getElementById("homePage").style.display = "block";
    setHomeOptionsVisible(true);
    setCustomCompetitionVisible(false);
+   document.getElementById("bannerContainer").style.display = "none";
 }
 
 function hideHomePage() {
    document.getElementById("homePage").style.display = "none";
    setHomeOptionsVisible(false);
    setCustomCompetitionVisible(false);
+   document.getElementById("bannerContainer").style.display = "none";
 }
 
 export function initHomeOptionButtons() {
@@ -68,6 +71,7 @@ export function initHomeOptionButtons() {
       backBtn.addEventListener("click", () => {
          setCustomCompetitionVisible(false);
          setHomeOptionsVisible(true);
+         document.getElementById("bannerContainer").style.display = "none";
       });
    }
 }
