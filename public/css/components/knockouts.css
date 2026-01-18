@@ -22,7 +22,7 @@
 #knockoutTab .left-side{direction:ltr;} #knockoutTab .right-side{direction:rtl;} #knockoutTab .right-side>*{direction:ltr;}
 
 #knockoutTab .side-round>h3,
-#knockoutTab .center-final>h3{color:#fff;text-align:center;margin:0 0 4px;font-weight:700;letter-spacing:.2px;font-size:15px}
+#knockoutTab .center-final>h3{color:#fff;text-align:center;margin:0 0 6px;font-weight:700;letter-spacing:.2px;font-size:15px}
 
 /* Center trophy */
 #knockoutTab .bracket-center {
@@ -373,10 +373,10 @@
 @media (max-width:900px){
 
   #knockoutTab{
-    margin-top: 130px;
+    margin-top: 120px;
   }
 
-  #knockoutTab .bracket-frame{margin-top: 65px; margin-bottom: 25px;-webkit-overflow-scrolling: touch;}
+  #knockoutTab .bracket-frame{margin-top: 65px; margin-bottom: 5px;-webkit-overflow-scrolling: touch;}
 
   #knockoutTab .ko-card{background:rgba(0, 0, 0, 0.700);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px;margin-bottom:6px;box-shadow:0 0 8px rgba(255, 255, 255, 0.2);font-size:12px}
   #knockoutTab .ko-row-2{display:grid;gap:10px}
