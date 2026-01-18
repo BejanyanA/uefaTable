@@ -1,39 +1,66 @@
+/* =========================
+   Global reset & base
+========================= */
 html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
+  height: 100%;
   overflow-x: hidden;
-  background: transparent; 
+  background: transparent; /* important: no white canvas */
 }
 
-.root {
-  flex-direction: column;
+/* =========================
+   Global background layer
+   (covers Safari top/bottom)
+========================= */
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('../assets/images/desktopBack.png') center / cover no-repeat;
+  z-index: -1;
+  transform: translateZ(0); /* iOS repaint fix */
 }
 
-
+/* =========================
+   Body (content only)
+========================= */
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: url('../assets/images/desktopBack.png') center / cover no-repeat fixed;
-  background-size: cover;
   color: rgb(95, 95, 95);
+
   display: flex;
   flex-direction: column;
+
   min-height: 100vh;
-  min-height: 100dvh; 
+  min-height: 100dvh;
+
+  background: transparent; /* background is on html::before */
   padding-bottom: var(--footer-height);
 }
 
-.body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {
+/* =========================
+   Root container
+========================= */
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   Modal lock
+========================= */
+body.modal-open > *:not(.modal):not(#toast-container):not(#loader) {
   pointer-events: none;
-  /* disable all interaction */
   user-select: none;
-  /* prevent selection */
   filter: blur(3px);
   transition: filter 0.3s ease;
 }
 
+/* =========================
+   Inputs & autofill
+========================= */
 .input-league-name {
   position: relative;
   width: 100%;
@@ -49,41 +76,27 @@ input:-webkit-autofill:active {
   border: 1px solid #444 !important;
   border-radius: 6px !important;
 
-  /* --- KEY PART: force text color persistence --- */
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff !important;
 
-  /* --- Remove Chrome yellow flash & animation --- */
   -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
   box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.03) inset !important;
+
   transition: background-color 9999s ease-in-out 0s !important;
 }
 
-
-
-/* Mobile */
+/* =========================
+   Mobile adjustments
+========================= */
 @media (max-width: 480px) {
+
   body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
-    min-height: 100dvh; 
-    position: relative;
-    /* -webkit-overflow-scrolling: touch;  */
     overscroll-behavior-y: contain;
-    /* prevent “bounce” chaining */
     scroll-behavior: smooth;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('../assets/images/mobileBack.png') center / cover no-repeat fixed;
-    background-size: cover;
-    z-index: -1;
+  /* Swap background image for mobile */
+  html::before {
+    background-image: url('../assets/images/mobileBack.png');
   }
 }
