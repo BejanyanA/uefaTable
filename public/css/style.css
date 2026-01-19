@@ -21,7 +21,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh; 
-  padding-top: env(safe-area-inset-top);
+  /* padding-top: env(safe-area-inset-top); */
 }
 
 .body.modal-open>*:not(.modal):not(#toast-container):not(#loader) {

@@ -5,8 +5,8 @@ footer.page-footer {
   top: 10;
   bottom: 0;              /* stick to bottom */
   height: var(--footer-height);
-  min-height: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height));
-  padding-bottom: env(safe-area-inset-bottom);
+  /* min-height: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height));
+  padding-bottom: env(safe-area-inset-bottom); */
   background: transparent;
   color: white;
   text-align: center;
