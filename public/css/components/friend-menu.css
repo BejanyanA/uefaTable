@@ -405,10 +405,11 @@
 
   /* Outer section or container */
   #friendsContainer {
-    padding: 14px;
+    padding: 14px 14px 0 14px;
     -webkit-overflow-scrolling: touch;
     /* smooth scroll on iOS */
     margin-inline: 0;
+    margin-bottom: 30px;
     overflow-y: unset;
   }
 
