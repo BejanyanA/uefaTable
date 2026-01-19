@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#00020c" />
   <title>Table UEFA</title>
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
@@ -134,29 +133,31 @@
     </div>
 
     <!-- Login Modal  -->
-    <div class="modal" id="loginModal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal('loginModal')">&times;</span>
-        <h2 id="loginTitle">Login</h2>
-        <form id="loginForm">
-          <div class="input-group input-league-name">
-            <input type="text" id="loginEmail" placeholder=" " autocomplete="current-email" />
-            <label for="loginEmail" id="loginEmailLabel"></label>
-          </div>
-          <div class="error" id="loginEmailError"></div>
-
-          <div class="input-league-name">
-            <div class="input-group submit-button">
-              <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" />
-              <label for="loginPassword" id="loginPasswordLabel"></label>
+    <div class="modal-overlay">
+      <div class="modal" id="loginModal">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal('loginModal')">&times;</span>
+          <h2 id="loginTitle">Login</h2>
+          <form id="loginForm">
+            <div class="input-group input-league-name">
+              <input type="text" id="loginEmail" placeholder=" " autocomplete="current-email" />
+              <label for="loginEmail" id="loginEmailLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
-              onclick="togglePassword('loginPassword', this)" />
-          </div>
-          <div class="error" id="loginPasswordError"></div>
+            <div class="error" id="loginEmailError"></div>
 
-          <button type="submit" class="submit-button" id="loginSubmit">Login</button>
-        </form>
+            <div class="input-league-name">
+              <div class="input-group submit-button">
+                <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" />
+                <label for="loginPassword" id="loginPasswordLabel"></label>
+              </div>
+              <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
+                onclick="togglePassword('loginPassword', this)" />
+            </div>
+            <div class="error" id="loginPasswordError"></div>
+
+            <button type="submit" class="submit-button" id="loginSubmit">Login</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -245,35 +246,33 @@
       </div>
     </div>
 
-          <!-- ✅ Your existing banner container stays separate and unchanged -->
-      <div class="banner-container" id="bannerContainer" style="display: none;">
+    <div class="banner-container" id="bannerContainer" style="display: none;">
 
-        <div id="bannerContainerWrapper">
-          <!-- We will show this only when logged in + clicked Custom -->
-          <div id="customCompetitionBlock" style="display: none;">
-            <button class="bannerBackBtn" id="bannerBackBtn">⬅ Back</button>
-            <h2 id="competition-types">Competition Types</h2>
-          </div>
+      <div id="bannerContainerWrapper">
+        <div id="customCompetitionBlock" style="display: none;">
+          <button class="bannerBackBtn" id="bannerBackBtn">⬅ Back</button>
+          <h2 id="competition-types">Competition Types</h2>
         </div>
-
-        <div id="customCompetitionBlockBanners" style="display: none;">
-          <div class="banner-wrap" id="banner-wrap">
-            <div id="banner1" class="banner" banner-id="1">
-              <h2 id="banner-title">Champions League</h2>
-            </div>
-            <div id="banner2" class="banner" banner-id="2">
-              <h2 id="banner-title">Europe League</h2>
-            </div>
-            <div id="banner3" class="banner" banner-id="3">
-              <h2 id="banner-title">EURO Cup</h2>
-            </div>
-            <div id="banner4" class="banner" banner-id="4">
-              <h2 id="banner-title">WORLD Cup</h2>
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      <div id="customCompetitionBlockBanners" style="display: none;">
+        <div class="banner-wrap" id="banner-wrap">
+          <div id="banner1" class="banner" banner-id="1">
+            <h2 id="banner-title">Champions League</h2>
+          </div>
+          <div id="banner2" class="banner" banner-id="2">
+            <h2 id="banner-title">Europe League</h2>
+          </div>
+          <div id="banner3" class="banner" banner-id="3">
+            <h2 id="banner-title">EURO Cup</h2>
+          </div>
+          <div id="banner4" class="banner" banner-id="4">
+            <h2 id="banner-title">WORLD Cup</h2>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <!-- 🔹 Live Data -->
     <div class="liveDataPage" id="liveDataPage" style="display:none;">
@@ -457,9 +456,9 @@
     </div>
   </div>
 
-  
+
   <footer class="page-footer">
-      Powered by And Bejanyan © <span id="year"></span> All rights reserved
+    Powered by And Bejanyan © <span id="year"></span> All rights reserved
   </footer>
 
 
@@ -484,7 +483,6 @@
         if (setDefault) {
           teamCountSelect.value = isKnockout ? "16" : "32"; // ⬅ default values
         } else {
-          // Ensure valid selection if current is hidden
           if (teamCountSelect.options[teamCountSelect.selectedIndex].hidden) {
             const firstVisible = [...teamCountSelect.options].find(o => !o.hidden);
             if (firstVisible) teamCountSelect.value = firstVisible.value;
@@ -494,7 +492,6 @@
 
       stageSelect.addEventListener("change", () => updateTeamCountOptions(true));
 
-      // Initial run — set default for initial stage type (Group → 32)
       updateTeamCountOptions(true);
     });
   </script>
@@ -518,7 +515,7 @@
       e.preventDefault();
       dropdownMenu.classList.remove("show");
 
-      // Call your existing logout() function if available
+      
       if (typeof logout === "function") {
         logout();
       } else {
