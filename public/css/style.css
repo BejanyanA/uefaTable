@@ -14,7 +14,7 @@ body {
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: url('../assets/images/desktopBack.png') center / cover no-repeat fixed;
+  background: url('../assets/images/desktopBackground.avif') center / cover no-repeat fixed;
   background-size: cover;
   color: rgb(95, 95, 95);
   display: flex;
