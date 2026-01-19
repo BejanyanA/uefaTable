@@ -374,6 +374,7 @@
 
   #knockoutTab{
     margin-top: 120px;
+    margin-bottom: 30px;
   }
 
   #knockoutTab .bracket-frame{margin-top: 65px; margin-bottom: 5px;-webkit-overflow-scrolling: touch;}

@@ -88,7 +88,7 @@
   /* Outer section or container */
   #leagueType1,
   #leagueType2 {
-    padding: 14px;
+    padding: 14px 14px 0 14px;
     -webkit-overflow-scrolling: touch;
     /* smooth scroll on iOS */
     margin-inline: 0
