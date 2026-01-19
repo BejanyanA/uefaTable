@@ -15,28 +15,18 @@
   padding-right: 70px;
 }
 
-/* The container for each label/input pair */
 .profile-row {
   display: grid;
-  /* Define a single column that takes up all available space. */
-  /* This makes each item (label, input, error) stack vertically. */
   grid-template-columns: 1fr;
-
-  /* Define the order of elements within the grid for each row */
-  /* Label first, then input group, then error message */
   grid-template-areas:
     "label"
     "input-group"
     "error";
 
   gap: 0;
-  /* No explicit gap between stacked items, use margins for fine-tuning */
   align-items: start;
-  /* Align items to the top of their grid area */
   margin-bottom: 0px;
-  /* Add more space between entire profile-rows */
   padding-bottom: 5px;
-  /* Keep separation line if desired */
 }
 
 .profile-row:last-child {
@@ -45,34 +35,24 @@
 
 .profile-row label {
   grid-area: label;
-  /* Assign to the 'label' area */
   font-weight: 700;
-  /* Make label text bolder as it's a heading for the field */
   font-size: 14px;
   text-transform: uppercase;
   color: #f3f3f3;
   padding-bottom: 5px;
-  /* Space between label and the input field below it */
   margin-top: 5px;
-  /* Add a little space from the previous row's error/content */
 }
 
-/* The container holding the input and the icon */
 .profile-row-item {
   grid-area: input-group;
   display: flex;
   align-items: center;
   flex-grow: 1;
-
-  /* 🎯 KEY: Set the positioning context */
   position: relative;
-
-  /* Ensure nothing sticks out of the container boundary */
   overflow: hidden;
   width: 400px;
 }
 
-/* The input field */
 .profile-item {
   /* width: 100%; */
   width: 100%;
@@ -96,7 +76,6 @@
 
 .profile-item:focus:not([disabled]) {
   border-color: #4CAF50;
-  /* Highlight on focus */
   outline: none;
 }
 
@@ -106,27 +85,16 @@
 
 .edit-icon,
 .save-icon {
-  /* 🎯 KEY: Take the icon out of the normal flow */
   position: absolute;
-
-  /* Position it inside the right edge of the input field */
   right: 10px;
-  /* Adjust distance from the right edge */
   top: 50%;
-  /* Start at half height */
   transform: translateY(-50%);
-  /* Center vertically */
-
+  height: 28px;
   height: 22px;
-  /* Define icon size */
   cursor: pointer;
   z-index: 5;
-  /* Ensure it is on top of the input text */
-
-  /* Remove any margin that was pushing it away */
   margin-left: 0;
   opacity: 0.7;
-  /* <--- IMPORTANT: Clear previous margin */
 }
 
 .edit-icon:hover,
@@ -134,29 +102,15 @@
   opacity: 1;
 }
 
-.save-icon {
-  height: 28px;
-  /* Example: if save icon is larger */
-}
-
 .visibility-toggle-icon {
-  /* 🎯 KEY: Take the icon out of the normal flow and position it */
   position: absolute;
-
-  /* Position it inside the right edge of the input field */
   right: 10px;
-  /* Adjust distance from the right edge */
   top: 50%;
-  /* Start at half height */
   transform: translateY(-50%);
-  /* Center vertically */
-
   height: 22px;
-  /* Define icon size */
   cursor: pointer;
   opacity: 0.7;
   z-index: 5;
-  /* Ensure it is on top of the input text */
 }
 
 .visibility-toggle-icon:hover {
@@ -165,10 +119,8 @@
 
 .profile-save-button {
   margin-left: 272px;
-  /* Give some space above the button */
   padding: 10px 20px;
   background-color: #4CAF50;
-  /* Example button style */
   color: white;
   border: none;
   border-radius: 5px;
@@ -179,15 +131,12 @@
 
 .validation-error-message {
   grid-area: error;
-  /* Assign to the 'error' area */
   color: red;
   font-size: 12px;
   margin-top: 5px;
-  /* Space between the input and the error message */
   margin-bottom: 0;
   padding: 0;
   min-height: 18px;
-  /* Reserve space to prevent layout shifting */
   padding-left: 0px;
 }
 
@@ -270,13 +219,9 @@
   border-radius: 6px;
 
   white-space: nowrap;
-  /* Prevents text from wrapping */
   max-width: 90%;
-  /* Ensures it doesn't overflow the card */
   overflow: hidden;
-  /* Hides excess text if too long */
   text-overflow: ellipsis;
-  /* Adds "…" if text is too long */
 }
 
 .achievement-details {
@@ -295,9 +240,7 @@
 
 .achievement-modal-content h3 {
   text-align: center;
-  /* centers text horizontally */
   margin: 0 0 20px 0;
-  /* spacing below the heading */
   font-size: 1.5em;
 }
 
@@ -562,25 +505,15 @@
   }
 
   .edit-icon {
-    /* 🎯 KEY CHANGE 3: Take the icon out of the normal flow */
     position: absolute;
-
-    /* Position it to the right edge of the input container */
     right: 8px;
-    /* Adjust this distance from the right edge of the input box */
     top: 50%;
-    /* Center vertically */
     transform: translateY(-50%);
-    /* Pull it back up by half its height */
-
-    /* Reset mobile layout properties */
     margin-left: 0;
-    /* Remove horizontal margin */
     height: 20px;
     cursor: pointer;
     z-index: 2;
     opacity: unset;
-    /* Ensure it is on top of the input text */
   }
 
   /* Style for the 'V' (Save) icon when changes are pending */
@@ -588,40 +521,27 @@
     opacity: 1;
     height: 26px;
     transform: translateY(-50%) scale(1.1);
-    /* Keep vertical centering */
     box-shadow: 0 0 8px rgba(76, 175, 79, 0);
     opacity: unset;
   }
 
 
   .visibility-toggle-icon {
-    /* 🎯 Positioning: Take the icon out of the normal flow */
     position: absolute;
-
-    /* Position it to the right edge of the input box */
     right: 10px;
-    /* Adjust distance from the right edge */
     top: 50%;
     transform: translateY(-50%);
-    /* Vertical centering */
-
     height: 22px;
-    /* Set icon size */
     cursor: pointer;
     z-index: 3;
     opacity: unset;
-    /* Ensure it is on top of the input text and other icons */
   }
 
 
   .profile-save-button {
-    /* Give some space above the button */
-    /* align-items: center;
-    justify-content: center; */
     margin-left: 110px;
     padding: 10px 20px;
     background-color: #4CAF50;
-    /* Example button style */
     color: white;
     border: none;
     border-radius: 5px;
@@ -640,7 +560,6 @@
     width: 300px;
     padding: 15px;
     justify-content: flex-start;
-    /* left alignment */
     flex-direction: column;
     align-items: center;
     justify-content: end;
@@ -656,7 +575,6 @@
   .empty-message {
     position: absolute;
     top: 0px;
-    /* near top edge */
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -672,7 +590,6 @@
   .golden-star-summary {
     position: absolute;
     top: 5px;
-    /* distance from top edge */
     left: 50%;
     transform: translateX(-50%);
     cursor: pointer;
