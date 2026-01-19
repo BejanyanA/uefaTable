@@ -45,11 +45,11 @@
   padding: 5px;
 }
 
-.liveCardTitle {
+/* .liveCardTitle {
   margin: 0 0 10px;
   font-size: 14px;
   opacity: .9;
-}
+} */
 
 .game-teams {
   margin-bottom: 5px;
@@ -122,9 +122,6 @@ date-picker button.next-day {
   background: linear-gradient(135deg, #2d7cff, #1b56d6);
   color: #ffffff;
   box-shadow: 0 6px 16px rgba(45, 124, 255, 0.35);
-}
-
-.liveTabBtn:active {
   transform: scale(0.97);
 }
 
@@ -241,10 +238,6 @@ api-sports-widget[data-type="game"] [data-action="players"] {
   object-fit: contain;
   flex-shrink: 0;
 }
-
-
-
-
 
 .matchesLayout {
   display: grid;

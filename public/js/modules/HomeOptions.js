@@ -18,11 +18,13 @@ export function setHomeOptionsVisible(visible) {
    const el = document.getElementById("homeOptionsBlock");
    if (el) el.style.display = visible ? "grid" : "none";
    document.getElementById("homePage").style.display = "block";
+   document.getElementById("homeOptionsBlock").style.display = "block";
    document.getElementById("bannerContainer").style.display = "none";
 }
 
 function showHomePage() {
    document.getElementById("homePage").style.display = "block";
+   document.getElementById("homeOptionsBlock").style.display = "block";
    setHomeOptionsVisible(true);
    setCustomCompetitionVisible(false);
    document.getElementById("bannerContainer").style.display = "none";
@@ -75,6 +77,7 @@ export function initHomeOptionButtons() {
          setCustomCompetitionVisible(false);
          setHomeOptionsVisible(true);
          document.getElementById("homePage").style.display = "block";
+         document.getElementById("homeOptionsBlock").style.display = "block";
          document.getElementById("bannerContainer").style.display = "none";
       });
    }

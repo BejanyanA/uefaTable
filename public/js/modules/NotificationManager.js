@@ -190,6 +190,7 @@ async function handleBellClick() {
                     document.getElementById("headerUsername").style.display = "block";
                     document.getElementById("profileMenu").style.display = "block";
                     document.getElementById("homePage").style.display = "block";
+                    document.getElementById("homeOptionsBlock").style.display = "block";
                     document.getElementById("bannerContainer").style.display = "none";
                     document.getElementById("stageContainer").style.display = "none";
                     document.getElementById("leagueType1").style.display = "none";

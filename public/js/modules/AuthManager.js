@@ -84,6 +84,7 @@ export const AuthManager = {
           setHomeOptionsVisible(true);
           setCustomCompetitionVisible(false);
           document.getElementById("homePage").style.display = "block";
+          document.getElementById("homeOptionsBlock").style.display = "block";
 
           if (post === "openCustom") {
             // user came here by clicking Custom League
