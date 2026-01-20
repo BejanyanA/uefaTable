@@ -13,10 +13,10 @@
 .league-names-row {
   display: flex;
   gap: 16px;
-  margin: 30px auto;
+  margin-bottom: 30px;
   padding-left: 5px;
   padding-right: 0px;
-  margin-top: 190px;
+  margin-top: 195px;
   flex-wrap: wrap;
 }
 

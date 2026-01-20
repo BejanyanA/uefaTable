@@ -16,7 +16,7 @@
       /* Space between stageBanners */
       flex-wrap: wrap;
       /* Allows wrapping on small screens */
-      margin: 20px auto;
+      margin: 0px auto;
       /* Optional centering */
   }
 
@@ -38,8 +38,8 @@
       font-size: 36px;
       color: white;
       width: fit-content;
-      margin: 30px auto;
-      padding: 60px 20px 20px;
+      margin: 30px auto 0 auto;
+      padding: 60px 20px 30px 20px;
       text-align: center;
   }
 
