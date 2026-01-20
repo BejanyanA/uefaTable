@@ -874,10 +874,10 @@ function renderPasswordDetails(userData, container, translation) {
   });
 
   const BANNER_MAP = [
-    { id: 1, name: "Champions League", trophyUrl: 'assets/images/champLeaOnlyCup.png' },
-    { id: 2, name: "Europe League", trophyUrl: 'assets/images/eur2OnlyCup.png' },
-    { id: 3, name: "EURO Cup", trophyUrl: 'assets/images/europ3OnlyCup.png' },
-    { id: 4, name: "World Cup", trophyUrl: 'assets/images/wrld4OnlyCup.png' }
+    { id: 1, name: "Champions League", trophyUrl: 'assets/images/champLeaOnlyCup.avif' },
+    { id: 2, name: "Europe League", trophyUrl: 'assets/images/eur2OnlyCup.avif' },
+    { id: 3, name: "EURO Cup", trophyUrl: 'assets/images/europ3OnlyCup.avif' },
+    { id: 4, name: "World Cup", trophyUrl: 'assets/images/wrld4OnlyCup.avif' }
   ];
 
   function renderAchievementBanners(userAchievements, translation) {
