@@ -354,10 +354,10 @@ export async function renderNationalKnockoutsStage(leagueId, rootEl) {
 
     // Cup + Final
     const cupSrc = {
-      1: "assets/images/champ1.png",
-      2: "assets/images/eur2.png",
-      3: "assets/images/europ3.png",
-      4: "assets/images/wrld4.png",
+      1: "assets/images/champ1.avif",
+      2: "assets/images/eur2.avif",
+      3: "assets/images/europ3.avif",
+      4: "assets/images/wrld4.avif",
     }[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
 
     const finalCol = document.createElement("div");
@@ -903,10 +903,10 @@ export async function renderNationalOnlyKnockouts(leagueId, rootEl) {
 
     // Trophy + Final (center)
     const cupSrc = {
-      1: "assets/images/champ1.png",
-      2: "assets/images/eur2.png",
-      3: "assets/images/europ3.png",
-      4: "assets/images/wrld4.png",
+      1: "assets/images/champ1.avif",
+      2: "assets/images/eur2.avif",
+      3: "assets/images/europ3.avif",
+      4: "assets/images/wrld4.avif",
     }[Number(data.leagueType) || Number(localStorage.getItem("leagueType")) || 1];
 
     const finalCol = document.createElement("div");
