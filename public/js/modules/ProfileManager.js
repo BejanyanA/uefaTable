@@ -683,9 +683,14 @@ function renderPasswordDetails(userData, container, translation) {
   ];
 
   // Create a centralized button element that will handle the save action for this whole block
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'update-button'; // your div class or id
+
   const saveButton = document.createElement('button');
   saveButton.textContent = translation.update || 'Change Password';
   saveButton.className = 'profile-save-button';
+
+
 
   // Store references for conditional enabling and validation
   const inputs = {};
@@ -734,6 +739,8 @@ function renderPasswordDetails(userData, container, translation) {
 
   // Append the Save Button
   container.appendChild(saveButton);
+    actionsDiv.appendChild(saveButton);
+  container.appendChild(actionsDiv);
 
   // --- 4. Conditional Enabling Logic (Current Password) ---
   const updateDependentFields = () => {
