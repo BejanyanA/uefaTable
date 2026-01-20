@@ -971,7 +971,7 @@ function liveDataTranslation() {
 
 // Homepage Cards
 function hompageCardTranslations() {
-  const { liveFootball: live_Football = "Live Football" } = langMap[currentLang] || {};
+  const { liveFootball: live_Football = "Scores & Classement" } = langMap[currentLang] || {};
   document.querySelectorAll("#liveFootball").forEach(element => {
     element.textContent = live_Football;
   });
