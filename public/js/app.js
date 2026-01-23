@@ -6,7 +6,7 @@ import { ProfileManager } from './modules/ProfileManager.js';
 import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { initHomeOptionButtons } from './modules/HomeOptions.js';
-
+import { initRouter } from "../js/modules/router.js"; // adjust path if needed
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
    ProfileManager.openProfile();
    changeLang(currentLang);
 
+   initRouter();
    checkLoggedIn();
    initHomeOptionButtons();
    window.logout = logout;

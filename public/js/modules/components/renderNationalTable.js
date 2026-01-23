@@ -19,6 +19,15 @@ export function renderNationalTable(data) {
   backBtn.class = "backButtn";
 
   backBtn.addEventListener("click", async () => {
+    localStorage.removeItem("lastActiveNationalLeagueTab");
+
+    const bannerId = Number(localStorage.getItem("currentBannerId"));
+    if (bannerId === 1) location.hash = "#champions-league";
+    else if (bannerId === 2) location.hash = "#europe-league";
+    else if (bannerId === 3) location.hash = "#euro-cup";
+    else if (bannerId === 4) location.hash = "#world-cup";
+    else location.hash = "#leagues";
+
     const token = localStorage.getItem("authToken");
 
     try {
@@ -97,19 +106,26 @@ export function renderNationalTable(data) {
     leagueBox.textContent = league.name;
     leagueBox.style.cursor = "pointer";
 
-    leagueBox.addEventListener("click", async () => {
-      try {
-        const response = await apiPost("/national-instances", { leagueId: league.id });
-        if (response.success) {
-          localStorage.setItem("leagueId", league.id);
-          renderNationalInstances(response.data);
+    leagueBox.addEventListener("click", () => {
+      localStorage.setItem("leagueId", league.id);
 
-        } else {
-          section.innerHTML = `<p>Error loading instances</p>`;
-        }
-      } catch (err) {
-        console.error("Failed to fetch league instances", err);
-      }
+      const bannerId = Number(localStorage.getItem("currentBannerId"));
+      const stageType = Number(localStorage.getItem("selectedStageType")) || 1; // 1 basic, 2 only
+      const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
+      const comp =
+        bannerId === 1 ? "ucl" :
+          bannerId === 2 ? "uel" :
+            bannerId === 3 ? "euro" :
+              bannerId === 4 ? "wc" : null;
+
+      const stage = stageType === 1 ? "basic" : "only";
+      const access = leagueTab === "owners" ? "my" : "invited";
+
+      // for knockout-only leagues, default to knockouts
+      const defaultInstancesTab = (stageType === 2) ? "knockouts" : "group";
+
+      location.hash = `#${comp}-${stage}-${access}-national-${defaultInstancesTab}`;
     });
 
     leagueRow.appendChild(leagueBox);
@@ -172,7 +188,14 @@ export function renderNationalTable(data) {
   // ✅ Tab filtering (show/hide items, keep grid/row layout intact)
   const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
 
-  let activeTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+  const hash = (location.hash || "").toLowerCase();
+  const routeTab =
+    hash.endsWith("-invited") ? "invited" :
+      hash.endsWith("-my") ? "owners" :
+        null;
+
+  let activeTab = routeTab || localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
   if (activeTab === "owners") {
     myTabBtn.classList.add(ACTIVE);
     myTabBtn.setAttribute("aria-selected", "true");
@@ -211,12 +234,33 @@ export function renderNationalTable(data) {
     else invitedTabBtn.classList.add(ACTIVE);
   };
 
-  [myTabBtn, invitedTabBtn].forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (btn.classList.contains(ACTIVE)) return; // already active
-      const tab = btn.dataset.tab === "owners" ? "owners" : "invited";
-      showTab(tab);
-    });
+  const bannerId = Number(localStorage.getItem("currentBannerId"));
+  const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+
+  function getRoutePrefix() {
+    if (bannerId === 1) return "ucl";
+    if (bannerId === 2) return "uel";
+    if (bannerId === 3) return "euro";
+    if (bannerId === 4) return "wc";
+    return null;
+  }
+
+  function getStageSuffix() {
+    return stageType === 1 ? "basic" : "only";
+  }
+
+  myTabBtn.addEventListener("click", () => {
+    const prefix = getRoutePrefix();
+    if (!prefix) return;
+
+    location.hash = `#${prefix}-${getStageSuffix()}-my`;
+  });
+
+  invitedTabBtn.addEventListener("click", () => {
+    const prefix = getRoutePrefix();
+    if (!prefix) return;
+
+    location.hash = `#${prefix}-${getStageSuffix()}-invited`;
   });
 
   // Initial view
@@ -260,7 +304,8 @@ export function renderNationalTable(data) {
 }
 
 
-export function renderNationalInstances(instanceData) {
+export function renderNationalInstances(instanceData, options = {}) {
+  const { autoRenderKnockouts = true } = options;
   const translation = langMap[currentLang];
   const wrapper = document.getElementById("leagueType2");
   wrapper.innerHTML = "";
@@ -275,10 +320,16 @@ export function renderNationalInstances(instanceData) {
   // If there are no visible groups and this league is "group" type, hide like before.
   // But if it's knockout-only (isGroup === false), DO NOT early-return; we'll render KO below.
   const hasVisibleGroups = instances.some(i => i.groups && Object.keys(i.groups).length);
-  if (!hasVisibleGroups && isGroup) {
+  const activeTab = localStorage.getItem("lastActiveNationalInstancesTab") || "group";
+
+  // ✅ Only hide when user is actually on Group tab
+  if (!hasVisibleGroups && isGroup && activeTab === "group") {
     wrapper.style.display = "none";
     return;
   }
+
+  // ✅ If Knockouts tab → we still must build UI so knockoutTab exists
+  wrapper.style.display = "block";
 
   // ✅ Back button
   const backBtn = document.createElement("button");
@@ -287,19 +338,20 @@ export function renderNationalInstances(instanceData) {
   backBtn.class = "backButtn";
 
   backBtn.addEventListener("click", async () => {
-    try {
-      const data = await apiPost("/leagues", { bannerId, isGroup });
-      if (data.success && data.data) {
-        wrapper.style.display = "none";
-        document.getElementById("bannerContainer").style.display = "none";
-        renderNationalTable(data.data);
-      } else {
-        showToast("Table not found.");
-      }
-    } catch (err) {
-      console.error("Error loading leagues", err);
-      showToast("Something went wrong", "error");
-    }
+    const bannerId = Number(localStorage.getItem("currentBannerId"));
+    const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+    const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
+    const comp =
+      bannerId === 1 ? "ucl" :
+        bannerId === 2 ? "uel" :
+          bannerId === 3 ? "euro" :
+            bannerId === 4 ? "wc" : null;
+
+    const stage = stageType === 1 ? "basic" : "only";
+    const access = leagueTab === "owners" ? "my" : "invited";
+
+    location.hash = `#${comp}-${stage}-${access}`; // your leagues list routes
   });
   wrapper.appendChild(backBtn);
   wrapper.style.display = "block";
@@ -388,10 +440,21 @@ export function renderNationalInstances(instanceData) {
         `;
 
         groupDiv.addEventListener("click", () => {
-          const leagueId = parseInt(localStorage.getItem("leagueId"));
-          const groupId = parseInt(groupDiv.dataset.groupId);
-          const gName = groupDiv.dataset.groupName;
-          renderNationalGroupStandingsPage(leagueId, groupId, gName);
+          const groupId = Number(groupDiv.dataset.groupId);
+          const gName = groupDiv.dataset.groupName || "";
+
+          localStorage.setItem("groupId", String(groupId));
+          localStorage.setItem("groupName", gName);
+
+          const bannerId = Number(localStorage.getItem("currentBannerId")); // 3=euro, 4=wc
+          const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+          const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
+          const comp = bannerId === 3 ? "euro" : "wc";
+          const stage = stageType === 1 ? "basic" : "only";
+          const access = leagueTab === "owners" ? "my" : "invited";
+
+          location.hash = `#${comp}-${stage}-${access}-national-group-standing?groupName=${encodeURIComponent(gName)}`;
         });
 
         groupsRow.appendChild(groupDiv);
@@ -403,68 +466,37 @@ export function renderNationalInstances(instanceData) {
     });
   }
 
-  async function refreshGroupPane() {
-    const leagueId = parseInt(localStorage.getItem("leagueId"));
-    groupStageContainer.innerHTML = `<div style="padding:20px;font-size:16px;"></div>`;
-    const res = await apiPost("/national-instances", { leagueId });
-    if (res.success && res.data && Array.isArray(res.data.leagueInstances)) {
-      renderGroupsInto(groupStageContainer, res.data.leagueInstances);
-    } else {
-      groupStageContainer.innerHTML = "Failed to load group stage.";
-    }
+  function getInstancesBase() {
+    const bannerId = Number(localStorage.getItem("currentBannerId"));
+    const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+    const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
+    const comp = bannerId === 3 ? "euro" : bannerId === 4 ? "wc" : null;
+    const stage = stageType === 1 ? "basic" : "only";
+    const access = leagueTab === "owners" ? "my" : "invited";
+
+    return { comp, stage, access };
   }
+
+  tabWrapper.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab; // "group" | "knockouts"
+      const { comp, stage, access } = getInstancesBase();
+      if (!comp) return;
+
+      location.hash = `#${comp}-${stage}-${access}-national-${tab}`;
+    });
+  });
 
   // ---- Initial fill
   if (isGroup) {
-    // Existing behavior (unchanged)
     renderGroupsInto(groupStageContainer, instances);
   } else {
-    // NEW: Knockout-only leagues → render bracket immediately
-    const leagueId = parseInt(localStorage.getItem("leagueId"));
-    knockoutContainer.innerHTML = "";
-    // Uses your existing function; no behavior change to the knockout renderer
-    renderNationalOnlyKnockouts(leagueId, knockoutContainer);
-  }
-
-  // ===== Tabs: visual state + data refresh =====
-  const ACTIVE_CLASS = "active-tab";
-
-  // Attach handlers only to whatever buttons exist
-  tabWrapper.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      if (btn.classList.contains(ACTIVE_CLASS)) return;
-      // visual
-      tabWrapper.querySelectorAll(".tab-btn").forEach(b => {
-        b.classList.remove(ACTIVE_CLASS);
-        b.classList.remove("active");
-      });
-      btn.classList.add(ACTIVE_CLASS);
-
-      const tab = btn.dataset.tab;
+    // ✅ Only render automatically if allowed
+    if (autoRenderKnockouts) {
       const leagueId = parseInt(localStorage.getItem("leagueId"));
-
-      if (tab === "group") {
-        // Guard: only when group exists
-        if (!isGroup) return;
-        knockoutContainer.style.display = "none";
-        groupStageContainer.style.display = "block";
-        try {
-          await refreshGroupPane();
-        } catch (e) {
-          console.error("Group refresh error", e);
-        }
-      } else if (tab === "knockouts") {
-        // Always available
-        if (isGroup && groupStageContainer) groupStageContainer.style.display = "none";
-        knockoutContainer.style.display = "block";
-        try {
-          knockoutContainer.innerHTML = "";
-          // Reuse your existing KO renderer
-          await renderNationalKnockoutsStage(leagueId, knockoutContainer);
-        } catch (e) {
-          console.error("KO render error", e);
-        }
-      }
-    });
-  });
+      knockoutContainer.innerHTML = "";
+      renderNationalOnlyKnockouts(leagueId, knockoutContainer);
+    }
+  }
 }

@@ -83,14 +83,14 @@ export const AuthManager = {
           // default: show homepage options after login
           setHomeOptionsVisible(true);
           setCustomCompetitionVisible(false);
-          document.getElementById("homePage").style.display = "block";
-          document.getElementById("homeOptionsBlock").style.display = "block";
+          // document.getElementById("homePage").style.display = "block";
+          // document.getElementById("homeOptionsBlock").style.display = "block";
 
           if (post === "openCustom") {
             // user came here by clicking Custom League
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
-            document.getElementById("homePage").style.display = "none";
+            location.hash = "leagues";
           }
 
           sessionStorage.removeItem("postLoginAction");

@@ -2,8 +2,26 @@ import { showToast } from '../../utils/toast.js';
 import { apiPost } from '../../services/api.js';
 import { renderLeagueInstances } from './renderLeagueTable.js';
 import { langMap, currentLang } from '../LanguageManager.js';
+import { getClubBackInstancesHash } from '../router.js';
 
-export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupName) {
+export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}) {
+  // ✅ Backward compatible: (leagueId, groupId, opts)
+  let groupName = "";
+  if (typeof groupNameOrOpts === "object" && groupNameOrOpts !== null) {
+    opts = groupNameOrOpts;
+  } else {
+    groupName = groupNameOrOpts || "";
+  }
+
+  // ✅ Fallbacks when coming from router
+  if (!groupName) {
+    groupName =
+      (opts?.query?.get?.("groupName") ? decodeURIComponent(opts.query.get("groupName")) : "") ||
+      localStorage.getItem("groupName") ||
+      "";
+  }
+
+  const initialTab = opts.initialTab || "standings";
   const wrapper = document.getElementById("leagueType1");
   const translation = langMap[currentLang];
   wrapper.innerHTML = `
@@ -25,31 +43,46 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
   const backBtn = document.getElementById("backBtn");
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
-    try {
-      const response = await apiPost("/league-instances", { leagueId });
-      if (response.success) {
-        renderLeagueInstances(response.data);
-      } else {
-        wrapper.innerHTML = `<p>Error loading instances</p>`;
-      }
-    } catch (err) {
-      console.error("Failed to fetch league instances", err);
-    }
+    location.hash = getClubBackInstancesHash();
   });
 
-  loadTabContent("standings");
+setActiveTab(initialTab);
+await loadTabContent(initialTab);
 
-  const ACTIVE_CLASS = "active";
+  function setActiveTab(tab) {
+    const ACTIVE_CLASS = "active";
+
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.remove(ACTIVE_CLASS);
+    });
+
+    const target = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (target) target.classList.add(ACTIVE_CLASS);
+  }
+
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      if (btn.classList.contains(ACTIVE_CLASS)) return;
-      // visual
-      document.querySelectorAll(".tab-btn").forEach(b => {
-        b.classList.remove(ACTIVE_CLASS);
-        b.classList.remove("active");
-      });
-      btn.classList.add(ACTIVE_CLASS);
-      loadTabContent(btn.dataset.tab);
+      const tab = btn.dataset.tab;              // "standings" | "matches"
+      const view = tab === "standings" ? "standing" : "matches";
+
+      // keep stored (router uses them)
+      localStorage.setItem("groupId", String(groupId));
+      localStorage.setItem("groupName", groupName);
+
+      const bannerId = Number(localStorage.getItem("currentBannerId"));
+      const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+      const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
+
+      const comp =
+        bannerId === 1 ? "ucl" :
+          bannerId === 2 ? "uel" :
+            bannerId === 3 ? "euro" :
+              bannerId === 4 ? "wc" : "ucl";
+
+      const stage = stageType === 1 ? "basic" : "only";
+      const access = leagueTab === "owners" ? "my" : "invited";
+
+      location.hash = `#${comp}-${stage}-${access}-club-group-${view}?groupName=${encodeURIComponent(groupName)}`;
     });
   });
 

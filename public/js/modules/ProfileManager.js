@@ -24,8 +24,9 @@ export const ProfileManager = {
       // 🔹 ensure we react to future language changes
       this.installLanguageReset();
 
-      profileLink.addEventListener("click", () => {
-        this._renderProfileView();
+      profileLink.addEventListener("click", (e) => {
+        e.preventDefault();                 // ✅ important if it's <a href="...">
+        location.hash = "profile";
       });
     }
   },
@@ -196,6 +197,7 @@ export const ProfileManager = {
 
     homeButton.addEventListener("click", async () => {
       const token = localStorage.getItem("authToken");
+      location.hash = "home";
 
       try {
         const response = await apiGet("/me", token);
@@ -204,19 +206,6 @@ export const ProfileManager = {
           setHomeOptionsVisible(true);
           setCustomCompetitionVisible(false);
 
-          document.getElementById("headerUsername").style.display = "block";
-          document.getElementById("profileMenu").style.display = "block";
-          document.getElementById("homePage").style.display = "block";
-          document.getElementById("homeOptionsBlock").style.display = "block";
-          document.getElementById("bannerContainer").style.display = "none";
-          document.getElementById("liveDataPage").style.display = "none";
-          document.getElementById("stageContainer").style.display = "none";
-          document.getElementById("leagueType1").style.display = "none";
-          document.getElementById("leagueType2").style.display = "none";
-          document.getElementById("loginBtn").style.display = "none";
-          document.getElementById("registerBtn").style.display = "none";
-          document.getElementById("profileContainer").style.display = "none";
-          document.getElementById("friendsContainer").style.display = "none";
           // End of first required block logic
         } else {
           localStorage.removeItem("authToken");
@@ -231,31 +220,6 @@ export const ProfileManager = {
     });
 
     section.appendChild(homeButton);
-
-    // --- 2. Initial View State Setup (Second required block) ---
-    // Start of second required block logic
-    document.getElementById("headerUsername").style.display = "block";
-    document.getElementById("profileMenu").style.display = "block";
-    document.getElementById("profileContainer").style.display = "block";
-    document.getElementById("homePage").style.display = "none";
-    document.getElementById("liveDataPage").style.display = "none";
-    document.getElementById("friendsContainer").style.display = "none";
-    document.getElementById("bannerContainer").style.display = "none";
-    document.getElementById("stageContainer").style.display = "none";
-    document.getElementById("leagueType1").style.display = "none";
-    document.getElementById("leagueType2").style.display = "none";
-    localStorage.removeItem("lastActiveLeagueTab");
-    localStorage.removeItem("leaguesActiveTab");
-    localStorage.removeItem("lastActiveNationalLeagueTab");
-    localStorage.removeItem("currentBannerId");
-    localStorage.removeItem("leagueId");
-    localStorage.removeItem("selectedStageType");
-    // End of second required block logic
-
-    // Initial data fetch for the default tab
-    // This is where the old code called getUserData.initGetUserPersonalDetailes()
-    // We will call it inside showProfileTab for the "personal" tab.
-    // getUserData.initGetUserPersonalDetailes(); // Called below
 
     // ✅ Tabs header
     const tabsHeader = document.createElement("div");
@@ -331,6 +295,12 @@ export const ProfileManager = {
 
     // 🎯 Tab Switching Logic - NOW MANAGES COLUMN VISIBILITY
     const showProfileTab = (tabName) => {
+      ProfileManager.__selectProfileTab = (tabKey) => {
+        const target = (tabKey === "achievements") ? "achievements" : "personal";
+        if (activeTab === target) return;   // ✅ prevents double fetch
+        showProfileTab(target);
+      };
+
       ProfileManager.__clearAllProfileErrors();
       activeTab = tabName;
 
@@ -364,9 +334,15 @@ export const ProfileManager = {
     [personalTabBtn, achievementTabBtn].forEach(btn => {
       btn.addEventListener("click", () => {
         if (btn.disabled) return;
-        showProfileTab(btn.dataset.tab);
+
+        // ✅ router-only: do NOT call showProfileTab here
+        location.hash = (btn.dataset.tab === "achievements") ? "achievements" : "profile";
       });
     });
+
+    const hashKey = (location.hash || "").replace("#", "");
+    if (hashKey === "achievements") activeTab = "achievements";
+    else activeTab = "personal";
 
     // Initialize the view with the personal tab
     showProfileTab(activeTab); // activeTab is hardcoded to "personal"
@@ -739,7 +715,7 @@ function renderPasswordDetails(userData, container, translation) {
 
   // Append the Save Button
   container.appendChild(saveButton);
-    actionsDiv.appendChild(saveButton);
+  actionsDiv.appendChild(saveButton);
   container.appendChild(actionsDiv);
 
   // --- 4. Conditional Enabling Logic (Current Password) ---

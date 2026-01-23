@@ -254,12 +254,18 @@ export const LeagueManager = {
 
     // 🔹 "Open"
     document.getElementById("openBtn").addEventListener("click", () => {
-      document.getElementById("tableModal").style.display = "none";
-      document.getElementById("bannerContainer").style.display = "none";
-      document.getElementById("stageContainer").style.display = "block";
+      const modal = document.getElementById("tableModal");
+      modal.style.display = "none";
 
-      const bannerId = parseInt(document.getElementById("tableModal").dataset.bannerId);
+      const bannerId = Number(modal.dataset.bannerId);
+      if (!bannerId) return;
+
       localStorage.setItem("currentBannerId", bannerId);
+
+      if (bannerId === 1) location.hash = "#champions-league";
+      else if (bannerId === 2) location.hash = "#europe-league";
+      else if (bannerId === 3) location.hash = "#euro-cup";
+      else if (bannerId === 4) location.hash = "#world-cup";
 
       // ✅ Insert Back Button into stageContainerWrapper if not already added
       const translation = langMap[currentLang];
@@ -268,6 +274,7 @@ export const LeagueManager = {
       backBtn.textContent = translation.backButton;
 
       backBtn.addEventListener("click", async () => {
+        location.hash = "leagues";
         const token = localStorage.getItem("authToken");
 
         try {
@@ -291,55 +298,23 @@ export const LeagueManager = {
 
     });
 
-    // ✅ Function to handle stage banner click and send request
-    function handleStageBannerClick(stageBannerId) {
-      const bannerId = parseInt(localStorage.getItem("currentBannerId"));
-      const translation = langMap[currentLang];
-
-      const isGroup = stageBannerId === 1;
-      localStorage.setItem("selectedStageType", stageBannerId);
-
-      // ✅ Send request
-      apiPost("/leagues", { bannerId, isGroup })
-        .then((data) => {
-          if (data.success && data.data) {
-            document.getElementById("stageContainer").style.display = "none";
-            document.getElementById("tableModal").style.display = "none";
-            document.getElementById("bannerContainer").style.display = "none";
-
-            if (bannerId === 1 || bannerId === 2) {
-              if (isGroup) {
-                renderLeagueTable(data.data);
-              } else {
-                renderLeagueTable(data.data);
-              }
-            } else {
-              if (isGroup) {
-                renderNationalTable(data.data);
-              } else {
-                renderNationalTable(data.data);
-              }
-            }
-
-
-          } else {
-            showToast(translation.not_found || "Not found", "info");
-            console.warn("⛔ Response data:", data);
-          }
-        })
-        .catch((err) => {
-          showToast(translation.something_went_wrong || "Something went wrong", "error");
-          console.error("❌ Error loading league data:", err);
-        });
-    }
-
     // ✅ Event listeners for stage banners
     document.getElementById("stageBanner1").addEventListener("click", () => {
-      handleStageBannerClick(1);
+      const bannerId = Number(localStorage.getItem("currentBannerId"));
+
+      if (bannerId === 1) location.hash = "#ucl-basic-my";  // default tab = my
+      else if (bannerId === 2) location.hash = "#uel-basic-my";
+      else if (bannerId === 3) location.hash = "#euro-basic-my";  // default tab = my
+      else if (bannerId === 4) location.hash = "#wc-basic-my";
     });
 
     document.getElementById("stageBanner2").addEventListener("click", () => {
-      handleStageBannerClick(2);
+      const bannerId = Number(localStorage.getItem("currentBannerId"));
+
+      if (bannerId === 1) location.hash = "#ucl-only-my";
+      else if (bannerId === 2) location.hash = "#uel-only-my";
+      else if (bannerId === 3) location.hash = "#euro-only-my";
+      else if (bannerId === 4) location.hash = "#wc-only-my";
     });
   },
 

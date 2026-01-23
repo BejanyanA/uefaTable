@@ -41,6 +41,9 @@ export const getFriends = {
     },
 
     initGetAllFriendsStatuses: async function () {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+        
         try {
             const response = await apiPost("/all-users");
             const container = document.getElementById("user-select");

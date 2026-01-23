@@ -7,9 +7,11 @@ export function isLoggedIn() {
 }
 
 export function setCustomCompetitionVisible(visible) {
+   const container = document.getElementById("bannerContainer");
    const title = document.getElementById("customCompetitionBlock");
    const banners = document.getElementById("customCompetitionBlockBanners");
-   document.getElementById("bannerContainer").style.display = "block";
+
+   if (container) container.style.display = visible ? "block" : "none";
    if (title) title.style.display = visible ? "block" : "none";
    if (banners) banners.style.display = visible ? "block" : "none";
 }
@@ -17,14 +19,11 @@ export function setCustomCompetitionVisible(visible) {
 export function setHomeOptionsVisible(visible) {
    const el = document.getElementById("homeOptionsBlock");
    if (el) el.style.display = visible ? "grid" : "none";
-   document.getElementById("homePage").style.display = "block";
-   document.getElementById("homeOptionsBlock").style.display = "block";
-   document.getElementById("bannerContainer").style.display = "none";
 }
 
 function showHomePage() {
-   document.getElementById("homePage").style.display = "block";
-   document.getElementById("homeOptionsBlock").style.display = "block";
+   // document.getElementById("homePage").style.display = "block";
+   // document.getElementById("homeOptionsBlock").style.display = "block";
    setHomeOptionsVisible(true);
    setCustomCompetitionVisible(false);
    document.getElementById("bannerContainer").style.display = "none";
@@ -40,32 +39,28 @@ function hideHomePage() {
 
 export function initHomeOptionButtons() {
    // initial state
-   showHomePage();
-   closeLiveData(); // ensures liveDataPage hidden
+   // showHomePage();
+   // closeLiveData();
 
    // Live Data button
    document.getElementById("btnLiveData")?.addEventListener("click", () => {
-      hideHomePage();
-      openLiveData();
+      location.hash = "live";   // router will show liveDataPage
    });
 
    // Back button from Live page
    document.getElementById("btnBackFromLive")?.addEventListener("click", () => {
-      closeLiveData();
-      showHomePage();
+      location.hash = "home";   // router will show homePage
    });
 
    // Custom League
    document.getElementById("btnCustomData")?.addEventListener("click", () => {
       if (!isLoggedIn()) {
          sessionStorage.setItem("postLoginAction", "openCustom");
-         openModal("loginModal"); // uses your existing modal function
+         openModal("loginModal");
          return;
       }
 
-      setHomeOptionsVisible(false);
-      setCustomCompetitionVisible(true);
-      document.getElementById("homePage").style.display = "none";
+      location.hash = "leagues"; // router will show leagueType1 (or your page)
    });
 
    // Banner back (custom league back)
@@ -74,11 +69,7 @@ export function initHomeOptionButtons() {
    if (backBtn) {
       backBtn.textContent = translation.backButton;
       backBtn.addEventListener("click", () => {
-         setCustomCompetitionVisible(false);
-         setHomeOptionsVisible(true);
-         document.getElementById("homePage").style.display = "block";
-         document.getElementById("homeOptionsBlock").style.display = "block";
-         document.getElementById("bannerContainer").style.display = "none";
+         location.hash = "home";
       });
    }
 }

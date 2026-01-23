@@ -18,8 +18,8 @@ export async function checkLoggedIn() {
       const data = await apiGet("/me", token); // ✅ Cleaner
       if (data.success && data.user) {
          // document.getElementById("logoutButtn").style.display = "block";
-         document.getElementById("homePage").style.display = "block";
-         document.getElementById("homeOptionsBlock").style.display = "block";
+         // document.getElementById("homePage").style.display = "block";
+         // document.getElementById("homeOptionsBlock").style.display = "block";
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
