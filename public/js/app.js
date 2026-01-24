@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
    });
 
    // optional: send initial page view once
-   if (window.ym) {
-      ym(106431737, "hit", location.pathname + location.hash);
+   if (typeof window.ym === "function") {
+      ym(106431737, "hit", location.pathname + (location.hash || "#home"));
    }
 });
 
