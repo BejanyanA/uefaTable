@@ -156,11 +156,7 @@ function renderTab(tab) {
       <!-- LEFT: leagues list -->
       <div class="standingsLeft" id="standingsLeaguesList">
 
-        <button class="standingsLeagueBtn active" type="button" data-league-id="2">
-          <span class="leagueName">Champions League</span>
-        </button>
-
-        <button class="standingsLeagueBtn" type="button" data-league-id="140">
+        <button class="standingsLeagueBtn active" type="button" data-league-id="140">
           <span class="leagueName">La Liga</span>
         </button>
 
@@ -182,6 +178,10 @@ function renderTab(tab) {
 
         <button class="standingsLeagueBtn" type="button" data-league-id="88">
           <span class="leagueName">Eredivisie</span>
+        </button>
+
+        <button class="standingsLeagueBtn" type="button" data-league-id="2">
+          <span class="leagueName">Champions League</span>
         </button>
         
         <button class="standingsLeagueBtn" type="button" data-league-id="3">
@@ -1017,9 +1017,10 @@ function initWidgetTranslationObserver() {
 }
 
 // ---------- public API ----------
-export function openLiveData() {
+export async function openLiveData() {
    setLiveDataVisible(true);
-
+   await loadApiSportsWidgetsOnce();
+   remountApiSportsWidgets();
    initLiveTabsOnce();
    ensureConfigWidget();
 

@@ -502,72 +502,107 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // -------- Stage / team count ----------
       const stageSelect = document.getElementById("stageSelect");
       const teamCountSelect = document.getElementById("count-select");
 
-      function updateTeamCountOptions(setDefault = false) {
-        const isKnockout = stageSelect.value === "false"; // knockout option
-        [...teamCountSelect.options].forEach(opt => {
-          const val = parseInt(opt.value, 10);
-          const show = isKnockout ? (val === 16) : (val === 32);
-          // const show = isKnockout ? (val === 16 || val === 32) : (val === 32 || val === 64);
-          opt.hidden = !show;
-        });
+      if (stageSelect && teamCountSelect) {
+        function updateTeamCountOptions(setDefault = false) {
+          const isKnockout = stageSelect.value === "false";
+          [...teamCountSelect.options].forEach((opt) => {
+            const val = parseInt(opt.value, 10);
+            const show = isKnockout ? val === 16 : val === 32;
+            opt.hidden = !show;
+          });
 
-        if (setDefault) {
-          teamCountSelect.value = isKnockout ? "16" : "32"; // ⬅ default values
-        } else {
-          if (teamCountSelect.options[teamCountSelect.selectedIndex].hidden) {
-            const firstVisible = [...teamCountSelect.options].find(o => !o.hidden);
+          if (setDefault) {
+            teamCountSelect.value = isKnockout ? "16" : "32";
+          } else if (teamCountSelect.options[teamCountSelect.selectedIndex]?.hidden) {
+            const firstVisible = [...teamCountSelect.options].find((o) => !o.hidden);
             if (firstVisible) teamCountSelect.value = firstVisible.value;
           }
         }
+
+        stageSelect.addEventListener("change", () => updateTeamCountOptions(true));
+        updateTeamCountOptions(true);
       }
 
-      stageSelect.addEventListener("change", () => updateTeamCountOptions(true));
+      
 
-      updateTeamCountOptions(true);
-    });
-  </script>
+      // -------- User dropdown ----------
+      const userIcon = document.getElementById("userIcon");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      const logoutBtn = document.getElementById("logoutBtn");
 
-  <script>
-    const userIcon = document.getElementById("userIcon");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-    const logoutBtn = document.getElementById("logoutBtn");
+      if (userIcon && dropdownMenu) {
+        userIcon.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle("show");
+        });
 
-    // Toggle dropdown open/close
-    userIcon.addEventListener("click", (e) => {
-      e.stopPropagation();
-      dropdownMenu.classList.toggle("show");
-    });
+        document.addEventListener("click", () => dropdownMenu.classList.remove("show"));
 
-    // Close dropdown when clicking outside
-    document.addEventListener("click", () => dropdownMenu.classList.remove("show"));
-
-    // Logout functionality
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      dropdownMenu.classList.remove("show");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            dropdownMenu.classList.remove("show");
+            if (typeof logout === "function") logout();
+          });
+        }
+      }
 
 
-      if (typeof logout === "function") {
-        logout();
-      } else {
-        console.warn("logout() function not found");
+
+      // -------- Footer year ----------
+      const yearEl = document.getElementById("year");
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+
+
+      // -------- Live route reload fix (widgets) ----------
+      if (isLiveRoute()) {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            loadApiSportsWidgetsOnce().then(remountApiSportsWidgets);
+          }, 0);
+        });
       }
     });
-  </script>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    function isLiveRoute() {
+      return location.hash === "#live" || location.hash.includes("liveData");
+    }
+
+    function loadApiSportsWidgetsOnce() {
+      if (window.__apiSportsLoaded) return window.__apiSportsLoadedPromise;
+
+      window.__apiSportsLoadedPromise = new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.type = "module";
+        s.src = "https://widgets.api-sports.io/3.1.0/widgets.js";
+        s.onload = () => resolve();
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+
+      window.__apiSportsLoaded = true;
+      return window.__apiSportsLoadedPromise;
+    }
+
+    function remountApiSportsWidgets() {
+      const container = document.getElementById("wg-api-football"); // ensure this is correct
+      if (!container) return;
+
+      const widget = container.querySelector("api-sports-widget");
+      if (!widget) return;
+
+      widget.replaceWith(widget.cloneNode(true));
+    }
   </script>
 
   <noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   </noscript>
-
-
-  <script type="module" src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
 
 </body>
 
