@@ -72,7 +72,8 @@
   <link rel="stylesheet" href="css/components/friend-menu.css">
   <link rel="stylesheet" href="css/components/notification-bell.css">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print"
+    onload="this.media='all'">
   <link rel="stylesheet" href="css/components/homepage-options.css">
   <link rel="stylesheet" href="css/components/live-data.css">
 </head>
@@ -560,6 +561,10 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  </noscript>
 
 
   <script type="module" src="https://widgets.api-sports.io/3.1.0/widgets.js"></script>
