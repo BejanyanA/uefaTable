@@ -1,6 +1,6 @@
 .liveDataPage {
   margin-inline: 0;
-  padding-top: 100px;
+  padding-top: 130px;
   margin-bottom: 30px;
   width: 100%;
 }
@@ -566,6 +566,10 @@ api-sports-widget[data-type="game"] [data-action="players"] {
 
 /* ✅ Extra small phones */
 @media (max-width: 420px) {
+  .liveDataPage {
+    padding-top: 100px;
+  }
+
   .standingsLeagueBtn {
     padding: 8px 10px;
     font-size: 12px;
