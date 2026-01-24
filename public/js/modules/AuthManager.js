@@ -93,9 +93,8 @@ export const AuthManager = {
             location.hash = "leagues";
           }
 
-          sessionStorage.removeItem("postLoginAction");
-
           closeModal("loginModal");
+          
         } else {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
           localStorage.removeItem("authToken");
