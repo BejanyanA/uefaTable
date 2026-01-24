@@ -26,25 +26,6 @@ export function renderLeagueTable(data) {
     else if (bannerId === 3) location.hash = "#euro-cup";
     else if (bannerId === 4) location.hash = "#world-cup";
     else location.hash = "#leagues";
-
-    const token = localStorage.getItem("authToken");
-
-    try {
-      const response = await apiGet("/me", token);
-      if (response.success && response.user) {
-        // document.getElementById("logoutButtn").style.display = "block";
-        document.getElementById("stageContainer").style.display = "block";
-        document.getElementById("leagueType1").style.display = "none";
-        localStorage.removeItem("lastActiveLeagueTab");
-      } else {
-        localStorage.removeItem("authToken");
-        if (authButtons) authButtons.style.display = "flex";
-      }
-    } catch (err) {
-      console.error("🔴 Error in Back button to /me:", err);
-      localStorage.removeItem("authToken");
-      if (authButtons) authButtons.style.display = "flex";
-    }
   });
 
   section.appendChild(backBtn); // Add Back button

@@ -1,5 +1,5 @@
 import { langMap, currentLang } from "./LanguageManager.js";
-import { openLiveData, closeLiveData } from "./liveData.js";
+import { apiGet } from '../services/api.js';
 
 export function isLoggedIn() {
    const token = localStorage.getItem("authToken");
@@ -68,7 +68,7 @@ export function initHomeOptionButtons() {
    const backBtn = document.getElementById("bannerBackBtn");
    if (backBtn) {
       backBtn.textContent = translation.backButton;
-      backBtn.addEventListener("click", () => {
+      backBtn.addEventListener("click", async () => {
          location.hash = "home";
       });
    }

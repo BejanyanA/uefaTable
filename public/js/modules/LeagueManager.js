@@ -252,6 +252,31 @@ export const LeagueManager = {
       });
     });
 
+    const translation = langMap[currentLang];
+    const section = document.getElementById("stageContainer");
+    const backBtn = document.getElementById("stageBackBtn");
+    backBtn.textContent = translation.backButton;
+
+    backBtn.addEventListener("click", async () => {
+      location.hash = "leagues";
+      const token = localStorage.getItem("authToken");
+
+      // try {
+      //   const response = await apiGet("/me", token);
+      //   if (response.success && response.user) {
+      //     document.getElementById("bannerContainer").style.display = "block";
+      //     document.getElementById("stageContainer").style.display = "none";
+      //   } else {
+      //     localStorage.removeItem("authToken");
+      //     if (authButtons) authButtons.style.display = "flex";
+      //   }
+      // } catch (err) {
+      //   console.error("🔴 Error in Back button to /me:", err);
+      //   localStorage.removeItem("authToken");
+      //   if (authButtons) authButtons.style.display = "flex";
+      // }
+    });
+
     // 🔹 "Open"
     document.getElementById("openBtn").addEventListener("click", () => {
       const modal = document.getElementById("tableModal");
@@ -267,36 +292,9 @@ export const LeagueManager = {
       else if (bannerId === 3) location.hash = "#euro-cup";
       else if (bannerId === 4) location.hash = "#world-cup";
 
-      // ✅ Insert Back Button into stageContainerWrapper if not already added
-      const translation = langMap[currentLang];
-      const section = document.getElementById("stageContainer");
-      const backBtn = document.getElementById("stageBackBtn");
-      backBtn.textContent = translation.backButton;
-
-      backBtn.addEventListener("click", async () => {
-        location.hash = "leagues";
-        const token = localStorage.getItem("authToken");
-
-        try {
-          const response = await apiGet("/me", token);
-          if (response.success && response.user) {
-            // document.getElementById("logoutButtn").style.display = "block";
-            document.getElementById("bannerContainer").style.display = "block";
-            document.getElementById("stageContainer").style.display = "none";
-          } else {
-            localStorage.removeItem("authToken");
-            if (authButtons) authButtons.style.display = "flex";
-          }
-        } catch (err) {
-          console.error("🔴 Error in Back button to /me:", err);
-          localStorage.removeItem("authToken");
-          if (authButtons) authButtons.style.display = "flex";
-        }
-      });
-
-      section.appendChild(backBtn);
-
     });
+
+    section.appendChild(backBtn);
 
     // ✅ Event listeners for stage banners
     document.getElementById("stageBanner1").addEventListener("click", () => {
