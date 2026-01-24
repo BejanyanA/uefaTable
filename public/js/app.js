@@ -36,6 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // make sure openModal is available by now
       openModal("loginModal");
    }
+
+
+   window.addEventListener("hashchange", () => {
+      if (window.ym) {
+         ym(106431737, "hit", location.pathname + location.hash);
+      }
+   });
+
+   // optional: send initial page view once
+   if (window.ym) {
+      ym(106431737, "hit", location.pathname + location.hash);
+   }
 });
 
 // 🔹 Language Dropdown
