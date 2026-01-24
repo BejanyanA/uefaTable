@@ -76,7 +76,7 @@
 
   #stageBanner1 {
 
-      background-image: url('../../assets/images/greoupKnockout.png');
+      background-image: url('../../assets/images/groupKnockout.png');
   }
 
   #stageBanner2 {
@@ -180,7 +180,7 @@
 
       #stageBanner1 {
 
-          background-image: url('../../assets/images/greoupKnockout.png') !important;
+          background-image: url('../../assets/images/groupKnockout.png') !important;
       }
 
       #stageBanner2 {
