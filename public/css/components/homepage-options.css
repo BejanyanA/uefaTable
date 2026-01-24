@@ -216,4 +216,8 @@
     .choiceBottom {
         font-size: 13px;
     }
+    
+    .loading #choiceiconLive {
+        animation: none;
+    }
 }
