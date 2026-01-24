@@ -21,6 +21,11 @@ export function setHomeOptionsVisible(visible) {
    if (el) el.style.display = visible ? "grid" : "none";
 }
 
+export function setLiveVisible(visible) {
+   const livePage = document.getElementById("liveDataPage");
+   if (livePage) livePage.style.display = visible ? "grid" : "none";
+}
+
 function showHomePage() {
    // document.getElementById("homePage").style.display = "block";
    // document.getElementById("homeOptionsBlock").style.display = "block";
@@ -38,18 +43,20 @@ function hideHomePage() {
 }
 
 export function initHomeOptionButtons() {
-   // initial state
-   // showHomePage();
-   // closeLiveData();
 
    // Live Data button
    document.getElementById("btnLiveData")?.addEventListener("click", () => {
+      if (!isLoggedIn()) {
+         sessionStorage.setItem("actionForLive", "openLive");
+      }
       location.hash = "live";   // router will show liveDataPage
    });
 
    // Back button from Live page
    document.getElementById("btnBackFromLive")?.addEventListener("click", () => {
       location.hash = "home";   // router will show homePage
+      sessionStorage.removeItem("actionForLive");
+      setHomeOptionsVisible(true);
    });
 
    // Custom League

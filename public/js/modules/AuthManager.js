@@ -4,7 +4,7 @@ import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { setError, clearErrors } from '../utils/helper.js';
 import { apiPost, apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
-import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
+import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } from "./HomeOptions.js";
 
 export const AuthManager = {
   initLogin: function () {
@@ -78,7 +78,8 @@ export const AuthManager = {
             }
           }
 
-          const post = sessionStorage.getItem("postLoginAction");
+          const custome = sessionStorage.getItem("postLoginAction");
+          const live = sessionStorage.getItem("actionForLive");
 
           // default: show homepage options after login
           setHomeOptionsVisible(true);
@@ -86,15 +87,23 @@ export const AuthManager = {
           // document.getElementById("homePage").style.display = "block";
           // document.getElementById("homeOptionsBlock").style.display = "block";
 
-          if (post === "openCustom") {
+          if (custome === "openCustom") {
             // user came here by clicking Custom League
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
             location.hash = "leagues";
           }
 
+          else if (live === "openLive") {
+            // user came here by clicking Custom League
+            setLiveVisible(true);
+            setHomeOptionsVisible(false);
+            setCustomCompetitionVisible(false);
+            location.hash = "live";
+          }
+
           closeModal("loginModal");
-          
+
         } else {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
           localStorage.removeItem("authToken");

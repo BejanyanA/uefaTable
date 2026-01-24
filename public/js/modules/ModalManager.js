@@ -36,6 +36,7 @@ export const ModalManager = {
       // Reset fields specific to the Login Modal
       forcePasswordIconReset("loginPassword", "loginEyeToggle");
       sessionStorage.removeItem("postLoginAction");
+      sessionStorage.removeItem("actionForLive");
 
     } else if (id === 'registerModal') { // Assuming your registration modal ID is 'registrationModal'
       // Reset fields specific to the Registration Modal

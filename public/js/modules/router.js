@@ -479,8 +479,14 @@ const routes = {
 
     live: {
         id: "liveDataPage",
-        onEnter: openLiveData,
-        onLeave: closeLiveData
+        onEnter: () => {
+            sessionStorage.setItem("actionForLive", "openLive");
+            openLiveData();
+        },
+        onLeave: () => {
+            sessionStorage.removeItem("actionForLive");
+            closeLiveData();
+        }
     },
 
 
