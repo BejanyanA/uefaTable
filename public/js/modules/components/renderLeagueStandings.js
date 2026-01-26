@@ -3,6 +3,10 @@ import { apiPost } from '../../services/api.js';
 import { renderLeagueInstances } from './renderLeagueTable.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 import { getClubBackInstancesHash } from '../router.js';
+import { setGroupIdForContext } from '../router.js';
+import { setGroupSelectionForContext } from '../router.js';
+import { getGroupSelectionForContext } from '../router.js';
+import { getGroupLetterFromName } from '../router.js';
 
 export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}) {
   // ✅ Backward compatible: (leagueId, groupId, opts)
@@ -13,11 +17,29 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
     groupName = groupNameOrOpts || "";
   }
 
+  const bannerId = Number(localStorage.getItem("currentBannerId"));
+  const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+  const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
+
+  const comp =
+    bannerId === 1 ? "ucl" :
+      bannerId === 2 ? "uel" :
+        bannerId === 3 ? "euro" :
+          bannerId === 4 ? "wc" : "ucl";
+
+  const stage = stageType === 1 ? "basic" : "only";
+  const access = leagueTab === "owners" ? "my" : "invited";
+
   // ✅ Fallbacks when coming from router
   if (!groupName) {
+    const ctx = { comp, stage, access };
+    const groupLetter = (opts?.query?.get?.("groupLetter") || "").toUpperCase();
+
     groupName =
-      (opts?.query?.get?.("groupName") ? decodeURIComponent(opts.query.get("groupName")) : "") ||
-      localStorage.getItem("groupName") ||
+      (opts?.query?.get?.("groupName")
+        ? decodeURIComponent(opts.query.get("groupName"))
+        : "") ||
+      getGroupSelectionForContext(ctx, groupLetter).groupName ||
       "";
   }
 
@@ -46,8 +68,8 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
     location.hash = getClubBackInstancesHash();
   });
 
-setActiveTab(initialTab);
-await loadTabContent(initialTab);
+  setActiveTab(initialTab);
+  await loadTabContent(initialTab);
 
   function setActiveTab(tab) {
     const ACTIVE_CLASS = "active";
@@ -62,27 +84,14 @@ await loadTabContent(initialTab);
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      const tab = btn.dataset.tab;              // "standings" | "matches"
+      const tab = btn.dataset.tab;
       const view = tab === "standings" ? "standing" : "matches";
 
-      // keep stored (router uses them)
-      localStorage.setItem("groupId", String(groupId));
-      localStorage.setItem("groupName", groupName);
+      const letter = getGroupLetterFromName(groupName);
 
-      const bannerId = Number(localStorage.getItem("currentBannerId"));
-      const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
-      const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
+      setGroupSelectionForContext({ comp, stage, access }, { groupId, groupName, groupLetter: letter });
 
-      const comp =
-        bannerId === 1 ? "ucl" :
-          bannerId === 2 ? "uel" :
-            bannerId === 3 ? "euro" :
-              bannerId === 4 ? "wc" : "ucl";
-
-      const stage = stageType === 1 ? "basic" : "only";
-      const access = leagueTab === "owners" ? "my" : "invited";
-
-      location.hash = `#${comp}-${stage}-${access}-club-group-${view}?groupName=${encodeURIComponent(groupName)}`;
+      location.hash = `#${comp}-${stage}-${access}-club-group-${letter}-${view}`;
     });
   });
 

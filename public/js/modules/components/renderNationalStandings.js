@@ -3,6 +3,10 @@ import { apiPost } from '../../services/api.js';
 import { renderNationalInstances } from './renderNationalTable.js';
 import { langMap, currentLang } from '../LanguageManager.js';
 import { getNationalBackInstancesHash } from '../router.js';
+import { setGroupIdForContext } from '../router.js';
+import { setGroupSelectionForContext } from '../router.js';
+import { getGroupSelectionForContext } from '../router.js';
+import { getGroupLetterFromName } from '../router.js';
 
 export async function renderNationalGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}) {
   // ✅ Backward compatible: (leagueId, groupId, opts) OR (leagueId, groupId, groupName, opts)
@@ -13,10 +17,24 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
     groupName = groupNameOrOpts || "";
   }
 
+  const bannerId = Number(localStorage.getItem("currentBannerId")); // 3=euro, 4=wc
+  const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+  const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+
+  const comp = bannerId === 3 ? "euro" : "wc";
+  const stage = stageType === 1 ? "basic" : "only";
+  const access = leagueTab === "owners" ? "my" : "invited";
+
   if (!groupName) {
+    const ctx = { comp, stage, access };
+    const groupLetter =
+      (opts?.query?.get?.("groupLetter") || "").toUpperCase(); // optional
+
     groupName =
-      (opts?.query?.get?.("groupName") ? decodeURIComponent(opts.query.get("groupName")) : "") ||
-      localStorage.getItem("groupName") ||
+      (opts?.query?.get?.("groupName")
+        ? decodeURIComponent(opts.query.get("groupName"))
+        : "") ||
+      getGroupSelectionForContext(ctx, groupLetter).groupName ||
       "";
   }
 
@@ -64,19 +82,11 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
       const tab = btn.dataset.tab; // standings | matches
       const view = tab === "standings" ? "standing" : "matches";
 
-      // keep stored for router
-      localStorage.setItem("groupId", String(groupId));
-      localStorage.setItem("groupName", groupName);
+      const letter = getGroupLetterFromName(groupName);
 
-      const bannerId = Number(localStorage.getItem("currentBannerId")); // 3=euro, 4=wc
-      const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
-      const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
+      setGroupSelectionForContext({ comp, stage, access }, { groupId, groupName, groupLetter: letter });
 
-      const comp = bannerId === 3 ? "euro" : "wc";
-      const stage = stageType === 1 ? "basic" : "only";
-      const access = leagueTab === "owners" ? "my" : "invited";
-
-      location.hash = `#${comp}-${stage}-${access}-national-group-${view}?groupName=${encodeURIComponent(groupName)}`;
+      location.hash = `#${comp}-${stage}-${access}-national-group-${letter}-${view}`;
     });
   });
 

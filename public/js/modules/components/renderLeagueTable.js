@@ -3,6 +3,11 @@ import { renderLeagueGroupStandingsPage } from './renderLeagueStandings.js'
 import { langMap, currentLang } from '../LanguageManager.js';
 import { LeagueManager } from '../LeagueManager.js';
 import { renderLeagueKnockoutsStage, renderLeagueOnlyKnockouts } from './renderLeagueKnockout.js'
+import { setLeagueIdForContext } from '../router.js';
+import { getLeagueIdForContext } from '../router.js';
+import { setGroupIdForContext } from '../router.js';
+import { setGroupSelectionForContext } from '../router.js';
+import { getGroupLetterFromName } from '../router.js';
 
 export function renderLeagueTable(data) {
   const translation = langMap[currentLang];
@@ -87,8 +92,6 @@ export function renderLeagueTable(data) {
     leagueBox.style.cursor = "pointer";
 
     leagueBox.addEventListener("click", () => {
-      localStorage.setItem("leagueId", league.id);
-
       const bannerId = Number(localStorage.getItem("currentBannerId"));
       const stageType = Number(localStorage.getItem("selectedStageType")) || 1; // 1 basic, 2 only
       const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
@@ -101,6 +104,8 @@ export function renderLeagueTable(data) {
 
       const stage = stageType === 1 ? "basic" : "only";
       const access = leagueTab === "owners" ? "my" : "invited";
+
+      setLeagueIdForContext({ comp, stage, access }, league.id);
 
       // for knockout-only leagues, default to knockouts
       const defaultInstancesTab = (stageType === 2) ? "knockouts" : "group";
@@ -417,29 +422,28 @@ export function renderLeagueInstances(instanceData, options = {}) {
         `;
 
         groupDiv.addEventListener("click", () => {
-  const groupId = Number(groupDiv.dataset.groupId);
-  const gName = groupDiv.dataset.groupName || "";
+          const groupId = Number(groupDiv.dataset.groupId);
+          const gName = groupDiv.dataset.groupName || "";
 
-  // store for router usage
-  localStorage.setItem("groupId", String(groupId));
-  localStorage.setItem("groupName", gName);
+          const bannerId = Number(localStorage.getItem("currentBannerId"));
+          const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
+          const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
 
-  const bannerId = Number(localStorage.getItem("currentBannerId"));
-  const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
-  const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
+          const comp =
+            bannerId === 1 ? "ucl" :
+              bannerId === 2 ? "uel" :
+                bannerId === 3 ? "euro" :
+                  bannerId === 4 ? "wc" : "ucl";
 
-  const comp =
-    bannerId === 1 ? "ucl" :
-    bannerId === 2 ? "uel" :
-    bannerId === 3 ? "euro" :
-    bannerId === 4 ? "wc" : "ucl";
+          const stage = stageType === 1 ? "basic" : "only";
+          const access = leagueTab === "owners" ? "my" : "invited";
 
-  const stage = stageType === 1 ? "basic" : "only";
-  const access = leagueTab === "owners" ? "my" : "invited";
+          const letter = getGroupLetterFromName(gName);
 
-  // ✅ go via router
-  location.hash = `#${comp}-${stage}-${access}-club-group-standing?groupName=${encodeURIComponent(gName)}`;
-});
+          setGroupSelectionForContext({ comp, stage, access }, { groupId, groupName: gName, groupLetter: letter });
+
+          location.hash = `#${comp}-${stage}-${access}-club-group-${letter}-standing`;
+        });
 
         groupsRow.appendChild(groupDiv);
       }
@@ -483,7 +487,7 @@ export function renderLeagueInstances(instanceData, options = {}) {
   } else {
     // ✅ Only render automatically if allowed
     if (autoRenderKnockouts) {
-      const leagueId = parseInt(localStorage.getItem("leagueId"));
+      const leagueId = getLeagueIdForContext({ comp, stage, access });
       knockoutContainer.innerHTML = "";
       renderLeagueOnlyKnockouts(leagueId, knockoutContainer);
     }

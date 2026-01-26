@@ -75,6 +75,29 @@ const COMP_TO_BANNER = { ucl: 1, uel: 2, euro: 3, wc: 4 };
 const STAGE_TO_TYPE = { basic: 1, only: 2 };          // selectedStageType
 const ACCESS_TO_TAB = { my: "owners", invited: "invited" };
 
+
+
+function getLeagueKey({ comp, stage, access }) {
+    return `${comp}-${stage}-${access}`; // unique for "ucl-basic-my", "wc-only-invited", etc.
+}
+
+export function setLeagueIdForContext(ctx, leagueId) {
+    const key = getLeagueKey(ctx);
+    localStorage.setItem(`leagueId:${key}`, String(leagueId));
+    // optional: also store last context
+    localStorage.setItem("lastLeagueKey", key);
+}
+
+export function getLeagueIdForContext(ctx) {
+    const key = getLeagueKey(ctx);
+    const v = localStorage.getItem(`leagueId:${key}`);
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+
+
+
 function setActiveInstancesTab(tab) {
     const groupBtn = document.getElementById("groupStageTitle");
     const koBtn = document.getElementById("knockoutStageTitle");
@@ -104,7 +127,8 @@ async function openInstances({ comp, stage, access, tab }) {
     localStorage.setItem("lastActiveLeagueTab", leagueTab);
     localStorage.setItem("lastActiveInstancesTab", effectiveTab);
 
-    const leagueId = Number(localStorage.getItem("leagueId"));
+    const leagueId = getLeagueIdForContext({ comp, stage, access });
+
     if (!leagueId) {
         location.hash = `#${comp}-${stage}-${access}`;
         return;
@@ -206,7 +230,8 @@ async function openNationalInstances({ comp, stage, access, tab }) {
     localStorage.setItem("lastActiveNationalLeagueTab", leagueTab);
     localStorage.setItem("lastActiveNationalInstancesTab", effectiveTab);
 
-    const leagueId = Number(localStorage.getItem("leagueId"));
+    const leagueId = getLeagueIdForContext({ comp, stage, access });
+
     if (!leagueId) {
         location.hash = `#${comp}-${stage}-${access}`;
         return;
@@ -313,6 +338,61 @@ export function getNationalBackInstancesHash() {
 
 
 
+export function setGroupIdForContext(ctx, groupId) {
+    const key = getLeagueKey(ctx); // same comp-stage-access key
+    localStorage.setItem(`groupId:${key}`, String(groupId));
+}
+
+export function getGroupIdForContext(ctx) {
+    const key = getLeagueKey(ctx);
+    const v = localStorage.getItem(`groupId:${key}`);
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+
+export function getGroupLetterFromName(groupName = "") {
+    // supports "Group A", "A", "GROUP B", etc.
+    const s = String(groupName).trim();
+    const m = s.match(/\b([A-H])\b/i);
+    return m ? m[1].toUpperCase() : ""; // "" if not found
+}
+
+function getGroupKey(ctx, groupLetter = "") {
+    const base = getLeagueKey(ctx); // ucl-basic-my
+    const letter = String(groupLetter || "").trim().toUpperCase();
+    return letter ? `${base}-${letter}` : base; // ucl-basic-my-A
+}
+
+export function setGroupSelectionForContext(ctx, { groupId, groupName, groupLetter }) {
+    const letter = groupLetter || getGroupLetterFromName(groupName);
+    const key = getGroupKey(ctx, letter);
+
+    localStorage.setItem(`groupId:${key}`, String(groupId));
+    localStorage.setItem(`groupName:${key}`, String(groupName || ""));
+    localStorage.setItem(`lastGroupLetter:${getLeagueKey(ctx)}`, String(letter || "")); // helpful
+}
+
+export function getGroupSelectionForContext(ctx, groupLetter) {
+    const base = getLeagueKey(ctx);
+
+    // if letter not provided, try last selected letter in this context
+    const letter =
+        (groupLetter || "").toUpperCase() ||
+        (localStorage.getItem(`lastGroupLetter:${base}`) || "").toUpperCase();
+
+    const key = getGroupKey(ctx, letter);
+
+    const id = Number(localStorage.getItem(`groupId:${key}`));
+    const groupId = Number.isFinite(id) && id > 0 ? id : 0;
+    const groupName = (localStorage.getItem(`groupName:${key}`) || "").trim();
+
+    return { groupId, groupName, groupLetter: letter };
+}
+
+
+
+
 
 function getStoredGroupId() {
     const v =
@@ -324,37 +404,38 @@ function getStoredGroupId() {
 }
 
 // ✅ Club: Group → Standing / Matches
-async function openClubGroupDetail({ comp, stage, access, view }) {
+async function openClubGroupDetail({ comp, stage, access, view, groupLetter }) {
     const stageType = STAGE_TO_TYPE[stage];
     if (stageType !== 1) {
         location.hash = `#${comp}-${stage}-${access}-club-knockouts`;
         return;
     }
 
-    const leagueId = Number(localStorage.getItem("leagueId")) || 0;
-    const groupId = getStoredGroupId();
+    const leagueId = getLeagueIdForContext({ comp, stage, access });
+
+    const ctx = { comp, stage, access };
+    const { groupId, groupName } = getGroupSelectionForContext(ctx, groupLetter);
 
     if (!leagueId || !groupId) {
         location.hash = `#${comp}-${stage}-${access}-club-group`;
         return;
     }
 
-    // ✅ view -> your tab names
     const initialTab = view === "standing" ? "standings" : "matches";
-
-    // ✅ use your existing renderer (it contains both tabs)
-    await renderLeagueGroupStandingsPage(leagueId, groupId, { initialTab });
+    await renderLeagueGroupStandingsPage(leagueId, groupId, groupName, { initialTab });
 }
 
-async function openNationalGroupDetail({ comp, stage, access, view }) {
+async function openNationalGroupDetail({ comp, stage, access, view, groupLetter }) {
     const stageType = STAGE_TO_TYPE[stage];
     if (stageType !== 1) {
         location.hash = `#${comp}-${stage}-${access}-national-knockouts`;
         return;
     }
 
-    const leagueId = Number(localStorage.getItem("leagueId")) || 0;
-    const groupId = getStoredGroupId();
+    const leagueId = getLeagueIdForContext({ comp, stage, access });
+
+    const ctx = { comp, stage, access };
+    const { groupId, groupName } = getGroupSelectionForContext(ctx, groupLetter);
 
     if (!leagueId || !groupId) {
         location.hash = `#${comp}-${stage}-${access}-national-group`;
@@ -362,8 +443,7 @@ async function openNationalGroupDetail({ comp, stage, access, view }) {
     }
 
     const initialTab = view === "standing" ? "standings" : "matches";
-
-    await renderNationalGroupStandingsPage(leagueId, groupId, { initialTab });
+    await renderNationalGroupStandingsPage(leagueId, groupId, groupName, { initialTab });
 }
 
 
@@ -371,23 +451,23 @@ async function openNationalGroupDetail({ comp, stage, access, view }) {
 // ✅ Club: auto-register group standing/matches routes
 function registerClubGroupDetailRoutes(routes) {
     const comps = ["ucl", "uel", "euro", "wc"];
-    const stages = ["basic", "only"];
+    const stages = ["basic"];
     const access = ["my", "invited"];
     const views = ["standing", "matches"];
+    const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 views.forEach(view => {
-                    // group standing/matches only for "basic"
-                    if (stage === "only") return;
-
-                    const key = `${comp}-${stage}-${acc}-club-group-${view}`;
-                    routes[key] = {
-                        id: "leagueType1",
-                        guard: guardLoggedIn,
-                        onEnter: () => openClubGroupDetail({ comp, stage, access: acc, view }),
-                    };
+                    letters.forEach(letter => {
+                        const key = `${comp}-${stage}-${acc}-club-group-${letter}-${view}`;
+                        routes[key] = {
+                            id: "leagueType1",
+                            guard: guardLoggedIn,
+                            onEnter: () => openClubGroupDetail({ comp, stage, access: acc, view, groupLetter: letter }),
+                        };
+                    });
                 });
             });
         });
@@ -397,22 +477,23 @@ function registerClubGroupDetailRoutes(routes) {
 // ✅ National: auto-register group standing/matches routes
 function registerNationalGroupDetailRoutes(routes) {
     const comps = ["euro", "wc"];
-    const stages = ["basic", "only"];
+    const stages = ["basic"];
     const access = ["my", "invited"];
     const views = ["standing", "matches"];
+    const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 views.forEach(view => {
-                    if (stage === "only") return;
-
-                    const key = `${comp}-${stage}-${acc}-national-group-${view}`;
-                    routes[key] = {
-                        id: "leagueType2",
-                        guard: guardLoggedIn,
-                        onEnter: () => openNationalGroupDetail({ comp, stage, access: acc, view }),
-                    };
+                    letters.forEach(letter => {
+                        const key = `${comp}-${stage}-${acc}-national-group-${letter}-${view}`;
+                        routes[key] = {
+                            id: "leagueType2",
+                            guard: guardLoggedIn,
+                            onEnter: () => openNationalGroupDetail({ comp, stage, access: acc, view, groupLetter: letter }),
+                        };
+                    });
                 });
             });
         });
@@ -421,6 +502,8 @@ function registerNationalGroupDetailRoutes(routes) {
 
 
 
+
+// Me
 let _meCheckInFlight = false;
 
 function shouldValidateMe(nextKey, nextRoute) {

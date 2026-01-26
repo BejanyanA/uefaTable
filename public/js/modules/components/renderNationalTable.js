@@ -3,6 +3,11 @@ import { renderNationalGroupStandingsPage } from './renderNationalStandings.js'
 import { langMap, currentLang } from '../LanguageManager.js';
 import { LeagueManager } from '../LeagueManager.js';
 import { renderNationalKnockoutsStage, renderNationalOnlyKnockouts } from './renderNationalKnockout.js'
+import { setLeagueIdForContext } from '../router.js';
+import { getLeagueIdForContext } from '../router.js';
+import { setGroupIdForContext } from '../router.js';
+import { setGroupSelectionForContext } from '../router.js';
+import { getGroupLetterFromName } from '../router.js';
 
 export function renderNationalTable(data) {
   const translation = langMap[currentLang];
@@ -88,7 +93,6 @@ export function renderNationalTable(data) {
     leagueBox.style.cursor = "pointer";
 
     leagueBox.addEventListener("click", () => {
-      localStorage.setItem("leagueId", league.id);
 
       const bannerId = Number(localStorage.getItem("currentBannerId"));
       const stageType = Number(localStorage.getItem("selectedStageType")) || 1; // 1 basic, 2 only
@@ -102,6 +106,8 @@ export function renderNationalTable(data) {
 
       const stage = stageType === 1 ? "basic" : "only";
       const access = leagueTab === "owners" ? "my" : "invited";
+
+      setLeagueIdForContext({ comp, stage, access }, league.id);
 
       // for knockout-only leagues, default to knockouts
       const defaultInstancesTab = (stageType === 2) ? "knockouts" : "group";
@@ -424,9 +430,6 @@ export function renderNationalInstances(instanceData, options = {}) {
           const groupId = Number(groupDiv.dataset.groupId);
           const gName = groupDiv.dataset.groupName || "";
 
-          localStorage.setItem("groupId", String(groupId));
-          localStorage.setItem("groupName", gName);
-
           const bannerId = Number(localStorage.getItem("currentBannerId")); // 3=euro, 4=wc
           const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
           const leagueTab = localStorage.getItem("lastActiveNationalLeagueTab") || "owners";
@@ -435,7 +438,11 @@ export function renderNationalInstances(instanceData, options = {}) {
           const stage = stageType === 1 ? "basic" : "only";
           const access = leagueTab === "owners" ? "my" : "invited";
 
-          location.hash = `#${comp}-${stage}-${access}-national-group-standing?groupName=${encodeURIComponent(gName)}`;
+          const letter = getGroupLetterFromName(gName);
+
+          setGroupSelectionForContext({ comp, stage, access }, { groupId: groupId, groupName: groupName, groupLetter: letter });
+
+          location.hash = `#${comp}-${stage}-${access}-national-group-${letter}-standing`;
         });
 
         groupsRow.appendChild(groupDiv);
@@ -475,7 +482,7 @@ export function renderNationalInstances(instanceData, options = {}) {
   } else {
     // ✅ Only render automatically if allowed
     if (autoRenderKnockouts) {
-      const leagueId = parseInt(localStorage.getItem("leagueId"));
+      const leagueId = getLeagueIdForContext({ comp, stage, access });
       knockoutContainer.innerHTML = "";
       renderNationalOnlyKnockouts(leagueId, knockoutContainer);
     }
