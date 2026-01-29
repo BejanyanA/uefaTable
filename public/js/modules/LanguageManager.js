@@ -486,17 +486,16 @@ export const langMap = {
 };
 
 function getLangFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  const lang = params.get("lang");
-  return langMap[lang] ? lang : "en";
+  const pathLang = window.location.pathname.split("/")[1];
+  return langMap[pathLang] ? pathLang : "en";
 }
 
 let currentLang = getLangFromURL();
 
 function updateURLWithLang(lang) {
-  const url = new URL(window.location);
-  url.searchParams.set("lang", lang);
-  window.history.replaceState(null, "", url);
+  const { origin, hash } = window.location;
+  const newUrl = `${origin}/${lang}${hash || ""}`;
+  window.history.replaceState(null, "", newUrl);
 }
 
 window.__APP_BOOTING__ = true;
