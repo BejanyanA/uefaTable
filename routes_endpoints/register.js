@@ -5,11 +5,27 @@ export async function handleRegister(request, env) {
   const { username, email, password } = await parseBody(request);
 
   const errors = {};
+
   if (!username) errors.username = "Username is required";
   if (!email) errors.email = "Email is required";
   if (!password) errors.password = "Password is required";
-  if (username.length > 10) errors.username = "Username must not exceed 10 characters";
-  if (password.length > 30) errors.password = "Password must not exceed 30 characters";
+
+  if (username && username.length > 10)
+    errors.username = "Username must not exceed 10 characters";
+
+  if (password && password.length > 30)
+    errors.password = "Password must not exceed 30 characters";
+
+  // ✅ NEW: Password strength validation
+  if (password) {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      errors.password =
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and special character";
+    }
+  }
 
   if (Object.keys(errors).length > 0) {
     return jsonResponse({ success: false, errors }, 400);
