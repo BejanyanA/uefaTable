@@ -6,27 +6,52 @@ export async function handleRegister(request, env) {
 
   const errors = {};
 
-  if (!username) errors.username = "Username is required";
-  if (!email) errors.email = "Email is required";
-  if (!password) errors.password = "Password is required";
+  // 🔹 Normalize inputs first
+  const trimmedUsername = (username || "").trim();
+  const trimmedEmail = (email || "").trim();
+  const trimmedPassword = (password || "").trim();
 
-  if (username && username.length > 10)
-    errors.username = "Username must not exceed 10 characters";
+  // 🔹 Required checks
+  if (!trimmedUsername) errors.username = "Username is required";
+  if (!trimmedEmail) errors.email = "Email is required";
+  if (!trimmedPassword) errors.password = "Password is required";
 
-  if (password && password.length > 30)
+  // 🔹 Username validation
+  if (trimmedUsername) {
+    if (trimmedUsername.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    } else if (trimmedUsername.length > 10) {
+      errors.username = "Username must not exceed 10 characters";
+    }
+  }
+
+  // 🔹 Email format validation
+  if (trimmedEmail) {
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    if (!emailRegex.test(trimmedEmail)) {
+      errors.email = "Invalid email format";
+    }
+  }
+
+  // 🔹 Password length limit
+  if (trimmedPassword && trimmedPassword.length > 30) {
     errors.password = "Password must not exceed 30 characters";
+  }
 
-  // ✅ NEW: Password strength validation
-  if (password) {
+  // 🔹 Password strength validation
+  if (trimmedPassword) {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]).{8,}$/;
 
-    if (!passwordRegex.test(password)) {
+    if (!passwordRegex.test(trimmedPassword)) {
       errors.password =
         "Password must be at least 8 characters and include uppercase, lowercase, number, and special character";
     }
   }
 
+  // 🔹 Stop if any errors
   if (Object.keys(errors).length > 0) {
     return jsonResponse({ success: false, errors }, 400);
   }
