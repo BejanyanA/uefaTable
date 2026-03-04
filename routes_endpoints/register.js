@@ -27,11 +27,25 @@ export async function handleRegister(request, env) {
 
   // 🔹 Email format validation
   if (trimmedEmail) {
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!emailRegex.test(trimmedEmail)) {
       errors.email = "Invalid email format";
+    } else {
+      const domain = trimmedEmail.split("@")[1];
+
+      if (domain.startsWith("-") || domain.endsWith("-")) {
+        errors.email = "Invalid email format";
+      }
+
+      if (domain.includes("-.") || domain.includes(".-")) {
+        errors.email = "Invalid email format";
+      }
+
+      // ❌ reject IP based domains like test@[192.168.1.1]
+      if (domain.includes("[") || domain.includes("]")) {
+        errors.email = "Invalid email format";
+      }
     }
   }
 
