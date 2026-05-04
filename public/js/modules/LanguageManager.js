@@ -512,6 +512,7 @@ function changeLang(lang, opts = {}) {
 
   // Live Translation
   liveDataTranslation();
+  translateEmptyResults();
 
   // Homepage Card
   hompageCardTranslations();
@@ -966,6 +967,25 @@ function liveDataTranslation() {
     element.textContent = allAboutFootball;
   });
 }
+
+// Live empty results
+function translateEmptyResults() {
+  const { live_empty_standings: liveEmptyResults = "No standings available for this league." } =
+    langMap[currentLang] || {};
+
+  document.querySelectorAll(".empty-result").forEach(el => {
+    el.textContent = liveEmptyResults;
+  });
+}
+
+const observer = new MutationObserver(() => {
+  translateEmptyResults();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
 
 
 // Homepage Cards

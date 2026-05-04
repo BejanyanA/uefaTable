@@ -82,3 +82,15 @@ document.addEventListener("click", function (e) {
       dropdown.classList.remove("show");
    }
 });
+
+// ✅ Close ALL opened popups/modals on ESC
+document.addEventListener('keydown', (event) => {
+   if (event.key !== 'Escape') return;
+
+   const openModals = [...document.querySelectorAll('.modal')]
+      .filter(modal => window.getComputedStyle(modal).display !== 'none');
+
+   openModals.forEach(modal => {
+      closeModal(modal.id);
+   });
+});
