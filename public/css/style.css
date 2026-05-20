@@ -20,7 +20,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh; 
+  min-height: 100dvh;
   /* padding-top: env(safe-area-inset-top); */
   /* padding-bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height)); */
 }
@@ -62,12 +62,33 @@ input:-webkit-autofill:active {
 
 
 /* Mobile */
+@media (hover: none) {
+
+  .auth-buttons button:hover,
+  .auth-buttons button:active,
+  .modal form button:hover,
+  .modal form button:active {
+    background-color: inherit;
+    color: #fff;
+    transform: none;
+  }
+
+  .confirm-delete-btn:hover,
+  .confirm-delete-btn:active,
+  .cancel-btn:hover,
+  .cancel-btn:active,
+  .confirm-edit-btn:hover {
+    color: #fff;
+    transform: none;
+  }
+}
+
 @media (max-width: 480px) {
   body {
     margin: 0;
     font-family: Arial, sans-serif;
     min-height: 100vh;
-    min-height: 100dvh; 
+    min-height: 100dvh;
     position: relative;
     /* -webkit-overflow-scrolling: touch;  */
     overscroll-behavior-y: contain;

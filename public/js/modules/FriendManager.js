@@ -344,16 +344,24 @@ export const FriendManager = {
         } else if (friend.status === "rejected") {
 
           // Show Delete button only for the user who rejected 
-          if (friend.byMe !== true) {
+          if (friend.byMe === true) {
             actions.append(
               mkBtn("action-delete", "delete", "Delete")
             );
+          } else {
+            name.classList.add("no-desktop-button");
+            item.classList.add("no-desktop-button");
+            actions.classList.add("no-desktop-button");
           }
         }
 
         item.appendChild(actions);
         rowContainer.appendChild(item);
-        enhanceActionsForMobile(actions);
+        if (friend.byMe === true) {
+          enhanceActionsForMobile(actions);
+        } else {
+          actions.classList.add("no-mobile-toggle");
+        }
       });
     } // end renderFriendsList
 
@@ -636,7 +644,7 @@ export const FriendManager = {
     // 2. Manually start the fetch (the callback, window.__setFriendsStatuses, will handle rendering)
     // We don't show a loading indicator here because the empty screen IS the loading screen for now.
   },
-  
+
 
   addFriends: async function () {
     const translation = langMap[currentLang];
