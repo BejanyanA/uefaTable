@@ -8,10 +8,10 @@
    background-color: rgb(0, 0, 0);
    /* border: 1px solid white; */
    color: rgb(255, 255, 255);
-   padding: 8px 12px;
+   padding: 8px 10px;
    cursor: pointer;
    font-size: 14px;
-   border-radius: 6px;
+   border-radius: 12px;
    transition: background 0.3s, color 0.3s, transform 0.1s;
    white-space: nowrap;
    width: 100px;
@@ -21,8 +21,8 @@
 }
 
 .auth-buttons button:hover {
-   background-color: rgb(172, 172, 172);
-   color: rgb(255, 255, 255);
+   background-color: rgb(255, 255, 255);
+   color: rgb(0, 0, 0);
 }
 
 .auth-buttons button:active {
@@ -79,7 +79,7 @@
       /* let buttons adjust naturally on mobile */
       min-width: 80px;
       font-size: 12px;
-      padding: 4px 6px;
+      padding: 6px 8px;
    }
 
    .logoOut-button {
