@@ -525,9 +525,25 @@ export const FriendManager = {
 
       toggle.addEventListener("click", (e) => {
         e.stopPropagation();
+
+        // Close all other menus
+        document.querySelectorAll(".friend-actions-menu.open").forEach((m) => {
+          if (m !== menu) {
+            m.classList.remove("open");
+
+            const otherToggle = m.parentElement?.querySelector(".friend-actions-menu-toggle");
+            if (otherToggle) {
+              otherToggle.setAttribute("aria-expanded", "false");
+            }
+          }
+        });
+
         const isOpen = menu.classList.toggle("open");
         toggle.setAttribute("aria-expanded", String(isOpen));
-        if (isOpen) menu.focus();
+
+        if (isOpen) {
+          menu.focus();
+        }
       });
 
       document.addEventListener("click", (e) => {

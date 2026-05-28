@@ -39,13 +39,28 @@ export async function handleGetApprovedFriends(request, env) {
     }
 
     let accessUserIds = [];
+
     if (leagueId) {
         const accessRows = await env.core_data.prepare(`
-      SELECT u.id, u.username
-      FROM league_access la
-      JOIN users u ON u.id = la.user_id
-      WHERE la.league_id = ?
-    `).bind(leagueId).all();
+            SELECT DISTINCT u.id, u.username
+            FROM league_access la
+            JOIN users u ON u.id = la.user_id
+
+            WHERE la.league_id = ?
+            AND EXISTS (
+                SELECT 1
+                FROM friends f
+                WHERE (
+                    (f.user_id = ? AND f.friend_id = u.id)
+                    OR
+                    (f.friend_id = ? AND f.user_id = u.id)
+                    )
+                AND f.status = 'approved'
+                    )
+                `)
+            .bind(leagueId, loggedInUserId, loggedInUserId)
+            .all();
+
         accessUserIds = accessRows.results;
     }
 

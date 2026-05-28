@@ -142,7 +142,7 @@
 
 .user-pill .remove-btn {
    margin-left: 8px;
-   color: #ff4d4d;
+   color: #ff0000;
    font-weight: bold;
    cursor: pointer;
 }
@@ -150,7 +150,7 @@
 .remove-btn {
    margin-left: 6px;
    cursor: pointer;
-   color: red !important;
+   color: #ff0000;
    font-weight: bold;
    font-family: inherit;
    font-size: 14px;
@@ -222,6 +222,16 @@
    box-sizing: border-box;
 }
 
+
+
+
+
+@media (hover: hover) {
+   .add-friend-btn:hover:not(:disabled) {
+      background-color: #1ab914;
+   }
+}
+
 @media (max-width: 480px) {
 
    .edit-modal {
@@ -267,8 +277,23 @@
    .remove-btn {
       margin-left: 6px;
       cursor: pointer;
-      color: red;
+      color: #ff0000;
       font-weight: bold;
+   }
+
+   .user-pill .remove-btn {
+      color: #ff0000;
+   }
+
+   .add-friend-btn:disabled,
+   .add-friend-btn:disabled:hover,
+   .add-friend-btn:disabled:active,
+   .add-friend-btn:disabled:focus {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #1d1d1d !important;
+      color: rgb(83, 83, 83);
+      border: 1px solid #555;
    }
 
    .edit-modal-buttons {

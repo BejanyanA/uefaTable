@@ -182,20 +182,39 @@ api-sports-widget [data-action="scheduled"] {
   display: none !important;
 }
 
-api-sports-widget .group-title {
+/* api-sports-widget .group-title {
   display: none !important;
-}
+} */
 
 api-sports-widget[data-type="standings"] .navtab-header {
   display: none !important;
 }
 
-api-sports-widget .header {
+/* api-sports-widget .header {
   display: none !important;
-}
+} */
 
 api-sports-widget[data-type="game"] [data-action="players"] {
   display: none !important;
+}
+
+api-sports-widget[data-type="standings"] td:nth-child(7),
+api-sports-widget[data-type="standings"] th:nth-child(7) {
+  display: none !important;
+}
+
+api-sports-widget .calendar-popup {
+  position: fixed !important;
+  top: 130px !important;
+  right: 40px !important;
+  z-index: 999999 !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
+
+api-sports-widget .modal-widget-close {
+  transform: scale(1);
+  color: #ff4d4d !important;
 }
 
 .standingsLeagueBtn.active {
@@ -356,12 +375,6 @@ api-sports-widget[data-type="game"] [data-action="players"] {
   /* ensure above widget UI */
 }
 
-
-
-.modal-widget-content .body .apiPopupCloseBtn:hover {
-  transform: scale(1);
-  color: #ff4d4d;
-}
 
 .modal-widget-content .body .apiPopupCloseBtn:active {
   transform: scale(0.50);
@@ -633,5 +646,18 @@ api-sports-widget[data-type="game"] [data-action="players"] {
     border-radius: 12px;
     padding: 12px 0px 0px;
     overflow: hidden;
+  }
+
+  api-sports-widget .calendar-popup {
+    position: fixed !important;
+    top: 166px !important;
+    left: 90px !important;
+    z-index: 999999 !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+
+  api-sports-widget .modal-widget-close {
+    color: #ff4d4d !important;
   }
 }

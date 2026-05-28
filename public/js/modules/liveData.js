@@ -10,6 +10,24 @@ let leagueLogosMap = null;
 let leagueLogosCache = null;
 let leagueLogosPromise = null;
 
+const leagueLogos = {
+   140: "assets/league_logos/laliga.png",
+   39: "assets/league_logos/premierLeague.png",
+   61: "assets/league_logos/frenchLigue1.png",
+   135: "assets/league_logos/serieA.png",
+   78: "assets/league_logos/bundesliga.png",
+   88: "assets/league_logos/eredivisie.png",
+
+   2: "assets/league_logos/championsLeague.png",
+   3: "assets/league_logos/europaLeague.png",
+
+   1: "assets/league_logos/worldCup.png",
+   4: "assets/league_logos/euro.png",
+   5: "assets/league_logos/nationsLeague.png",
+
+   21: "assets/league_logos/confederationsCup.png",
+};
+
 export async function loadLeagueLogos() {
    // ✅ return cached results
    if (leagueLogosCache) return leagueLogosCache;
@@ -37,34 +55,26 @@ export async function loadLeagueLogos() {
 }
 
 async function injectLeagueLogos() {
-   const logos = await loadLeagueLogos();
-   if (!logos) return;
-
    document.querySelectorAll(".standingsLeagueBtn").forEach((btn) => {
-      const nameEl = btn.querySelector(".leagueName");
-      if (!nameEl) return;
+      const leagueId = btn.dataset.leagueId;
+      const logoUrl = leagueLogos[leagueId];
 
-      const leagueName = nameEl.textContent.trim().toLowerCase();
-      const logoUrl = logos[leagueName];
       if (!logoUrl) return;
-
-      // Prevent duplicate logos
       if (btn.querySelector("img.leagueLogo")) return;
 
       const img = document.createElement("img");
       img.className = "leagueLogo";
       img.src = logoUrl;
-      img.alt = leagueName;
+      img.alt = "";
 
       btn.prepend(img);
    });
 }
 
-async function updateStandingsTitle(leagueName) {
+async function updateStandingsTitle(leagueName, leagueId) {
    const title = document.getElementById("standingsTitle");
    if (!title) return;
 
-   // Ensure text span exists
    let titleText = document.getElementById("standingsTitleText");
    if (!titleText) {
       titleText = document.createElement("span");
@@ -72,7 +82,6 @@ async function updateStandingsTitle(leagueName) {
       title.appendChild(titleText);
    }
 
-   // Ensure logo img exists
    let titleLogo = document.getElementById("standingsTitleLogo");
    if (!titleLogo) {
       titleLogo = document.createElement("img");
@@ -82,8 +91,12 @@ async function updateStandingsTitle(leagueName) {
       title.prepend(titleLogo);
    }
 
+   titleText.textContent = leagueName;
+
    const logos = await loadLeagueLogos();
-   const logoUrl = logos?.[leagueName.toLowerCase()];
+
+   // use ID instead of text
+   const logoUrl = leagueLogos[leagueId];
 
    if (logoUrl) {
       titleLogo.src = logoUrl;
@@ -192,15 +205,15 @@ function renderTab(tab) {
           <span class="leagueName">FIFA World Cup</span>
         </button>
         
-        <button class="standingsLeagueBtn" type="button" data-league-id="5">
+        <button class="standingsLeagueBtn" type="button" data-league-id="4">
           <span class="leagueName">EURO</span>
         </button>
 
-        <button class="standingsLeagueBtn" type="button" data-league-id="4">
-          <span class="leagueName">Conference League</span>
+        <button class="standingsLeagueBtn" type="button" data-league-id="21">
+          <span class="leagueName">Confederations Cup</span>
         </button>
 
-        <button class="standingsLeagueBtn" type="button" data-league-id="6">
+        <button class="standingsLeagueBtn" type="button" data-league-id="5">
           <span class="leagueName">Nations League</span>
         </button>
 
@@ -210,10 +223,8 @@ function renderTab(tab) {
 
       <!-- RIGHT: standings data -->
       <div class="standingsRight" id="standingsDataPane">
-        <div class="standingsTitle" id="standingsTitle">
-         <img id="standingsTitleLogo" class="standingsTitleLogo" alt="">
-         <span id="standingsTitleText">Champions League</span>
-        </div>
+
+
 
 
         <div id="standingsWidgetHost"></div>
@@ -221,6 +232,15 @@ function renderTab(tab) {
 
     </div>
   `;
+
+      // <div class="standingsRight" id="standingsDataPane">
+      //   <div class="standingsTitle" id="standingsTitle">
+      //    <img id="standingsTitleLogo" class="standingsTitleLogo" alt="">
+      //    <span id="standingsTitleText">Champions League</span>
+      //   </div>
+
+      //     <div id="standingsWidgetHost"></div>
+      // </div>
 
       initStandingsPickerOnce();     // bind click once
       loadStandingsWidgetOnce();     // load default selected league
@@ -306,7 +326,11 @@ function renderStandingsWidget(leagueId, leagueName) {
    const title = document.getElementById("standingsTitle");
    if (!host) return;
 
-   const season = getCurrentSeasonYear();
+   const currentYearLeagues = ["1", "4", "5", "6"];
+
+   const season = currentYearLeagues.includes(String(leagueId))
+      ? new Date().getFullYear()
+      : getCurrentSeasonYear();
    if (title) title.textContent = leagueName;
 
    // Re-create widget element (most custom elements refresh better this way)
@@ -330,7 +354,7 @@ function renderStandingsWidget(leagueId, leagueName) {
       ></api-sports-widget>
   `;
 
-   updateStandingsTitle(leagueName);
+   updateStandingsTitle(leagueName, leagueId);
 
    // Remove "Goals For : Against"
    removeColumnsByHeaders(host, [
@@ -382,32 +406,36 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
    if (!scopeRoot) return;
 
    const apply = () => {
-      const table = scopeRoot.querySelector("table");
-      if (!table) return false;
+      const tables = scopeRoot.querySelectorAll("table");
+      if (!tables.length) return false;
 
-      const headers = Array.from(table.querySelectorAll("th"))
-         .filter((th) => headerSelectors.some((sel) => th.matches(sel)));
+      let removedAny = false;
 
-      if (!headers.length) return false;
+      tables.forEach((table) => {
+         const headers = Array.from(table.querySelectorAll("th"))
+            .filter((th) => headerSelectors.some((sel) => th.matches(sel)));
 
-      const indexes = [...new Set(
-         headers.map((th) => Array.from(th.parentElement.children).indexOf(th))
-      )].sort((a, b) => b - a);
+         if (!headers.length) return;
 
-      indexes.forEach((idx) => {
-         table.querySelectorAll("tr").forEach((tr) => {
-            const cell = tr.children[idx];
-            if (cell) cell.remove();
+         const indexes = [...new Set(
+            headers.map((th) => Array.from(th.parentElement.children).indexOf(th))
+         )].sort((a, b) => b - a);
+
+         indexes.forEach((idx) => {
+            table.querySelectorAll("tr").forEach((tr) => {
+               const cell = tr.children[idx];
+               if (cell) cell.remove();
+            });
          });
+
+         removedAny = true;
       });
 
-      return true;
+      return removedAny;
    };
 
-   // Try now
    if (apply()) return;
 
-   // Observe until content appears
    const obs = new MutationObserver(() => {
       if (apply()) obs.disconnect();
    });
@@ -425,9 +453,9 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
 
 //// Matches
 const DEFAULT_MATCH_LEAGUE = {
-   leagueId: "140",           // La Liga (API-Football)
+   leagueId: "140",
    leagueTitle: "La Liga",
-   logoName: "La Liga",
+   logoUrl: "assets/league_logos/laliga.png",
 };
 
 const MATCHES_MENU = [
@@ -436,21 +464,9 @@ const MATCHES_MENU = [
       title: "Spain",
       logoLeagueName: "Spain",
       options: [
-         {
-            title: "La Liga",
-            leagueId: 140,
-            logoName: "La Liga",
-         },
-         {
-            title: "Super Cup",
-            leagueId: 556,
-            logoName: "Spain Super Cup",
-         },
-         {
-            title: "Copa del Rey",
-            leagueId: 143,
-            logoName: "Copa del Rey",
-         },
+         { title: "La Liga", leagueId: 140, logoUrl: "assets/league_logos/laliga.png" },
+         { title: "Super Cup", leagueId: 556, logoUrl: "assets/league_logos/spanishSuperCup.png" },
+         { title: "Copa del Rey", leagueId: 143, logoUrl: "assets/league_logos/copaDelRey.png" },
       ],
    },
    {
@@ -458,21 +474,9 @@ const MATCHES_MENU = [
       title: "England",
       logoLeagueName: "England",
       options: [
-         {
-            title: "Premier League",
-            leagueId: 39,
-            logoName: "Premier League",
-         },
-         {
-            title: "Community Shield",
-            leagueId: 528,
-            logoName: "Community Shield",
-         },
-         {
-            title: "FA Cup",
-            leagueId: 45,
-            logoName: "FA Cup",
-         },
+         { title: "Premier League", leagueId: 39, logoUrl: "assets/league_logos/premierLeague.png" },
+         { title: "Community Shield", leagueId: 528, logoUrl: "assets/league_logos/communityShield.png" },
+         { title: "FA Cup", leagueId: 45, logoUrl: "assets/league_logos/faCup.png" },
       ],
    },
    {
@@ -480,21 +484,9 @@ const MATCHES_MENU = [
       title: "France",
       logoLeagueName: "France",
       options: [
-         {
-            title: "Ligue 1",
-            leagueId: 61,
-            logoName: "Ligue 1",
-         },
-         {
-            title: "Trophée des Champions",
-            leagueId: 526,
-            logoName: "Trophée des Champions",
-         },
-         {
-            title: "Coupe de France",
-            leagueId: 66,
-            logoName: "Coupe de France",
-         },
+         { title: "Ligue 1", leagueId: 61, logoUrl: "assets/league_logos/frenchLigue1.png" },
+         { title: "Trophée des Champions", leagueId: 526, logoUrl: "assets/league_logos/tropheeDesChampions.png" },
+         { title: "Coupe de France", leagueId: 66, logoUrl: "assets/league_logos/coupeDeFrance.png" },
       ],
    },
    {
@@ -502,21 +494,9 @@ const MATCHES_MENU = [
       title: "Italy",
       logoLeagueName: "Italy",
       options: [
-         {
-            title: "Serie A",
-            leagueId: 135,
-            logoName: "Serie A",
-         },
-         {
-            title: "Super Cup",
-            leagueId: 547,
-            logoName: "Italy Super Cup",
-         },
-         {
-            title: "Coppa Italia",
-            leagueId: 137,
-            logoName: "Coppa Italia",
-         },
+         { title: "Serie A", leagueId: 135, logoUrl: "assets/league_logos/serieA.png" },
+         { title: "Super Cup", leagueId: 547, logoUrl: "assets/league_logos/italianSuperCup.png" },
+         { title: "Coppa Italia", leagueId: 137, logoUrl: "assets/league_logos/coppaItalia.png" },
       ],
    },
    {
@@ -524,21 +504,9 @@ const MATCHES_MENU = [
       title: "Germany",
       logoLeagueName: "Germany",
       options: [
-         {
-            title: "Bundesliga",
-            leagueId: 78,
-            logoName: "Bundesliga",
-         },
-         {
-            title: "Super Cup",
-            leagueId: 529,
-            logoName: "Germany Super Cup",
-         },
-         {
-            title: "DFB Pokal",
-            leagueId: 81,
-            logoName: "DFB Pokal",
-         },
+         { title: "Bundesliga", leagueId: 78, logoUrl: "assets/league_logos/bundesliga.png" },
+         { title: "Super Cup", leagueId: 529, logoUrl: "assets/league_logos/germanySuperCup.png" },
+         { title: "DFB Pokal", leagueId: 81, logoUrl: "assets/league_logos/germanyDfbCup.png" },
       ],
    },
    {
@@ -546,43 +514,17 @@ const MATCHES_MENU = [
       title: "Netherlands",
       logoLeagueName: "Netherlands",
       options: [
-         {
-            title: "Eredivisie",
-            leagueId: 88,
-            logoName: "Eredivisie",
-         },
-         {
-            title: "Super Cup",
-            leagueId: 543,
-            logoName: "Johan Cruyff Shield",
-         },
-         {
-            title: "KNVB Beker",
-            leagueId: 90,
-            logoName: "KNVB Beker",
-         },
+         { title: "Eredivisie", leagueId: 88, logoUrl: "assets/league_logos/eredivisie.png" },
+         { title: "Super Cup", leagueId: 543, logoUrl: "assets/league_logos/nethSuperCup.png" },
+         { title: "KNVB Beker", leagueId: 90, logoUrl: "assets/league_logos/knvbBeker.png" },
       ],
    },
-
-   // ✅ Singles (no dropdown)
-   {
-      key: "ucl",
-      title: "Champions League",
-      leagueId: 2,
-      logoName: "Champions League",
-   },
-   {
-      key: "uel",
-      title: "Europa League",
-      leagueId: 3,
-      logoName: "Europa League",
-   },
-   {
-      key: "uecl",
-      title: "Conference League",
-      leagueId: 4,
-      logoName: "Conference League",
-   },
+   { key: "ucl", title: "Champions League", leagueId: 2, logoUrl: "assets/league_logos/championsLeague.png" },
+   { key: "uel", title: "Europa League", leagueId: 3, logoUrl: "assets/league_logos/europaLeague.png" },
+   { key: "uecl", title: "World Cup", leagueId: 1, logoUrl: "assets/league_logos/worldCup.png" },
+   { key: "uecl", title: "EURO", leagueId: 4, logoUrl: "assets/league_logos/euro.png" },
+   { key: "uecl", title: "Confederations Cup", leagueId: 21, logoUrl: "assets/league_logos/confederationsCup.png" },
+   { key: "uecl", title: "Nations League", leagueId: 5, logoUrl: "assets/league_logos/nationsLeague.png" },
 ];
 
 
@@ -596,8 +538,18 @@ function renderMatchesMenu() {
       if (item.options?.length) {
          return `
         <div class="matchMenuGroup" data-key="${item.key}">
-<button class="matchMenuParentBtn" type="button" data-action="toggle" data-logo-name="${item.logoLeagueName || item.title}">
-  <span class="matchMenuParentText">${item.title}</span>
+<button class="matchMenuParentBtn" type="button" data-action="toggle">
+
+  <div class="matchMenuParentLeft">
+    <img
+      class="matchLogo"
+      src="assets/country_logos/${item.logoLeagueName}.png"
+      alt="${item.title}"
+    >
+
+    <span class="matchMenuParentText">${item.title}</span>
+  </div>
+
   <span class="matchMenuChevron">▾</span>
 </button>
 
@@ -606,15 +558,16 @@ function renderMatchesMenu() {
                .map(
                   (opt) => `
                 <button
-                  class="matchMenuChildBtn"
-                  type="button"
-                  data-action="open"
-                  data-league-id="${opt.leagueId}"
-                  data-league-title="${opt.title}"
-                  data-logo-name="${opt.logoName || opt.title}"
-                >
-                  ${opt.title}
-                </button>
+  class="matchMenuChildBtn"
+  type="button"
+  data-action="open"
+  data-league-id="${opt.leagueId}"
+  data-league-title="${opt.title}"
+  data-logo-url="${opt.logoUrl || ""}"
+>
+  ${opt.logoUrl ? `<img class="matchLogo" src="${opt.logoUrl}" alt="">` : ""}
+  <span>${opt.title}</span>
+</button>
               `
                )
                .join("")}
@@ -625,16 +578,17 @@ function renderMatchesMenu() {
 
       // Single item (no dropdown)
       return `
-      <button
-        class="matchMenuSingleBtn"
-        type="button"
-        data-action="open"
-        data-league-id="${item.leagueId}"
-        data-league-title="${item.title}"
-        data-logo-name="${item.logoLeagueName || item.title}"
-      >
-        ${item.title}
-      </button>
+<button
+  class="matchMenuSingleBtn"
+  type="button"
+  data-action="open"
+  data-league-id="${item.leagueId}"
+  data-league-title="${item.title}"
+  data-logo-url="${item.logoUrl || ""}"
+>
+  ${item.logoUrl ? `<img class="matchLogo" src="${item.logoUrl}" alt="">` : ""}
+  <span>${item.title}</span>
+</button>
     `;
    }).join("");
 
@@ -821,34 +775,34 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 }
 
 
-function injectApiSportsModalX() {
-   document
-      .querySelectorAll("modal-component .modal-widget-content.active .body")
-      .forEach((body) => {
-         // prevent duplicates
-         if (body.querySelector(":scope > .apiPopupCloseBtn")) return;
+// function injectApiSportsModalX() {
+//    document
+//       .querySelectorAll("modal-component .modal-widget-content.active .body")
+//       .forEach((body) => {
+//          // prevent duplicates
+//          if (body.querySelector(":scope > .apiPopupCloseBtn")) return;
 
-         const btn = document.createElement("button");
-         btn.className = "apiPopupCloseBtn";
-         btn.type = "button";
-         btn.setAttribute("aria-label", "Close");
-         btn.textContent = "✕";
+//          const btn = document.createElement("button");
+//          btn.className = "apiPopupCloseBtn";
+//          btn.type = "button";
+//          btn.setAttribute("aria-label", "Close");
+//          btn.textContent = "✕";
 
-         btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+//          btn.addEventListener("click", (e) => {
+//             e.preventDefault();
+//             e.stopPropagation();
 
-            // click the widget's real close button
-            const content = body.closest(".modal-widget-content");
-            const closeBtn = content?.querySelector(
-               'button.modal-widget-close[aria-label="Close"]'
-            );
-            if (closeBtn) closeBtn.click();
-         });
+//             // click the widget's real close button
+//             const content = body.closest(".modal-widget-content");
+//             const closeBtn = content?.querySelector(
+//                'button.modal-widget-close[aria-label="Close"]'
+//             );
+//             if (closeBtn) closeBtn.click();
+//          });
 
-         body.prepend(btn); // ✅ EXACT place you wanted
-      });
-}
+//          body.prepend(btn); // ✅ EXACT place you wanted
+//       });
+// }
 
 let apiSportsModalXStarted = false;
 
