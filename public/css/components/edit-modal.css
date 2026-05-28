@@ -133,7 +133,6 @@
    display: inline-flex;
    align-items: center;
    background-color: #444;
-   color: white;
    padding: 4px 8px;
    border-radius: 6px;
    margin: 1px;
@@ -277,12 +276,14 @@
    .remove-btn {
       margin-left: 6px;
       cursor: pointer;
-      color: #ff0000;
+      color: #ff0000 !important;
       font-weight: bold;
    }
 
    .user-pill .remove-btn {
-      color: #ff0000;
+      color: #ff0000 !important;
+      -webkit-text-fill-color: #ff0000 !important;
+      opacity: 1 !important;
    }
 
    .add-friend-btn:disabled,
