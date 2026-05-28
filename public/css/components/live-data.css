@@ -650,6 +650,8 @@ api-sports-widget .modal-widget-close {
 
   api-sports-widget .calendar-popup {
     position: fixed !important;
+    top: none;
+    left: none;
     z-index: 999999 !important;
     max-height: 80vh !important;
     overflow-y: auto !important;
