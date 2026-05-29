@@ -373,8 +373,9 @@ export const LeagueManager = {
       pill.className = "user-pill";
       pill.textContent = user.username;
 
-      const removeBtn = document.createElement("span");
-      removeBtn.textContent = "✖";
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.innerHTML = "&times;";
       removeBtn.className = "remove-btn";
       removeBtn.onclick = () => {
         accessContainer.removeChild(pill);
