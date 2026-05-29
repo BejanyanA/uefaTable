@@ -7,6 +7,7 @@ import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { initHomeOptionButtons } from './modules/HomeOptions.js';
 import { initRouter } from "../js/modules/router.js"; // adjust path if needed
+import { initMessagesPage } from "./modules/Messages.js";
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
    initRouter();
    checkLoggedIn();
    initHomeOptionButtons();
+   initMessagesPage();
    window.logout = logout;
 
    const action = sessionStorage.getItem("postLogoutAction");

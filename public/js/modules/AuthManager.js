@@ -72,6 +72,7 @@ export const AuthManager = {
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
+            document.getElementById("messagesBtn").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
             initNotifications();
@@ -91,6 +92,7 @@ export const AuthManager = {
               document.getElementById("headerUsername").style.display = "block";
               document.getElementById("notificationBell").style.display = "block";
               document.getElementById("profileMenu").style.display = "block";
+              document.getElementById("messagesBtn").style.display = "block";
               document.getElementById("homePageIcon").style.display = "none";
               document.getElementById("loginBtn").style.display = "none";
               document.getElementById("registerBtn").style.display = "none";
@@ -111,6 +113,7 @@ export const AuthManager = {
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
+            document.getElementById("messagesBtn").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
             initNotifications();

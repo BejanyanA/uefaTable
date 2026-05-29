@@ -9,7 +9,7 @@
   transition: color 0.2s ease;
   margin-right: 8px;
   padding-right: 1px;
-  padding-left: 12px;
+  padding-left: 0px;
   /* A bit of space before the profile icon */
 }
 
@@ -67,7 +67,7 @@
     font-size: 1.1em;
     /* Smaller bell icon */
     padding-right: 1px;
-    padding-left: 10px;
+    padding-left: 0px;
   }
 
   /* F. Notification Badge */

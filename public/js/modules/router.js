@@ -10,6 +10,7 @@ import { renderLeagueGroupStandingsPage } from './components/renderLeagueStandin
 import { renderNationalTable, renderNationalInstances } from './components/renderNationalTable.js';
 import { renderNationalKnockoutsStage, renderNationalOnlyKnockouts } from './components/renderNationalKnockout.js';
 import { renderNationalGroupStandingsPage } from './components/renderNationalStandings.js';
+import { openMessagesPage } from './Messages.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
 
@@ -557,18 +558,18 @@ function validateMeNonBlockingOrRedirect() {
 
 const routes = {
     home: {
-    id: "homePage",
-    onEnter: () => {
-        // Hide the home icon on the home page
-        const homeIcon = document.getElementById("homePageIcon");
-        if (homeIcon) homeIcon.style.display = "none";
+        id: "homePage",
+        onEnter: () => {
+            // Hide the home icon on the home page
+            const homeIcon = document.getElementById("homePageIcon");
+            if (homeIcon) homeIcon.style.display = "none";
+        },
+        onLeave: () => {
+            // Show the home icon when leaving the home page
+            const homeIcon = document.getElementById("homePageIcon");
+            if (homeIcon) homeIcon.style.display = "block";
+        }
     },
-    onLeave: () => {
-        // Show the home icon when leaving the home page
-        const homeIcon = document.getElementById("homePageIcon");
-        if (homeIcon) homeIcon.style.display = "block";
-    }
-},
 
     live: {
         id: "liveDataPage",
@@ -579,6 +580,29 @@ const routes = {
         onLeave: () => {
             sessionStorage.removeItem("actionForLive");
             closeLiveData();
+        }
+    },
+
+
+    messages: {
+        id: "messagesPage",
+        guard: () => {
+            if (!isLoggedIn()) {
+                location.hash = "home";
+                return false;
+            }
+            return true;
+        },
+
+        onEnter: () => {
+            setHomeOptionsVisible(false);
+            openMessagesPage();
+        },
+
+        onLeave: () => {
+            const messages = document.getElementById("messagesPage");
+            if (messages) messages.style.display = "none";
+            setHomeOptionsVisible(true);
         }
     },
 
@@ -641,7 +665,7 @@ const routes = {
             return true;
         },
         onEnter: () => {
-            setHomeOptionsVisible(false);        // hide home options
+            setHomeOptionsVisible(false);    // hide home options
             setCustomCompetitionVisible(true);   // show bannerContainer + banners
         },
         onLeave: () => {

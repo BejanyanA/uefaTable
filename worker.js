@@ -42,6 +42,12 @@ import { handleUpdateNationalOnlyKnockoutWinner } from './routes_endpoints/natio
 import { handleGetNationalPlayers } from './routes_endpoints/national/national_player.js';
 import { handleAttachNationalPlayers, handleAttachNationalKnockPlayers, handleAttachNationalOnlyKnockPlayers } from './routes_endpoints/national/attach_national_player.js';
 
+// Messaging
+import { handleConversations } from './routes_endpoints/conversations.js';
+import { handleMessages } from './routes_endpoints/messages.js';
+import { handleConversationMessages } from './routes_endpoints/conversation-messages.js';
+import { handleMyConversations } from './routes_endpoints/my_conversations.js';
+
 
 // Route registry with path as key and allowed methods as subkeys
 const routeRegistry = {
@@ -107,6 +113,13 @@ const routeRegistry = {
   "/attach-national-players": { POST: handleAttachNationalPlayers },
   "/attach-national-knock-players": { POST: handleAttachNationalKnockPlayers },
   "/attach-national-round-knock-players": { POST: handleAttachNationalOnlyKnockPlayers },
+
+  // Messaging
+  "/conversations": { POST: handleConversations },
+  "/messages": { POST: handleMessages },
+  "/conversation-messages": { POST: handleConversationMessages },
+  "/my-conversations": { POST: handleMyConversations },
+
 
 };
 

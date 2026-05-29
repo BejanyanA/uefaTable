@@ -21,6 +21,7 @@ export async function checkLoggedIn() {
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
+         document.getElementById("messagesBtn").style.display = "block";
          document.getElementById("homePageIcon").style.display = "none";
          localStorage.setItem('user', JSON.stringify(data.user));
          localStorage.removeItem("lastActiveLeagueTab");
@@ -63,6 +64,7 @@ export function homepage() {
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
+            document.getElementById("messagesBtn").style.display = "block";
             document.getElementById("homePageIcon").style.display = "none";
             localStorage.setItem('user', JSON.stringify(response.user));
             localStorage.removeItem("lastActiveLeagueTab");
@@ -109,6 +111,7 @@ export function logout() {
    document.getElementById("notificationBell").style.display = "none";
    document.getElementById("headerUsername").style.display = "none";
    document.getElementById("profileMenu").style.display = "none";
+   document.getElementById("messagesBtn").style.display = "none";
 
    document.getElementById("loginBtn").style.display = "inline-block";
    document.getElementById("registerBtn").style.display = "inline-block";

@@ -71,6 +71,7 @@
   <link rel="stylesheet" href="css/components/profile-menu.css">
   <link rel="stylesheet" href="css/components/friend-menu.css">
   <link rel="stylesheet" href="css/components/notification-bell.css">
+  <link rel="stylesheet" href="css/components/messages.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print"
     onload="this.media='all'">
@@ -119,6 +120,12 @@
     <div class="header-username" id="headerUsername" style="display: none;">
       <h2 id="headerUsernameTitle"></h2>
     </div>
+
+
+    <div class="messages-btn" id="messagesBtn" style="display: none;">
+      <img src="assets/icons/messageIcon.webp" alt="messageIcon" id="messageIcon" class="message-icon" />
+    </div>
+
 
     <div class="notification-bell" id="notificationBell" style="display: none;">
       <i class="fa-regular fa-bell"></i>
@@ -441,6 +448,49 @@
       <div id="leagueGroupsWrapper" class="league-background-wrapper" style="display: none;"></div>
       <div class="tab-content" data-content="standings"></div>
       <div class="tab-content hidden" data-content="matches"></div>
+    </section>
+
+
+    <!--  Messages -->
+    <section id="messagesPage" style="display:none;">
+      <div class="chat-layout">
+
+        <aside class="conversation-panel">
+          <div class="chat-tabs">
+            <button class="chat-tab-btn active" data-tab="all">
+              Chats
+            </button>
+
+            <button class="chat-tab-btn" data-tab="friends">
+              Friends
+            </button>
+          </div>
+
+          <div id="conversationList"></div>
+        </aside>
+
+        <div class="chat-area">
+          <div id="emptyChatState" class="empty-chat-state">
+            Select a chat to start messaging
+          </div>
+
+          <div id="activeChatBox" class="active-chat-box" style="display:none;">
+            <span id="chatHeaderName" class="chat-header" ></span>
+            <button id="chatBackBtn" class="chat-back-btn">←</button>
+            
+            <div id="messagesContainer"></div>
+
+            <div class="message-input-row">
+              <input id="messageInput" type="text" placeholder="Type a message..." />
+
+              <button id="sendMessageBtn">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </section>
 
 
