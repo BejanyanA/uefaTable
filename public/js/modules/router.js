@@ -807,9 +807,9 @@ export function initRouter() {
         const hashChanged = raw !== prevHash;                   // ✅ NEW
 
         // ✅ NEW: call /me ONLY for those 3 destinations
-        if (isLoggedIn() && shouldValidateMe(nextKey, next)) {
-            validateMeNonBlockingOrRedirect();
-        }
+        // if (isLoggedIn() && shouldValidateMe(nextKey, next)) {
+        //     validateMeNonBlockingOrRedirect();
+        // }
 
 
         // guard (auth check)

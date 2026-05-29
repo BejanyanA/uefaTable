@@ -8,6 +8,7 @@ import { getCountries } from './GetWorldCountries.js';
 import { getEuropeCountries } from './GetEuropeCountries.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { renderNationalTable } from './components/renderNationalTable.js';
+import { customLeagues } from './CustomLeagues.js';
 
 
 export const LeagueManager = {
@@ -260,7 +261,7 @@ export const LeagueManager = {
     backBtn.addEventListener("click", async () => {
       location.hash = "leagues";
       const token = localStorage.getItem("authToken");
-
+      customLeagues()
       // try {
       //   const response = await apiGet("/me", token);
       //   if (response.success && response.user) {
@@ -281,6 +282,8 @@ export const LeagueManager = {
     document.getElementById("openBtn").addEventListener("click", () => {
       const modal = document.getElementById("tableModal");
       modal.style.display = "none";
+
+      customLeagues()
 
       const bannerId = Number(modal.dataset.bannerId);
       if (!bannerId) return;

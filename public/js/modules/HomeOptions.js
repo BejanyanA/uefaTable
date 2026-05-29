@@ -1,5 +1,7 @@
 import { langMap, currentLang } from "./LanguageManager.js";
 import { apiGet } from '../services/api.js';
+import { customLeagues } from './CustomLeagues.js';
+import { checkLoggedIn } from './MeHomepage.js';
 
 export function isLoggedIn() {
    const token = localStorage.getItem("authToken");
@@ -60,14 +62,20 @@ export function initHomeOptionButtons() {
    });
 
    // Custom League
-   document.getElementById("btnCustomData")?.addEventListener("click", () => {
+   document.getElementById("btnCustomData")?.addEventListener("click", async () => {
       if (!isLoggedIn()) {
          sessionStorage.setItem("postLoginAction", "openCustom");
          openModal("loginModal");
          return;
       }
 
-      location.hash = "leagues"; // router will show leagueType1 (or your page)
+      try {
+         customLeagues()
+         location.hash = "leagues";
+      } catch (error) {
+         console.error("Failed to load custom leagues:", error);
+         showToast("Failed to load leagues", "error");
+      }
    });
 
    // Banner back (custom league back)
@@ -77,6 +85,9 @@ export function initHomeOptionButtons() {
       backBtn.textContent = translation.backButton;
       backBtn.addEventListener("click", async () => {
          location.hash = "home";
+         if (!checkLoggedIn()) {
+            showHomePage()
+         }
       });
    }
 }

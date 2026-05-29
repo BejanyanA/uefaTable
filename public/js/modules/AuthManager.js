@@ -5,6 +5,7 @@ import { setError, clearErrors } from '../utils/helper.js';
 import { apiPost, apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
 import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } from "./HomeOptions.js";
+import { customLeagues } from './CustomLeagues.js';
 
 export const AuthManager = {
   initLogin: function () {
@@ -89,6 +90,7 @@ export const AuthManager = {
 
           if (custome === "openCustom") {
             // user came here by clicking Custom League
+            customLeagues();
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
             location.hash = "leagues";

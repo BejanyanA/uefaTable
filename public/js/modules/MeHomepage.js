@@ -1,5 +1,6 @@
 import { apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
+import { customLeagues } from './CustomLeagues.js';
 
 // 🔹 JWT Check on Load
 export async function checkLoggedIn() {
@@ -17,9 +18,6 @@ export async function checkLoggedIn() {
    try {
       const data = await apiGet("/me", token); // ✅ Cleaner
       if (data.success && data.user) {
-         // document.getElementById("logoutButtn").style.display = "block";
-         // document.getElementById("homePage").style.display = "block";
-         // document.getElementById("homeOptionsBlock").style.display = "block";
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
