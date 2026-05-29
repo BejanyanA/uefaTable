@@ -61,49 +61,66 @@ export const AuthManager = {
         if (loginData.success && loginData.token) {
           localStorage.setItem("authToken", loginData.token);
 
-          const me = await apiGet("/me");
-          if (me.success) {
+          // Read post‑login flags
+          const postLoginAction = sessionStorage.getItem("postLoginAction"); // e.g. 'openCustom'
+          const actionForLive = sessionStorage.getItem("actionForLive");   // e.g. 'openLive'
+
+          // Scenario 1: user clicked Custom League while not logged in
+          if (postLoginAction === "openCustom") {
+            sessionStorage.removeItem("postLoginAction");
+
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
-            document.getElementById("liveDataPage").style.display = "none";
-            localStorage.setItem('user', JSON.stringify(me.user));
             initNotifications();
 
-            // ✅ Immediately update the username in header
-            const usernameEl = document.getElementById("headerUsernameTitle");
-            if (usernameEl && me.user.username) {
-              usernameEl.textContent = me.user.username;
-            }
-          }
-
-          const custome = sessionStorage.getItem("postLoginAction");
-          const live = sessionStorage.getItem("actionForLive");
-
-          // default: show homepage options after login
-          setHomeOptionsVisible(true);
-          setCustomCompetitionVisible(false);
-          // document.getElementById("homePage").style.display = "block";
-          // document.getElementById("homeOptionsBlock").style.display = "block";
-
-          if (custome === "openCustom") {
-            // user came here by clicking Custom League
-            customLeagues();
+            await customLeagues();               // call your custom‑league API here
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
             location.hash = "leagues";
-          }
 
-          else if (live === "openLive") {
-            // user came here by clicking Custom League
+            // Scenario 3: user just clicked the login button normally
+          } else {
+            // Fetch the user profile
+            const me = await apiGet("/me", localStorage.getItem("authToken"));
+            if (me.success) {
+              // Update UI with user data
+              localStorage.setItem("user", JSON.stringify(me.user));
+              document.getElementById("headerUsername").style.display = "block";
+              document.getElementById("notificationBell").style.display = "block";
+              document.getElementById("profileMenu").style.display = "block";
+              document.getElementById("loginBtn").style.display = "none";
+              document.getElementById("registerBtn").style.display = "none";
+              const usernameEl = document.getElementById("headerUsernameTitle");
+              if (usernameEl && me.user.username) {
+                usernameEl.textContent = me.user.username;
+              }
+              initNotifications();
+            }
+            // Default home page state
+            setHomeOptionsVisible(true);
+            setCustomCompetitionVisible(false);
+
+            // Scenario 2: user clicked Live while not logged in
+          } if (actionForLive === "openLive") {
+            sessionStorage.removeItem("actionForLive");
+
+            document.getElementById("headerUsername").style.display = "block";
+            document.getElementById("notificationBell").style.display = "block";
+            document.getElementById("profileMenu").style.display = "block";
+            document.getElementById("loginBtn").style.display = "none";
+            document.getElementById("registerBtn").style.display = "none";
+            initNotifications();
+
             setLiveVisible(true);
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(false);
             location.hash = "live";
           }
 
+          // Close the modal regardless of scenario
           closeModal("loginModal");
 
         } else {
