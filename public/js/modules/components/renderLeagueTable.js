@@ -8,6 +8,7 @@ import { getLeagueIdForContext } from '../router.js';
 import { setGroupIdForContext } from '../router.js';
 import { setGroupSelectionForContext } from '../router.js';
 import { getGroupLetterFromName } from '../router.js';
+import { checkLoggedIn } from '../MeHomepage.js';
 
 export function renderLeagueTable(data) {
   const translation = langMap[currentLang];
@@ -23,6 +24,12 @@ export function renderLeagueTable(data) {
   backBtn.id = "backBtn";
 
   backBtn.addEventListener("click", async () => {
+
+    if (!checkLoggedIn()) {
+      location.hash = "home";
+      showHomePage()
+    }
+
     localStorage.removeItem("lastActiveLeagueTab");
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
@@ -320,6 +327,12 @@ export function renderLeagueInstances(instanceData, options = {}) {
   backBtn.textContent = translation.backButton;
   backBtn.id = "backBtn";
   backBtn.addEventListener("click", async () => {
+
+    if (!checkLoggedIn()) {
+      location.hash = "home";
+      showHomePage()
+    }
+
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
     const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";
