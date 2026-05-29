@@ -139,13 +139,6 @@
    font-size: 12px;
 }
 
-.user-pill .remove-btn {
-   margin-left: 8px;
-   color: #ff0000;
-   font-weight: bold;
-   cursor: pointer;
-}
-
 .remove-btn {
    margin-left: 6px;
    cursor: pointer;
@@ -274,16 +267,10 @@
    }
 
    .remove-btn {
-      margin-left: 6px;
+      margin-left: 8px;
       cursor: pointer;
       color: #ff0000 !important;
       font-weight: bold;
-   }
-
-   .user-pill .remove-btn {
-      color: #ff0000 !important;
-      -webkit-text-fill-color: #ff0000 !important;
-      opacity: 1 !important;
    }
 
    .add-friend-btn:disabled,
