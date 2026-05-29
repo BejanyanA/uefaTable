@@ -204,9 +204,8 @@ api-sports-widget[data-type="standings"] th:nth-child(7) {
 }
 
 api-sports-widget .calendar-popup {
-  position: fixed !important;
-  top: 130px !important;
-  right: 40px !important;
+  top: 25px !important;
+  right: 42px !important;
   z-index: 999999 !important;
   max-height: 80vh !important;
   overflow-y: auto !important;
