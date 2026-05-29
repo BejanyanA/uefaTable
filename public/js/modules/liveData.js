@@ -973,17 +973,22 @@ function initWidgetTranslationObserver() {
 // ---------- public API ----------
 export async function openLiveData() {
    setLiveDataVisible(true);
+
    await loadApiSportsWidgetsOnce();
-   remountApiSportsWidgets();
+
    initLiveTabsOnce();
+
+   setActiveTab("allGames");
+
+   await new Promise(requestAnimationFrame);
+
    ensureConfigWidget();
+   remountApiSportsWidgets();
 
    initWidgetTranslationObserver();
    initPopupTranslationHooks();
    translateWidgetTexts();
    initApiSportsModalX();
-
-   setActiveTab("allGames");
 }
 
 export function closeLiveData() {

@@ -258,6 +258,27 @@ api-sports-widget .modal-widget-close {
   flex-shrink: 0;
 }
 
+.table-widget th:first-of-type {
+  text-align: left;
+  padding-left: 0px;
+  padding-right: 8px;
+}
+
+.standings-table tr th {
+  font-size: 14px;
+}
+
+.standings-table th,
+.standings-table td {
+  font-size: 12px;
+}
+
+:where(api-sports-widget.initialized:not([data-type=config])) h3,
+.modal-widget h3 {
+
+  font-size: 14px
+}
+
 .matchesLayout {
   display: grid;
   grid-template-columns: 260px 1fr;
