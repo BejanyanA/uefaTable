@@ -201,7 +201,7 @@ export const ProfileManager = {
 
     // ✅ Tabs header
     const tabsHeader = document.createElement("div");
-    tabsHeader.className = "tab-switcher tabs-container";
+    tabsHeader.className = "tab-switcher-user tabs-container";
     tabsHeader.id = "profileTabsHeader";
 
     // Build tab buttons

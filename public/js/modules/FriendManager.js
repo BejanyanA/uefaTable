@@ -141,7 +141,7 @@ export const FriendManager = {
 
     // ✅ Tabs header (always shown now since we have some data)
     const tabsHeader = document.createElement("div");
-    tabsHeader.className = "tab-switcher status-tabs-container";
+    tabsHeader.className = "tab-switcher-user status-tabs-container";
     tabsHeader.id = "friendsStatusesContainer";
 
     // --- after: const tabsHeader = document.createElement("div"); tabsHeader.className = "tab-switcher"; tabsHeader.id = "friendsTab";

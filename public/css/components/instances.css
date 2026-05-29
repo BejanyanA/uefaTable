@@ -79,6 +79,51 @@
     font-size: 16px;
 }
 
+
+
+
+.tab-switcher-user {
+    position: fixed;
+    display: flex;
+    gap: 10px;
+    margin: 90px 0;
+    margin-bottom: 10px;
+    z-index: 100;
+}
+
+.tab-switcher-user button {
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s, transform 0.1s;
+    white-space: nowrap;
+    width: auto;
+    text-align: center;
+    box-sizing: content-box;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.tab-switcher-user button:hover {
+    /* background: rgba(255, 255, 255, 0.12); */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.tab-switcher-user .active-tab {
+    background: rgb(255, 255, 255);
+    color: black;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+
+
+
+
+
+
 .tab-switcher {
     position: fixed;
     display: flex;
@@ -147,6 +192,23 @@
     .tab-switcher button {
         padding: 8px 10px;
     }
+
+
+
+    .tab-switcher-user {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 1px;
+        margin-top: 80px;
+        position: fixed;
+    }
+
+    .tab-switcher-user button {
+        padding: 8px 10px;
+    }
+
+
+
 
     .league-instance {
         margin-top: 10px;

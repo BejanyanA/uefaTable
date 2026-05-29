@@ -8,7 +8,7 @@
   gap: 16px;
   margin: 30px auto;
   padding-right: 0px;
-  margin-top: 265px;
+  margin-top: 230px;
   flex-wrap: wrap;
 }
 
@@ -213,7 +213,8 @@
   display: flex;
   gap: 5px;
   /* margin-bottom: 25px; */
-  margin-top: 200px;
+  left: 22px;
+  margin-top: 160px;
   padding: 8px;
   background-color: rgba(90, 87, 87, 0.308);
   border-radius: 8px;
@@ -291,7 +292,7 @@
 
 #searchResultsContainer {
   max-width: 600px;
-  margin: 260px 0 0;
+  margin: 218px 0 0;
   padding: 0;
 }
 
@@ -447,8 +448,8 @@
     flex-wrap: wrap;
     gap: 8px;
     margin: 0px;
-    padding-top: 250px;
-    padding-left: 2px;
+    padding-top: 203px;
+    padding-left: 1px;
     padding-right: 0px;
     text-align: start;
     flex-direction: column;
@@ -574,8 +575,8 @@
   .add-friend-bar {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 190px;
-    left: 15px;
+    margin-top: 145px;
+    left: 13px;
     right: 0px;
     width: 90%;
   }
@@ -622,7 +623,7 @@
 
   #searchResultsContainer {
     max-width: 600px;
-    margin: 240px auto 0;
+    margin: 194px auto 0;
     padding: 0;
     margin-left: 1px;
   }

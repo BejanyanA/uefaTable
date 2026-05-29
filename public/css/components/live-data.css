@@ -27,7 +27,7 @@
   border-radius: 12px;
   cursor: pointer;
   margin: 10px;
-  top: 87px;
+  top: 85px;
   left: 15px;
   z-index: 1;
   text-align: center;
@@ -257,17 +257,17 @@ api-sports-widget .modal-widget-close {
   flex-shrink: 0;
 }
 
-.table-widget th:first-of-type {
+api-sports-widget .table-widget th:first-of-type {
   text-align: left;
   padding-left: 0px;
   padding-right: 8px;
 }
 
-.standings-table tr th {
+api-sports-widget .standings-table tr th {
   font-size: 14px;
 }
 
-.standings-table th,
+api-sports-widget .standings-table th,
 .standings-table td {
   font-size: 12px;
 }
@@ -475,7 +475,7 @@ api-sports-widget .modal-widget-close {
   }
 
   .liveWidgetCard {
-    margin: 20px 10px 10px;
+    margin: 0px 10px 10px;
     border: 1px solid rgba(255, 255, 255, .15);
     background: rgba(0, 0, 0, .20);
     border-radius: 16px;
@@ -484,7 +484,7 @@ api-sports-widget .modal-widget-close {
 
   .liveBackBtn {
     left: 3px;
-    top: 60px;
+    top: 65px;
     width: 40px;
   }
 
@@ -626,7 +626,7 @@ api-sports-widget .modal-widget-close {
 
   .liveBackBtn {
     left: 3px;
-    top: 60px;
+    top: 65px;
     width: 40px;
   }
 
