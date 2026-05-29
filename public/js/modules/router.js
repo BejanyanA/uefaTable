@@ -557,8 +557,18 @@ function validateMeNonBlockingOrRedirect() {
 
 const routes = {
     home: {
-        id: "homePage"
+    id: "homePage",
+    onEnter: () => {
+        // Hide the home icon on the home page
+        const homeIcon = document.getElementById("homePageIcon");
+        if (homeIcon) homeIcon.style.display = "none";
     },
+    onLeave: () => {
+        // Show the home icon when leaving the home page
+        const homeIcon = document.getElementById("homePageIcon");
+        if (homeIcon) homeIcon.style.display = "block";
+    }
+},
 
     live: {
         id: "liveDataPage",

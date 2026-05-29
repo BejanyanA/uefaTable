@@ -33,7 +33,9 @@ function showHomePage() {
    // document.getElementById("homeOptionsBlock").style.display = "block";
    setHomeOptionsVisible(true);
    setCustomCompetitionVisible(false);
+   document.getElementById("homePageIcon").style.display = "none";
    document.getElementById("bannerContainer").style.display = "none";
+   document.getElementById("homePageIcon").style.display = "block";
 }
 
 function hideHomePage() {
@@ -42,6 +44,7 @@ function hideHomePage() {
    setCustomCompetitionVisible(false);
    document.getElementById("bannerContainer").style.display = "none";
    document.getElementById("homePage").style.display = "none";
+   document.getElementById("homePageIcon").style.display = "block";
 }
 
 export function initHomeOptionButtons() {
@@ -85,6 +88,7 @@ export function initHomeOptionButtons() {
       backBtn.textContent = translation.backButton;
       backBtn.addEventListener("click", async () => {
          location.hash = "home";
+         document.getElementById("homePageIcon").style.display = "block";
          if (!checkLoggedIn()) {
             showHomePage()
          }

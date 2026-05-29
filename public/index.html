@@ -84,28 +84,36 @@
   <!-- Header  -->
   <header>
     <div class="language-auth-group">
-      <div class="language-switcher">
-        <img src="assets/flags/en.svg" alt="Language" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
-        <div id="langDropdown" class="dropdown-menu">
-          <div class="language-option" onclick="setLanguage('en')">
-            <img src="assets/flags/en.svg" />
-            <span>English</span>
-          </div>
-          <div class="language-option" onclick="setLanguage('am')">
-            <img src="assets/flags/am.svg" />
-            <span>Հայերեն</span>
-          </div>
-          <div class="language-option" onclick="setLanguage('fr')">
-            <img src="assets/flags/fr.svg" />
-            <span>Français</span>
+      <div class="header-left">
+        <div class="language-switcher">
+          <img src="assets/flags/en.svg" alt="Language" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
+          <div id="langDropdown" class="dropdown-menu">
+            <div class="language-option" onclick="setLanguage('en')">
+              <img src="assets/flags/en.svg" />
+              <span>English</span>
+            </div>
+            <div class="language-option" onclick="setLanguage('am')">
+              <img src="assets/flags/am.svg" />
+              <span>Հայերեն</span>
+            </div>
+            <div class="language-option" onclick="setLanguage('fr')">
+              <img src="assets/flags/fr.svg" />
+              <span>Français</span>
+            </div>
           </div>
         </div>
+        <div class="home-page-icon" id="homePageIcon" style="display: none;">
+          <img src="assets/icons/homeIcon.webp" alt="homeIcon" class="home-icon" />
+        </div>
       </div>
+
       <div class="auth-buttons" style="display: none;" id="authButtons">
         <button onclick="openModal('loginModal')" id="loginBtn">Login</button>
         <button onclick="openModal('registerModal')" id="registerBtn">Sign Up</button>
       </div>
+
     </div>
+
 
 
     <div class="header-username" id="headerUsername" style="display: none;">
@@ -266,7 +274,8 @@
                 <div class="choiceSub" id="customLeagueTitle">Create & Manage your own leagues</div>
               </div>
             </div>
-            <div class="choiceSubDescr" id="customLeagueDescription">Build your own league, invite friends and track standings.</div>
+            <div class="choiceSubDescr" id="customLeagueDescription">Build your own league, invite friends and track
+              standings.</div>
             <div class="choiceBottom">
               <span class="choiceHint" id="openCustomleague">Open Custom Leagues</span>
               <span class="choiceArrow">→</span>
@@ -523,7 +532,7 @@
         updateTeamCountOptions(true);
       }
 
-      
+
 
       // -------- User dropdown ----------
       const userIcon = document.getElementById("userIcon");

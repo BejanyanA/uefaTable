@@ -804,25 +804,25 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 //       });
 // }
 
-let apiSportsModalXStarted = false;
+// let apiSportsModalXStarted = false;
 
-export function initApiSportsModalX() {
-   if (apiSportsModalXStarted) return;
-   apiSportsModalXStarted = true;
+// export function initApiSportsModalX() {
+//    if (apiSportsModalXStarted) return;
+//    apiSportsModalXStarted = true;
 
-   // Observe BODY because modal-component is appended dynamically
-   const obs = new MutationObserver(() => {
-      injectApiSportsModalX();
-   });
+//    // Observe BODY because modal-component is appended dynamically
+//    const obs = new MutationObserver(() => {
+//       injectApiSportsModalX();
+//    });
 
-   obs.observe(document.body, { childList: true, subtree: true });
+//    obs.observe(document.body, { childList: true, subtree: true });
 
-   // Run immediately + retries
-   injectApiSportsModalX();
-   requestAnimationFrame(injectApiSportsModalX);
-   setTimeout(injectApiSportsModalX, 150);
-   setTimeout(injectApiSportsModalX, 400);
-}
+//    // Run immediately + retries
+//    injectApiSportsModalX();
+//    requestAnimationFrame(injectApiSportsModalX);
+//    setTimeout(injectApiSportsModalX, 150);
+//    setTimeout(injectApiSportsModalX, 400);
+// }
 
 
 
@@ -988,7 +988,7 @@ export async function openLiveData() {
    initWidgetTranslationObserver();
    initPopupTranslationHooks();
    translateWidgetTexts();
-   initApiSportsModalX();
+   // initApiSportsModalX();
 }
 
 export function closeLiveData() {

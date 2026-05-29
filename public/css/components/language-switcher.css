@@ -9,6 +9,23 @@
    width: 100%;
 }
 
+.header-left {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+}
+
+.home-icon {
+   display: block;
+   width: 50px;
+   height: 50px;
+   object-fit: cover;
+   border-radius: 50%;
+   object-position: center;
+   cursor: pointer;
+
+}
+
 .language-switcher {
    position: relative;
    margin-right: 15px;
@@ -95,6 +112,22 @@
       justify-content: space-between;
       /* ⬅️ Language left, buttons right */
       width: 100%;
+   }
+
+   .header-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+   }
+
+   .home-icon {
+      display: block;
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 50%;
+      object-position: center;
+      cursor: pointer;
    }
 
    .language-switcher {

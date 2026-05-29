@@ -8,7 +8,7 @@ import { getLeagueIdForContext } from '../router.js';
 import { setGroupIdForContext } from '../router.js';
 import { setGroupSelectionForContext } from '../router.js';
 import { getGroupLetterFromName } from '../router.js';
-import { checkLoggedIn } from '../MeHomepage.js';
+import { customLeagues } from '../CustomLeagues.js';
 
 export function renderNationalTable(data) {
   const translation = langMap[currentLang];
@@ -26,12 +26,10 @@ export function renderNationalTable(data) {
 
   backBtn.addEventListener("click", async () => {
 
-    if (!checkLoggedIn()) {
-      location.hash = "home";
-      showHomePage()
-    }
+    customLeagues()
 
     localStorage.removeItem("lastActiveNationalLeagueTab");
+    document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     if (bannerId === 1) location.hash = "#champions-league";
@@ -332,6 +330,8 @@ export function renderNationalInstances(instanceData, options = {}) {
   backBtn.class = "backButtn";
 
   backBtn.addEventListener("click", async () => {
+
+    document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     const stageType = Number(localStorage.getItem("selectedStageType")) || 1;

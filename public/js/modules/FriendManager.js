@@ -4,7 +4,7 @@ import { apiGet, apiPost } from '../services/api.js';
 import { showToast } from '../utils/toast.js';
 import { markSeenIfUnread } from './NotificationManager.js';
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
-
+import { homepage } from "./MeHomepage.js";
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
   const username = friendsSearchInput.value.trim();
@@ -127,38 +127,17 @@ export const FriendManager = {
 
       friendsLink.addEventListener("click", (e) => {
         e.preventDefault?.();
+
+        document.getElementById("homePageIcon").style.display = "block";
+
         location.hash = "friends"; // ✅ routing only
       });
+
+      homepage()
+
     }
 
     section.innerHTML = "";
-    const homeButton = document.createElement("button");
-    homeButton.textContent = translation.homeButton;
-    homeButton.id = "homeButton";
-
-    homeButton.addEventListener("click", async () => {
-      const token = localStorage.getItem("authToken");
-      location.hash = "home";
-
-      try {
-        const response = await apiGet("/me", token);
-        if (response.success && response.user) {
-
-          setHomeOptionsVisible(true);
-          setCustomCompetitionVisible(false);
-        } else {
-          localStorage.removeItem("authToken");
-          if (authButtons) authButtons.style.display = "flex";
-          document.getElementById("bannerContainer").style.display = "none";
-        }
-      } catch (err) {
-        console.error("🔴 Error in Back button to /me:", err);
-        localStorage.removeItem("authToken");
-        if (authButtons) authButtons.style.display = "flex";
-      }
-    });
-
-    section.appendChild(homeButton);
 
     // ✅ Tabs header (always shown now since we have some data)
     const tabsHeader = document.createElement("div");

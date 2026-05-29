@@ -6,6 +6,7 @@ import { isValidEmail, isValidPassword, detectSpace } from '../utils/validators.
 import { setError, clearErrors } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
+import { homepage } from "./MeHomepage.js";
 
 const ACTIVE_CLASS = "active-tab";
 
@@ -26,6 +27,9 @@ export const ProfileManager = {
 
       profileLink.addEventListener("click", (e) => {
         e.preventDefault();                 // ✅ important if it's <a href="...">
+
+        document.getElementById("homePageIcon").style.display = "block";
+
         location.hash = "profile";
       });
     }
@@ -185,41 +189,15 @@ export const ProfileManager = {
           resetActiveEditingState();
         }
       });
+
+      homepage()
+
     }
 
     // Clear previous content
     section.innerHTML = "";
 
-    // --- 1. Home Button Logic (First required block) ---
-    const homeButton = document.createElement("button");
-    homeButton.textContent = translation.homeButton;
-    homeButton.id = "homeButton";
 
-    homeButton.addEventListener("click", async () => {
-      const token = localStorage.getItem("authToken");
-      location.hash = "home";
-
-      try {
-        const response = await apiGet("/me", token);
-        if (response.success && response.user) {
-          // Start of first required block logic
-          setHomeOptionsVisible(true);
-          setCustomCompetitionVisible(false);
-
-          // End of first required block logic
-        } else {
-          localStorage.removeItem("authToken");
-          if (authButtons) authButtons.style.display = "flex";
-          document.getElementById("bannerContainer").style.display = "none";
-        }
-      } catch (err) {
-        console.error("🔴 Error in Back button to /me:", err);
-        localStorage.removeItem("authToken");
-        if (authButtons) authButtons.style.display = "flex";
-      }
-    });
-
-    section.appendChild(homeButton);
 
     // ✅ Tabs header
     const tabsHeader = document.createElement("div");

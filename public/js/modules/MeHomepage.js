@@ -21,6 +21,7 @@ export async function checkLoggedIn() {
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
+         document.getElementById("homePageIcon").style.display = "none";
          localStorage.setItem('user', JSON.stringify(data.user));
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");
@@ -47,6 +48,49 @@ export async function checkLoggedIn() {
       if (authButtons) authButtons.style.display = "flex";
       if (bannerSection) bannerSection.style.display = "none";
    }
+}
+
+export function homepage() {
+   const homeButton = document.getElementById("homePageIcon");
+
+   homeButton.addEventListener("click", async () => {
+      const token = localStorage.getItem("authToken");
+      location.hash = "home";
+
+      try {
+         const response = await apiGet("/me", token);
+         if (response.success && response.user) {
+            document.getElementById("headerUsername").style.display = "block";
+            document.getElementById("notificationBell").style.display = "block";
+            document.getElementById("profileMenu").style.display = "block";
+            document.getElementById("homePageIcon").style.display = "none";
+            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.removeItem("lastActiveLeagueTab");
+            localStorage.removeItem("lastActiveNationalLeagueTab");
+
+            const usernameEl = document.getElementById("headerUsernameTitle");
+            if (usernameEl && response.user.username) {
+               usernameEl.textContent = response.user.username;
+            }
+
+         } else {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("leaguesActiveTab");
+            localStorage.removeItem("lastActiveLeagueTab");
+            localStorage.removeItem("lastActiveNationalLeagueTab");
+            localStorage.removeItem("user");
+            localStorage.removeItem("currentBannerId");
+            localStorage.removeItem("leagueId");
+            localStorage.removeItem("selectedStageType");
+            if (authButtons) authButtons.style.display = "flex";
+
+         }
+      } catch (err) {
+         console.error("🔴 Error in Back button to /me:", err);
+         localStorage.removeItem("authToken");
+         if (authButtons) authButtons.style.display = "flex";
+      }
+   });
 }
 
 // 🔹 Logout
