@@ -328,11 +328,6 @@ export function renderLeagueInstances(instanceData, options = {}) {
   backBtn.id = "backBtn";
   backBtn.addEventListener("click", async () => {
 
-    if (!checkLoggedIn()) {
-      location.hash = "home";
-      showHomePage()
-    }
-
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     const stageType = Number(localStorage.getItem("selectedStageType")) || 1;
     const leagueTab = localStorage.getItem("lastActiveLeagueTab") || "owners";

@@ -7,7 +7,6 @@ import { setGroupIdForContext } from '../router.js';
 import { setGroupSelectionForContext } from '../router.js';
 import { getGroupSelectionForContext } from '../router.js';
 import { getGroupLetterFromName } from '../router.js';
-import { checkLoggedIn } from '../MeHomepage.js';
 
 export async function renderNationalGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}) {
   // ✅ Backward compatible: (leagueId, groupId, opts) OR (leagueId, groupId, groupName, opts)
@@ -61,12 +60,6 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
   const backBtn = document.getElementById("nationalBackBtn");
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
-
-    if (!checkLoggedIn()) {
-      location.hash = "home";
-      showHomePage()
-    }
-
     location.hash = getNationalBackInstancesHash();
   });
 
