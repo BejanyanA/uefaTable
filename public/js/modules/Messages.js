@@ -107,7 +107,9 @@ async function loadConversations() {
 
   list.innerHTML = `<div class="empty-chat">Loading...</div>`;
 
-  const data = await apiPost("/my-conversations");
+  const data = await apiPost("/my-conversations", {}, {
+    showLoading: false
+  });
 
   if (!data.success || !data.conversations?.length) {
     list.innerHTML = `<div class="empty-chat">No conversations yet</div>`;
@@ -290,23 +292,55 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  await apiPost("/messages", {
-    conversationId: currentConversationId,
-    encryptedMessage: text
-  });
+  const sentConversationId = currentConversationId;
+
+  const response = await apiPost(
+    "/messages",
+    {
+      conversationId: sentConversationId,
+      encryptedMessage: text
+    },
+    {
+      showLoading: false
+    }
+  );
+
+  if (!response.success) return;
 
   input.value = "";
 
-  await openConversation(currentConversationId, currentFriendUsername);
+  // add message immediately to UI
+  renderSingleMessage({
+    senderId: myUserId,
+    encryptedMessage: text,
+    createdAt: new Date().toISOString()
+  });
+
+  selectedConversationId = sentConversationId;
+
+  // only refresh conversation order
+  await loadConversations();
+}
+
+function getUserTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 function formatTime(dateValue) {
   if (!dateValue) return "";
 
-  return new Date(dateValue).toLocaleTimeString([], {
+  const userTimeZone = getUserTimeZone();
+
+  const utcDateValue = dateValue.includes("T")
+    ? dateValue
+    : dateValue.replace(" ", "T") + "Z";
+
+  return new Intl.DateTimeFormat(undefined, {
+    timeZone: userTimeZone,
     hour: "2-digit",
-    minute: "2-digit"
-  });
+    minute: "2-digit",
+    hour12: false
+  }).format(new Date(utcDateValue));
 }
 
 function openMobileChatView() {
@@ -336,4 +370,30 @@ function setActiveChatItem(activeElement) {
     });
 
   activeElement.classList.add("active");
+}
+
+function renderSingleMessage(message) {
+  const container = document.getElementById("messagesContainer");
+  if (!container) return;
+
+  const row = document.createElement("div");
+  row.className = "message-row mine";
+
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble";
+
+  const text = document.createElement("div");
+  text.textContent = message.encryptedMessage;
+
+  const time = document.createElement("span");
+  time.className = "message-time";
+  time.textContent = formatTime(message.createdAt);
+
+  bubble.appendChild(text);
+  bubble.appendChild(time);
+
+  row.appendChild(bubble);
+  container.appendChild(row);
+
+  container.scrollTop = container.scrollHeight;
 }

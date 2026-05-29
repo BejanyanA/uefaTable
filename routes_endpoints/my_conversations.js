@@ -23,23 +23,43 @@ export async function handleMyConversations(request, env) {
 
   const userId = Number(user.id);
 
-  const conversations = await env.core_data.prepare(`
-    SELECT
-      c.id AS conversationId,
-      u.id AS friendId,
-      u.username AS friendUsername
-    FROM conversations c
-    JOIN users u
-      ON u.id = CASE
-          WHEN c.user1_id = ? THEN c.user2_id
-          ELSE c.user1_id
-      END
-    WHERE c.user1_id = ?
-       OR c.user2_id = ?
-    ORDER BY c.id DESC
-  `)
-  .bind(userId, userId, userId)
-  .all();
+const conversations = await env.core_data.prepare(`
+  SELECT
+    c.id AS conversationId,
+    u.id AS friendId,
+    u.username AS friendUsername,
+
+    (
+      SELECT encrypted_message
+      FROM messages m2
+      WHERE m2.conversation_id = c.id
+      ORDER BY m2.created_at DESC, m2.id DESC
+      LIMIT 1
+    ) AS lastMessage,
+
+    (
+      SELECT created_at
+      FROM messages m3
+      WHERE m3.conversation_id = c.id
+      ORDER BY m3.created_at DESC, m3.id DESC
+      LIMIT 1
+    ) AS lastMessageAt
+
+  FROM conversations c
+  JOIN users u
+    ON u.id = CASE
+      WHEN c.user1_id = ? THEN c.user2_id
+      ELSE c.user1_id
+    END
+  WHERE c.user1_id = ?
+     OR c.user2_id = ?
+  ORDER BY
+    CASE WHEN lastMessageAt IS NULL THEN 1 ELSE 0 END,
+    lastMessageAt DESC,
+    c.id DESC
+`)
+.bind(userId, userId, userId)
+.all();
 
   return Response.json({
     success: true,
