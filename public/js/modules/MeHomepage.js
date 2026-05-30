@@ -97,22 +97,30 @@ export function homepage() {
 
 // 🔹 Logout
 export function logout() {
-   localStorage.removeItem("authToken");
-   localStorage.removeItem("leaguesActiveTab");
-   localStorage.removeItem("lastActiveLeagueTab");
-   localStorage.removeItem("lastActiveNationalLeagueTab");
-   localStorage.removeItem("user");
-   localStorage.removeItem("currentBannerId");
-   localStorage.removeItem("leagueId");
-   localStorage.removeItem("selectedStageType");
-   location.reload();
+   showLoader();
+   location.hash = "home";
 
-   // document.getElementById("homePage").style.display = "none";
-   document.getElementById("notificationBell").style.display = "none";
-   document.getElementById("headerUsername").style.display = "none";
-   document.getElementById("profileMenu").style.display = "none";
-   document.getElementById("messagesBtn").style.display = "none";
+   [
+      "authToken",
+      "leaguesActiveTab",
+      "lastActiveLeagueTab",
+      "lastActiveNationalLeagueTab",
+      "user",
+      "currentBannerId",
+      "leagueId",
+      "selectedStageType", 
+      "groupId",
+      "groupId:ucl-basic-my-A",
+      "groupName",
+      "groupName:ucl-basic-my-A",
+      "lastActiveInstancesTab",
+      "lastGroupLetter:ucl-basic-my",
+      "lastLeagueKey",
+      "leagueId:ucl-basic-my",
+      "leagueId:wc-basic-my"
+   ].forEach(key => localStorage.removeItem(key));
 
-   document.getElementById("loginBtn").style.display = "inline-block";
-   document.getElementById("registerBtn").style.display = "inline-block";
-};
+   requestAnimationFrame(() => {
+      location.reload();
+   });
+}

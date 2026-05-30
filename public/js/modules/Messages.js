@@ -223,7 +223,9 @@ async function loadApprovedFriends() {
 
   list.innerHTML = `<div class="empty-chat">Loading friends...</div>`;
 
-  const data = await apiPost("/all-users");
+  const data = await apiPost("/all-users", {}, {
+    showLoading: false
+  });
 
   const friends = (data.data?.friends || [])
     .filter(friend =>
@@ -329,7 +331,7 @@ async function openConversation(conversationId, friendUsername) {
   if (input) {
     input.value = "";
   }
-  
+
   const requestId = ++conversationRequestId;
 
   currentConversationId = conversationId;
