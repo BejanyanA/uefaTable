@@ -51,6 +51,33 @@ export function initMessagesPage() {
       if (activeChatTab === "all") {
         await loadConversations();
       } else {
+        selectedConversationId = null;
+        currentConversationId = null;
+        currentFriendUsername = null;
+
+        setActiveChatItem(null);
+
+        const messagesContainer = document.getElementById("messagesContainer");
+        if (messagesContainer) {
+          messagesContainer.innerHTML = "";
+        }
+
+        const input = document.getElementById("messageInput");
+        if (input) {
+          input.value = "";
+        }
+
+        const activeChatBox = document.getElementById("activeChatBox");
+        const emptyChatState = document.getElementById("emptyChatState");
+
+        if (activeChatBox) {
+          activeChatBox.style.display = "none";
+        }
+
+        if (emptyChatState) {
+          emptyChatState.style.display = "flex";
+        }
+
         await loadApprovedFriends();
       }
     });
@@ -522,7 +549,9 @@ function setActiveChatItem(activeElement) {
       item.classList.remove("active");
     });
 
-  activeElement.classList.add("active");
+  if (activeElement) {
+    activeElement.classList.add("active");
+  }
 }
 
 async function renderSingleMessage(message) {
