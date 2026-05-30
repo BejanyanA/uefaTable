@@ -310,7 +310,9 @@ function renderMessages(messages) {
     container.appendChild(row);
   });
 
-  container.scrollTop = container.scrollHeight;
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
 }
 
 async function sendMessage() {
@@ -439,7 +441,9 @@ function renderSingleMessage(message) {
   row.appendChild(bubble);
   container.appendChild(row);
 
-  container.scrollTop = container.scrollHeight;
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
 }
 
 
