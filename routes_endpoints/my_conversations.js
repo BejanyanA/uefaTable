@@ -59,10 +59,13 @@ export async function handleMyConversations(request, env) {
       WHEN c.user1_id = ? THEN c.user2_id
       ELSE c.user1_id
     END
-  WHERE c.user1_id = ?
-     OR c.user2_id = ?
+  WHERE (c.user1_id = ? OR c.user2_id = ?)
+    AND EXISTS (
+      SELECT 1
+      FROM messages m
+      WHERE m.conversation_id = c.id
+    )
   ORDER BY
-    CASE WHEN lastMessageAt IS NULL THEN 1 ELSE 0 END,
     lastMessageAt DESC,
     c.id DESC
 `)

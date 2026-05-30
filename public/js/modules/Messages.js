@@ -278,9 +278,14 @@ async function loadApprovedFriends() {
     startBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
 
-      const response = await apiPost("/conversations", {
-        friendId: friend.id
-      });
+      const response = await apiPost("/conversations",
+        {
+          friendId: friend.id
+        },
+        {
+          showLoading: false
+        }
+      );
 
       if (!response.success) return;
 
