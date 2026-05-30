@@ -97,7 +97,7 @@ export function homepage() {
 
 // 🔹 Logout
 export function logout() {
-   showLoader();
+   showLoading: true
    location.hash = "home";
 
    [
