@@ -7,7 +7,7 @@ import { changeLang, currentLang } from './modules/LanguageManager.js';
 import { ModalManager } from './modules/ModalManager.js';
 import { initHomeOptionButtons } from './modules/HomeOptions.js';
 import { initRouter } from "../js/modules/router.js"; // adjust path if needed
-import { initMessagesPage } from "./modules/Messages.js";
+import { initMessagesPage, connectChatSocket, updateHeaderMessagesBadge } from "./modules/Messages.js";
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -15,7 +15,7 @@ window.closeModal = ModalManager.close;
 window.togglePassword = ModalManager.togglePassword;
 
 // ✅ Init App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
    AuthManager.initLogin();
    AuthManager.initRegister();
    LeagueManager.initCreate();
@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
    initHomeOptionButtons();
    initMessagesPage();
    window.logout = logout;
+
+   await initGlobalUserState();
 
    const action = sessionStorage.getItem("postLogoutAction");
    if (action === "openLogin") {
@@ -96,3 +98,13 @@ document.addEventListener('keydown', (event) => {
       closeModal(modal.id);
    });
 });
+
+async function initGlobalUserState() {
+   const token = localStorage.getItem("authToken");
+
+   if (!token) return;
+
+   connectChatSocket();
+
+   await updateHeaderMessagesBadge();
+}
