@@ -606,6 +606,7 @@
             e.preventDefault();
             dropdownMenu.classList.remove("show");
             if (typeof logout === "function") logout();
+            location.hash = "home";
           });
         }
       }
