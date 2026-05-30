@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from "../services/api.js";
 import { API_BASE } from "../services/config.js";
+import { encryptMessage, decryptMessage } from "../services/encryption.js";
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -266,13 +267,18 @@ async function openConversation(conversationId, friendUsername) {
   openMobileChatView();
 }
 
-function renderMessages(messages) {
+async function renderMessages(messages) {
   const container = document.getElementById("messagesContainer");
   if (!container) return;
 
   container.innerHTML = "";
 
-  messages.forEach((message) => {
+  for (const message of messages) {
+
+    const decryptedText = await decryptMessage(
+      message.encryptedMessage
+    );
+
     const row = document.createElement("div");
     row.className = "message-row";
 
@@ -285,7 +291,7 @@ function renderMessages(messages) {
 
     const text = document.createElement("div");
     text.className = "message-text";
-    text.textContent = message.encryptedMessage;
+    text.textContent = decryptedText;
 
     const time = document.createElement("span");
     time.className = "message-time";
@@ -307,9 +313,8 @@ function renderMessages(messages) {
     bubble.appendChild(footer);
 
     row.appendChild(bubble);
-
     container.appendChild(row);
-  });
+  }
 
   requestAnimationFrame(() => {
     container.scrollTop = container.scrollHeight;
@@ -324,12 +329,13 @@ async function sendMessage() {
   if (!text) return;
 
   const sentConversationId = currentConversationId;
+  const encryptedMessage = await encryptMessage(text);
 
   const response = await apiPost(
     "/messages",
     {
       conversationId: sentConversationId,
-      encryptedMessage: text
+      encryptedMessage
     },
     {
       showLoading: false
