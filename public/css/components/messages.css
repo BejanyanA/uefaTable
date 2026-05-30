@@ -273,7 +273,7 @@
   border: none;
   background: transparent;
   color: #fff;
-  font-size: 22px;
+  font-size: 20px;
   cursor: pointer;
 }
 
@@ -375,6 +375,7 @@
     border: 1px solid #222;
     border-radius: 8px;
     color: #fff;
+    margin-bottom: 10px;
   }
 
   .conversation-panel {
@@ -444,8 +445,10 @@
 
   .chat-back-btn {
     display: flex;
-    padding-left: 10px;
-    padding-bottom: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 14px;
+    padding-right: 10px;
   }
 
   .chat-header {
