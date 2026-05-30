@@ -15,7 +15,7 @@ export async function handleConversationMessages(request, env) {
     return Response.json({ success: false, message: "Invalid token" }, { status: 401 });
   }
 
-  const { conversationId } = await request.json();
+  const { conversationId, beforeId } = await request.json();
 
   if (!conversationId) {
     return Response.json({ success: false, message: "conversationId is required" }, { status: 400 });
@@ -72,7 +72,7 @@ export async function handleConversationMessages(request, env) {
     });
   }
 
-  const messages = await env.core_data.prepare(`
+  let query = `
   SELECT
     id,
     conversation_id AS conversationId,
@@ -82,13 +82,40 @@ export async function handleConversationMessages(request, env) {
     created_at AS createdAt
   FROM messages
   WHERE conversation_id = ?
-  ORDER BY created_at ASC, id ASC
-`)
-    .bind(conversationId)
+  ORDER BY id DESC
+  LIMIT 50
+  `;
+
+  let bindings = [conversationId];
+
+  if (beforeId) {
+    query = `
+    SELECT
+      id,
+      conversation_id AS conversationId,
+      sender_id AS senderId,
+      encrypted_message AS encryptedMessage,
+      is_read AS isRead,
+      created_at AS createdAt
+    FROM messages
+    WHERE conversation_id = ?
+      AND id < ?
+    ORDER BY id DESC
+    LIMIT 50
+  `;
+
+    bindings = [conversationId, beforeId];
+  }
+
+  const messagesResult = await env.core_data.prepare(query)
+    .bind(...bindings)
     .all();
+
+  const messages = (messagesResult.results || []).reverse();
 
   return Response.json({
     success: true,
-    messages: messages.results || []
+    messages,
+    hasMore: messages.length === 50
   });
 }

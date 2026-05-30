@@ -140,6 +140,7 @@ export const langMap = {
     // Messaging
     myChats: "Chats",
     noChatSelected: "Select a chat to start messaging",
+    typeMessagePlaceholder: "Type a message...",
 
 
 
@@ -306,6 +307,7 @@ export const langMap = {
     // Messaging
     myChats: "Զրույցներ",
     noChatSelected: "Ընտրեք ընկերոջը և սկսեք նամակագրությունը",
+    typeMessagePlaceholder: "Գրեք հաղորդագրություն...",
 
 
     //BE translations
@@ -471,6 +473,7 @@ export const langMap = {
     // Messaging
     myChats: "Messages",
     noChatSelected: "Sélectionnez une discussion pour commencer à envoyer des messages",
+    typeMessagePlaceholder: "Tapez un message...",
 
 
 
@@ -708,9 +711,14 @@ function changeLang(lang, opts = {}) {
     opt.textContent = messagesMyChats;
   });
 
-    const noChatselected = langMap[currentLang].noChatSelected || "Chats";
+  const noChatselected = langMap[currentLang].noChatSelected || "Select a chat to start messaging";
   document.querySelectorAll("#emptyChatState").forEach(opt => {
     opt.textContent = noChatselected;
+  });
+
+  const typeMessagePlaceholder = langMap[currentLang].typeMessagePlaceholder || "Type a message...";
+  document.querySelectorAll("#messageInput").forEach(opt => {
+    opt.textContent = typeMessagePlaceholder;
   });
 
 
@@ -889,6 +897,11 @@ function placeholderTranslate() {
   const { friendsSearchPlaceholder: searchUserByUsername = "Search or Enter Username..." } = langMap[currentLang] || {};
   document.querySelectorAll("#friendsSearchInput").forEach(inputElement => {
     inputElement.placeholder = searchUserByUsername;
+  });
+
+  const { typeMessagePlaceholder: typeMessagePlaceholder = "Type a message..." } = langMap[currentLang] || {};
+  document.querySelectorAll("#messageInput").forEach(inputElement => {
+    inputElement.placeholder = typeMessagePlaceholder;
   });
 }
 
