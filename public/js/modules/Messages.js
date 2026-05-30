@@ -263,7 +263,7 @@ async function openConversation(conversationId, friendUsername) {
 
   if (!data.success) return;
 
-  renderMessages(data.messages || []);
+  await renderMessages(data.messages || []);
   openMobileChatView();
 }
 
@@ -274,10 +274,7 @@ async function renderMessages(messages) {
   container.innerHTML = "";
 
   for (const message of messages) {
-
-    const decryptedText = await decryptMessage(
-      message.encryptedMessage
-    );
+    const decryptedText = await decryptMessage(message.encryptedMessage);
 
     const row = document.createElement("div");
     row.className = "message-row";
@@ -347,9 +344,12 @@ async function sendMessage() {
   input.value = "";
 
   // add message immediately to UI
-  renderSingleMessage({
+  await renderSingleMessage({
+    id: response.messageId,
+    conversationId: sentConversationId,
     senderId: myUserId,
-    encryptedMessage: text,
+    encryptedMessage,
+    isRead: 0,
     createdAt: new Date().toISOString()
   });
 
@@ -409,7 +409,7 @@ function setActiveChatItem(activeElement) {
   activeElement.classList.add("active");
 }
 
-function renderSingleMessage(message) {
+async function renderSingleMessage(message) {
   const container = document.getElementById("messagesContainer");
   if (!container) return;
 
@@ -424,7 +424,10 @@ function renderSingleMessage(message) {
   bubble.className = "message-bubble";
 
   const text = document.createElement("div");
-  text.textContent = message.encryptedMessage;
+  text.className = "message-text";
+
+  const decryptedText = await decryptMessage(message.encryptedMessage);
+  text.textContent = decryptedText;
 
   const time = document.createElement("span");
   time.className = "message-time";
@@ -501,7 +504,7 @@ export function connectChatSocket() {
     if (!message?.conversationId) return;
 
     if (Number(message.conversationId) === Number(currentConversationId)) {
-      renderSingleMessage(message);
+      await renderSingleMessage(message);
 
       await apiPost("/conversation-messages", {
         conversationId: currentConversationId

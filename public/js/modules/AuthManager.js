@@ -63,7 +63,6 @@ export const AuthManager = {
           localStorage.setItem("authToken", loginData.token);
 
           connectChatSocket();
-          await updateHeaderMessagesBadge()
 
           // Read post‑login flags
           const postLoginAction = sessionStorage.getItem("postLoginAction"); // e.g. 'openCustom'
