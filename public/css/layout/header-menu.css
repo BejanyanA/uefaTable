@@ -11,10 +11,10 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #2d2c3e;
-  border: 2px solid #EB9532;
+  background: #dad3d3e9;
+  /* border: 2px solid #EB9532; */
   /* orange */
-  color: #FFFFFF;
+  color: #060606;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,15 +102,23 @@
 /* 📱 Responsive */
 @media (max-width: 480px) {
 
+  .profile-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-inline-start: auto;
+    margin-top: -1px;
+  }
+
   .user-icon {
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    background: #2d2c3e;
-    border: 2px solid #EB9532;
+    background: #dad3d3e9;
+    /* border: 2px solid #EB9532; */
     /* orange */
-    color: #FFFFFF;
-    display: flex;
+    color: #000000;
+    display: bl;
     align-items: center;
     justify-content: center;
     font-size: 12px;

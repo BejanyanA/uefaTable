@@ -20,7 +20,7 @@ header {
 
 .header-username h2 {
   font-size: 16px;
-  color: #fff;
+  color: #dad3d3e9;
   padding-right: 8px;
 }
 
@@ -50,7 +50,7 @@ header {
 
   .header-username h2 {
     font-size: 12px;
-    color: #fff;
+    color: #dad3d3e9;
       padding-right: 0px;
   }
 }
