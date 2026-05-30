@@ -1,6 +1,8 @@
 import { apiGet, apiPost } from "../services/api.js";
 import { API_BASE } from "../services/config.js";
 import { encryptMessage, decryptMessage } from "../services/encryption.js";
+import { showToast } from '../utils/toast.js';
+import { langMap, currentLang } from '../modules/LanguageManager.js';
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -166,7 +168,7 @@ async function loadConversations() {
     const list = document.getElementById("conversationList");
     if (!list) return;
 
-    list.innerHTML = `<div class="empty-chat">Loading...</div>`;
+    // list.innerHTML = `<div class="empty-chat">Loading...</div>`;
 
     const data = await apiPost("/my-conversations", {}, {
       showLoading: false
@@ -248,7 +250,7 @@ async function loadApprovedFriends() {
   const list = document.getElementById("conversationList");
   if (!list) return;
 
-  list.innerHTML = `<div class="empty-chat">Loading friends...</div>`;
+  // list.innerHTML = `<div class="empty-chat">Loading friends...</div>`;
 
   const data = await apiPost("/all-users", {}, {
     showLoading: false
@@ -613,11 +615,30 @@ export function connectChatSocket() {
 
     if (!message?.conversationId) return;
 
+    const isReceivedMessage = Number(message.senderId) !== Number(myUserId);
+
+    const messageReceivedText =
+      langMap[currentLang]?.message_received || "sent you a message";
+
+    if (
+      isReceivedMessage &&
+      (
+        document.visibilityState !== "visible" ||
+        Number(message.conversationId) !== Number(currentConversationId)
+      )
+    ) {
+      showToast(
+        `${data.senderUsername || "Someone"} ${messageReceivedText}`,
+        "info"
+      );
+    }
+
     if (Number(message.conversationId) === Number(currentConversationId)) {
       await renderSingleMessage(message);
 
       await apiPost("/conversation-messages", {
-        conversationId: currentConversationId
+        conversationId: currentConversationId,
+        markAsRead: document.visibilityState === "visible"
       }, {
         showLoading: false
       });

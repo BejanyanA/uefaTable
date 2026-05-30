@@ -65,12 +65,21 @@ export async function handleMessages(request, env) {
   const id = env.CHAT_ROOM.idFromName("global-chat");
   const room = env.CHAT_ROOM.get(id);
 
+  const sender = await env.core_data.prepare(`
+  SELECT username
+  FROM users
+  WHERE id = ?
+  `)
+    .bind(user.id)
+    .first();
+
   await room.fetch("https://chat-room/notify", {
     method: "POST",
     body: JSON.stringify({
       type: "new_message",
       conversationId,
       senderId: user.id,
+      senderUsername: sender?.username || "Someone",
       receiverId,
       messageId: result.meta.last_row_id,
       encryptedMessage,

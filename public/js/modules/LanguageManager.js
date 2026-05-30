@@ -141,6 +141,7 @@ export const langMap = {
     myChats: "Chats",
     noChatSelected: "Select a chat to start messaging",
     typeMessagePlaceholder: "Type a message...",
+    message_received: "sent you a message",
 
 
 
@@ -308,6 +309,7 @@ export const langMap = {
     myChats: "Զրույցներ",
     noChatSelected: "Ընտրեք ընկերոջը և սկսեք նամակագրությունը",
     typeMessagePlaceholder: "Գրել հաղորդագրություն...",
+    message_received: "ուղարկել է ձեզ հաղորդագրություն",
 
 
     //BE translations
@@ -474,6 +476,7 @@ export const langMap = {
     myChats: "Messages",
     noChatSelected: "Sélectionnez une discussion pour commencer à envoyer des messages",
     typeMessagePlaceholder: "Tapez un message...",
+    message_received: "vous a envoyé un message",
 
 
 
