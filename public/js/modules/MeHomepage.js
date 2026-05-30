@@ -102,10 +102,10 @@ export function logout() {
 
    [
       "authToken",
+      "user",
       "leaguesActiveTab",
       "lastActiveLeagueTab",
       "lastActiveNationalLeagueTab",
-      "user",
       "currentBannerId",
       "leagueId",
       "selectedStageType", 
@@ -117,7 +117,8 @@ export function logout() {
       "lastGroupLetter:ucl-basic-my",
       "lastLeagueKey",
       "leagueId:ucl-basic-my",
-      "leagueId:wc-basic-my"
+      "leagueId:wc-basic-my",
+      "lastActiveNationalInstancesTab"
    ].forEach(key => localStorage.removeItem(key));
 
    requestAnimationFrame(() => {
