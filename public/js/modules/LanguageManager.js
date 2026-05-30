@@ -137,6 +137,10 @@ export const langMap = {
     live_statistics: "Statistics",
     live_lineups: "Lineups",
 
+    // Messaging
+    myChats: "Chats",
+    noChatSelected: "Select a chat to start messaging",
+
 
 
     //BE translations
@@ -299,6 +303,10 @@ export const langMap = {
     live_statistics: "Տվյալներ",
     live_lineups: "Կազմեր",
 
+    // Messaging
+    myChats: "Զրույցներ",
+    noChatSelected: "Ընտրեք ընկերոջը և սկսեք նամակագրությունը",
+
 
     //BE translations
     username_exists: "Գրանցման անունը արդեն գոյություն ունի",
@@ -459,6 +467,10 @@ export const langMap = {
     live_events: "Événements",
     live_statistics: "Statistiques",
     live_lineups: "Compositions",
+
+    // Messaging
+    myChats: "Messages",
+    noChatSelected: "Sélectionnez une discussion pour commencer à envoyer des messages",
 
 
 
@@ -683,6 +695,24 @@ function changeLang(lang, opts = {}) {
   document.querySelectorAll("#confirmNewPassword").forEach(opt => {
     opt.textContent = confirmNewPassword;
   });
+
+
+  // Messaging
+  const messagesMyFriends = langMap[currentLang].myFriends || "Friends";
+  document.querySelectorAll("#messagesMyFriends").forEach(opt => {
+    opt.textContent = messagesMyFriends;
+  });
+
+  const messagesMyChats = langMap[currentLang].myChats || "Chats";
+  document.querySelectorAll("#messagesMyChats").forEach(opt => {
+    opt.textContent = messagesMyChats;
+  });
+
+    const noChatselected = langMap[currentLang].noChatSelected || "Chats";
+  document.querySelectorAll("#emptyChatState").forEach(opt => {
+    opt.textContent = noChatselected;
+  });
+
 
 
   const dynamicLabels = {
