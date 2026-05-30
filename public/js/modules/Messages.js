@@ -355,9 +355,7 @@ async function openConversation(conversationId, friendUsername) {
 
   const data = await apiPost("/conversation-messages", {
     conversationId
-  }, {
-    showLoading: false
-  });
+  })
 
   if (requestId !== conversationRequestId) return;
   if (!data.success) return;
