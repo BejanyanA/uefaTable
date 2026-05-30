@@ -25,16 +25,6 @@ export function initMessagesPage() {
     messagesBtn.addEventListener("click", openMessagesPage);
   }
 
-  const messagesContainer = document.getElementById("messagesContainer");
-
-  if (messagesContainer) {
-    messagesContainer.addEventListener("scroll", async () => {
-      if (messagesContainer.scrollTop <= 20) {
-        await loadOlderMessages();
-      }
-    });
-  }
-
   const backBtn = document.getElementById("chatBackBtn");
 
   if (backBtn) {
@@ -51,6 +41,7 @@ export function initMessagesPage() {
       activeChatTab = btn.dataset.tab;
 
       if (activeChatTab === "all") {
+        // bindMessagesScrollOnce();
         await loadConversations();
       } else {
         selectedConversationId = null;
@@ -60,6 +51,7 @@ export function initMessagesPage() {
         setActiveChatItem(null);
 
         const messagesContainer = document.getElementById("messagesContainer");
+
         if (messagesContainer) {
           messagesContainer.innerHTML = "";
         }
@@ -118,27 +110,11 @@ export async function openMessagesPage() {
   currentConversationId = null;
   currentFriendUsername = null;
 
-  const emptyState = document.getElementById("emptyChatState");
-  const activeChatBox = document.getElementById("activeChatBox");
-
-  if (emptyState) emptyState.style.display = "flex";
-  if (activeChatBox) activeChatBox.style.display = "none";
-
   const user = JSON.parse(localStorage.getItem("user"));
 
   if (user?.id) {
     myUserId = Number(user.id);
   }
-
-  // const me = await apiGet("/me");
-
-  // if (me.success) {
-  //   myUserId = Number(me.user?.id || me.id);
-
-  //   connectChatSocket();
-
-  //   await updateHeaderMessagesBadge();
-  // }
 
   activeChatTab = "all";
 
@@ -202,16 +178,27 @@ async function loadConversations() {
       }
 
       item.addEventListener("click", async () => {
-        selectedConversationId = conversation.conversationId;
-        setActiveChatItem(item);
+        if (isOpeningConversation) return;
 
-        await openConversation(
-          conversation.conversationId,
-          conversation.friendUsername
-        );
+        const clickedConversationId = Number(conversation.conversationId);
 
-        removeUnreadBadgeFromItem(item);
-        updateHeaderBadgeFromVisibleItems();
+        if (clickedConversationId === Number(selectedConversationId)) {
+          return;
+        }
+
+        isOpeningConversation = true;
+
+        try {
+          selectedConversationId = clickedConversationId;
+          setActiveChatItem(item);
+
+          await openConversation(clickedConversationId, conversation.friendUsername);
+
+          removeUnreadBadgeFromItem(item);
+          updateHeaderBadgeFromVisibleItems();
+        } finally {
+          isOpeningConversation = false;
+        }
       });
 
       list.appendChild(item);
@@ -250,16 +237,11 @@ async function loadApprovedFriends() {
   const list = document.getElementById("conversationList");
   if (!list) return;
 
-  // list.innerHTML = `<div class="empty-chat">Loading friends...</div>`;
+  const data = await apiPost("/all-users", {}, { showLoading: false });
 
-  const data = await apiPost("/all-users", {}, {
-    showLoading: false
+  const friends = (data.data?.friends || []).filter((friend) => {
+    return friend.status === "approved";
   });
-
-  const friends = (data.data?.friends || [])
-    .filter(friend =>
-      friend.status === "approved"
-    );
 
   if (!data.success || !friends.length) {
     list.innerHTML = `<div class="empty-chat">No approved friends</div>`;
@@ -272,30 +254,6 @@ async function loadApprovedFriends() {
     const item = document.createElement("div");
     item.className = "friend-chat-item";
 
-    item.addEventListener("click", async () => {
-      const clickedConversationId = Number(conversation.conversationId);
-
-      if (isOpeningConversation) return;
-      if (clickedConversationId === Number(selectedConversationId)) return;
-
-      isOpeningConversation = true;
-
-      try {
-        selectedConversationId = clickedConversationId;
-        setActiveChatItem(item);
-
-        await openConversation(
-          clickedConversationId,
-          conversation.friendUsername
-        );
-
-        removeUnreadBadgeFromItem(item);
-        updateHeaderBadgeFromVisibleItems();
-      } finally {
-        isOpeningConversation = false;
-      }
-    });
-
     const name = document.createElement("span");
     name.textContent = friend.username;
 
@@ -307,30 +265,30 @@ async function loadApprovedFriends() {
     startBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
 
-      const response = await apiPost("/conversations",
-        {
-          friendId: friend.id
-        },
-        {
-          showLoading: false
-        }
-      );
+      if (isOpeningConversation) return;
+      isOpeningConversation = true;
 
-      if (!response.success) return;
+      try {
+        const response = await apiPost(
+          "/conversations",
+          { friendId: friend.id },
+          { showLoading: false }
+        );
 
-      selectedConversationId = response.conversationId;
+        if (!response.success) return;
 
-      await switchToAllTab();
+        selectedConversationId = response.conversationId;
 
-      await openConversation(
-        response.conversationId,
-        friend.username
-      );
+        await switchToAllTab();
+
+        await openConversation(response.conversationId, friend.username);
+      } finally {
+        isOpeningConversation = false;
+      }
     });
 
     item.appendChild(name);
     item.appendChild(startBtn);
-
     list.appendChild(item);
   });
 }
@@ -344,21 +302,6 @@ async function switchToAllTab() {
 
   await loadConversations();
 }
-
-function setActiveConversationItem(activeItem) {
-  document.querySelectorAll(".conversation-item").forEach((item) => {
-    item.classList.remove("active");
-  });
-
-  activeItem.classList.add("active");
-}
-
-
-const emptyState = document.getElementById("emptyChatState");
-const activeChatBox = document.getElementById("activeChatBox");
-
-if (emptyState) emptyState.style.display = "none";
-if (activeChatBox) activeChatBox.style.display = "flex";
 
 async function openConversation(conversationId, friendUsername) {
   const input = document.getElementById("messageInput");
@@ -387,6 +330,8 @@ async function openConversation(conversationId, friendUsername) {
   const headerName = document.getElementById("chatHeaderName");
   if (headerName) headerName.textContent = friendUsername;
 
+  bindMessagesScrollOnce();
+
   const data = await apiPost("/conversation-messages", {
     conversationId
   })
@@ -407,10 +352,13 @@ async function renderMessages(messages) {
 
   container.innerHTML = "";
 
-  for (const message of messages) {
-    const row = await createMessageRow(message);
+  const rows = await Promise.all(
+    messages.map(createMessageRow)
+  );
+
+  rows.forEach((row) => {
     container.appendChild(row);
-  }
+  });
 
   requestAnimationFrame(() => {
     container.scrollTop = container.scrollHeight;
@@ -499,9 +447,33 @@ async function sendMessage() {
   });
 
   selectedConversationId = sentConversationId;
+}
 
-  // only refresh conversation order
-  await loadConversations();
+export async function updateHeaderMessagesBadge() {
+  const badge = document.getElementById("messagesUnreadBadge");
+  if (!badge) return;
+
+  const data = await apiPost("/my-conversations", {}, {
+    showLoading: false
+  });
+
+  if (!data.success || !data.conversations?.length) {
+    badge.style.display = "none";
+    badge.textContent = "0";
+    return;
+  }
+
+  const totalUnread = data.conversations.reduce((sum, conversation) => {
+    return sum + Number(conversation.unreadCount || 0);
+  }, 0);
+
+  if (totalUnread > 0) {
+    badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+    badge.textContent = "0";
+  }
 }
 
 function getUserTimeZone() {
@@ -576,6 +548,11 @@ export function connectChatSocket() {
   const token = localStorage.getItem("authToken");
   if (!token || chatSocket) return;
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (user?.id) {
+    myUserId = Number(user.id);
+  }
+
   const apiUrl = new URL(API_BASE);
   const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
   const wsBase = `${wsProtocol}//${apiUrl.host}`;
@@ -598,7 +575,6 @@ export function connectChatSocket() {
       }
 
       await loadConversations();
-      await updateHeaderMessagesBadge();
       return;
     }
 
@@ -655,35 +631,12 @@ export function connectChatSocket() {
     console.warn("⚠️ Chat socket closed");
     chatSocket = null;
 
-    setTimeout(connectChatSocket, 2000);
+    setTimeout(() => {
+      if (localStorage.getItem("authToken")) {
+        connectChatSocket();
+      }
+    }, 2000);
   };
-}
-
-export async function updateHeaderMessagesBadge() {
-  const badge = document.getElementById("messagesUnreadBadge");
-  if (!badge) return;
-
-  const data = await apiPost("/my-conversations", {}, {
-    showLoading: false
-  });
-
-  if (!data.success || !data.conversations?.length) {
-    badge.style.display = "none";
-    badge.textContent = "0";
-    return;
-  }
-
-  const totalUnread = data.conversations.reduce((sum, conversation) => {
-    return sum + Number(conversation.unreadCount || 0);
-  }, 0);
-
-  if (totalUnread > 0) {
-    badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
-    badge.style.display = "inline-flex";
-  } else {
-    badge.style.display = "none";
-    badge.textContent = "0";
-  }
 }
 
 async function loadOlderMessages() {
@@ -725,10 +678,13 @@ async function prependMessages(messages) {
 
   const fragment = document.createDocumentFragment();
 
-  for (const message of messages) {
-    const row = await createMessageRow(message);
+  const rows = await Promise.all(
+    messages.map(createMessageRow)
+  );
+
+  rows.forEach((row) => {
     fragment.appendChild(row);
-  }
+  });
 
   container.prepend(fragment);
 }
