@@ -307,7 +307,7 @@ export const langMap = {
     // Messaging
     myChats: "Զրույցներ",
     noChatSelected: "Ընտրեք ընկերոջը և սկսեք նամակագրությունը",
-    typeMessagePlaceholder: "Գրեք հաղորդագրություն...",
+    typeMessagePlaceholder: "Գրել հաղորդագրություն...",
 
 
     //BE translations
