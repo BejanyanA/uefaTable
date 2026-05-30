@@ -284,6 +284,7 @@ function renderMessages(messages) {
     bubble.className = "message-bubble";
 
     const text = document.createElement("div");
+    text.className = "message-text";
     text.textContent = message.encryptedMessage;
 
     const time = document.createElement("span");
