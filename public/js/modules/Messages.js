@@ -507,7 +507,10 @@ function closeMobileChat() {
   if (layout) layout.classList.remove("mobile-chat-open");
 
   currentConversationId = null;
+  selectedConversationId = null;
   currentFriendUsername = null;
+
+  setActiveChatItem(null);
 
   const emptyState = document.getElementById("emptyChatState");
   const activeChatBox = document.getElementById("activeChatBox");

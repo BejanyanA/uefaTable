@@ -312,9 +312,9 @@
 /* Styling for the unread count badge */
 .messages-unread-badge {
   position: absolute;
-  top: 5px;
+  top: 10px;
   /* Position above the bell */
-  right: 110px;
+  right: 105px;
   /* Position to the right of the bell */
   background-color: #ff0000;
   /* Red color for alerts */
@@ -478,8 +478,8 @@
     font-size: 0.5em;
     /* Smaller text in the badge */
     text-align: center;
-    top: 6px;
-    right: 88px;
+    top: 7px;
+    right: 77px;
   }
 
   .message-bubble {
