@@ -32,6 +32,25 @@
   /* Allows clicks to pass through to the bell */
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Apply the animation when new notifications are present */
+.notification-badge.new-notifications {
+  animation: pulse 1s infinite;
+}
+
 /* Mobile: show at bottom */
 @media (max-width: 450px) {
 
