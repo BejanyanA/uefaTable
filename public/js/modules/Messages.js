@@ -1,4 +1,5 @@
 import { apiGet, apiPost } from "../services/api.js";
+import { API_BASE } from "../services/config.js";
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -121,20 +122,28 @@ async function loadConversations() {
   data.conversations.forEach((conversation) => {
     const item = document.createElement("div");
     item.className = "conversation-item";
-    item.textContent = conversation.friendUsername;
+    item.innerHTML = `
+  <span>${conversation.friendUsername}</span>
+  ${Number(conversation.unreadCount) > 0
+        ? `<span class="unread-badge">${conversation.unreadCount}</span>`
+        : ""
+      }
+    `;
 
     if (Number(conversation.conversationId) === Number(selectedConversationId)) {
       item.classList.add("active");
     }
 
-    item.addEventListener("click", () => {
+    item.addEventListener("click", async () => {
       selectedConversationId = conversation.conversationId;
       setActiveChatItem(item);
 
-      openConversation(
+      await openConversation(
         conversation.conversationId,
         conversation.friendUsername
       );
+
+      await loadConversations();
     });
 
     list.appendChild(item);
@@ -275,8 +284,22 @@ function renderMessages(messages) {
     time.className = "message-time";
     time.textContent = formatTime(message.createdAt);
 
+    const footer = document.createElement("div");
+    footer.className = "message-footer";
+
+    footer.appendChild(time);
+
+    if (Number(message.senderId) === Number(myUserId)) {
+      const status = document.createElement("span");
+      status.className = "message-status";
+      status.textContent = message.isRead ? "✓✓" : "✓";
+
+      footer.appendChild(status);
+    }
+
     bubble.appendChild(text);
-    bubble.appendChild(time);
+    bubble.appendChild(footer);
+
     row.appendChild(bubble);
 
     container.appendChild(row);
@@ -396,4 +419,51 @@ function renderSingleMessage(message) {
   container.appendChild(row);
 
   container.scrollTop = container.scrollHeight;
+}
+
+
+
+let chatSocket = null;
+
+export function connectChatSocket() {
+  const token = localStorage.getItem("authToken");
+  if (!token || chatSocket) return;
+
+  const apiUrl = new URL(API_BASE);
+  const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
+  const wsBase = `${wsProtocol}//${apiUrl.host}`;
+
+  chatSocket = new WebSocket(`${wsBase}/chat-socket?token=${token}`);
+
+  chatSocket.onopen = () => {
+  };
+
+  chatSocket.onmessage = async (event) => {
+
+    const data = JSON.parse(event.data);
+
+    if (data.type !== "new_message") return;
+
+    if (Number(data.conversationId) === Number(currentConversationId)) {
+      renderSingleMessage({
+        senderId: data.senderId,
+        encryptedMessage: data.encryptedMessage,
+        createdAt: data.createdAt,
+        isRead: false
+      });
+    }
+
+    await loadConversations();
+  };
+
+  chatSocket.onerror = (error) => {
+    console.error("❌ Chat socket error:", error);
+  };
+
+  chatSocket.onclose = () => {
+    console.warn("⚠️ Chat socket closed");
+    chatSocket = null;
+
+    setTimeout(connectChatSocket, 2000);
+  };
 }

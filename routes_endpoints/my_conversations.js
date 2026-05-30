@@ -23,7 +23,7 @@ export async function handleMyConversations(request, env) {
 
   const userId = Number(user.id);
 
-const conversations = await env.core_data.prepare(`
+  const conversations = await env.core_data.prepare(`
   SELECT
     c.id AS conversationId,
     u.id AS friendId,
@@ -43,7 +43,15 @@ const conversations = await env.core_data.prepare(`
       WHERE m3.conversation_id = c.id
       ORDER BY m3.created_at DESC, m3.id DESC
       LIMIT 1
-    ) AS lastMessageAt
+    ) AS lastMessageAt,
+
+    (
+      SELECT COUNT(*)
+      FROM messages m4
+      WHERE m4.conversation_id = c.id
+        AND m4.sender_id != ?
+        AND m4.is_read = 0
+    ) AS unreadCount
 
   FROM conversations c
   JOIN users u
@@ -58,8 +66,8 @@ const conversations = await env.core_data.prepare(`
     lastMessageAt DESC,
     c.id DESC
 `)
-.bind(userId, userId, userId)
-.all();
+    .bind(userId, userId, userId, userId)
+    .all();
 
   return Response.json({
     success: true,

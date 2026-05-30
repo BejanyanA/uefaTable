@@ -39,17 +39,28 @@ export async function handleConversationMessages(request, env) {
     );
   }
 
+  await env.core_data.prepare(`
+  UPDATE messages
+  SET is_read = 1
+  WHERE conversation_id = ?
+    AND sender_id != ?
+    AND is_read = 0
+`)
+    .bind(conversationId, loggedInUserId)
+    .run();
+
   const messages = await env.core_data.prepare(`
-    SELECT
-      id,
-      conversation_id AS conversationId,
-      sender_id AS senderId,
-      encrypted_message AS encryptedMessage,
-      created_at AS createdAt
-    FROM messages
-    WHERE conversation_id = ?
-    ORDER BY created_at ASC, id ASC
-  `)
+  SELECT
+    id,
+    conversation_id AS conversationId,
+    sender_id AS senderId,
+    encrypted_message AS encryptedMessage,
+    is_read AS isRead,
+    created_at AS createdAt
+  FROM messages
+  WHERE conversation_id = ?
+  ORDER BY created_at ASC, id ASC
+`)
     .bind(conversationId)
     .all();
 

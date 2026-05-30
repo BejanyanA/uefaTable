@@ -6,6 +6,7 @@ import { apiPost, apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
 import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } from "./HomeOptions.js";
 import { customLeagues } from './CustomLeagues.js';
+import { connectChatSocket } from './Messages.js';
 
 export const AuthManager = {
   initLogin: function () {
@@ -61,6 +62,8 @@ export const AuthManager = {
         if (loginData.success && loginData.token) {
           localStorage.setItem("authToken", loginData.token);
 
+          connectChatSocket();
+
           // Read post‑login flags
           const postLoginAction = sessionStorage.getItem("postLoginAction"); // e.g. 'openCustom'
           const actionForLive = sessionStorage.getItem("actionForLive");   // e.g. 'openLive'
@@ -88,6 +91,7 @@ export const AuthManager = {
             const me = await apiGet("/me", localStorage.getItem("authToken"));
             if (me.success) {
               // Update UI with user data
+              connectChatSocket();
               localStorage.setItem("user", JSON.stringify(me.user));
               document.getElementById("headerUsername").style.display = "block";
               document.getElementById("notificationBell").style.display = "block";

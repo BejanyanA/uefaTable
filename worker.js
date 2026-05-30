@@ -233,6 +233,26 @@ export default {
       return jsonResponse({ success: true });
     }
 
+    if (url.pathname === "/chat-socket") {
+      if (request.headers.get("Upgrade") !== "websocket") {
+        return new Response("Expected websocket", { status: 426 });
+      }
+      const token = url.searchParams.get("token");
+
+      const user = await verifyToken(token, env.JWT_SECRET);
+
+      if (!user?.id) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
+      const id = env.CHAT_ROOM.idFromName("global-chat");
+      const room = env.CHAT_ROOM.get(id);
+
+      return room.fetch(
+        new Request(`https://chat-room/connect?userId=${user.id}`, request)
+      );
+    }
+
     // === Fallback to your existing router ===
     return onRequest({ request, env, ctx });
   }
@@ -281,4 +301,59 @@ export async function publishToUser(env, userId, payload) {
   u.searchParams.set("userId", String(userId));
   for (const [k, v] of Object.entries(payload)) u.searchParams.set(k, String(v));
   await stub.fetch(u.toString(), { method: "POST" });
+}
+
+
+export class ChatRoom {
+  constructor(state, env) {
+    this.state = state;
+    this.env = env;
+    this.sessions = new Map();
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/connect") {
+      const userId = url.searchParams.get("userId");
+
+      if (!userId) {
+        return new Response("Missing userId", { status: 400 });
+      }
+
+      const pair = new WebSocketPair();
+      const [client, server] = Object.values(pair);
+
+      server.accept();
+
+      this.sessions.set(String(userId), server);
+
+      server.addEventListener("close", () => {
+        this.sessions.delete(String(userId));
+      });
+
+      server.addEventListener("error", () => {
+        this.sessions.delete(String(userId));
+      });
+
+      return new Response(null, {
+        status: 101,
+        webSocket: client
+      });
+    }
+
+    if (url.pathname === "/notify") {
+      const body = await request.json();
+
+      const socket = this.sessions.get(String(body.receiverId));
+
+      if (socket) {
+        socket.send(JSON.stringify(body));
+      }
+
+      return Response.json({ success: true });
+    }
+
+    return new Response("Not found", { status: 404 });
+  }
 }

@@ -31,13 +31,13 @@ export async function handleMessages(request, env) {
   }
 
   const conversation = await env.core_data.prepare(`
-    SELECT id
-    FROM conversations
-    WHERE id = ?
-      AND (user1_id = ? OR user2_id = ?)
-  `)
-  .bind(conversationId, user.id, user.id)
-  .first();
+  SELECT id, user1_id, user2_id
+  FROM conversations
+  WHERE id = ?
+    AND (user1_id = ? OR user2_id = ?)
+`)
+    .bind(conversationId, user.id, user.id)
+    .first();
 
   if (!conversation) {
     return Response.json(
@@ -47,19 +47,36 @@ export async function handleMessages(request, env) {
   }
 
   const result = await env.core_data.prepare(`
-    INSERT INTO messages (
-      conversation_id,
-      sender_id,
-      encrypted_message
-    )
-    VALUES (?, ?, ?)
-  `)
-  .bind(
-    conversationId,
-    user.id,
-    encryptedMessage
+  INSERT INTO messages (
+    conversation_id,
+    sender_id,
+    encrypted_message
   )
-  .run();
+  VALUES (?, ?, ?)
+`)
+    .bind(conversationId, user.id, encryptedMessage)
+    .run();
+
+  const receiverId =
+    Number(conversation.user1_id) === Number(user.id)
+      ? conversation.user2_id
+      : conversation.user1_id;
+
+  const id = env.CHAT_ROOM.idFromName("global-chat");
+  const room = env.CHAT_ROOM.get(id);
+
+  await room.fetch("https://chat-room/notify", {
+    method: "POST",
+    body: JSON.stringify({
+      type: "new_message",
+      conversationId,
+      senderId: user.id,
+      receiverId,
+      messageId: result.meta.last_row_id,
+      encryptedMessage,
+      createdAt: new Date().toISOString()
+    })
+  });
 
   return Response.json({
     success: true,

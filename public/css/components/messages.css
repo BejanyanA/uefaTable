@@ -224,6 +224,44 @@
   cursor: pointer;
 }
 
+.conversation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unread-badge {
+  min-width: 10px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff0000;
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-status {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.message-row.mine .message-status {
+  color: #4fc3f7;
+}
+
+.message-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
 @media (max-width: 480px) {
 
   #messagesPage {
@@ -251,7 +289,7 @@
   .chat-area {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 115px);
+    height: calc(100vh - 120px);
     min-height: 0;
     background: rgba(20, 20, 20, 0.88);
     border: 1px solid #444;

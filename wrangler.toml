@@ -21,8 +21,15 @@ database_id = "09b42559-8b10-4ee0-b3b0-af0d5a5f3609"
 name = "NOTIF_HUB"
 class_name = "NotificationHub"
 
+[[durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
 
-# Each time you add/rename a DO class, add a NEW [[migrations]] entry with a new tag.
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["NotificationHub"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ChatRoom"]
