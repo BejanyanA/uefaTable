@@ -11,6 +11,7 @@
   border-radius: 50%;
   object-position: center;
   cursor: pointer;
+  position: relative;
 }
 
 .messages-page {
@@ -262,6 +263,44 @@
   font-size: 11px;
 }
 
+/* Styling for the unread count badge */
+.messages-unread-badge {
+  position: absolute;
+  top: 5px;
+  /* Position above the bell */
+  right: 110px;
+  /* Position to the right of the bell */
+  background-color: #ff0000;
+  /* Red color for alerts */
+  color: white;
+  border-radius: 50%;
+  padding: 5px 7px;
+  font-size: 0.6em;
+  text-align: center;
+  line-height: 1;
+  pointer-events: none;
+  /* Allows clicks to pass through to the bell */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Apply the animation when new notifications are present */
+.messages-unread-badge.new-notifications {
+  animation: pulse 1s infinite;
+}
+
 @media (max-width: 480px) {
 
   #messagesPage {
@@ -390,5 +429,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  .messages-unread-badge {
+    padding: 4px 6px;
+    font-size: 0.5em;
+    /* Smaller text in the badge */
+    text-align: center;
+    top: 6px;
+    right: 88px;
   }
 }
