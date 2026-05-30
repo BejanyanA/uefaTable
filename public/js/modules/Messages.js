@@ -79,8 +79,13 @@ export async function openMessagesPage() {
   if (activeChatBox) activeChatBox.style.display = "none";
 
   const me = await apiGet("/me");
+
   if (me.success) {
     myUserId = Number(me.user?.id || me.id);
+
+    connectChatSocket();
+
+    await updateHeaderMessagesBadge();
   }
 
   activeChatTab = "all";
@@ -144,6 +149,7 @@ async function loadConversations() {
       );
 
       await loadConversations();
+      await updateHeaderMessagesBadge();
     });
 
     list.appendChild(item);
@@ -292,8 +298,7 @@ function renderMessages(messages) {
     if (Number(message.senderId) === Number(myUserId)) {
       const status = document.createElement("span");
       status.className = "message-status";
-      status.textContent = message.isRead ? "✓✓" : "✓";
-
+      status.textContent = Number(message.isRead) === 1 ? "✓✓" : "✓";
       footer.appendChild(status);
     }
 
@@ -400,7 +405,11 @@ function renderSingleMessage(message) {
   if (!container) return;
 
   const row = document.createElement("div");
-  row.className = "message-row mine";
+  row.className = "message-row";
+
+  if (Number(message.senderId) === Number(myUserId)) {
+    row.classList.add("mine");
+  }
 
   const bubble = document.createElement("div");
   bubble.className = "message-bubble";
@@ -412,8 +421,20 @@ function renderSingleMessage(message) {
   time.className = "message-time";
   time.textContent = formatTime(message.createdAt);
 
+  const footer = document.createElement("div");
+  footer.className = "message-footer";
+
+  footer.appendChild(time);
+
+  if (Number(message.senderId) === Number(myUserId)) {
+    const status = document.createElement("span");
+    status.className = "message-status";
+    status.textContent = Number(message.isRead) === 1 ? "✓✓" : "✓";
+    footer.appendChild(status);
+  }
+
   bubble.appendChild(text);
-  bubble.appendChild(time);
+  bubble.appendChild(footer);
 
   row.appendChild(bubble);
   container.appendChild(row);
@@ -439,21 +460,47 @@ export function connectChatSocket() {
   };
 
   chatSocket.onmessage = async (event) => {
-
     const data = JSON.parse(event.data);
+
+    if (data.type === "messages_read") {
+      if (Number(data.conversationId) === Number(currentConversationId)) {
+        document
+          .querySelectorAll(".message-row.mine .message-status")
+          .forEach((status) => {
+            status.textContent = "✓✓";
+          });
+      }
+
+      await loadConversations();
+      await updateHeaderMessagesBadge();
+      return;
+    }
 
     if (data.type !== "new_message") return;
 
-    if (Number(data.conversationId) === Number(currentConversationId)) {
-      renderSingleMessage({
-        senderId: data.senderId,
-        encryptedMessage: data.encryptedMessage,
-        createdAt: data.createdAt,
-        isRead: false
+    const message = data.message || {
+      id: data.messageId,
+      conversationId: data.conversationId,
+      senderId: data.senderId,
+      encryptedMessage: data.encryptedMessage,
+      isRead: data.isRead,
+      createdAt: data.createdAt
+    };
+
+    if (!message?.conversationId) return;
+
+    if (Number(message.conversationId) === Number(currentConversationId)) {
+      renderSingleMessage(message);
+
+      await apiPost("/conversation-messages", {
+        conversationId: currentConversationId
+      }, {
+        showLoading: false
       });
     }
 
     await loadConversations();
+    await updateHeaderMessagesBadge();
   };
 
   chatSocket.onerror = (error) => {
@@ -466,4 +513,31 @@ export function connectChatSocket() {
 
     setTimeout(connectChatSocket, 2000);
   };
+}
+
+export async function updateHeaderMessagesBadge() {
+  const badge = document.getElementById("messagesUnreadBadge");
+  if (!badge) return;
+
+  const data = await apiPost("/my-conversations", {}, {
+    showLoading: false
+  });
+
+  if (!data.success || !data.conversations?.length) {
+    badge.style.display = "none";
+    badge.textContent = "0";
+    return;
+  }
+
+  const totalUnread = data.conversations.reduce((sum, conversation) => {
+    return sum + Number(conversation.unreadCount || 0);
+  }, 0);
+
+  if (totalUnread > 0) {
+    badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+    badge.textContent = "0";
+  }
 }

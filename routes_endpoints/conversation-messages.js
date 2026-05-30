@@ -49,6 +49,29 @@ export async function handleConversationMessages(request, env) {
     .bind(conversationId, loggedInUserId)
     .run();
 
+  const senderRows = await env.core_data.prepare(`
+  SELECT DISTINCT sender_id AS senderId
+  FROM messages
+  WHERE conversation_id = ?
+    AND sender_id != ?
+`)
+    .bind(conversationId, loggedInUserId)
+    .all();
+
+  const id = env.CHAT_ROOM.idFromName("global-chat");
+  const room = env.CHAT_ROOM.get(id);
+
+  for (const row of senderRows.results || []) {
+    await room.fetch("https://chat-room/notify", {
+      method: "POST",
+      body: JSON.stringify({
+        type: "messages_read",
+        receiverId: row.senderId,
+        conversationId
+      })
+    });
+  }
+
   const messages = await env.core_data.prepare(`
   SELECT
     id,
