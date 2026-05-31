@@ -265,7 +265,7 @@ async function loadApprovedFriends() {
 
     const startBtn = document.createElement("button");
     startBtn.className = "start-chat-btn";
-    startBtn.textContent = "+";
+    startBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i>';
     startBtn.title = "Start chat";
 
     startBtn.addEventListener("click", async (e) => {

@@ -260,7 +260,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
   border-radius: 8px;
   background: #2a2a2ad2;
   margin-bottom: 8px;
@@ -269,10 +272,8 @@
 
 .start-chat-btn {
   border: none;
-  background: #0066ff;
+  background: none;
   color: #fff;
-  width: 24px;
-  height: 24px;
   border-radius: 50%;
   cursor: pointer;
   font-size: 14px;
@@ -410,7 +411,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 8px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
     border-radius: 8px;
     background: #2a2a2ad2;
     margin-bottom: 8px;
@@ -420,7 +424,7 @@
 
   .start-chat-btn {
     border: none;
-    background: #0066ff;
+    background: none;
     color: #fff;
     width: 20px;
     height: 20px;
