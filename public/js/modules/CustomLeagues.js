@@ -22,7 +22,7 @@ export async function customLeagues() {
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
          document.getElementById("messagesBtn").style.display = "block";
-         document.getElementById("homePageIcon").style.display = "block";
+         // document.getElementById("homePageIcon").style.display = "block";
          localStorage.setItem('user', JSON.stringify(data.user));
          localStorage.removeItem("lastActiveLeagueTab");
          localStorage.removeItem("lastActiveNationalLeagueTab");

@@ -61,7 +61,7 @@ export async function renderNationalGroupStandingsPage(leagueId, groupId, groupN
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
     location.hash = getNationalBackInstancesHash();
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
   });
 
   setActiveTab(initialTab);

@@ -28,7 +28,7 @@ export function renderLeagueTable(data) {
     customLeagues()
 
     localStorage.removeItem("lastActiveLeagueTab");
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     if (bannerId === 1) location.hash = "#champions-league";
@@ -326,7 +326,7 @@ export function renderLeagueInstances(instanceData, options = {}) {
   backBtn.id = "backBtn";
   backBtn.addEventListener("click", async () => {
 
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     const stageType = Number(localStorage.getItem("selectedStageType")) || 1;

@@ -28,7 +28,7 @@ export const ProfileManager = {
       profileLink.addEventListener("click", (e) => {
         e.preventDefault();                 // ✅ important if it's <a href="...">
 
-        document.getElementById("homePageIcon").style.display = "block";
+        // document.getElementById("homePageIcon").style.display = "block";
 
         location.hash = "profile";
       });

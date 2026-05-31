@@ -29,7 +29,7 @@ export function renderNationalTable(data) {
     customLeagues()
 
     localStorage.removeItem("lastActiveNationalLeagueTab");
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     if (bannerId === 1) location.hash = "#champions-league";
@@ -331,7 +331,7 @@ export function renderNationalInstances(instanceData, options = {}) {
 
   backBtn.addEventListener("click", async () => {
 
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
     const stageType = Number(localStorage.getItem("selectedStageType")) || 1;

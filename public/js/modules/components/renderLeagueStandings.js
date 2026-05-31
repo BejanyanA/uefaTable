@@ -66,7 +66,7 @@ export async function renderLeagueGroupStandingsPage(leagueId, groupId, groupNam
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
     location.hash = getClubBackInstancesHash();
-    document.getElementById("homePageIcon").style.display = "block";
+    // document.getElementById("homePageIcon").style.display = "block";
   });
 
   setActiveTab(initialTab);
