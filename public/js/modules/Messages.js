@@ -253,7 +253,8 @@ async function loadConversations() {
             conversation.friendUsername,
             conversation.friendId,
             presence.isOnline,
-            presence.lastSeen
+            presence.lastSeen,
+            conversation.friendshipStatus
           );
 
           removeUnreadBadgeFromItem(item);
@@ -397,7 +398,14 @@ async function switchToAllTab() {
   await loadConversations();
 }
 
-async function openConversation(conversationId, friendUsername, friendId, isOnline, lastSeen) {
+async function openConversation(
+  conversationId,
+  friendUsername,
+  friendId,
+  isOnline,
+  lastSeen,
+  friendshipStatus
+) {
   const input = document.getElementById("messageInput");
   if (input) {
     input.value = "";
@@ -445,6 +453,7 @@ async function openConversation(conversationId, friendUsername, friendId, isOnli
   }
 
   updateChatHeaderStatus(isOnline, lastSeen);
+  updateMessageInputVisibility(friendshipStatus);
   bindMessagesScrollOnce();
 
   const data = await apiPost("/conversation-messages", {
@@ -610,6 +619,18 @@ function formatTime(dateValue) {
     minute: "2-digit",
     hour12: false
   }).format(new Date(utcDateValue));
+}
+
+function updateMessageInputVisibility(friendshipStatus) {
+  const inputRow = document.querySelector(".message-input-row");
+
+  if (!inputRow) return;
+
+  if (friendshipStatus === "approved") {
+    inputRow.style.display = "flex";
+  } else {
+    inputRow.style.display = "none";
+  }
 }
 
 function openMobileChatView() {

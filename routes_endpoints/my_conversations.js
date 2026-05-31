@@ -28,6 +28,7 @@ export async function handleMyConversations(request, env) {
     c.id AS conversationId,
     u.id AS friendId,
     u.username AS friendUsername,
+    f.status AS friendshipStatus,
 
     (
       SELECT encrypted_message
@@ -59,6 +60,12 @@ export async function handleMyConversations(request, env) {
       WHEN c.user1_id = ? THEN c.user2_id
       ELSE c.user1_id
     END
+  LEFT JOIN friends f
+    ON (
+      (f.user_id = c.user1_id AND f.friend_id = c.user2_id)
+      OR
+      (f.user_id = c.user2_id AND f.friend_id = c.user1_id)
+    )
   WHERE (c.user1_id = ? OR c.user2_id = ?)
     AND EXISTS (
       SELECT 1
@@ -68,7 +75,7 @@ export async function handleMyConversations(request, env) {
   ORDER BY
     lastMessageAt DESC,
     c.id DESC
-`)
+  `)
     .bind(userId, userId, userId, userId)
     .all();
 
