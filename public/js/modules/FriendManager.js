@@ -336,7 +336,7 @@ export const FriendManager = {
 
         item.appendChild(actions);
         rowContainer.appendChild(item);
-        if (friend.byMe === true || friend.status === "approved") {
+        if (friend.byMe === true || friend.status === "approved" || friend.status === "pending") {
           enhanceActionsForMobile(actions);
         } else {
           actions.classList.add("no-mobile-toggle");
