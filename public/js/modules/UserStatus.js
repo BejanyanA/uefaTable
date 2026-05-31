@@ -1,17 +1,14 @@
-import { langMap, currentLang } from './LanguageManager.js';
-import { getFriends } from './GetFriends.js';
-import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
-import { FriendManager } from './FriendManager.js';
-import { showToast } from '../utils/toast.js';
-import { logout } from './MeHomepage.js'
-import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
+import { updateChatHeaderStatus, getCurrentFriendId } from "./Messages.js";
 
 let presenceSocket = null;
 let presencePingTimer = null;
 
+const presenceCache = new Map();
+
 export function connectPresenceSocket() {
     console.log("CONNECTING PRESENCE SOCKET");
+
     const token = localStorage.getItem("authToken");
     if (!token || presenceSocket) return;
 
@@ -33,11 +30,14 @@ export function connectPresenceSocket() {
         const data = JSON.parse(event.data);
 
         if (data.type === "presence_status") {
-            updateConversationUserStatus(
-                data.userId,
-                data.isOnline,
-                data.lastSeen
-            );
+            updateConversationUserStatus(data.userId, data.isOnline, data.lastSeen);
+            return;
+        }
+
+        if (data.type === "presence_statuses") {
+            data.users.forEach((user) => {
+                updateConversationUserStatus(user.userId, user.isOnline, user.lastSeen);
+            });
         }
     };
 
@@ -65,43 +65,68 @@ export function disconnectPresenceSocket() {
     }
 }
 
-function updateConversationUserStatus(userId, isOnline, lastSeen) {
-  document
-    .querySelectorAll(`.conversation-item[data-friend-id="${userId}"]`)
-    .forEach((item) => {
-      const dot = item.querySelector(".online-dot");
-      const status = item.querySelector(".conversation-status");
+export function requestPresenceStatuses(friendIds = []) {
+    if (!presenceSocket || presenceSocket.readyState !== WebSocket.OPEN) return;
 
-      if (dot) {
-        dot.classList.toggle("online", Boolean(isOnline));
-        dot.classList.toggle("offline", !Boolean(isOnline));
-      }
-
-      if (status) {
-        status.textContent = isOnline
-          ? "Online"
-          : lastSeen
-            ? `Last seen ${formatLastSeen(lastSeen)}`
-            : "Offline";
-      }
-    });
+    presenceSocket.send(JSON.stringify({
+        type: "get_statuses",
+        friendIds
+    }));
 }
 
-function formatLastSeen(value) {
-  const dateValue = value.includes("T")
-    ? value
-    : value.replace(" ", "T") + "Z";
+export function getPresenceStatus(userId) {
+    return presenceCache.get(Number(userId)) || {
+        isOnline: false,
+        lastSeen: null
+    };
+}
 
-  const date = new Date(dateValue);
-  const now = new Date();
+function updateConversationUserStatus(userId, isOnline, lastSeen) {
+    presenceCache.set(Number(userId), {
+        isOnline: Boolean(isOnline),
+        lastSeen: lastSeen || null
+    });
 
-  const diffMinutes = Math.floor((now - date) / 60000);
+    document
+        .querySelectorAll(`[data-friend-id="${userId}"]`)
+        .forEach((item) => {
+            const dot = item.querySelector(".online-dot");
+            const status = item.querySelector(".conversation-status");
 
-  if (diffMinutes < 1) return "just now";
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+            if (dot) {
+                dot.classList.toggle("online", Boolean(isOnline));
+                dot.classList.toggle("offline", !Boolean(isOnline));
+            }
 
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
+            if (status) {
+                status.textContent = isOnline
+                    ? "Online"
+                    : lastSeen
+                        ? `Last seen ${formatLastSeen(lastSeen)}`
+                        : "Offline";
+            }
+        });
 
-  return date.toLocaleDateString();
+    if (Number(userId) === Number(getCurrentFriendId())) {
+        updateChatHeaderStatus(isOnline, lastSeen);
+    }
+}
+
+export function formatLastSeen(value) {
+    const dateValue = value.includes("T")
+        ? value
+        : value.replace(" ", "T") + "Z";
+
+    const date = new Date(dateValue);
+    const now = new Date();
+
+    const diffMinutes = Math.floor((now - date) / 60000);
+
+    if (diffMinutes < 1) return "just now";
+    if (diffMinutes < 60) return `${diffMinutes} min ago`;
+
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    return date.toLocaleDateString();
 }

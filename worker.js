@@ -383,9 +383,9 @@ export class PresenceRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
-    this.sessions = new Map(); // userId -> Set<WebSocket>
-    this.lastPing = new Map(); // userId -> timestamp
-    this.status = new Map(); // userId -> boolean
+    this.sessions = new Map();
+    this.lastPing = new Map();
+    this.status = new Map();
 
     this.cleanupTimer = setInterval(() => {
       this.checkOfflineUsers();
@@ -404,6 +404,30 @@ export class PresenceRoom {
     }
   }
 
+  async sendStatuses(socket, friendIds = []) {
+    if (!Array.isArray(friendIds) || !friendIds.length) return;
+
+    const safeIds = friendIds.map(Number).filter(Boolean);
+    if (!safeIds.length) return;
+
+    const placeholders = safeIds.map(() => "?").join(",");
+
+    const rows = await this.env.core_data.prepare(`
+      SELECT id, is_online, last_seen
+      FROM users
+      WHERE id IN (${placeholders})
+    `).bind(...safeIds).all();
+
+    socket.send(JSON.stringify({
+      type: "presence_statuses",
+      users: rows.results.map((user) => ({
+        userId: user.id,
+        isOnline: Number(user.is_online) === 1,
+        lastSeen: user.last_seen || null
+      }))
+    }));
+  }
+
   async setOnline(userId) {
     const key = String(userId);
     this.lastPing.set(key, Date.now());
@@ -413,10 +437,10 @@ export class PresenceRoom {
     this.status.set(key, true);
 
     await this.env.core_data.prepare(`
-    UPDATE users
-    SET is_online = 1
-    WHERE id = ?
-  `).bind(userId).run();
+      UPDATE users
+      SET is_online = 1
+      WHERE id = ?
+    `).bind(userId).run();
 
     this.broadcast({
       type: "presence_status",
@@ -436,11 +460,11 @@ export class PresenceRoom {
     const lastSeen = new Date().toISOString();
 
     await this.env.core_data.prepare(`
-    UPDATE users
-    SET is_online = 0,
-        last_seen = ?
-    WHERE id = ?
-  `).bind(lastSeen, userId).run();
+      UPDATE users
+      SET is_online = 0,
+          last_seen = ?
+      WHERE id = ?
+    `).bind(lastSeen, userId).run();
 
     this.broadcast({
       type: "presence_status",
@@ -483,23 +507,30 @@ export class PresenceRoom {
     }
 
     this.sessions.get(key).add(server);
-    this.setOnline(userId);
+    await this.setOnline(userId);
 
-    server.addEventListener("message", (event) => {
+    server.addEventListener("message", async (event) => {
       try {
         const data = JSON.parse(event.data);
 
         if (data.type === "ping") {
           this.lastPing.set(key, Date.now());
-          this.setOnline(userId);
+          await this.setOnline(userId);
+          return;
+        }
+
+        if (data.type === "get_statuses") {
+          await this.sendStatuses(server, data.friendIds || []);
         }
       } catch { }
     });
 
-    const cleanup = () => {
+    const cleanup = async () => {
       const set = this.sessions.get(key);
+
       if (set) {
         set.delete(server);
+
         if (!set.size) {
           this.sessions.delete(key);
         }
@@ -507,7 +538,7 @@ export class PresenceRoom {
 
       if (!this.sessions.has(key)) {
         this.lastPing.delete(key);
-        this.setOffline(userId);
+        await this.setOffline(userId);
       }
     };
 

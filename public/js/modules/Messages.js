@@ -3,6 +3,7 @@ import { API_BASE } from "../services/config.js";
 import { encryptMessage, decryptMessage } from "../services/encryption.js";
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
+import { requestPresenceStatuses, formatLastSeen, getPresenceStatus } from '../modules/UserStatus.js';
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -15,6 +16,11 @@ let isLoadingOlderMessages = false;
 let isLoadingConversations = false;
 let isOpeningConversation = false;
 let conversationRequestId = 0;
+let currentFriendId = null;
+
+export function getCurrentFriendId() {
+  return currentFriendId;
+}
 
 export function initMessagesPage() {
   const messagesBtn = document.getElementById("messagesBtn");
@@ -109,6 +115,41 @@ export async function openMessagesPage() {
   // reset selected chat
   currentConversationId = null;
   currentFriendUsername = null;
+  currentFriendId = null;
+  selectedConversationId = null;
+
+  setActiveChatItem(null);
+
+  const messagesContainer = document.getElementById("messagesContainer");
+  if (messagesContainer) {
+    messagesContainer.innerHTML = "";
+  }
+
+  const input = document.getElementById("messageInput");
+  if (input) {
+    input.value = "";
+  }
+
+  const emptyChatState = document.getElementById("emptyChatState");
+  const activeChatBox = document.getElementById("activeChatBox");
+
+  if (emptyChatState) {
+    emptyChatState.style.display = "flex";
+  }
+
+  if (activeChatBox) {
+    activeChatBox.style.display = "none";
+  }
+
+  const chatHeaderName = document.getElementById("chatHeaderName");
+  if (chatHeaderName) {
+    chatHeaderName.textContent = "";
+  }
+
+  const chatHeaderStatus = document.getElementById("chatHeaderStatus");
+  if (chatHeaderStatus) {
+    chatHeaderStatus.textContent = "";
+  }
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -144,8 +185,6 @@ async function loadConversations() {
     const list = document.getElementById("conversationList");
     if (!list) return;
 
-    // list.innerHTML = `<div class="empty-chat">Loading...</div>`;
-
     const data = await apiPost("/my-conversations", {}, {
       showLoading: false
     });
@@ -167,14 +206,26 @@ async function loadConversations() {
     conversations.forEach((conversation) => {
       const item = document.createElement("div");
       item.className = "conversation-item";
+      item.dataset.friendId = conversation.friendId;
+
+      const isOnline = false;
+      const statusText = "Offline";
 
       item.innerHTML = `
-      <span>${conversation.friendUsername}</span>
-      ${Number(conversation.unreadCount) > 0
+        <div class="conversation-user">
+          <span class="online-dot ${isOnline ? "online" : "offline"}"></span>
+
+          <div class="conversation-user-info">
+            <span class="conversation-name">${conversation.friendUsername}</span>
+            <small class="conversation-status">${statusText}</small>
+          </div>
+        </div>
+
+        ${Number(conversation.unreadCount) > 0
           ? `<span class="unread-badge">${conversation.unreadCount}</span>`
           : ""
         }
-    `;
+      `;
 
       if (Number(conversation.conversationId) === Number(selectedConversationId)) {
         item.classList.add("active");
@@ -195,7 +246,15 @@ async function loadConversations() {
           selectedConversationId = clickedConversationId;
           setActiveChatItem(item);
 
-          await openConversation(clickedConversationId, conversation.friendUsername);
+          const presence = getPresenceStatus(conversation.friendId);
+
+          await openConversation(
+            clickedConversationId,
+            conversation.friendUsername,
+            conversation.friendId,
+            presence.isOnline,
+            presence.lastSeen
+          );
 
           removeUnreadBadgeFromItem(item);
           updateHeaderBadgeFromVisibleItems();
@@ -207,6 +266,9 @@ async function loadConversations() {
       list.appendChild(item);
     });
 
+    requestPresenceStatuses(
+      conversations.map((conversation) => conversation.friendId)
+    );
   } finally {
     isLoadingConversations = false;
   }
@@ -243,7 +305,7 @@ async function loadApprovedFriends() {
   const data = await apiPost("/all-users", {}, { showLoading: false });
 
   const friends = (data.data?.friends || []).filter((friend) => {
-    return friend.status === "approved";
+    return String(friend.status).trim().toLowerCase() === "approved";
   });
 
   if (!data.success || !friends.length) {
@@ -259,9 +321,22 @@ async function loadApprovedFriends() {
   friends.forEach((friend) => {
     const item = document.createElement("div");
     item.className = "friend-chat-item";
+    item.dataset.friendId = friend.id;
 
-    const name = document.createElement("span");
-    name.textContent = friend.username;
+    const isOnline = false;
+    const statusText = "Offline";
+
+    const userInfo = document.createElement("div");
+    userInfo.className = "conversation-user";
+
+    userInfo.innerHTML = `
+    <span class="online-dot ${isOnline ? "online" : "offline"}"></span>
+
+    <div class="conversation-user-info">
+    <span class="conversation-name">${friend.username}</span>
+    <small class="conversation-status">${statusText}</small>
+    </div>
+    `;
 
     const startBtn = document.createElement("button");
     startBtn.className = "start-chat-btn";
@@ -287,16 +362,29 @@ async function loadApprovedFriends() {
 
         await switchToAllTab();
 
-        await openConversation(response.conversationId, friend.username);
+        const presence = getPresenceStatus(friend.id);
+
+        await openConversation(
+          response.conversationId,
+          friend.username,
+          friend.id,
+          presence.isOnline,
+          presence.lastSeen
+        );
+
       } finally {
         isOpeningConversation = false;
       }
     });
 
-    item.appendChild(name);
+    item.appendChild(userInfo);
     item.appendChild(startBtn);
     list.appendChild(item);
   });
+
+  requestPresenceStatuses(
+    friends.map((friend) => friend.id)
+  );
 }
 
 async function switchToAllTab() {
@@ -309,7 +397,7 @@ async function switchToAllTab() {
   await loadConversations();
 }
 
-async function openConversation(conversationId, friendUsername) {
+async function openConversation(conversationId, friendUsername, friendId, isOnline, lastSeen) {
   const input = document.getElementById("messageInput");
   if (input) {
     input.value = "";
@@ -319,10 +407,12 @@ async function openConversation(conversationId, friendUsername) {
 
   currentConversationId = conversationId;
   currentFriendUsername = friendUsername;
+  currentFriendId = friendId;
 
   oldestMessageId = null;
   hasMoreMessages = true;
   isLoadingOlderMessages = false;
+  updateChatHeaderStatus(isOnline, lastSeen);
 
   const container = document.getElementById("messagesContainer");
   if (container) container.innerHTML = "";
@@ -334,8 +424,27 @@ async function openConversation(conversationId, friendUsername) {
   if (activeChatBox) activeChatBox.style.display = "flex";
 
   const headerName = document.getElementById("chatHeaderName");
-  if (headerName) headerName.textContent = friendUsername;
 
+  if (headerName) {
+    let headerNameText = document.getElementById("chatHeaderNameText");
+    let headerStatus = document.getElementById("chatHeaderStatus");
+
+    if (!headerNameText) {
+      headerNameText = document.createElement("span");
+      headerNameText.id = "chatHeaderNameText";
+      headerName.appendChild(headerNameText);
+    }
+
+    if (!headerStatus) {
+      headerStatus = document.createElement("small");
+      headerStatus.id = "chatHeaderStatus";
+      headerName.appendChild(headerStatus);
+    }
+
+    headerNameText.textContent = friendUsername;
+  }
+
+  updateChatHeaderStatus(isOnline, lastSeen);
   bindMessagesScrollOnce();
 
   const data = await apiPost("/conversation-messages", {
@@ -515,6 +624,7 @@ function closeMobileChat() {
   currentConversationId = null;
   selectedConversationId = null;
   currentFriendUsername = null;
+  currentFriendId = null;
 
   setActiveChatItem(null);
 
@@ -727,4 +837,64 @@ function updateHeaderBadgeFromConversations(conversations = []) {
     badge.textContent = "0";
     badge.style.display = "none";
   }
+}
+
+export function updateChatHeaderStatus(isOnline, lastSeen) {
+  const status = document.getElementById("chatHeaderStatus");
+  if (!status) return;
+
+  if (Number(isOnline) === 1 || isOnline === true) {
+    status.textContent = "Online";
+    return;
+  }
+
+  if (!lastSeen) {
+    status.textContent = "Offline";
+    return;
+  }
+
+  status.textContent = `Last seen ${formatLastSeenDateTime(lastSeen)}`;
+}
+
+export function formatLastSeenDateTime(lastSeen) {
+  const userTimeZone = getUserTimeZone();
+
+  const dateValue = lastSeen.includes("T")
+    ? lastSeen
+    : lastSeen.replace(" ", "T") + "Z";
+
+  const date = new Date(dateValue);
+  const now = new Date();
+
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  if (isToday) {
+    const time = new Intl.DateTimeFormat(undefined, {
+      timeZone: userTimeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(date);
+
+    return `today at ${time}`;
+  }
+
+  const datePart = new Intl.DateTimeFormat(undefined, {
+    timeZone: userTimeZone,
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit"
+  }).format(date);
+
+  const timePart = new Intl.DateTimeFormat(undefined, {
+    timeZone: userTimeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(date);
+
+  return `${datePart} ${timePart}`;
 }

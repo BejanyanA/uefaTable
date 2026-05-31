@@ -107,7 +107,10 @@
 }
 
 .conversation-panel {
-  padding: 14px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .conversation-item {
@@ -145,6 +148,9 @@
 }
 
 .chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 14px;
   border-bottom: 1px solid #444;
   font-weight: bold;
@@ -278,6 +284,8 @@
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
+  padding-right: 0px;
+  padding-left: 8px;
 }
 
 .chat-back-btn {
@@ -339,6 +347,20 @@
   /* Allows clicks to pass through to the bell */
 }
 
+#chatHeaderStatus {
+  font-size: 12px;
+}
+
+.conversation-name {
+  width: 80px;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.conversation-status {
+  /* padding-left: 10px; */
+  font-size: 10px;
+}
 
 @media (max-width: 480px) {
 
@@ -469,7 +491,7 @@
   .chat-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
   }
 
   .messages-unread-badge {
@@ -556,6 +578,20 @@
     cursor: pointer;
     background: #0066ff;
     color: #fff;
+  }
+
+  #chatHeaderStatus {
+    margin-left: auto;
+    font-size: 10px;
+  }
+
+  .conversation-name {
+    width: 120px;
+    display: inline-block;
+  }
+
+  .conversation-status {
+    padding-left: 10px;
   }
 }
 
