@@ -46,6 +46,30 @@ export async function handleMessages(request, env) {
     );
   }
 
+  const relation = await env.core_data.prepare(`
+    SELECT f.id
+    FROM conversations c
+    JOIN friends f
+      ON (
+        (f.user_id = c.user1_id AND f.friend_id = c.user2_id)
+        OR
+        (f.user_id = c.user2_id AND f.friend_id = c.user1_id)
+      )
+    WHERE c.id = ?
+      AND (c.user1_id = ? OR c.user2_id = ?)
+      AND f.status = 'approved'
+    LIMIT 1
+   `)
+    .bind(conversationId, user.id, user.id)
+    .first();
+
+  if (!relation) {
+    return Response.json(
+      { success: false, message: "messaging_not_allowed" },
+      { status: 403 }
+    );
+  }
+
   const result = await env.core_data.prepare(`
   INSERT INTO messages (
     conversation_id,
