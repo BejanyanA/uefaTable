@@ -328,7 +328,79 @@ export class ChatRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
-    this.sessions = new Map();
+
+    this.sessions = new Map(); // userId -> Set<WebSocket>
+    this.lastPing = new Map(); // userId -> timestamp
+
+    this.cleanupTimer = setInterval(() => {
+      this.checkDisconnectedUsers();
+    }, 1000);
+  }
+
+  addSession(userId, socket) {
+    const key = String(userId);
+
+    if (!this.sessions.has(key)) {
+      this.sessions.set(key, new Set());
+    }
+
+    this.sessions.get(key).add(socket);
+    this.lastPing.set(key, Date.now());
+  }
+
+  removeSession(userId, socket) {
+    const key = String(userId);
+    const sockets = this.sessions.get(key);
+
+    if (!sockets) return;
+
+    sockets.delete(socket);
+
+    if (!sockets.size) {
+      this.sessions.delete(key);
+      this.lastPing.delete(key);
+    }
+  }
+
+  checkDisconnectedUsers() {
+    const now = Date.now();
+
+    for (const [userId, lastPingTime] of this.lastPing.entries()) {
+      if (now - lastPingTime > 4000) {
+        const sockets = this.sessions.get(userId);
+
+        if (sockets) {
+          for (const socket of sockets) {
+            try {
+              socket.close();
+            } catch { }
+          }
+        }
+
+        this.sessions.delete(userId);
+        this.lastPing.delete(userId);
+      }
+    }
+  }
+
+  sendToUser(userId, data) {
+    const sockets = this.sessions.get(String(userId));
+    if (!sockets?.size) return;
+
+    const message = JSON.stringify(data);
+
+    for (const socket of sockets) {
+      try {
+        socket.send(message);
+      } catch {
+        sockets.delete(socket);
+      }
+    }
+
+    if (!sockets.size) {
+      this.sessions.delete(String(userId));
+      this.lastPing.delete(String(userId));
+    }
   }
 
   async fetch(request) {
@@ -346,15 +418,24 @@ export class ChatRoom {
 
       server.accept();
 
-      this.sessions.set(String(userId), server);
+      this.addSession(userId, server);
 
-      server.addEventListener("close", () => {
-        this.sessions.delete(String(userId));
+      server.addEventListener("message", (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.type === "ping") {
+            this.lastPing.set(String(userId), Date.now());
+          }
+        } catch { }
       });
 
-      server.addEventListener("error", () => {
-        this.sessions.delete(String(userId));
-      });
+      const cleanup = () => {
+        this.removeSession(userId, server);
+      };
+
+      server.addEventListener("close", cleanup);
+      server.addEventListener("error", cleanup);
 
       return new Response(null, {
         status: 101,
@@ -365,11 +446,7 @@ export class ChatRoom {
     if (url.pathname === "/notify") {
       const body = await request.json();
 
-      const socket = this.sessions.get(String(body.receiverId));
-
-      if (socket) {
-        socket.send(JSON.stringify(body));
-      }
+      this.sendToUser(body.receiverId, body);
 
       return Response.json({ success: true });
     }

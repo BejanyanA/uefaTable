@@ -17,6 +17,7 @@ let isLoadingConversations = false;
 let isOpeningConversation = false;
 let conversationRequestId = 0;
 let currentFriendId = null;
+let pendingVisibleMessages = [];
 
 export function getCurrentFriendId() {
   return currentFriendId;
@@ -47,7 +48,6 @@ export function initMessagesPage() {
       activeChatTab = btn.dataset.tab;
 
       if (activeChatTab === "all") {
-        // bindMessagesScrollOnce();
         await loadConversations();
       } else {
         selectedConversationId = null;
@@ -81,6 +81,34 @@ export function initMessagesPage() {
         await loadApprovedFriends();
       }
     });
+  });
+
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible") return;
+    if (!pendingVisibleMessages.length) return;
+
+    const messagesToRender = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) === Number(currentConversationId);
+    });
+
+    pendingVisibleMessages = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) !== Number(currentConversationId);
+    });
+
+    for (const message of messagesToRender) {
+      await renderSingleMessage(message);
+    }
+
+    if (messagesToRender.length) {
+      await apiPost("/conversation-messages", {
+        conversationId: currentConversationId,
+        markAsRead: true
+      }, {
+        showLoading: false
+      });
+
+      await loadConversations();
+    }
   });
 
   if (sendBtn) {
@@ -273,6 +301,39 @@ async function loadConversations() {
   } finally {
     isLoadingConversations = false;
   }
+}
+
+function bindVisibilityMessageHandlerOnce() {
+  if (document.body.dataset.messageVisibilityBound === "1") return;
+  document.body.dataset.messageVisibilityBound = "1";
+
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible") return;
+    if (!pendingVisibleMessages.length) return;
+
+    const messagesToRender = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) === Number(currentConversationId);
+    });
+
+    pendingVisibleMessages = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) !== Number(currentConversationId);
+    });
+
+    for (const message of messagesToRender) {
+      await renderSingleMessage(message);
+    }
+
+    if (messagesToRender.length) {
+      await apiPost("/conversation-messages", {
+        conversationId: currentConversationId,
+        markAsRead: true
+      }, {
+        showLoading: false
+      });
+
+      await loadConversations();
+    }
+  });
 }
 
 function updateHeaderBadgeFromVisibleItems() {
@@ -683,6 +744,8 @@ async function renderSingleMessage(message) {
 
 
 let chatSocket = null;
+let chatPingTimer = null;
+
 
 export function connectChatSocket() {
   const token = localStorage.getItem("authToken");
@@ -700,6 +763,11 @@ export function connectChatSocket() {
   chatSocket = new WebSocket(`${wsBase}/chat-socket?token=${token}`);
 
   chatSocket.onopen = () => {
+    chatPingTimer = setInterval(() => {
+      if (chatSocket?.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify({ type: "ping" }));
+      }
+    }, 1000);
   };
 
   chatSocket.onmessage = async (event) => {
@@ -714,7 +782,11 @@ export function connectChatSocket() {
           });
       }
 
-      await loadConversations();
+      if (activeChatTab === "all") {
+        await loadConversations();
+      } else {
+        await updateHeaderMessagesBadge();
+      }
       return;
     }
 
@@ -750,17 +822,28 @@ export function connectChatSocket() {
     }
 
     if (Number(message.conversationId) === Number(currentConversationId)) {
-      await renderSingleMessage(message);
+      const shouldShowNow =
+        isCurrentConversationReallyVisible(message.conversationId);
 
-      await apiPost("/conversation-messages", {
-        conversationId: currentConversationId,
-        markAsRead: document.visibilityState === "visible"
-      }, {
-        showLoading: false
-      });
+      if (shouldShowNow) {
+        await renderSingleMessage(message);
+
+        await apiPost("/conversation-messages", {
+          conversationId: currentConversationId,
+          markAsRead: true
+        }, {
+          showLoading: false
+        });
+      } else {
+        pendingVisibleMessages.push(message);
+      }
     }
 
-    await loadConversations();
+    if (activeChatTab === "all") {
+      await loadConversations();
+    } else {
+      await updateHeaderMessagesBadge();
+    }
   };
 
   chatSocket.onerror = (error) => {
@@ -769,6 +852,9 @@ export function connectChatSocket() {
 
   chatSocket.onclose = () => {
     console.warn("⚠️ Chat socket closed");
+
+    clearInterval(chatPingTimer);
+    chatPingTimer = null;
     chatSocket = null;
 
     setTimeout(() => {
@@ -777,6 +863,19 @@ export function connectChatSocket() {
       }
     }, 2000);
   };
+}
+
+export function disconnectChatSocket() {
+  if (chatPingTimer) {
+    clearInterval(chatPingTimer);
+    chatPingTimer = null;
+  }
+
+  if (chatSocket) {
+    chatSocket.onclose = null;
+    chatSocket.close();
+    chatSocket = null;
+  }
 }
 
 async function loadOlderMessages() {
@@ -827,6 +926,35 @@ async function prependMessages(messages) {
   });
 
   container.prepend(fragment);
+}
+
+function isCurrentConversationReallyVisible(conversationId) {
+  const messagesPage = document.getElementById("messagesPage");
+  const activeChatBox = document.getElementById("activeChatBox");
+  const layout = document.querySelector(".chat-layout");
+
+  const isMessagesPageVisible =
+    messagesPage && messagesPage.style.display !== "none";
+
+  const isChatBoxVisible =
+    activeChatBox && activeChatBox.style.display !== "none";
+
+  const isSameConversation =
+    Number(conversationId) === Number(currentConversationId);
+
+  const isBrowserTabVisible =
+    document.visibilityState === "visible";
+
+  const isMobileChatOpen =
+    !layout || window.innerWidth > 480 || layout.classList.contains("mobile-chat-open");
+
+  return (
+    isBrowserTabVisible &&
+    isMessagesPageVisible &&
+    isChatBoxVisible &&
+    isSameConversation &&
+    isMobileChatOpen
+  );
 }
 
 function bindMessagesScrollOnce() {
