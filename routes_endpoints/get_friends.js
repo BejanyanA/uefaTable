@@ -91,17 +91,20 @@ export async function handleGetAllFriendsStatuses(request, env) {
 
     // We include an extra derived column `byMe`
     const friends = await env.core_data.prepare(`
-    SELECT 
-        u.id,
-        u.username,
-        f.status,
-        CASE WHEN f.user_id = ? THEN 1 ELSE 0 END AS byMe
+    SELECT
+    u.id,
+    u.username,
+    f.status,
+    CASE
+        WHEN f.rejected_by_user_id = ? THEN 1
+        ELSE 0
+    END AS byMe
     FROM friends f
-    JOIN users u ON u.id = 
-        CASE 
-          WHEN f.user_id = ? THEN f.friend_id
-          ELSE f.user_id
-        END
+    JOIN users u ON u.id =
+    CASE
+        WHEN f.user_id = ? THEN f.friend_id
+        ELSE f.user_id
+    END
     WHERE f.user_id = ? OR f.friend_id = ?
   `).bind(loggedInUserId, loggedInUserId, loggedInUserId, loggedInUserId).all();
 
