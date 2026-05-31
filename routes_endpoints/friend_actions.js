@@ -227,9 +227,11 @@ export async function handleRejectFriend(request, env) {
     // 5) Reject + timestamp
     await env.core_data.prepare(`
     UPDATE friends
-    SET status = 'rejected', updated_at = datetime('now')
+    SET status = 'rejected',
+      rejected_by_user_id = ?,
+      updated_at = datetime('now')
     WHERE id = ?
-  `).bind(relation.id).run();
+    `).bind(receiverId, relation.id).run();
 
     // 6) Notify requester instantly over SSE
     await publishToUser(env, requesterId, {
