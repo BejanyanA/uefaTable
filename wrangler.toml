@@ -25,6 +25,10 @@ class_name = "NotificationHub"
 name = "CHAT_ROOM"
 class_name = "ChatRoom"
 
+[[durable_objects.bindings]]
+name = "PRESENCE_ROOM"
+class_name = "PresenceRoom"
+
 
 [[migrations]]
 tag = "v1"
@@ -33,3 +37,7 @@ new_sqlite_classes = ["NotificationHub"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["ChatRoom"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["PresenceRoom"]

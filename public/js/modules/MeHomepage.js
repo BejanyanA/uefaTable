@@ -1,6 +1,8 @@
 import { apiGet } from '../services/api.js';
 import { initNotifications } from './NotificationManager.js';
 import { customLeagues } from './CustomLeagues.js';
+import { connectChatSocket } from './Messages.js';
+import { connectPresenceSocket } from './UserStatus.js';
 
 // 🔹 JWT Check on Load
 export async function checkLoggedIn() {
@@ -18,6 +20,9 @@ export async function checkLoggedIn() {
    try {
       const data = await apiGet("/me", token); // ✅ Cleaner
       if (data.success && data.user) {
+         connectChatSocket();
+         connectPresenceSocket();
+
          document.getElementById("headerUsername").style.display = "block";
          document.getElementById("notificationBell").style.display = "block";
          document.getElementById("profileMenu").style.display = "block";
@@ -61,6 +66,9 @@ export function homepage() {
       try {
          const response = await apiGet("/me", token);
          if (response.success && response.user) {
+            connectChatSocket();
+            connectPresenceSocket();
+
             document.getElementById("headerUsername").style.display = "block";
             document.getElementById("notificationBell").style.display = "block";
             document.getElementById("profileMenu").style.display = "block";
@@ -108,7 +116,7 @@ export function logout() {
       "lastActiveNationalLeagueTab",
       "currentBannerId",
       "leagueId",
-      "selectedStageType", 
+      "selectedStageType",
       "groupId",
       "groupId:ucl-basic-my-A",
       "groupName",

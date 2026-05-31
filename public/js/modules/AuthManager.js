@@ -7,6 +7,8 @@ import { initNotifications } from './NotificationManager.js';
 import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } from "./HomeOptions.js";
 import { customLeagues } from './CustomLeagues.js';
 import { connectChatSocket, updateHeaderMessagesBadge } from './Messages.js';
+import { connectPresenceSocket } from './UserStatus.js';
+
 
 export const AuthManager = {
   initLogin: function () {
@@ -63,6 +65,7 @@ export const AuthManager = {
           localStorage.setItem("authToken", loginData.token);
 
           connectChatSocket();
+          connectPresenceSocket();
 
           // Read post‑login flags
           const postLoginAction = sessionStorage.getItem("postLoginAction"); // e.g. 'openCustom'
@@ -70,6 +73,7 @@ export const AuthManager = {
 
           // Scenario 1: user clicked Custom League while not logged in
           if (postLoginAction === "openCustom") {
+            initNotifications();
             sessionStorage.removeItem("postLoginAction");
 
             document.getElementById("headerUsername").style.display = "block";
@@ -78,7 +82,6 @@ export const AuthManager = {
             document.getElementById("messagesBtn").style.display = "block";
             document.getElementById("loginBtn").style.display = "none";
             document.getElementById("registerBtn").style.display = "none";
-            initNotifications();
 
             await customLeagues();               // call your custom‑league API here
             setHomeOptionsVisible(false);
@@ -92,6 +95,7 @@ export const AuthManager = {
             if (me.success) {
               // Update UI with user data
               connectChatSocket();
+              connectPresenceSocket();
               await updateHeaderMessagesBadge();
 
               localStorage.setItem("user", JSON.stringify(me.user));
@@ -108,6 +112,7 @@ export const AuthManager = {
               }
               initNotifications();
             }
+
             // Default home page state
             setHomeOptionsVisible(true);
             setCustomCompetitionVisible(false);

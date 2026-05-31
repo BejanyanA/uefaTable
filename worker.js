@@ -253,6 +253,26 @@ export default {
       );
     }
 
+    if (url.pathname === "/presence-socket") {
+      if (request.headers.get("Upgrade") !== "websocket") {
+        return new Response("Expected websocket", { status: 426 });
+      }
+
+      const token = url.searchParams.get("token");
+      const user = await verifyToken(token, env.JWT_SECRET);
+
+      if (!user?.id) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
+      const id = env.PRESENCE_ROOM.idFromName("presence");
+      const room = env.PRESENCE_ROOM.get(id);
+
+      return room.fetch(
+        new Request(`https://presence-room/connect?userId=${user.id}`, request)
+      );
+    }
+
     // === Fallback to your existing router ===
     return onRequest({ request, env, ctx });
   }
@@ -355,5 +375,148 @@ export class ChatRoom {
     }
 
     return new Response("Not found", { status: 404 });
+  }
+}
+
+
+export class PresenceRoom {
+  constructor(state, env) {
+    this.state = state;
+    this.env = env;
+    this.sessions = new Map(); // userId -> Set<WebSocket>
+    this.lastPing = new Map(); // userId -> timestamp
+    this.status = new Map(); // userId -> boolean
+
+    this.cleanupTimer = setInterval(() => {
+      this.checkOfflineUsers();
+    }, 1000);
+  }
+
+  broadcast(data) {
+    const message = JSON.stringify(data);
+
+    for (const sockets of this.sessions.values()) {
+      for (const socket of sockets) {
+        try {
+          socket.send(message);
+        } catch { }
+      }
+    }
+  }
+
+  async setOnline(userId) {
+    const key = String(userId);
+    this.lastPing.set(key, Date.now());
+
+    if (this.status.get(key) === true) return;
+
+    this.status.set(key, true);
+
+    await this.env.core_data.prepare(`
+    UPDATE users
+    SET is_online = 1
+    WHERE id = ?
+  `).bind(userId).run();
+
+    this.broadcast({
+      type: "presence_status",
+      userId: Number(userId),
+      isOnline: true,
+      lastSeen: null
+    });
+  }
+
+  async setOffline(userId) {
+    const key = String(userId);
+
+    if (this.status.get(key) === false) return;
+
+    this.status.set(key, false);
+
+    const lastSeen = new Date().toISOString();
+
+    await this.env.core_data.prepare(`
+    UPDATE users
+    SET is_online = 0,
+        last_seen = ?
+    WHERE id = ?
+  `).bind(lastSeen, userId).run();
+
+    this.broadcast({
+      type: "presence_status",
+      userId: Number(userId),
+      isOnline: false,
+      lastSeen
+    });
+  }
+
+  checkOfflineUsers() {
+    const now = Date.now();
+
+    for (const [userId, lastPingTime] of this.lastPing.entries()) {
+      if (now - lastPingTime > 4000) {
+        this.lastPing.delete(userId);
+        this.setOffline(userId);
+      }
+    }
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+
+    if (url.pathname !== "/connect") {
+      return new Response("Not found", { status: 404 });
+    }
+
+    const userId = url.searchParams.get("userId");
+    if (!userId) return new Response("Missing userId", { status: 400 });
+
+    const pair = new WebSocketPair();
+    const [client, server] = Object.values(pair);
+
+    server.accept();
+
+    const key = String(userId);
+
+    if (!this.sessions.has(key)) {
+      this.sessions.set(key, new Set());
+    }
+
+    this.sessions.get(key).add(server);
+    this.setOnline(userId);
+
+    server.addEventListener("message", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "ping") {
+          this.lastPing.set(key, Date.now());
+          this.setOnline(userId);
+        }
+      } catch { }
+    });
+
+    const cleanup = () => {
+      const set = this.sessions.get(key);
+      if (set) {
+        set.delete(server);
+        if (!set.size) {
+          this.sessions.delete(key);
+        }
+      }
+
+      if (!this.sessions.has(key)) {
+        this.lastPing.delete(key);
+        this.setOffline(userId);
+      }
+    };
+
+    server.addEventListener("close", cleanup);
+    server.addEventListener("error", cleanup);
+
+    return new Response(null, {
+      status: 101,
+      webSocket: client
+    });
   }
 }
