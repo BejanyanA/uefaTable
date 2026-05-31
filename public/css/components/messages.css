@@ -41,6 +41,17 @@
   overflow: hidden;
 }
 
+.empty-chat {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 16px;
+  padding: 50px 10px 50px 10px;
+  text-align: center;
+}
+
 .empty-chat-state {
   height: 100%;
   display: flex;

@@ -155,7 +155,10 @@ async function loadConversations() {
     updateHeaderBadgeFromConversations(conversations);
 
     if (!data.success || !conversations.length) {
-      list.innerHTML = `<div class="empty-chat">No conversations yet</div>`;
+      const emptyChat =
+        langMap[currentLang]?.chatEmptyConversation || "No conversations yet";
+
+      list.innerHTML = `<div class="empty-chat" id="emptyChat">${emptyChat}</div>`;
       return;
     }
 
@@ -244,7 +247,10 @@ async function loadApprovedFriends() {
   });
 
   if (!data.success || !friends.length) {
-    list.innerHTML = `<div class="empty-chat">No approved friends</div>`;
+    const emptyFriends =
+      langMap[currentLang]?.chatEmptyFriends || "No friends yet";
+
+    list.innerHTML = `<div class="empty-chat" id="emptyFriends">${emptyFriends}</div>`;
     return;
   }
 

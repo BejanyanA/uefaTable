@@ -142,6 +142,8 @@ export const langMap = {
     noChatSelected: "Select a chat to start messaging",
     typeMessagePlaceholder: "Type a message...",
     message_received: "sent you a message",
+    chatEmptyConversation: "No conversations yet",
+    chatEmptyFriends: "No friends yet",
 
 
 
@@ -310,6 +312,8 @@ export const langMap = {
     noChatSelected: "Ընտրեք ընկերոջը և սկսեք նամակագրությունը",
     typeMessagePlaceholder: "Գրել հաղորդագրություն...",
     message_received: "ուղարկել է ձեզ հաղորդագրություն",
+    chatEmptyConversation: "Դեռևս զրույցներ չկան",
+    chatEmptyFriends: "Դեռևս ընկերներ չկան",
 
 
     //BE translations
@@ -477,6 +481,8 @@ export const langMap = {
     noChatSelected: "Sélectionnez une discussion pour commencer à envoyer des messages",
     typeMessagePlaceholder: "Tapez un message...",
     message_received: "vous a envoyé un message",
+    chatEmptyConversation: "Aucune conversation pour le moment",
+    chatEmptyFriends: "Aucun ami pour le moment",
 
 
 
@@ -724,6 +730,15 @@ function changeLang(lang, opts = {}) {
     opt.textContent = typeMessagePlaceholder;
   });
 
+  const emptyChat = langMap[currentLang].chatEmptyConversation || "No conversations yet";
+  document.querySelectorAll("#emptyChat").forEach(opt => {
+    opt.textContent = emptyChat;
+  });
+
+  const emptyFriends = langMap[currentLang].chatEmptyFriends || "No friends yet";
+  document.querySelectorAll("#emptyFriends").forEach(opt => {
+    opt.textContent = emptyFriends;
+  });
 
 
   const dynamicLabels = {
