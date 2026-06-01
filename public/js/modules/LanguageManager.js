@@ -144,6 +144,13 @@ export const langMap = {
     message_received: "sent you a message",
     chatEmptyConversation: "No conversations yet",
     chatEmptyFriends: "No friends yet",
+    online: "Online",
+    offline: "Offline",
+    last_seen: "Last seen",
+    just_now: "just now",
+    min_ago: "min ago",
+    hour_ago: "h ago",
+    today_at: "today at",
 
 
 
@@ -314,6 +321,13 @@ export const langMap = {
     message_received: "ուղարկել է ձեզ հաղորդագրություն",
     chatEmptyConversation: "Դեռևս զրույցներ չկան",
     chatEmptyFriends: "Դեռևս ընկերներ չկան",
+    online: "Առցանց",
+    offline: "Անցանց",
+    last_seen: "Վերջին այցը",
+    just_now: "հենց հիմա",
+    min_ago: "րոպե առաջ",
+    hour_ago: "ժ առաջ",
+    today_at: "այսօր ժամը",
 
 
     //BE translations
@@ -483,6 +497,13 @@ export const langMap = {
     message_received: "vous a envoyé un message",
     chatEmptyConversation: "Aucune conversation pour le moment",
     chatEmptyFriends: "Aucun ami pour le moment",
+    online: "En ligne",
+    offline: "Hors ligne",
+    last_seen: "Vu",
+    just_now: "à l’instant",
+    min_ago: "min",
+    hour_ago: "h",
+    today_at: "aujourd’hui à",
 
 
 
