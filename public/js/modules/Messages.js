@@ -83,33 +83,7 @@ export function initMessagesPage() {
     });
   });
 
-  document.addEventListener("visibilitychange", async () => {
-    if (document.visibilityState !== "visible") return;
-    if (!pendingVisibleMessages.length) return;
-
-    const messagesToRender = pendingVisibleMessages.filter((message) => {
-      return Number(message.conversationId) === Number(currentConversationId);
-    });
-
-    pendingVisibleMessages = pendingVisibleMessages.filter((message) => {
-      return Number(message.conversationId) !== Number(currentConversationId);
-    });
-
-    for (const message of messagesToRender) {
-      await renderSingleMessage(message);
-    }
-
-    if (messagesToRender.length) {
-      await apiPost("/conversation-messages", {
-        conversationId: currentConversationId,
-        markAsRead: true
-      }, {
-        showLoading: false
-      });
-
-      await loadConversations();
-    }
-  });
+  bindVisibilityMessageHandlerOnce();
 
   if (sendBtn) {
     sendBtn.addEventListener("click", sendMessage);
@@ -203,8 +177,8 @@ function hideAllSections() {
   });
 }
 
-async function loadConversations() {
-  if (isLoadingConversations) return;
+async function loadConversations(force = false) {
+  if (isLoadingConversations && !force) return;
 
   isLoadingConversations = true;
 
@@ -302,6 +276,14 @@ async function loadConversations() {
   }
 }
 
+function isMessageAlreadyRendered(messageId) {
+  if (!messageId) return false;
+
+  return Boolean(
+    document.querySelector(`.message-row[data-message-id="${messageId}"]`)
+  );
+}
+
 function bindVisibilityMessageHandlerOnce() {
   if (document.body.dataset.messageVisibilityBound === "1") return;
   document.body.dataset.messageVisibilityBound = "1";
@@ -330,7 +312,11 @@ function bindVisibilityMessageHandlerOnce() {
         showLoading: false
       });
 
-      await loadConversations();
+      if (activeChatTab === "all") {
+        await loadConversations();
+      } else {
+        await updateHeaderMessagesBadge();
+      }
     }
   });
 }
@@ -553,6 +539,7 @@ async function renderMessages(messages) {
 async function createMessageRow(message) {
   const row = document.createElement("div");
   row.className = "message-row";
+  row.dataset.messageId = message.id;
 
   if (Number(message.senderId) === Number(myUserId)) {
     row.classList.add("mine");
@@ -632,6 +619,23 @@ async function sendMessage() {
   });
 
   selectedConversationId = sentConversationId;
+
+  await renderSingleMessage({
+    id: response.messageId,
+    conversationId: sentConversationId,
+    senderId: myUserId,
+    encryptedMessage,
+    isRead: 0,
+    createdAt: new Date().toISOString()
+  });
+
+  selectedConversationId = sentConversationId;
+
+  if (activeChatTab === "all") {
+    await loadConversations(true);
+  } else {
+    await updateHeaderMessagesBadge();
+  }
 }
 
 export async function updateHeaderMessagesBadge() {
@@ -732,6 +736,8 @@ function setActiveChatItem(activeElement) {
 async function renderSingleMessage(message) {
   const container = document.getElementById("messagesContainer");
   if (!container) return;
+
+  if (isMessageAlreadyRendered(message.id)) return;
 
   const row = await createMessageRow(message);
   container.appendChild(row);

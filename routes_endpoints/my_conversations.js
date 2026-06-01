@@ -73,8 +73,8 @@ export async function handleMyConversations(request, env) {
       WHERE m.conversation_id = c.id
     )
   ORDER BY
-    lastMessageAt DESC,
-    c.id DESC
+  datetime(lastMessageAt) DESC,
+  c.id DESC
   `)
     .bind(userId, userId, userId, userId)
     .all();
