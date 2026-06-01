@@ -1113,7 +1113,7 @@ function handleTyping() {
 
   typingTimer = setTimeout(() => {
     sendTypingStatus("typing_stop");
-  }, 2000);
+  }, 500);
 }
 
 function sendTypingStatus(type) {
@@ -1136,9 +1136,9 @@ function showTypingNearUsername() {
   if (!typingEl) {
     typingEl = document.createElement("small");
     typingEl.id = "chatTypingStatus";
-    typingEl.textContent = " typing...";
-    nameText.after(typingEl);
+    nameText.insertAdjacentElement("afterend", typingEl);
   }
+  typingEl.textContent = langMap[currentLang]?.typing || "typing...";
 
   typingEl.style.display = "inline";
 

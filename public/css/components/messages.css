@@ -136,7 +136,7 @@
 }
 
 .chat-header {
-  display: flex;
+  position: relative;
   justify-content: space-between;
   align-items: center;
   padding: 14px;
@@ -357,6 +357,11 @@
 }
 
 #chatHeaderStatus {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  padding-top: 3px;
   font-size: 12px;
   letter-spacing: 1px;
   font-weight: normal;
@@ -389,8 +394,8 @@
 }
 
 #chatTypingStatus {
-  margin-left: 6px;
-  font-size: 12px;
+  margin-left: 3px;
+  font-size: 11px;
   color: #9ca3af;
 }
 
@@ -621,6 +626,10 @@
   }
 
   #chatHeaderStatus {
+    position: unset;
+    left: unset;
+    transform: unset;
+    padding-top: unset;
     margin-left: auto;
     font-size: 10px;
     letter-spacing: 1px;
@@ -636,6 +645,12 @@
   .conversation-status {
     padding-right: 0px;
     letter-spacing: 1px;
+  }
+
+  #chatTypingStatus {
+    margin-left: 3px;
+    font-size: 10px;
+    color: #9ca3af;
   }
 }
 
