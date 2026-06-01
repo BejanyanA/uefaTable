@@ -20,6 +20,10 @@ let currentFriendId = null;
 let pendingVisibleMessages = [];
 let chatSocket = null;
 let chatPingTimer = null;
+let typingTimer = null;
+let lastTypingSentAt = 0;
+let typingHideTimer = null;
+
 
 const messageSound = new Audio("assets/sounds/message.mp3");
 messageSound.preload = "auto";
@@ -106,6 +110,8 @@ export function initMessagesPage() {
         sendMessage();
       }
     });
+
+    input.addEventListener("input", handleTyping);
   }
 }
 
@@ -246,12 +252,27 @@ export function connectChatSocket() {
           .forEach((status) => {
             status.textContent = "✓✓";
           });
+        return;
       }
 
       if (activeChatTab === "all") {
         await loadConversations();
       } else {
         await updateHeaderMessagesBadge();
+      }
+      return;
+    }
+
+    if (data.type === "typing") {
+      if (Number(data.conversationId) === Number(currentConversationId)) {
+        showTypingNearUsername();
+      }
+      return;
+    }
+
+    if (data.type === "typing_stop") {
+      if (Number(data.conversationId) === Number(currentConversationId)) {
+        hideTypingNearUsername();
       }
       return;
     }
@@ -456,12 +477,17 @@ async function loadConversations(force = false) {
         statusElement.classList.add("online-status");
       }
 
-      const isOnline = Number(conversation.isOnline) === 1;
+      const presence = getPresenceStatus(conversation.friendId);
+
+      const isOnline = presence.isOnline;
+
       const statusText = isOnline
         ? getOnlineText()
-        : conversation.lastSeen
-          ? `${getLastSeenText()} ${formatLastSeen(conversation.lastSeen)}`
+        : presence.lastSeen
+          ? `${getLastSeenText()} ${formatLastSeen(presence.lastSeen)}`
           : getOfflineText();
+
+      const statusClass = isOnline ? "online-status" : "";
 
       item.innerHTML = `
         <div class="conversation-user">
@@ -469,14 +495,9 @@ async function loadConversations(force = false) {
 
           <div class="conversation-user-info">
             <span class="conversation-name">${conversation.friendUsername}</span>
-            <small class="conversation-status">${statusText}</small>
+            <small class="conversation-status ${statusClass}">${statusText}</small>
           </div>
         </div>
-
-        ${Number(conversation.unreadCount) > 0
-          ? `<span class="unread-badge">${conversation.unreadCount}</span>`
-          : ""
-        }
       `;
 
       if (Number(conversation.conversationId) === Number(selectedConversationId)) {
@@ -1069,4 +1090,67 @@ function unlockMessageSound() {
     .catch(() => {
       messageSound.volume = 1;
     });
+}
+
+function handleTyping() {
+  if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+  if (!currentConversationId || !currentFriendId) return;
+
+  const input = document.getElementById("messageInput");
+  if (!input || !input.value.trim()) {
+    sendTypingStatus("typing_stop");
+    return;
+  }
+
+  const now = Date.now();
+
+  if (now - lastTypingSentAt > 1200) {
+    sendTypingStatus("typing");
+    lastTypingSentAt = now;
+  }
+
+  clearTimeout(typingTimer);
+
+  typingTimer = setTimeout(() => {
+    sendTypingStatus("typing_stop");
+  }, 2000);
+}
+
+function sendTypingStatus(type) {
+  if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+  if (!currentConversationId || !currentFriendId) return;
+
+  chatSocket.send(JSON.stringify({
+    type,
+    conversationId: currentConversationId,
+    receiverId: currentFriendId
+  }));
+}
+
+function showTypingNearUsername() {
+  const nameText = document.getElementById("chatHeaderNameText");
+  if (!nameText) return;
+
+  let typingEl = document.getElementById("chatTypingStatus");
+
+  if (!typingEl) {
+    typingEl = document.createElement("small");
+    typingEl.id = "chatTypingStatus";
+    typingEl.textContent = " typing...";
+    nameText.after(typingEl);
+  }
+
+  typingEl.style.display = "inline";
+
+  clearTimeout(typingHideTimer);
+  typingHideTimer = setTimeout(() => {
+    hideTypingNearUsername();
+  }, 3000);
+}
+
+function hideTypingNearUsername() {
+  const typingEl = document.getElementById("chatTypingStatus");
+  if (typingEl) {
+    typingEl.style.display = "none";
+  }
 }

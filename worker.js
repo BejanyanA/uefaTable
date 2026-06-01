@@ -427,6 +427,16 @@ export class ChatRoom {
           if (data.type === "ping") {
             this.lastPing.set(String(userId), Date.now());
           }
+
+          if (data.type === "typing" || data.type === "typing_stop") {
+            this.sendToUser(data.receiverId, {
+              type: data.type,
+              conversationId: data.conversationId,
+              senderId: Number(userId)
+            });
+            return;
+          }
+          
         } catch { }
       });
 
