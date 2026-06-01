@@ -366,7 +366,7 @@ export class ChatRoom {
     const now = Date.now();
 
     for (const [userId, lastPingTime] of this.lastPing.entries()) {
-      if (now - lastPingTime > 4000) {
+      if (now - lastPingTime > 45000) {
         const sockets = this.sessions.get(userId);
 
         if (sockets) {
@@ -555,7 +555,7 @@ export class PresenceRoom {
     const now = Date.now();
 
     for (const [userId, lastPingTime] of this.lastPing.entries()) {
-      if (now - lastPingTime > 4000) {
+      if (now - lastPingTime > 45000) {
         this.lastPing.delete(userId);
         this.setOffline(userId);
       }
