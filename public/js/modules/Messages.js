@@ -431,7 +431,8 @@ async function loadApprovedFriends() {
           friend.username,
           friend.id,
           presence.isOnline,
-          presence.lastSeen
+          presence.lastSeen,
+          "approved"
         );
 
       } finally {
@@ -465,7 +466,7 @@ async function openConversation(
   friendId,
   isOnline,
   lastSeen,
-  friendshipStatus
+  friendshipStatus = "approved"
 ) {
   const input = document.getElementById("messageInput");
   if (input) {
