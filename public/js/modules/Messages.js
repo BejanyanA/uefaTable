@@ -1010,7 +1010,7 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
     return;
   }
 
-  status.textContent = `Last seen ${formatLastSeenDateTime(lastSeen)}`;
+  status.textContent = `Last seen ${formatLastSeen(lastSeen)}`;
 }
 
 export function formatLastSeenDateTime(lastSeen) {

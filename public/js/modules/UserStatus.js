@@ -1,5 +1,5 @@
 import { API_BASE } from '../services/config.js';
-import { updateChatHeaderStatus, getCurrentFriendId } from "./Messages.js";
+import { updateChatHeaderStatus, getCurrentFriendId, formatLastSeenDateTime } from "./Messages.js";
 
 let presenceSocket = null;
 let presencePingTimer = null;
@@ -101,7 +101,7 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
                 status.textContent = isOnline
                     ? "Online"
                     : lastSeen
-                        ? `Last seen ${formatLastSeen(lastSeen)}`
+                        ? `Last seen ${formatLastSeenDateTime(lastSeen)}`
                         : "Offline";
             }
         });
