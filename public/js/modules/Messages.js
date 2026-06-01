@@ -763,6 +763,10 @@ export function connectChatSocket() {
   chatSocket = new WebSocket(`${wsBase}/chat-socket?token=${token}`);
 
   chatSocket.onopen = () => {
+    if (chatPingTimer) {
+      clearInterval(chatPingTimer);
+    }
+
     chatPingTimer = setInterval(() => {
       if (chatSocket?.readyState === WebSocket.OPEN) {
         chatSocket.send(JSON.stringify({ type: "ping" }));
@@ -851,8 +855,6 @@ export function connectChatSocket() {
   };
 
   chatSocket.onclose = () => {
-    console.warn("⚠️ Chat socket closed");
-
     clearInterval(chatPingTimer);
     chatPingTimer = null;
     chatSocket = null;
