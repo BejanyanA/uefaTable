@@ -7,10 +7,8 @@
   color: #dad3d3e9;
   /* Subtle grey color */
   transition: color 0.2s ease;
-  margin-right: 8px;
-  padding-right: 1px;
-  padding-left: 0px;
-  /* A bit of space before the profile icon */
+  padding-right: 6px;
+  padding-left: 2px;
 }
 
 /* Styling for the unread count badge */
@@ -18,7 +16,7 @@
   position: absolute;
   top: 8px;
   /* Position above the bell */
-  right: 66px;
+  right: 105px;
   /* Position to the right of the bell */
   background-color: #ff0000;
   /* Red color for alerts */
@@ -46,10 +44,6 @@
   }
 }
 
-/* Apply the animation when new notifications are present */
-.notification-badge.new-notifications {
-  animation: pulse 1s infinite;
-}
 
 /* Mobile: show at bottom */
 @media (max-width: 450px) {
@@ -58,10 +52,8 @@
   /* E. Notification Bell Icon */
   .notification-bell {
     font-size: 1.1em;
-    /* Smaller bell icon */
-    margin-right: 2px;
-    padding-right: 1px;
-    padding-left: 0px;
+    padding-right: 2px;
+    padding-left: 4px;
   }
 
   /* F. Notification Badge */
@@ -71,7 +63,7 @@
     /* Smaller text in the badge */
     text-align: center;
     top: 10px;
-    right: 44px;
+    right: 74px;
   }
 
 }
