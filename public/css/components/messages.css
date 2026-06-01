@@ -114,13 +114,9 @@
 }
 
 .conversation-item.active {
-  background: #0066ff;
+  background: #03337b;
   color: #fff;
   border-left: 4px solid #4da3ff;
-}
-
-.conversation-item.active:hover {
-  background: #0066ff;
 }
 
 .friend-chat-item.active {
@@ -173,7 +169,7 @@
 }
 
 .message-row.mine .message-bubble {
-  background: #0066ff;
+  background: #03337b;
 }
 
 .message-time {
@@ -223,9 +219,9 @@
 #sendMessageBtn {
   border: none;
   border-radius: 8px;
-  padding: 8px 12px;
+    padding: 8px 14px 6px 16px; 
   cursor: pointer;
-  background: #0066ff;
+  background: #03337b;
   color: #fff;
 }
 
@@ -250,7 +246,7 @@
 }
 
 .chat-tab-btn.active {
-  background: #0066ff;
+  background: #03337b;
 }
 
 .friend-chat-item {
@@ -382,7 +378,8 @@
 }
 
 .online-status {
-  color: #22c55e;
+  color: #00ff5e;
+  font-weight: bold;
   font-weight: 500;
 }
 
@@ -608,9 +605,9 @@
   #sendMessageBtn {
     border: none;
     border-radius: 8px;
-    padding: 4px 8px;
+    padding: 4px 8px 1px 11px;
     cursor: pointer;
-    background: #0066ff;
+    background: #03337b;
     color: #fff;
   }
 
