@@ -337,8 +337,11 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
   const status = document.getElementById("chatHeaderStatus");
   if (!status) return;
 
+  status.classList.remove("online-status", "last-seen");
+
   if (Number(isOnline) === 1 || isOnline === true) {
     status.textContent = getOnlineText();
+    status.classList.add("online-status");
     return;
   }
 
@@ -348,6 +351,8 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
   }
 
   status.textContent = `${getLastSeenText()} ${formatLastSeenDateTime(lastSeen)}`;
+
+  status.classList.add("last-seen");
 }
 
 async function loadOlderMessages() {
@@ -431,6 +436,12 @@ async function loadConversations(force = false) {
       const item = document.createElement("div");
       item.className = "conversation-item";
       item.dataset.friendId = conversation.friendId;
+
+      const statusElement = item.querySelector(".conversation-status");
+
+      if (statusElement && isOnline) {
+        statusElement.classList.add("online-status");
+      }
 
       const isOnline = Number(conversation.isOnline) === 1;
       const statusText = isOnline
@@ -527,6 +538,12 @@ async function loadApprovedFriends() {
     const item = document.createElement("div");
     item.className = "friend-chat-item";
     item.dataset.friendId = friend.id;
+
+    const statusElement = item.querySelector(".conversation-status");
+
+    if (statusElement && isOnline) {
+      statusElement.classList.add("online-status");
+    }
 
     const isOnline = Number(friend.isOnline) === 1;
     const statusText = isOnline

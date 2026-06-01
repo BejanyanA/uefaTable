@@ -217,6 +217,8 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
             }
 
             if (status) {
+                status.classList.toggle("online-status", Boolean(isOnline));
+
                 status.textContent = isOnline
                     ? getOnlineText()
                     : lastSeen

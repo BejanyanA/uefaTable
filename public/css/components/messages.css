@@ -355,6 +355,11 @@
   /* Allows clicks to pass through to the bell */
 }
 
+#chatHeaderNameText {
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
 #chatHeaderStatus {
   font-size: 12px;
   letter-spacing: 1px;
@@ -363,8 +368,9 @@
 
 .conversation-name {
   width: 90px;
+  letter-spacing: 0․5px;
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
 }
 
@@ -372,6 +378,17 @@
   /* padding-left: 10px; */
   font-size: 10px;
   letter-spacing: 1px;
+  color: #b4b4b4;
+}
+
+.online-status {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.last-seen {
+  color: #b4b4b4;
+  font-weight: 500;
 }
 
 @media (max-width: 480px) {
@@ -597,6 +614,11 @@
     color: #fff;
   }
 
+  #chatHeaderNameText {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
   #chatHeaderStatus {
     margin-left: auto;
     font-size: 10px;
@@ -606,6 +628,8 @@
   .conversation-name {
     width: 100px;
     display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.5px;
   }
 
   .conversation-status {
