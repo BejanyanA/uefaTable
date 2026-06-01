@@ -20,14 +20,21 @@ let currentFriendId = null;
 let pendingVisibleMessages = [];
 let chatSocket = null;
 let chatPingTimer = null;
-const messageSound = new Audio("assets/sounds/message.wav");
+
+const messageSound = new Audio("assets/sounds/message.mp3");
 messageSound.preload = "auto";
+
+let soundUnlocked = false;
 
 export function getCurrentFriendId() {
   return currentFriendId;
 }
 
 export function initMessagesPage() {
+  // Safari/iOS audio unlock
+  document.addEventListener("click", unlockMessageSound, { once: true });
+  document.addEventListener("touchstart", unlockMessageSound, { once: true });
+
   const messagesBtn = document.getElementById("messagesBtn");
   const sendBtn = document.getElementById("sendMessageBtn");
   const input = document.getElementById("messageInput");
@@ -1045,4 +1052,21 @@ function playMessageSound() {
     messageSound.currentTime = 0;
     messageSound.play().catch(() => { });
   } catch { }
+}
+
+function unlockMessageSound() {
+  if (soundUnlocked) return;
+
+  messageSound.volume = 0.01;
+
+  messageSound.play()
+    .then(() => {
+      messageSound.pause();
+      messageSound.currentTime = 0;
+      messageSound.volume = 1;
+      soundUnlocked = true;
+    })
+    .catch(() => {
+      messageSound.volume = 1;
+    });
 }
