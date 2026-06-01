@@ -767,7 +767,7 @@ export function connectChatSocket() {
       if (chatSocket?.readyState === WebSocket.OPEN) {
         chatSocket.send(JSON.stringify({ type: "ping" }));
       }
-    }, 1000);
+    }, 20000);
   };
 
   chatSocket.onmessage = async (event) => {

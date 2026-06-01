@@ -22,7 +22,7 @@ export function connectPresenceSocket() {
             if (presenceSocket?.readyState === WebSocket.OPEN) {
                 presenceSocket.send(JSON.stringify({ type: "ping" }));
             }
-        }, 1000);
+        }, 20000);
     };
 
     presenceSocket.onmessage = (event) => {
