@@ -1,4 +1,5 @@
 import { API_BASE } from '../services/config.js';
+import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { updateChatHeaderStatus, getCurrentFriendId, formatLastSeenDateTime } from "./Messages.js";
 
 let presenceSocket = null;
@@ -80,6 +81,74 @@ export function getPresenceStatus(userId) {
     };
 }
 
+export function formatLastSeen(value) {
+    const dateValue = value.includes("T")
+        ? value
+        : value.replace(" ", "T") + "Z";
+
+    const date = new Date(dateValue);
+    const now = new Date();
+
+    const diffMinutes = Math.floor((now - date) / 60000);
+
+    if (diffMinutes < 1) {
+        return tr("just_now", "just now");
+    }
+
+    if (diffMinutes < 60) {
+        return `${diffMinutes} ${tr("min_ago", "min ago")}`;
+    }
+
+    const diffHours = Math.floor(diffMinutes / 60);
+
+    if (diffHours < 24) {
+        return `${diffHours}${tr("hour_ago", "h ago")}`;
+    }
+
+    return date.toLocaleDateString();
+}
+
+export function getOnlineText() {
+    return tr("online", "Online");
+}
+
+export function getOfflineText() {
+    return tr("offline", "Offline");
+}
+
+export function getLastSeenText() {
+    return tr("last_seen", "Last seen");
+}
+
+export function refreshPresenceTexts() {
+    document
+        .querySelectorAll(".conversation-item, .friend-chat-item")
+        .forEach((item) => {
+            const statusEl = item.querySelector(".conversation-status");
+            if (!statusEl) return;
+
+            const friendId = Number(item.dataset.friendId);
+            const presence = getPresenceStatus(friendId);
+
+            statusEl.textContent = presence.isOnline
+                ? (langMap[currentLang]?.online || "Online")
+                : presence.lastSeen
+                    ? `${langMap[currentLang]?.last_seen || "Last seen"} ${formatLastSeen(presence.lastSeen)}`
+                    : (langMap[currentLang]?.offline || "Offline");
+        });
+
+    const currentFriendIdValue = getCurrentFriendId();
+
+    if (currentFriendIdValue) {
+        const presence = getPresenceStatus(currentFriendIdValue);
+
+        updateChatHeaderStatus(
+            presence.isOnline,
+            presence.lastSeen
+        );
+    }
+}
+
 function updateConversationUserStatus(userId, isOnline, lastSeen) {
     presenceCache.set(Number(userId), {
         isOnline: Boolean(isOnline),
@@ -99,10 +168,10 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
 
             if (status) {
                 status.textContent = isOnline
-                    ? "Online"
+                    ? getOnlineText()
                     : lastSeen
-                        ? `Last seen ${formatLastSeenDateTime(lastSeen)}`
-                        : "Offline";
+                        ? `${langMap[currentLang]?.last_seen || "Last seen"} ${formatLastSeen(lastSeen)}`
+                        : getOfflineText();
             }
         });
 
@@ -111,21 +180,6 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
     }
 }
 
-export function formatLastSeen(value) {
-    const dateValue = value.includes("T")
-        ? value
-        : value.replace(" ", "T") + "Z";
-
-    const date = new Date(dateValue);
-    const now = new Date();
-
-    const diffMinutes = Math.floor((now - date) / 60000);
-
-    if (diffMinutes < 1) return "just now";
-    if (diffMinutes < 60) return `${diffMinutes} min ago`;
-
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-
-    return date.toLocaleDateString();
+function tr(key, fallback) {
+    return langMap[currentLang]?.[key] || fallback;
 }

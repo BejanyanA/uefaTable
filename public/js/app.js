@@ -8,6 +8,7 @@ import { ModalManager } from './modules/ModalManager.js';
 import { initHomeOptionButtons } from './modules/HomeOptions.js';
 import { initRouter } from "../js/modules/router.js"; // adjust path if needed
 import { initMessagesPage, connectChatSocket, updateHeaderMessagesBadge } from "./modules/Messages.js";
+import { refreshPresenceTexts } from "./modules/UserStatus.js";
 
 // ✅ Register modal methods globally
 window.openModal = ModalManager.open;
@@ -70,6 +71,8 @@ window.setLanguage = function (lang) {
    if (typeof changeLang === "function") {
       changeLang(lang);
    }
+
+   refreshPresenceTexts();
 };
 
 // 🔹 Close lang dropdown on outside click

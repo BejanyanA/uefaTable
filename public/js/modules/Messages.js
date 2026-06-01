@@ -3,7 +3,7 @@ import { API_BASE } from "../services/config.js";
 import { encryptMessage, decryptMessage } from "../services/encryption.js";
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
-import { requestPresenceStatuses, formatLastSeen, getPresenceStatus } from '../modules/UserStatus.js';
+import { requestPresenceStatuses, formatLastSeen, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -338,16 +338,16 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
   if (!status) return;
 
   if (Number(isOnline) === 1 || isOnline === true) {
-    status.textContent = "Online";
+    status.textContent = getOnlineText();
     return;
   }
 
   if (!lastSeen) {
-    status.textContent = "Offline";
+    status.textContent = getOfflineText();
     return;
   }
 
-  status.textContent = `Last seen ${formatLastSeen(lastSeen)}`;
+  status.textContent = `${getLastSeenText()} ${formatLastSeenDateTime(lastSeen)}`;
 }
 
 export function formatLastSeenDateTime(lastSeen) {
@@ -373,7 +373,7 @@ export function formatLastSeenDateTime(lastSeen) {
       hour12: false
     }).format(date);
 
-    return `today at ${time}`;
+    return `${langMap[currentLang]?.today_at || "today at"} ${time}`;
   }
 
   const datePart = new Intl.DateTimeFormat(undefined, {
@@ -475,8 +475,12 @@ async function loadConversations(force = false) {
       item.className = "conversation-item";
       item.dataset.friendId = conversation.friendId;
 
-      const isOnline = false;
-      const statusText = "Offline";
+      const isOnline = Number(conversation.isOnline) === 1;
+      const statusText = isOnline
+        ? getOnlineText()
+        : conversation.lastSeen
+          ? `${getLastSeenText()} ${formatLastSeen(conversation.lastSeen)}`
+          : getOfflineText();
 
       item.innerHTML = `
         <div class="conversation-user">
@@ -567,8 +571,12 @@ async function loadApprovedFriends() {
     item.className = "friend-chat-item";
     item.dataset.friendId = friend.id;
 
-    const isOnline = false;
-    const statusText = "Offline";
+    const isOnline = Number(friend.isOnline) === 1;
+    const statusText = isOnline
+      ? getOnlineText()
+      : friend.lastSeen
+        ? `${getLastSeenText()} ${formatLastSeen(friend.lastSeen)}`
+        : getOfflineText();
 
     const userInfo = document.createElement("div");
     userInfo.className = "conversation-user";
@@ -1050,4 +1058,8 @@ function updateHeaderBadgeFromConversations(conversations = []) {
     badge.textContent = "0";
     badge.style.display = "none";
   }
+}
+
+function t(key, fallback) {
+  return langMap[currentLang]?.[key] || fallback;
 }
