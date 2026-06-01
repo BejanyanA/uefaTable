@@ -18,6 +18,8 @@ let isOpeningConversation = false;
 let conversationRequestId = 0;
 let currentFriendId = null;
 let pendingVisibleMessages = [];
+let chatSocket = null;
+let chatPingTimer = null;
 
 export function getCurrentFriendId() {
   return currentFriendId;
@@ -171,10 +173,274 @@ export async function openMessagesPage() {
   selectedConversationId = null;
 }
 
-function hideAllSections() {
-  document.querySelectorAll("section").forEach((section) => {
-    section.style.display = "none";
+export async function updateHeaderMessagesBadge() {
+  const badge = document.getElementById("messagesUnreadBadge");
+  if (!badge) return;
+
+  const data = await apiPost("/my-conversations", {}, {
+    showLoading: false
   });
+
+  if (!data.success || !data.conversations?.length) {
+    badge.style.display = "none";
+    badge.textContent = "0";
+    return;
+  }
+
+  const totalUnread = data.conversations.reduce((sum, conversation) => {
+    return sum + Number(conversation.unreadCount || 0);
+  }, 0);
+
+  if (totalUnread > 0) {
+    badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+    badge.textContent = "0";
+  }
+}
+
+export function connectChatSocket() {
+  const token = localStorage.getItem("authToken");
+  if (!token || chatSocket) return;
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (user?.id) {
+    myUserId = Number(user.id);
+  }
+
+  const apiUrl = new URL(API_BASE);
+  const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
+  const wsBase = `${wsProtocol}//${apiUrl.host}`;
+
+  chatSocket = new WebSocket(`${wsBase}/chat-socket?token=${token}`);
+
+  chatSocket.onopen = () => {
+    if (chatPingTimer) {
+      clearInterval(chatPingTimer);
+    }
+
+    chatPingTimer = setInterval(() => {
+      if (chatSocket?.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify({ type: "ping" }));
+      }
+    }, 20000);
+  };
+
+  chatSocket.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.type === "messages_read") {
+      if (Number(data.conversationId) === Number(currentConversationId)) {
+        document
+          .querySelectorAll(".message-row.mine .message-status")
+          .forEach((status) => {
+            status.textContent = "✓✓";
+          });
+      }
+
+      if (activeChatTab === "all") {
+        await loadConversations();
+      } else {
+        await updateHeaderMessagesBadge();
+      }
+      return;
+    }
+
+    if (data.type !== "new_message") return;
+
+    const message = data.message || {
+      id: data.messageId,
+      conversationId: data.conversationId,
+      senderId: data.senderId,
+      encryptedMessage: data.encryptedMessage,
+      isRead: data.isRead,
+      createdAt: data.createdAt
+    };
+
+    if (!message?.conversationId) return;
+
+    const isReceivedMessage = Number(message.senderId) !== Number(myUserId);
+
+    const messageReceivedText =
+      langMap[currentLang]?.message_received || "sent you a message";
+
+    if (
+      isReceivedMessage &&
+      (
+        document.visibilityState !== "visible" ||
+        Number(message.conversationId) !== Number(currentConversationId)
+      )
+    ) {
+      showToast(
+        `${data.senderUsername || "Someone"} ${messageReceivedText}`,
+        "info"
+      );
+    }
+
+    if (Number(message.conversationId) === Number(currentConversationId)) {
+      const shouldShowNow =
+        isCurrentConversationReallyVisible(message.conversationId);
+
+      if (shouldShowNow) {
+        await renderSingleMessage(message);
+
+        await apiPost("/conversation-messages", {
+          conversationId: currentConversationId,
+          markAsRead: true
+        }, {
+          showLoading: false
+        });
+      } else {
+        pendingVisibleMessages.push(message);
+      }
+    }
+
+    if (activeChatTab === "all") {
+      await loadConversations();
+    } else {
+      await updateHeaderMessagesBadge();
+    }
+  };
+
+  chatSocket.onerror = (error) => {
+    console.error("❌ Chat socket error:", error);
+  };
+
+  chatSocket.onclose = () => {
+    clearInterval(chatPingTimer);
+    chatPingTimer = null;
+    chatSocket = null;
+
+    setTimeout(() => {
+      if (localStorage.getItem("authToken")) {
+        connectChatSocket();
+      }
+    }, 2000);
+  };
+}
+
+export function disconnectChatSocket() {
+  if (chatPingTimer) {
+    clearInterval(chatPingTimer);
+    chatPingTimer = null;
+  }
+
+  if (chatSocket) {
+    chatSocket.onclose = null;
+    chatSocket.close();
+    chatSocket = null;
+  }
+}
+
+export function updateChatHeaderStatus(isOnline, lastSeen) {
+  const status = document.getElementById("chatHeaderStatus");
+  if (!status) return;
+
+  if (Number(isOnline) === 1 || isOnline === true) {
+    status.textContent = "Online";
+    return;
+  }
+
+  if (!lastSeen) {
+    status.textContent = "Offline";
+    return;
+  }
+
+  status.textContent = `Last seen ${formatLastSeen(lastSeen)}`;
+}
+
+export function formatLastSeenDateTime(lastSeen) {
+  const userTimeZone = getUserTimeZone();
+
+  const dateValue = lastSeen.includes("T")
+    ? lastSeen
+    : lastSeen.replace(" ", "T") + "Z";
+
+  const date = new Date(dateValue);
+  const now = new Date();
+
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  if (isToday) {
+    const time = new Intl.DateTimeFormat(undefined, {
+      timeZone: userTimeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(date);
+
+    return `today at ${time}`;
+  }
+
+  const datePart = new Intl.DateTimeFormat(undefined, {
+    timeZone: userTimeZone,
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit"
+  }).format(date);
+
+  const timePart = new Intl.DateTimeFormat(undefined, {
+    timeZone: userTimeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(date);
+
+  return `${datePart} ${timePart}`;
+}
+
+async function loadOlderMessages() {
+
+  if (!currentConversationId || !oldestMessageId) return;
+  if (!hasMoreMessages || isLoadingOlderMessages) return;
+
+  isLoadingOlderMessages = true;
+
+  const container = document.getElementById("messagesContainer");
+  const previousScrollHeight = container.scrollHeight;
+
+  const data = await apiPost("/conversation-messages", {
+    conversationId: currentConversationId,
+    beforeId: oldestMessageId
+  }, {
+    showLoading: false
+  });
+
+  if (data.success && data.messages?.length) {
+    await prependMessages(data.messages);
+
+    oldestMessageId = data.messages[0].id;
+    hasMoreMessages = data.hasMore;
+
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight - previousScrollHeight;
+    });
+  } else {
+    hasMoreMessages = false;
+  }
+
+  isLoadingOlderMessages = false;
+}
+
+async function prependMessages(messages) {
+  const container = document.getElementById("messagesContainer");
+  if (!container) return;
+
+  const fragment = document.createDocumentFragment();
+
+  const rows = await Promise.all(
+    messages.map(createMessageRow)
+  );
+
+  rows.forEach((row) => {
+    fragment.appendChild(row);
+  });
+
+  container.prepend(fragment);
 }
 
 async function loadConversations(force = false) {
@@ -274,75 +540,6 @@ async function loadConversations(force = false) {
   } finally {
     isLoadingConversations = false;
   }
-}
-
-function isMessageAlreadyRendered(messageId) {
-  if (!messageId) return false;
-
-  return Boolean(
-    document.querySelector(`.message-row[data-message-id="${messageId}"]`)
-  );
-}
-
-function bindVisibilityMessageHandlerOnce() {
-  if (document.body.dataset.messageVisibilityBound === "1") return;
-  document.body.dataset.messageVisibilityBound = "1";
-
-  document.addEventListener("visibilitychange", async () => {
-    if (document.visibilityState !== "visible") return;
-    if (!pendingVisibleMessages.length) return;
-
-    const messagesToRender = pendingVisibleMessages.filter((message) => {
-      return Number(message.conversationId) === Number(currentConversationId);
-    });
-
-    pendingVisibleMessages = pendingVisibleMessages.filter((message) => {
-      return Number(message.conversationId) !== Number(currentConversationId);
-    });
-
-    for (const message of messagesToRender) {
-      await renderSingleMessage(message);
-    }
-
-    if (messagesToRender.length) {
-      await apiPost("/conversation-messages", {
-        conversationId: currentConversationId,
-        markAsRead: true
-      }, {
-        showLoading: false
-      });
-
-      if (activeChatTab === "all") {
-        await loadConversations();
-      } else {
-        await updateHeaderMessagesBadge();
-      }
-    }
-  });
-}
-
-function updateHeaderBadgeFromVisibleItems() {
-  const headerBadge = document.getElementById("messagesUnreadBadge");
-  if (!headerBadge) return;
-
-  let totalUnread = 0;
-
-  document.querySelectorAll(".conversation-item .unread-badge").forEach((badge) => {
-    totalUnread += Number(badge.textContent || 0);
-  });
-
-  if (totalUnread > 0) {
-    headerBadge.textContent = totalUnread > 99 ? "99+" : totalUnread;
-    headerBadge.style.display = "inline-flex";
-  } else {
-    headerBadge.textContent = "0";
-    headerBadge.style.display = "none";
-  }
-}
-
-function removeUnreadBadgeFromItem(item) {
-  const badge = item.querySelector(".unread-badge");
-  if (badge) badge.remove();
 }
 
 async function loadApprovedFriends() {
@@ -638,31 +835,93 @@ async function sendMessage() {
   }
 }
 
-export async function updateHeaderMessagesBadge() {
-  const badge = document.getElementById("messagesUnreadBadge");
-  if (!badge) return;
+async function renderSingleMessage(message) {
+  const container = document.getElementById("messagesContainer");
+  if (!container) return;
 
-  const data = await apiPost("/my-conversations", {}, {
-    showLoading: false
+  if (isMessageAlreadyRendered(message.id)) return;
+
+  const row = await createMessageRow(message);
+  container.appendChild(row);
+
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
+}
+
+function hideAllSections() {
+  document.querySelectorAll("section").forEach((section) => {
+    section.style.display = "none";
+  });
+}
+
+function isMessageAlreadyRendered(messageId) {
+  if (!messageId) return false;
+
+  return Boolean(
+    document.querySelector(`.message-row[data-message-id="${messageId}"]`)
+  );
+}
+
+function bindVisibilityMessageHandlerOnce() {
+  if (document.body.dataset.messageVisibilityBound === "1") return;
+  document.body.dataset.messageVisibilityBound = "1";
+
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible") return;
+    if (!pendingVisibleMessages.length) return;
+
+    const messagesToRender = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) === Number(currentConversationId);
+    });
+
+    pendingVisibleMessages = pendingVisibleMessages.filter((message) => {
+      return Number(message.conversationId) !== Number(currentConversationId);
+    });
+
+    for (const message of messagesToRender) {
+      await renderSingleMessage(message);
+    }
+
+    if (messagesToRender.length) {
+      await apiPost("/conversation-messages", {
+        conversationId: currentConversationId,
+        markAsRead: true
+      }, {
+        showLoading: false
+      });
+
+      if (activeChatTab === "all") {
+        await loadConversations();
+      } else {
+        await updateHeaderMessagesBadge();
+      }
+    }
+  });
+}
+
+function updateHeaderBadgeFromVisibleItems() {
+  const headerBadge = document.getElementById("messagesUnreadBadge");
+  if (!headerBadge) return;
+
+  let totalUnread = 0;
+
+  document.querySelectorAll(".conversation-item .unread-badge").forEach((badge) => {
+    totalUnread += Number(badge.textContent || 0);
   });
 
-  if (!data.success || !data.conversations?.length) {
-    badge.style.display = "none";
-    badge.textContent = "0";
-    return;
-  }
-
-  const totalUnread = data.conversations.reduce((sum, conversation) => {
-    return sum + Number(conversation.unreadCount || 0);
-  }, 0);
-
   if (totalUnread > 0) {
-    badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
-    badge.style.display = "inline-flex";
+    headerBadge.textContent = totalUnread > 99 ? "99+" : totalUnread;
+    headerBadge.style.display = "inline-flex";
   } else {
-    badge.style.display = "none";
-    badge.textContent = "0";
+    headerBadge.textContent = "0";
+    headerBadge.style.display = "none";
   }
+}
+
+function removeUnreadBadgeFromItem(item) {
+  const badge = item.querySelector(".unread-badge");
+  if (badge) badge.remove();
 }
 
 function getUserTimeZone() {
@@ -733,209 +992,6 @@ function setActiveChatItem(activeElement) {
   }
 }
 
-async function renderSingleMessage(message) {
-  const container = document.getElementById("messagesContainer");
-  if (!container) return;
-
-  if (isMessageAlreadyRendered(message.id)) return;
-
-  const row = await createMessageRow(message);
-  container.appendChild(row);
-
-  requestAnimationFrame(() => {
-    container.scrollTop = container.scrollHeight;
-  });
-}
-
-
-
-let chatSocket = null;
-let chatPingTimer = null;
-
-
-export function connectChatSocket() {
-  const token = localStorage.getItem("authToken");
-  if (!token || chatSocket) return;
-
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  if (user?.id) {
-    myUserId = Number(user.id);
-  }
-
-  const apiUrl = new URL(API_BASE);
-  const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
-  const wsBase = `${wsProtocol}//${apiUrl.host}`;
-
-  chatSocket = new WebSocket(`${wsBase}/chat-socket?token=${token}`);
-
-  chatSocket.onopen = () => {
-    if (chatPingTimer) {
-      clearInterval(chatPingTimer);
-    }
-
-    chatPingTimer = setInterval(() => {
-      if (chatSocket?.readyState === WebSocket.OPEN) {
-        chatSocket.send(JSON.stringify({ type: "ping" }));
-      }
-    }, 20000);
-  };
-
-  chatSocket.onmessage = async (event) => {
-    const data = JSON.parse(event.data);
-
-    if (data.type === "messages_read") {
-      if (Number(data.conversationId) === Number(currentConversationId)) {
-        document
-          .querySelectorAll(".message-row.mine .message-status")
-          .forEach((status) => {
-            status.textContent = "✓✓";
-          });
-      }
-
-      if (activeChatTab === "all") {
-        await loadConversations();
-      } else {
-        await updateHeaderMessagesBadge();
-      }
-      return;
-    }
-
-    if (data.type !== "new_message") return;
-
-    const message = data.message || {
-      id: data.messageId,
-      conversationId: data.conversationId,
-      senderId: data.senderId,
-      encryptedMessage: data.encryptedMessage,
-      isRead: data.isRead,
-      createdAt: data.createdAt
-    };
-
-    if (!message?.conversationId) return;
-
-    const isReceivedMessage = Number(message.senderId) !== Number(myUserId);
-
-    const messageReceivedText =
-      langMap[currentLang]?.message_received || "sent you a message";
-
-    if (
-      isReceivedMessage &&
-      (
-        document.visibilityState !== "visible" ||
-        Number(message.conversationId) !== Number(currentConversationId)
-      )
-    ) {
-      showToast(
-        `${data.senderUsername || "Someone"} ${messageReceivedText}`,
-        "info"
-      );
-    }
-
-    if (Number(message.conversationId) === Number(currentConversationId)) {
-      const shouldShowNow =
-        isCurrentConversationReallyVisible(message.conversationId);
-
-      if (shouldShowNow) {
-        await renderSingleMessage(message);
-
-        await apiPost("/conversation-messages", {
-          conversationId: currentConversationId,
-          markAsRead: true
-        }, {
-          showLoading: false
-        });
-      } else {
-        pendingVisibleMessages.push(message);
-      }
-    }
-
-    if (activeChatTab === "all") {
-      await loadConversations();
-    } else {
-      await updateHeaderMessagesBadge();
-    }
-  };
-
-  chatSocket.onerror = (error) => {
-    console.error("❌ Chat socket error:", error);
-  };
-
-  chatSocket.onclose = () => {
-    clearInterval(chatPingTimer);
-    chatPingTimer = null;
-    chatSocket = null;
-
-    setTimeout(() => {
-      if (localStorage.getItem("authToken")) {
-        connectChatSocket();
-      }
-    }, 2000);
-  };
-}
-
-export function disconnectChatSocket() {
-  if (chatPingTimer) {
-    clearInterval(chatPingTimer);
-    chatPingTimer = null;
-  }
-
-  if (chatSocket) {
-    chatSocket.onclose = null;
-    chatSocket.close();
-    chatSocket = null;
-  }
-}
-
-async function loadOlderMessages() {
-
-  if (!currentConversationId || !oldestMessageId) return;
-  if (!hasMoreMessages || isLoadingOlderMessages) return;
-
-  isLoadingOlderMessages = true;
-
-  const container = document.getElementById("messagesContainer");
-  const previousScrollHeight = container.scrollHeight;
-
-  const data = await apiPost("/conversation-messages", {
-    conversationId: currentConversationId,
-    beforeId: oldestMessageId
-  }, {
-    showLoading: false
-  });
-
-  if (data.success && data.messages?.length) {
-    await prependMessages(data.messages);
-
-    oldestMessageId = data.messages[0].id;
-    hasMoreMessages = data.hasMore;
-
-    requestAnimationFrame(() => {
-      container.scrollTop = container.scrollHeight - previousScrollHeight;
-    });
-  } else {
-    hasMoreMessages = false;
-  }
-
-  isLoadingOlderMessages = false;
-}
-
-async function prependMessages(messages) {
-  const container = document.getElementById("messagesContainer");
-  if (!container) return;
-
-  const fragment = document.createDocumentFragment();
-
-  const rows = await Promise.all(
-    messages.map(createMessageRow)
-  );
-
-  rows.forEach((row) => {
-    fragment.appendChild(row);
-  });
-
-  container.prepend(fragment);
-}
-
 function isCurrentConversationReallyVisible(conversationId) {
   const messagesPage = document.getElementById("messagesPage");
   const activeChatBox = document.getElementById("activeChatBox");
@@ -994,64 +1050,4 @@ function updateHeaderBadgeFromConversations(conversations = []) {
     badge.textContent = "0";
     badge.style.display = "none";
   }
-}
-
-export function updateChatHeaderStatus(isOnline, lastSeen) {
-  const status = document.getElementById("chatHeaderStatus");
-  if (!status) return;
-
-  if (Number(isOnline) === 1 || isOnline === true) {
-    status.textContent = "Online";
-    return;
-  }
-
-  if (!lastSeen) {
-    status.textContent = "Offline";
-    return;
-  }
-
-  status.textContent = `Last seen ${formatLastSeen(lastSeen)}`;
-}
-
-export function formatLastSeenDateTime(lastSeen) {
-  const userTimeZone = getUserTimeZone();
-
-  const dateValue = lastSeen.includes("T")
-    ? lastSeen
-    : lastSeen.replace(" ", "T") + "Z";
-
-  const date = new Date(dateValue);
-  const now = new Date();
-
-  const isToday =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-
-  if (isToday) {
-    const time = new Intl.DateTimeFormat(undefined, {
-      timeZone: userTimeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    }).format(date);
-
-    return `today at ${time}`;
-  }
-
-  const datePart = new Intl.DateTimeFormat(undefined, {
-    timeZone: userTimeZone,
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit"
-  }).format(date);
-
-  const timePart = new Intl.DateTimeFormat(undefined, {
-    timeZone: userTimeZone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  }).format(date);
-
-  return `${datePart} ${timePart}`;
 }
