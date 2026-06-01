@@ -20,6 +20,8 @@ let currentFriendId = null;
 let pendingVisibleMessages = [];
 let chatSocket = null;
 let chatPingTimer = null;
+const messageSound = new Audio("assets/sounds/message.wav");
+messageSound.preload = "auto";
 
 export function getCurrentFriendId() {
   return currentFriendId;
@@ -264,6 +266,10 @@ export function connectChatSocket() {
 
     const messageReceivedText =
       langMap[currentLang]?.message_received || "sent you a message";
+
+    if (isReceivedMessage) {
+      playMessageSound();
+    }
 
     if (
       isReceivedMessage &&
@@ -1032,4 +1038,11 @@ function updateHeaderBadgeFromConversations(conversations = []) {
 
 function t(key, fallback) {
   return langMap[currentLang]?.[key] || fallback;
+}
+
+function playMessageSound() {
+  try {
+    messageSound.currentTime = 0;
+    messageSound.play().catch(() => { });
+  } catch { }
 }
