@@ -128,7 +128,6 @@ export const FriendManager = {
       friendsLink.addEventListener("click", (e) => {
         e.preventDefault?.();
 
-        // document.getElementById("homePageIcon").style.display = "block";
 
         location.hash = "friends"; // ✅ routing only
       });

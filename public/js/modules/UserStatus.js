@@ -7,7 +7,6 @@ let presencePingTimer = null;
 const presenceCache = new Map();
 
 export function connectPresenceSocket() {
-    console.log("CONNECTING PRESENCE SOCKET");
 
     const token = localStorage.getItem("authToken");
     if (!token || presenceSocket) return;

@@ -130,7 +130,6 @@ export async function openMessagesPage() {
   document.getElementById("headerUsername").style.display = "block";
   document.getElementById("notificationBell").style.display = "block";
   document.getElementById("profileMenu").style.display = "block";
-  // document.getElementById("homePageIcon").style.display = "block";
 
   localStorage.removeItem("lastActiveLeagueTab");
   localStorage.removeItem("lastActiveNationalLeagueTab");

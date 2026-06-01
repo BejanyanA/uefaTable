@@ -261,7 +261,6 @@ export const LeagueManager = {
     backBtn.addEventListener("click", async () => {
       location.hash = "leagues";
 
-      // document.getElementById("homePageIcon").style.display = "block";
 
       const token = localStorage.getItem("authToken");
       customLeagues()
@@ -288,7 +287,6 @@ export const LeagueManager = {
 
       customLeagues()
 
-      // document.getElementById("homePageIcon").style.display = "block";
 
       const bannerId = Number(modal.dataset.bannerId);
       if (!bannerId) return;
@@ -308,7 +306,6 @@ export const LeagueManager = {
     document.getElementById("stageBanner1").addEventListener("click", () => {
       const bannerId = Number(localStorage.getItem("currentBannerId"));
       
-      // document.getElementById("homePageIcon").style.display = "block";
 
       if (bannerId === 1) location.hash = "#ucl-basic-my";  // default tab = my
       else if (bannerId === 2) location.hash = "#uel-basic-my";
@@ -319,7 +316,6 @@ export const LeagueManager = {
     document.getElementById("stageBanner2").addEventListener("click", () => {
       const bannerId = Number(localStorage.getItem("currentBannerId"));
 
-      document.getElementById("homePageIcon").style.display = "block";
 
       if (bannerId === 1) location.hash = "#ucl-only-my";
       else if (bannerId === 2) location.hash = "#uel-only-my";
