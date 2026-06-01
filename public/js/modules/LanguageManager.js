@@ -148,8 +148,8 @@ export const langMap = {
     offline: "Offline",
     last_seen: "Last seen",
     just_now: "just now",
-    min_ago: "min ago",
-    hour_ago: "h ago",
+    min_ago: "min. ago",
+    hour_ago: "h. ago",
     today_at: "today at",
 
 
@@ -326,7 +326,7 @@ export const langMap = {
     last_seen: "Վերջին այցը",
     just_now: "հենց հիմա",
     min_ago: "րոպե առաջ",
-    hour_ago: "ժ առաջ",
+    hour_ago: "ժամ առաջ",
     today_at: "այսօր ժամը",
 
 
@@ -501,8 +501,8 @@ export const langMap = {
     offline: "Hors ligne",
     last_seen: "Vu il y a",
     just_now: "à l’instant",
-    min_ago: "min",
-    hour_ago: "h",
+    min_ago: "min.",
+    hour_ago: "h.",
     today_at: "aujourd’hui à",
 
 

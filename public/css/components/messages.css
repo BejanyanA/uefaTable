@@ -362,7 +362,7 @@
 }
 
 .conversation-name {
-  width: 95px;
+  width: 90px;
   display: inline-block;
   font-size: 12px;
   font-weight: bold;
@@ -604,7 +604,7 @@
   }
 
   .conversation-name {
-    width: 110px;
+    width: 100px;
     display: inline-block;
   }
 

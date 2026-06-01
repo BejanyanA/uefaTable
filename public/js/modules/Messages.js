@@ -3,7 +3,7 @@ import { API_BASE } from "../services/config.js";
 import { encryptMessage, decryptMessage } from "../services/encryption.js";
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
-import { requestPresenceStatuses, formatLastSeen, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
+import { requestPresenceStatuses, formatLastSeen, formatLastSeenDateTime, getUserTimeZone, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -348,49 +348,6 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
   }
 
   status.textContent = `${getLastSeenText()} ${formatLastSeenDateTime(lastSeen)}`;
-}
-
-export function formatLastSeenDateTime(lastSeen) {
-  const userTimeZone = getUserTimeZone();
-
-  const dateValue = lastSeen.includes("T")
-    ? lastSeen
-    : lastSeen.replace(" ", "T") + "Z";
-
-  const date = new Date(dateValue);
-  const now = new Date();
-
-  const isToday =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-
-  if (isToday) {
-    const time = new Intl.DateTimeFormat(undefined, {
-      timeZone: userTimeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    }).format(date);
-
-    return `${langMap[currentLang]?.today_at || "today at"} ${time}`;
-  }
-
-  const datePart = new Intl.DateTimeFormat(undefined, {
-    timeZone: userTimeZone,
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit"
-  }).format(date);
-
-  const timePart = new Intl.DateTimeFormat(undefined, {
-    timeZone: userTimeZone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  }).format(date);
-
-  return `${datePart} ${timePart}`;
 }
 
 async function loadOlderMessages() {
@@ -930,10 +887,6 @@ function updateHeaderBadgeFromVisibleItems() {
 function removeUnreadBadgeFromItem(item) {
   const badge = item.querySelector(".unread-badge");
   if (badge) badge.remove();
-}
-
-function getUserTimeZone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 function formatTime(dateValue) {

@@ -1,6 +1,6 @@
 import { API_BASE } from '../services/config.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
-import { updateChatHeaderStatus, getCurrentFriendId, formatLastSeenDateTime } from "./Messages.js";
+import { updateChatHeaderStatus, getCurrentFriendId } from "./Messages.js";
 
 let presenceSocket = null;
 let presencePingTimer = null;
@@ -102,10 +102,56 @@ export function formatLastSeen(value) {
     const diffHours = Math.floor(diffMinutes / 60);
 
     if (diffHours < 24) {
-        return `${diffHours}${tr("hour_ago", "h ago")}`;
+        return `${diffHours} ${tr("hour_ago", "h ago")}`;
     }
 
-    return date.toLocaleDateString();
+    return formatFullDateTime(date);
+}
+
+export function formatLastSeenDateTime(lastSeen) {
+    const userTimeZone = getUserTimeZone();
+
+    const dateValue = lastSeen.includes("T")
+        ? lastSeen
+        : lastSeen.replace(" ", "T") + "Z";
+
+    const date = new Date(dateValue);
+    const now = new Date();
+
+    const isToday =
+        date.getFullYear() === now.getFullYear() &&
+        date.getMonth() === now.getMonth() &&
+        date.getDate() === now.getDate();
+
+    if (isToday) {
+        const time = new Intl.DateTimeFormat(undefined, {
+            timeZone: userTimeZone,
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        }).format(date);
+
+        return `${langMap[currentLang]?.today_at || "today at"} ${time}`;
+    }
+
+    const localDate = new Date(
+        date.toLocaleString("en-US", { timeZone: userTimeZone })
+    );
+
+    const day = String(localDate.getDate()).padStart(2, "0");
+    const month = String(localDate.getMonth() + 1).padStart(2, "0");
+    const year = String(localDate.getFullYear()).slice(-2);
+
+    const datePart = `${day}.${month}.${year}`;
+
+    const timePart = new Intl.DateTimeFormat(undefined, {
+        timeZone: userTimeZone,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    }).format(date);
+
+    return `${datePart} ${timePart}`;
 }
 
 export function getOnlineText() {
@@ -149,6 +195,10 @@ export function refreshPresenceTexts() {
     }
 }
 
+export function getUserTimeZone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 function updateConversationUserStatus(userId, isOnline, lastSeen) {
     presenceCache.set(Number(userId), {
         isOnline: Boolean(isOnline),
@@ -178,6 +228,17 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
     if (Number(userId) === Number(getCurrentFriendId())) {
         updateChatHeaderStatus(isOnline, lastSeen);
     }
+}
+
+function formatFullDateTime(date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
 }
 
 function tr(key, fallback) {
