@@ -269,16 +269,22 @@ export function connectChatSocket() {
     }
 
     if (data.type === "typing") {
+      setListTypingStatus(data.senderId, true);
+
       if (Number(data.conversationId) === Number(currentConversationId)) {
         showTypingNearUsername();
       }
+
       return;
     }
 
     if (data.type === "typing_stop") {
+      setListTypingStatus(data.senderId, false);
+
       if (Number(data.conversationId) === Number(currentConversationId)) {
         hideTypingNearUsername();
       }
+
       return;
     }
 
@@ -502,6 +508,11 @@ async function loadConversations(force = false) {
             <small class="conversation-status ${statusClass}">${statusText}</small>
           </div>
         </div>
+
+        ${Number(conversation.unreadCount) > 0
+              ? `<span class="unread-badge">${conversation.unreadCount}</span>`
+              : ""
+        }
       `;
 
       if (Number(conversation.conversationId) === Number(selectedConversationId)) {
@@ -1144,4 +1155,35 @@ function hideTypingNearUsername() {
   if (typingEl) {
     typingEl.style.display = "none";
   }
+}
+
+function setListTypingStatus(userId, isTyping) {
+  document
+    .querySelectorAll(`[data-friend-id="${userId}"]`)
+    .forEach((item) => {
+      const status = item.querySelector(".conversation-status");
+      if (!status) return;
+
+      if (isTyping) {
+        status.dataset.previousText = status.textContent;
+        status.classList.remove("online-status", "last-seen");
+        status.classList.add("typing-status");
+        status.textContent = langMap[currentLang]?.typing || "typing...";
+        return;
+      }
+
+      status.classList.remove("typing-status");
+
+      const presence = getPresenceStatus(userId);
+      const isOnline = presence.isOnline;
+
+      status.textContent = isOnline
+        ? getOnlineText()
+        : presence.lastSeen
+          ? `${getLastSeenText()} ${formatLastSeen(presence.lastSeen)}`
+          : getOfflineText();
+
+      status.classList.toggle("online-status", isOnline);
+      status.classList.toggle("last-seen", !isOnline && Boolean(presence.lastSeen));
+    });
 }
