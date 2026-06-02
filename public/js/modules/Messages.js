@@ -35,15 +35,15 @@ export function getCurrentFriendId() {
 }
 
 export function initMessagesPage() {
-  // Safari/iOS audio unlock
-  document.addEventListener("click", unlockMessageSound, { once: true });
-  document.addEventListener("touchstart", unlockMessageSound, { once: true });
-
   const messagesBtn = document.getElementById("messagesBtn");
   const sendBtn = document.getElementById("sendMessageBtn");
   const input = document.getElementById("messageInput");
 
   if (messagesBtn) {
+    messagesBtn.addEventListener("click", () => {
+      soundUnlocked = true;
+    });
+
     messagesBtn.addEventListener("click", openMessagesPage);
   }
 
@@ -101,12 +101,16 @@ export function initMessagesPage() {
   bindVisibilityMessageHandlerOnce();
 
   if (sendBtn) {
-    sendBtn.addEventListener("click", sendMessage);
+    sendBtn.addEventListener("click", () => {
+      soundUnlocked = true;
+      sendMessage();
+    });
   }
 
   if (input) {
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
+        soundUnlocked = true;
         sendMessage();
       }
     });
@@ -117,6 +121,7 @@ export function initMessagesPage() {
 
 export async function openMessagesPage() {
   hideAllSections();
+  soundUnlocked = true;
 
   document.getElementById("headerUsername").style.display = "block";
   document.getElementById("notificationBell").style.display = "block";
@@ -1070,27 +1075,9 @@ function t(key, fallback) {
 
 function playMessageSound() {
   if (!soundUnlocked) return;
-  if (!localStorage.getItem("authToken")) return;
 
   messageSound.currentTime = 0;
   messageSound.play().catch(() => { });
-}
-
-function unlockMessageSound() {
-  if (soundUnlocked) return;
-
-  messageSound.muted = true;
-
-  messageSound.play()
-    .then(() => {
-      messageSound.pause();
-      messageSound.currentTime = 0;
-      messageSound.muted = false;
-      soundUnlocked = true;
-    })
-    .catch(() => {
-      messageSound.muted = false;
-    });
 }
 
 function handleTyping() {
