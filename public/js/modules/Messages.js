@@ -483,7 +483,6 @@ async function loadConversations(force = false) {
       }
 
       const presence = getPresenceStatus(conversation.friendId);
-
       const isOnline = presence.isOnline;
 
       const statusText = isOnline
@@ -584,12 +583,16 @@ async function loadApprovedFriends() {
       statusElement.classList.add("online-status");
     }
 
-    const isOnline = Number(friend.isOnline) === 1;
+    const presence = getPresenceStatus(friend.id);
+    const isOnline = presence.isOnline;
+
     const statusText = isOnline
       ? getOnlineText()
-      : friend.lastSeen
-        ? `${getLastSeenText()} ${formatLastSeen(friend.lastSeen)}`
+      : presence.lastSeen
+        ? `${getLastSeenText()} ${formatLastSeen(presence.lastSeen)}`
         : getOfflineText();
+
+    const statusClass = isOnline ? "online-status" : "";
 
     const userInfo = document.createElement("div");
     userInfo.className = "conversation-user";
