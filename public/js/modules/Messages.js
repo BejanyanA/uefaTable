@@ -1069,26 +1069,27 @@ function t(key, fallback) {
 }
 
 function playMessageSound() {
-  try {
-    messageSound.currentTime = 0;
-    messageSound.play().catch(() => { });
-  } catch { }
+  if (!soundUnlocked) return;
+  if (!localStorage.getItem("authToken")) return;
+
+  messageSound.currentTime = 0;
+  messageSound.play().catch(() => { });
 }
 
 function unlockMessageSound() {
   if (soundUnlocked) return;
 
-  messageSound.volume = 0.01;
+  messageSound.muted = true;
 
   messageSound.play()
     .then(() => {
       messageSound.pause();
       messageSound.currentTime = 0;
-      messageSound.volume = 1;
+      messageSound.muted = false;
       soundUnlocked = true;
     })
     .catch(() => {
-      messageSound.volume = 1;
+      messageSound.muted = false;
     });
 }
 
