@@ -1,10 +1,9 @@
 {
-  "name": "Table UEFA",
+  "name": "UEFA Results",
   "short_name": "UEFA",
-  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1a1a1a",
+  "background_color": "#00020c",
+  "theme_color": "#00020c",
   "icons": [
     {
       "src": "/assets/favicon/android-chrome-192x192.png",
