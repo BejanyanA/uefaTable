@@ -131,6 +131,7 @@ export const langMap = {
     live_scheduled_games: "Upcoming",
     liveTitleFootball: "All About Football",
     live_empty_standings: "No standings available for this league",
+    live_empty_matches: "No matches available for this league",
     live_standings: "Standings",
     live_fixtures: "Matches",
     live_events: "Events",
@@ -309,6 +310,7 @@ export const langMap = {
     live_scheduled_games: "Սպասվող",
     liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
     live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
+    live_empty_matches: "Խաղեր գոյություն չունեն այս լիգայի համար",
     live_standings: "Աղյուսակներ",
     live_fixtures: "Խաղացանկ",
     live_events: "Իրադարձություններ",
@@ -486,6 +488,7 @@ export const langMap = {
     live_scheduled_games: "À venir",
     liveTitleFootball: "Tout sur le football",
     live_empty_standings: "Aucun classement disponible pour cette ligue",
+    live_empty_matches: "Aucun match disponible pour cette ligue",
     live_standings: "Classements",
     live_fixtures: "Rencontres",
     live_events: "Événements",
@@ -1055,12 +1058,23 @@ function liveDataTranslation() {
 
 // Live empty results
 function translateEmptyResults() {
-  const { live_empty_standings: liveEmptyResults = "No standings available for this league." } =
-    langMap[currentLang] || {};
+  const t = langMap[currentLang] || {};
 
-  document.querySelectorAll(".empty-result").forEach(el => {
-    el.textContent = liveEmptyResults;
-  });
+  document
+    .querySelectorAll("standing-component .empty-result")
+    .forEach((el) => {
+      el.textContent =
+        t.live_empty_standings ||
+        "No standings available for this league.";
+    });
+
+  document
+    .querySelectorAll("games-component .empty-result")
+    .forEach((el) => {
+      el.textContent =
+        t.live_empty_matches ||
+        "No matches available for this league.";
+    });
 }
 
 const observer = new MutationObserver(() => {

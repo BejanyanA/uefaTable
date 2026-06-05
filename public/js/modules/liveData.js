@@ -431,8 +431,6 @@ function renderStandingsWidget(leagueId, leagueName) {
       ></api-sports-widget>
   `;
 
-   handleApiSportsEmptyState("standingsWidgetHost");
-
    updateStandingsTitle(leagueName, leagueId);
 
    // Remove "Goals For : Against"
@@ -748,8 +746,6 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
       ></api-sports-widget>
     `;
 
-   handleApiSportsEmptyState("matchesWidgetHost");
-
 }
 
 function openDefaultMatches() {
@@ -967,38 +963,23 @@ function translateWidgetTexts() {
       });
 }
 
-let widgetTranslationObserverStarted = false;
+let widgetTranslationObserverStarted = null;
+
 function initWidgetTranslationObserver() {
    if (widgetTranslationObserverStarted) return;
    widgetTranslationObserverStarted = true;
 
-   const root = document.getElementById("liveDataPage") || document.body;
+   const root = document.getElementById("leaguesWidgetContainer");
+   if (!root) return;
 
-   const observer = new MutationObserver(() => {
-      translateWidgetTexts();
+   initWidgetTranslationObserver = new MutationObserver(() => {
+      requestAnimationFrame(translateWidgetTexts);
    });
 
-   observer.observe(root, { childList: true, subtree: true });
-
-   translateWidgetTexts();
-   requestAnimationFrame(translateWidgetTexts);
-   setTimeout(translateWidgetTexts, 300);
-}
-
-function handleApiSportsEmptyState(hostId) {
-   const host = document.getElementById(hostId);
-   if (!host) return;
-
-   const observer = new MutationObserver(() => {
-      if (!host.querySelector(".empty-result")) return;
-
-      observer.disconnect();
-
-      host.classList.add("api-empty-loaded");
-   });
-
-   observer.observe(host, {
+   widgetTranslationObserver.observe(root, {
       childList: true,
       subtree: true
    });
+
+   requestAnimationFrame(translateWidgetTexts);
 }
