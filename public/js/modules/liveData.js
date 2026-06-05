@@ -429,7 +429,7 @@ function renderStandingsWidget(leagueId, leagueName) {
       data-favorite="false"
       ></api-sports-widget>
   `;
-
+   watchWidgetHost(host, 5000, "standings");
    updateStandingsTitle(leagueName, leagueId);
 
    // Remove "Goals For : Against"
@@ -745,6 +745,7 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
       ></api-sports-widget>
     `;
 
+   watchWidgetHost(host, 5000, "matches");
 }
 
 function openDefaultMatches() {
@@ -912,3 +913,56 @@ function translateWidgetTexts() {
       });
 }
 
+function watchWidgetHost(host, timeoutMs = 5000, type = "standings") {
+   if (!host) return;
+
+   const hasRealContent = (el) => {
+      // If only a loader is present, that's NOT real content
+      const loader = el.querySelector(".loading-block, .loading");
+      const table = el.querySelector("table");
+      const emptyResult = el.querySelector(".empty-result");
+
+      // Real content = has a table and no loader
+      if (table && !loader) return true;
+
+      // Widget settled into empty state = also counts as "done"
+      if (emptyResult && !loader) return true;
+
+      return false;
+   };
+
+   const obs = new MutationObserver(() => {
+      if (hasRealContent(host)) {
+         clearTimeout(timer);
+         obs.disconnect();
+      }
+   });
+
+   const timer = setTimeout(() => {
+      obs.disconnect();
+      if (!hasRealContent(host)) {
+         renderWidgetError(host, type);
+      }
+   }, timeoutMs);
+
+   obs.observe(host, { childList: true, subtree: true, attributes: false });
+}
+
+function renderWidgetError(host, type = "standings") {
+   const t = langMap[currentLang] || {};
+   const message = t.live_subscription_expired || "Data is currently unavailable";
+
+   if (type === "matches") {
+      host.innerHTML = `
+         <games-component>
+            <div class="empty-result">${message}</div>
+         </games-component>
+      `;
+   } else {
+      host.innerHTML = `
+         <standing-component>
+            <div class="empty-result">${message}</div>
+         </standing-component>
+      `;
+   }
+}
