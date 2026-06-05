@@ -431,10 +431,7 @@ function renderStandingsWidget(leagueId, leagueName) {
       ></api-sports-widget>
   `;
 
-   handleStuckApiSportsLoader(
-      "standingsWidgetHost",
-      "No standings data available"
-   );
+   handleApiSportsEmptyState("standingsWidgetHost");
 
    updateStandingsTitle(leagueName, leagueId);
 
@@ -751,10 +748,7 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
       ></api-sports-widget>
     `;
 
-   handleStuckApiSportsLoader(
-      "matchesWidgetHost",
-      "No matches data available"
-   );
+   handleApiSportsEmptyState("matchesWidgetHost");
 
 }
 
@@ -991,34 +985,20 @@ function initWidgetTranslationObserver() {
    setTimeout(translateWidgetTexts, 300);
 }
 
-function handleStuckApiSportsLoader(hostId, message) {
+function handleApiSportsEmptyState(hostId) {
    const host = document.getElementById(hostId);
    if (!host) return;
 
-   const checkId = Date.now().toString();
-   host.dataset.loaderCheckId = checkId;
+   const observer = new MutationObserver(() => {
+      if (!host.querySelector(".empty-result")) return;
 
-   setTimeout(() => {
-      if (host.dataset.loaderCheckId !== checkId) return;
+      observer.disconnect();
 
-      const text = host.innerText.trim().toLowerCase();
+      host.classList.add("api-empty-loaded");
+   });
 
-      const hasEmptyState =
-         text.includes("no standings available") ||
-         text.includes("no games available");
-
-      const hasRealContent =
-         host.querySelector("table") ||
-         host.querySelector(".game") ||
-         host.querySelector("[class*='game']") ||
-         host.querySelector("[class*='team']");
-
-      if (!hasEmptyState && !hasRealContent) {
-         host.innerHTML = `
-            <div class="api-empty-state">
-               ${message}
-            </div>
-         `;
-      }
-   }, 7000);
+   observer.observe(host, {
+      childList: true,
+      subtree: true
+   });
 }
