@@ -54,6 +54,32 @@ export async function loadLeagueLogos() {
    return leagueLogosPromise;
 }
 
+// ---------- public API ----------
+export async function openLiveData() {
+   setLiveDataVisible(true);
+
+   await loadApiSportsWidgetsOnce();
+
+   initLiveTabsOnce();
+
+   setActiveTab("allGames");
+
+   await new Promise(requestAnimationFrame);
+
+   ensureConfigWidget();
+   remountApiSportsWidgets();
+
+   initWidgetTranslationObserver();
+   initPopupTranslationHooks();
+   translateWidgetTexts();
+   // initApiSportsModalX();
+}
+
+export function closeLiveData() {
+   setLiveDataVisible(false);
+   resetLiveWidgets(); // so next open -> widget recreated -> request sent again
+}
+
 async function injectLeagueLogos() {
    document.querySelectorAll(".standingsLeagueBtn").forEach((btn) => {
       const leagueId = btn.dataset.leagueId;
@@ -107,7 +133,58 @@ async function updateStandingsTitle(leagueName, leagueId) {
    }
 }
 
+async function updateMatchesTitle(title, logoName) {
+   const text = document.getElementById("matchesTitleText");
+   const logo = document.getElementById("matchesTitleLogo");
 
+   if (text) text.textContent = title;
+
+   const logos = await loadLeagueLogos();
+   const url = logos?.[(logoName || title).toLowerCase()];
+
+   if (!logo) return;
+
+   if (url) {
+      logo.src = url;
+      logo.alt = title;
+      logo.style.display = "block";
+   } else {
+      logo.style.display = "none";
+   }
+}
+
+async function injectMatchesLogos() {
+   const logos = await loadLeagueLogos();
+   if (!logos) return;
+
+   const applyToBtn = (btn) => {
+      const logoName =
+         (btn.dataset.logoName || btn.querySelector(".matchBtnText")?.textContent || btn.textContent || "")
+            .trim()
+            .toLowerCase();
+
+      const url = logos[logoName];
+      if (!url) return;
+
+      if (btn.querySelector("img.matchLogo")) return;
+
+      const img = document.createElement("img");
+      img.className = "matchLogo";
+      img.src = url;
+      img.alt = logoName;
+
+      btn.prepend(img);
+   };
+
+   // ✅ Singles
+   document.querySelectorAll(".matchMenuSingleBtn").forEach(applyToBtn);
+
+   // ✅ Dropdown children
+   document.querySelectorAll(".matchMenuChildBtn").forEach(applyToBtn);
+
+   // ✅ Dropdown parents (Spain/England/etc.)
+   document.querySelectorAll(".matchMenuParentBtn").forEach(applyToBtn);
+}
 
 
 
@@ -354,6 +431,11 @@ function renderStandingsWidget(leagueId, leagueName) {
       ></api-sports-widget>
   `;
 
+   handleStuckApiSportsLoader(
+      "standingsWidgetHost",
+      "No standings data available"
+   );
+
    updateStandingsTitle(leagueName, leagueId);
 
    // Remove "Goals For : Against"
@@ -446,9 +528,6 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
    setTimeout(apply, 800);
    setTimeout(apply, 1500);
 }
-
-
-
 
 
 //// Matches
@@ -597,7 +676,6 @@ function renderMatchesMenu() {
 
 
 let matchesMenuBound = false;
-
 function initMatchesMenuClickOnce() {
    if (matchesMenuBound) return;
    matchesMenuBound = true;
@@ -673,60 +751,11 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
       ></api-sports-widget>
     `;
 
-}
+   handleStuckApiSportsLoader(
+      "matchesWidgetHost",
+      "No matches data available"
+   );
 
-
-async function updateMatchesTitle(title, logoName) {
-   const text = document.getElementById("matchesTitleText");
-   const logo = document.getElementById("matchesTitleLogo");
-
-   if (text) text.textContent = title;
-
-   const logos = await loadLeagueLogos();
-   const url = logos?.[(logoName || title).toLowerCase()];
-
-   if (!logo) return;
-
-   if (url) {
-      logo.src = url;
-      logo.alt = title;
-      logo.style.display = "block";
-   } else {
-      logo.style.display = "none";
-   }
-}
-
-async function injectMatchesLogos() {
-   const logos = await loadLeagueLogos();
-   if (!logos) return;
-
-   const applyToBtn = (btn) => {
-      const logoName =
-         (btn.dataset.logoName || btn.querySelector(".matchBtnText")?.textContent || btn.textContent || "")
-            .trim()
-            .toLowerCase();
-
-      const url = logos[logoName];
-      if (!url) return;
-
-      if (btn.querySelector("img.matchLogo")) return;
-
-      const img = document.createElement("img");
-      img.className = "matchLogo";
-      img.src = url;
-      img.alt = logoName;
-
-      btn.prepend(img);
-   };
-
-   // ✅ Singles
-   document.querySelectorAll(".matchMenuSingleBtn").forEach(applyToBtn);
-
-   // ✅ Dropdown children
-   document.querySelectorAll(".matchMenuChildBtn").forEach(applyToBtn);
-
-   // ✅ Dropdown parents (Spain/England/etc.)
-   document.querySelectorAll(".matchMenuParentBtn").forEach(applyToBtn);
 }
 
 function openDefaultMatches() {
@@ -825,8 +854,6 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 // }
 
 
-
-
 // ---------- translations ----------
 const widgetTranslations = {
    "No games available for this date": (t) => t.live_empty_games,
@@ -893,7 +920,6 @@ function burstTranslatePopupActions(durationMs = 1500, intervalMs = 50) {
 }
 
 let popupTranslateInitDone = false;
-
 function initPopupTranslationHooks() {
    if (popupTranslateInitDone) return;
    popupTranslateInitDone = true;
@@ -922,10 +948,6 @@ function initPopupTranslationHooks() {
    });
 }
 
-
-
-
-
 function translateWidgetTexts() {
    const t = langMap[currentLang];
    if (!t) return;
@@ -952,7 +974,6 @@ function translateWidgetTexts() {
 }
 
 let widgetTranslationObserverStarted = false;
-
 function initWidgetTranslationObserver() {
    if (widgetTranslationObserverStarted) return;
    widgetTranslationObserverStarted = true;
@@ -970,28 +991,34 @@ function initWidgetTranslationObserver() {
    setTimeout(translateWidgetTexts, 300);
 }
 
-// ---------- public API ----------
-export async function openLiveData() {
-   setLiveDataVisible(true);
+function handleStuckApiSportsLoader(hostId, message) {
+   const host = document.getElementById(hostId);
+   if (!host) return;
 
-   await loadApiSportsWidgetsOnce();
+   const checkId = Date.now().toString();
+   host.dataset.loaderCheckId = checkId;
 
-   initLiveTabsOnce();
+   setTimeout(() => {
+      if (host.dataset.loaderCheckId !== checkId) return;
 
-   setActiveTab("allGames");
+      const text = host.innerText.trim().toLowerCase();
 
-   await new Promise(requestAnimationFrame);
+      const hasEmptyState =
+         text.includes("no standings available") ||
+         text.includes("no games available");
 
-   ensureConfigWidget();
-   remountApiSportsWidgets();
+      const hasRealContent =
+         host.querySelector("table") ||
+         host.querySelector(".game") ||
+         host.querySelector("[class*='game']") ||
+         host.querySelector("[class*='team']");
 
-   initWidgetTranslationObserver();
-   initPopupTranslationHooks();
-   translateWidgetTexts();
-   // initApiSportsModalX();
-}
-
-export function closeLiveData() {
-   setLiveDataVisible(false);
-   resetLiveWidgets(); // so next open -> widget recreated -> request sent again
+      if (!hasEmptyState && !hasRealContent) {
+         host.innerHTML = `
+            <div class="api-empty-state">
+               ${message}
+            </div>
+         `;
+      }
+   }, 7000);
 }
