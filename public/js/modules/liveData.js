@@ -69,7 +69,6 @@ export async function openLiveData() {
    ensureConfigWidget();
    remountApiSportsWidgets();
 
-   initWidgetTranslationObserver();
    initPopupTranslationHooks();
    translateWidgetTexts();
    // initApiSportsModalX();
@@ -794,56 +793,6 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 }
 
 
-// function injectApiSportsModalX() {
-//    document
-//       .querySelectorAll("modal-component .modal-widget-content.active .body")
-//       .forEach((body) => {
-//          // prevent duplicates
-//          if (body.querySelector(":scope > .apiPopupCloseBtn")) return;
-
-//          const btn = document.createElement("button");
-//          btn.className = "apiPopupCloseBtn";
-//          btn.type = "button";
-//          btn.setAttribute("aria-label", "Close");
-//          btn.textContent = "✕";
-
-//          btn.addEventListener("click", (e) => {
-//             e.preventDefault();
-//             e.stopPropagation();
-
-//             // click the widget's real close button
-//             const content = body.closest(".modal-widget-content");
-//             const closeBtn = content?.querySelector(
-//                'button.modal-widget-close[aria-label="Close"]'
-//             );
-//             if (closeBtn) closeBtn.click();
-//          });
-
-//          body.prepend(btn); // ✅ EXACT place you wanted
-//       });
-// }
-
-// let apiSportsModalXStarted = false;
-
-// export function initApiSportsModalX() {
-//    if (apiSportsModalXStarted) return;
-//    apiSportsModalXStarted = true;
-
-//    // Observe BODY because modal-component is appended dynamically
-//    const obs = new MutationObserver(() => {
-//       injectApiSportsModalX();
-//    });
-
-//    obs.observe(document.body, { childList: true, subtree: true });
-
-//    // Run immediately + retries
-//    injectApiSportsModalX();
-//    requestAnimationFrame(injectApiSportsModalX);
-//    setTimeout(injectApiSportsModalX, 150);
-//    setTimeout(injectApiSportsModalX, 400);
-// }
-
-
 // ---------- translations ----------
 const widgetTranslations = {
    "No games available for this date": (t) => t.live_empty_games,
@@ -963,23 +912,3 @@ function translateWidgetTexts() {
       });
 }
 
-let widgetTranslationObserverStarted = null;
-
-function initWidgetTranslationObserver() {
-   if (widgetTranslationObserverStarted) return;
-   widgetTranslationObserverStarted = true;
-
-   const root = document.getElementById("leaguesWidgetContainer");
-   if (!root) return;
-
-   initWidgetTranslationObserver = new MutationObserver(() => {
-      requestAnimationFrame(translateWidgetTexts);
-   });
-
-   widgetTranslationObserver.observe(root, {
-      childList: true,
-      subtree: true
-   });
-
-   requestAnimationFrame(translateWidgetTexts);
-}
