@@ -416,6 +416,7 @@
 @media (max-width: 480px) {
 
   #messagesPage {
+    display: fixed;
     padding: 75px 8px 0 8px;
     -webkit-overflow-scrolling: touch;
     /* smooth scroll on iOS */
@@ -442,7 +443,7 @@
   }
 
   .chat-area {
-    display: flex;
+    display: fixed;
     flex-direction: column;
     height: calc(100vh - 105px);
     min-height: 0;
@@ -455,7 +456,7 @@
   }
 
   .chat-layout {
-    display: grid;
+    display: fixed;
     grid-template-columns: 280px 1fr;
     gap: 16px;
     max-width: 1100px;
