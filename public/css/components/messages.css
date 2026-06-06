@@ -29,15 +29,6 @@
   margin-left: 55px;
 }
 
-.chat-header-separate {
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid #222;
-  color: #fff;
-  overflow: hidden;
-}
-
 .empty-chat {
   height: 100%;
   display: flex;
@@ -68,7 +59,7 @@
 
 #messagesContainer {
   flex: 1;
-  padding: 14px;
+  padding: 10px;
   overflow-y: auto;
   min-height: 0;
 }
@@ -149,6 +140,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px;
+  border-bottom: 1px solid #222;
   font-weight: bold;
 }
 
@@ -160,7 +152,7 @@
 
 .message-row {
   display: flex;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .message-row.mine {
@@ -416,25 +408,10 @@
 @media (max-width: 480px) {
 
   #messagesPage {
-    display: fixed;
-    padding: 75px 8px 0 8px;
+    padding: 70px 8px 0 8px;
     -webkit-overflow-scrolling: touch;
     /* smooth scroll on iOS */
     margin-inline: 0
-  }
-
-  .chat-header-separate {
-    position: fixed;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.8);
-    border: unset;
-    color: #fff;
-    overflow: hidden;
-    top: 105px;
-    left: 11px;
-    right: 11px;
-    backdrop-filter: blur(2px);
-    z-index: 1000;
   }
 
   .messages-page {
@@ -443,9 +420,9 @@
   }
 
   .chat-area {
-    display: fixed;
+    display: flex;
     flex-direction: column;
-    height: calc(100vh - 105px);
+    height: calc(100vh - 120px);
     min-height: 0;
     background: rgba(0, 0, 0, 0.8);
     border: 1px solid #222;
@@ -455,14 +432,6 @@
     margin-left: 0px;
   }
 
-  .chat-layout {
-    display: fixed;
-    grid-template-columns: 280px 1fr;
-    gap: 16px;
-    max-width: 1100px;
-    margin: 0px 2px 0px 2px;
-  }
-
   #messagesContainer {
     flex: 1;
     padding: 6px;
@@ -470,9 +439,12 @@
     min-height: 0;
   }
 
-  .message-row {
-    display: flex;
-    margin-bottom: 6px;
+  .chat-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    max-width: 1100px;
+    margin: 2px 2px 4px 2px;
   }
 
   .conversation-panel,
@@ -566,7 +538,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
   }
 
   .message-icon {
