@@ -420,7 +420,7 @@
   }
 
   .chat-area {
-    display: flex;
+    display: fixed;
     flex-direction: column;
     height: calc(100vh - 120px);
     min-height: 0;
