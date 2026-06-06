@@ -153,6 +153,8 @@ export const langMap = {
     hour_ago: "h. ago",
     today_at: "today at",
     typing: "typing...",
+    today: "Today",
+    yesterday: "Yesterday",
 
 
 
@@ -332,6 +334,8 @@ export const langMap = {
     hour_ago: "ժամ առաջ",
     today_at: "այսօր ժամը",
     typing: "գրում է...",
+    today: "Այսօր",
+    yesterday: "Երեկ",
 
 
     //BE translations
@@ -510,6 +514,8 @@ export const langMap = {
     hour_ago: "h.",
     today_at: "aujourd’hui à",
     typing: "écrit...",
+    today: "Aujourd'hui",
+    yesterday: "Hier",
 
 
 

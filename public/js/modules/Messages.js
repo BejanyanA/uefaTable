@@ -400,6 +400,15 @@ export function updateChatHeaderStatus(isOnline, lastSeen) {
   status.classList.add("last-seen");
 }
 
+export function refreshMessageDateSeparators() {
+  document.querySelectorAll(".message-date-separator").forEach((separator) => {
+    const createdAt = separator.dataset.createdAt;
+    if (!createdAt) return;
+
+    separator.textContent = getMessageDateLabel(createdAt);
+  });
+}
+
 async function loadOlderMessages() {
 
   if (!currentConversationId || !oldestMessageId) return;
@@ -439,15 +448,23 @@ async function prependMessages(messages) {
 
   const fragment = document.createDocumentFragment();
 
-  const rows = await Promise.all(
-    messages.map(createMessageRow)
-  );
+  let lastDateKey = null;
 
-  rows.forEach((row) => {
+  for (const message of messages) {
+    const dateKey = getMessageDateKey(message.createdAt);
+    const dateLabel = getMessageDateLabel(message.createdAt);
+
+    if (dateKey !== lastDateKey) {
+      fragment.appendChild(createDateSeparator(dateLabel, dateKey, message.createdAt));
+      lastDateKey = dateKey;
+    }
+
+    const row = await createMessageRow(message);
     fragment.appendChild(row);
-  });
+  }
 
   container.prepend(fragment);
+  removeDuplicateDateSeparators();
 }
 
 async function loadConversations(force = false) {
@@ -510,8 +527,8 @@ async function loadConversations(force = false) {
         </div>
 
         ${Number(conversation.unreadCount) > 0
-              ? `<span class="unread-badge">${conversation.unreadCount}</span>`
-              : ""
+          ? `<span class="unread-badge">${conversation.unreadCount}</span>`
+          : ""
         }
       `;
 
@@ -755,13 +772,22 @@ async function renderMessages(messages) {
 
   container.innerHTML = "";
 
-  const rows = await Promise.all(
-    messages.map(createMessageRow)
-  );
+  let lastDateKey = null;
 
-  rows.forEach((row) => {
+  for (const message of messages) {
+    const dateKey = getMessageDateKey(message.createdAt);
+    const dateLabel = getMessageDateLabel(message.createdAt);
+
+    if (dateKey !== lastDateKey) {
+      container.appendChild(createDateSeparator(dateLabel, dateKey, message.createdAt));
+      lastDateKey = dateKey;
+    }
+
+    const row = await createMessageRow(message);
     container.appendChild(row);
-  });
+  }
+
+  removeDuplicateDateSeparators();
 
   requestAnimationFrame(() => {
     container.scrollTop = container.scrollHeight;
@@ -1186,4 +1212,71 @@ function setListTypingStatus(userId, isTyping) {
       status.classList.toggle("online-status", isOnline);
       status.classList.toggle("last-seen", !isOnline && Boolean(presence.lastSeen));
     });
+}
+
+function getMessageDateLabel(createdAt) {
+  const dateValue = createdAt.includes("T")
+    ? createdAt
+    : createdAt.replace(" ", "T") + "Z";
+
+  const date = new Date(dateValue);
+  const now = new Date();
+
+  const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffDays = Math.floor((today - messageDate) / 86400000);
+
+  if (diffDays === 0) {
+    return langMap[currentLang]?.today || "Today";
+  }
+
+  if (diffDays === 1) {
+    return langMap[currentLang]?.yesterday || "Yesterday";
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}.${month}.${year}`;
+}
+
+function getMessageDateKey(createdAt) {
+  const dateValue = createdAt.includes("T")
+    ? createdAt
+    : createdAt.replace(" ", "T") + "Z";
+
+  const date = new Date(dateValue);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${year}-${month}-${day}`;
+}
+
+function createDateSeparator(label, dateKey, createdAt) {
+  const separator = document.createElement("div");
+  separator.className = "message-date-separator";
+  separator.dataset.dateKey = dateKey;
+  separator.dataset.createdAt = createdAt;
+  separator.textContent = label;
+  return separator;
+}
+
+function removeDuplicateDateSeparators() {
+  const separators = [...document.querySelectorAll(".message-date-separator")];
+  const seen = new Set();
+
+  separators.forEach((separator) => {
+    const key = separator.dataset.dateKey;
+
+    if (seen.has(key)) {
+      separator.remove();
+      return;
+    }
+
+    seen.add(key);
+  });
 }
