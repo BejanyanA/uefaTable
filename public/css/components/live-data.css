@@ -413,6 +413,13 @@ api-sports-widget .standings-table th,
   font-size: 15px;
 }
 
+/* While watchWidgetHost() is deciding whether the widget loaded, keep its
+   content (notably the matches toolbar tabs) hidden so it never flashes before
+   we either reveal real data or swap in the .widgetUnavailable message. */
+.liveWidgetPending > * {
+  visibility: hidden;
+}
+
 
 @media (max-width: 600px) {
   .liveTabBtn {

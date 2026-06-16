@@ -132,6 +132,7 @@ export const langMap = {
     liveTitleFootball: "All About Football",
     live_empty_standings: "No standings available for this league",
     live_empty_matches: "No matches available for this league",
+    live_subscription_expired: "Data is currently unavailable",
     live_standings: "Standings",
     live_fixtures: "Matches",
     live_events: "Events",
@@ -313,6 +314,7 @@ export const langMap = {
     liveTitleFootball: "Ամեն ինչ Ֆուտբոլի մասին",
     live_empty_standings: "Աղյուսակ գոյություն չունի այս լիգայի համար",
     live_empty_matches: "Խաղեր գոյություն չունեն այս լիգայի համար",
+    live_subscription_expired: "Տվյալներն այս պահին հասանելի չեն",
     live_standings: "Աղյուսակներ",
     live_fixtures: "Խաղացանկ",
     live_events: "Իրադարձություններ",
@@ -493,6 +495,7 @@ export const langMap = {
     liveTitleFootball: "Tout sur le football",
     live_empty_standings: "Aucun classement disponible pour cette ligue",
     live_empty_matches: "Aucun match disponible pour cette ligue",
+    live_subscription_expired: "Données actuellement indisponibles",
     live_standings: "Classements",
     live_fixtures: "Rencontres",
     live_events: "Événements",
@@ -1063,30 +1066,32 @@ function liveDataTranslation() {
 }
 
 // Live empty results
+//
+// For the leagues we display, both the standings table and the matches list
+// always have data, so an `.empty-result` from either widget can only mean the
+// widget failed to load (e.g. the API subscription ended). In both cases we
+// show "Data is currently unavailable" immediately — we don't wait for the
+// widget to render a placeholder or for the watchdog to time out, which is
+// what caused the delay before the message appeared.
 function translateEmptyResults() {
   const t = langMap[currentLang] || {};
+  const unavailable =
+    t.live_subscription_expired || "Data is currently unavailable";
 
   // NOTE: setting `.textContent` replaces child nodes and emits a childList
   // mutation EVEN WHEN the value is unchanged. Because this runs from a
   // document.body MutationObserver, an unconditional write re-triggers the
   // observer -> writes again -> infinite microtask loop that freezes the UI.
-  // This used to lock up the page whenever an `.empty-result` appeared (e.g.
-  // when the live widget's subscription ends). Only write when it changes.
-  const standingsText =
-    t.live_empty_standings || "No standings available for this league.";
-  document
-    .querySelectorAll("standing-component .empty-result")
-    .forEach((el) => {
-      if (el.textContent !== standingsText) el.textContent = standingsText;
-    });
+  // Only write when the value actually changes.
+  const setText = (el, target) => {
+    if (el.textContent !== target) el.textContent = target;
+  };
 
-  const matchesText =
-    t.live_empty_matches || "No matches available for this league.";
   document
-    .querySelectorAll("games-component .empty-result")
-    .forEach((el) => {
-      if (el.textContent !== matchesText) el.textContent = matchesText;
-    });
+    .querySelectorAll(
+      "standing-component .empty-result, games-component .empty-result, .widgetUnavailable"
+    )
+    .forEach((el) => setText(el, unavailable));
 }
 
 const observer = new MutationObserver(() => {

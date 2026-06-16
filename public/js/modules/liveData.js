@@ -796,14 +796,17 @@ function closeAllMatchDropdowns(exceptGroup = null) {
 
 // ---------- translations ----------
 const widgetTranslations = {
-   "No games available for this date": (t) => t.live_empty_games,
    "Live": (t) => t.live_direct_games,
    "All": (t) => t.live_all_games,
    "Home": (t) => t.live_home_games,
    "Away": (t) => t.live_away_games,
    "Finished": (t) => t.live_finished_games,
    "Scheduled": (t) => t.live_scheduled_games,
-   "No standings available for this league": (t) => t.live_empty_standings,
+   // NOTE: standings AND matches empties are handled by translateEmptyResults()
+   // in LanguageManager.js — for the leagues we show, an empty result from
+   // either widget always means a load failure, so it renders "Data is
+   // currently unavailable" rather than a "no standings/matches" message. Don't
+   // map those empty strings here or the two translators fight over the element.
 };
 
 function setActionButtonLabelGlobal(action, translatedText) {
@@ -916,36 +919,72 @@ function translateWidgetTexts() {
 function watchWidgetHost(host, timeoutMs = 5000, type = "standings") {
    if (!host) return;
 
-   const hasRealContent = (el) => {
-      // If only a loader is present, that's NOT real content
-      const loader = el.querySelector(".loading-block, .loading");
-      const table = el.querySelector("table");
-      const emptyResult = el.querySelector(".empty-result");
+   // Hide the widget (including the matches toolbar tabs) until we know whether
+   // it has data. Without this, the matches widget paints its toolbar
+   // immediately and the tabs flash on screen before we can replace a failed
+   // widget with the "Data is currently unavailable" message.
+   host.classList.add("liveWidgetPending");
 
-      // Real content = has a table and no loader
-      if (table && !loader) return true;
+   // Real, successful content: a standings table OR matches game rows.
+   const hasData = () => !!host.querySelector("table, .game-teams");
+   // The widget library's own loading spinner.
+   const isLoading = () => !!host.querySelector(".loading-block, .loading");
+   // The widget's own empty placeholder.
+   const hasEmpty = () => !!host.querySelector(".empty-result");
+   // Has the widget rendered its UI yet? (matches toolbar, or either custom
+   // element). Lets us tell "still bootstrapping" from "settled with no data".
+   const hasMounted = () =>
+      !!host.querySelector(
+         "standing-component, games-component, .btn-widget-link, .widget-toolbar"
+      );
 
-      // Widget settled into empty state = also counts as "done"
-      if (emptyResult && !loader) return true;
-
-      return false;
+   let settleTimer = null;
+   const clearSettle = () => {
+      if (settleTimer) {
+         clearTimeout(settleTimer);
+         settleTimer = null;
+      }
    };
 
-   const obs = new MutationObserver(() => {
-      if (hasRealContent(host)) {
-         clearTimeout(timer);
-         obs.disconnect();
-      }
-   });
-
-   const timer = setTimeout(() => {
+   const done = () => {
+      clearTimeout(timer);
+      clearSettle();
       obs.disconnect();
-      if (!hasRealContent(host)) {
-         renderWidgetError(host, type);
-      }
-   }, timeoutMs);
+      host.classList.remove("liveWidgetPending");
+   };
 
+   const succeed = () => done(); // reveal the widget (class removed)
+
+   const fail = () => {
+      done();
+      // Replace the ENTIRE host (not just the empty-result text) so the matches
+      // toolbar tabs are removed too, giving the same clean UI as standings.
+      renderWidgetError(host, type);
+   };
+
+   const evaluate = () => {
+      if (hasData()) return succeed();
+      if (hasEmpty()) return fail(); // widget settled into its own empty state
+
+      // Widget has rendered its UI but shows no data and no loader -> it failed
+      // to load (e.g. subscription ended). Debounce briefly so we don't catch a
+      // transient frame between mount and the loader appearing.
+      if (hasMounted() && !isLoading()) {
+         if (!settleTimer) {
+            settleTimer = setTimeout(() => {
+               settleTimer = null;
+               if (!hasData() && !isLoading()) fail();
+            }, 600);
+         }
+      } else {
+         clearSettle();
+      }
+   };
+
+   const obs = new MutationObserver(evaluate);
+   const timer = setTimeout(fail, timeoutMs); // backstop: never loaded at all
    obs.observe(host, { childList: true, subtree: true, attributes: false });
+   evaluate();
 }
 
 function renderWidgetError(host, type = "standings") {
