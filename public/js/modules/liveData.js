@@ -952,17 +952,12 @@ function renderWidgetError(host, type = "standings") {
    const t = langMap[currentLang] || {};
    const message = t.live_subscription_expired || "Data is currently unavailable";
 
-   if (type === "matches") {
-      host.innerHTML = `
-         <games-component>
-            <div class="empty-result">${message}</div>
-         </games-component>
-      `;
-   } else {
-      host.innerHTML = `
-         <standing-component>
-            <div class="empty-result">${message}</div>
-         </standing-component>
-      `;
-   }
+   // IMPORTANT: do NOT use the widget library's custom elements
+   // (<standing-component> / <games-component>) here. Injecting a bare one
+   // re-runs its lifecycle, which boots into its own loading spinner with no
+   // data to resolve it — causing the "infinite loader" this is meant to fix.
+   // Use plain markup so nothing re-bootstraps a widget.
+   host.innerHTML = `
+      <div class="widgetUnavailable empty-result">${message}</div>
+   `;
 }

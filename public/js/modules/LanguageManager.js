@@ -1066,20 +1066,26 @@ function liveDataTranslation() {
 function translateEmptyResults() {
   const t = langMap[currentLang] || {};
 
+  // NOTE: setting `.textContent` replaces child nodes and emits a childList
+  // mutation EVEN WHEN the value is unchanged. Because this runs from a
+  // document.body MutationObserver, an unconditional write re-triggers the
+  // observer -> writes again -> infinite microtask loop that freezes the UI.
+  // This used to lock up the page whenever an `.empty-result` appeared (e.g.
+  // when the live widget's subscription ends). Only write when it changes.
+  const standingsText =
+    t.live_empty_standings || "No standings available for this league.";
   document
     .querySelectorAll("standing-component .empty-result")
     .forEach((el) => {
-      el.textContent =
-        t.live_empty_standings ||
-        "No standings available for this league.";
+      if (el.textContent !== standingsText) el.textContent = standingsText;
     });
 
+  const matchesText =
+    t.live_empty_matches || "No matches available for this league.";
   document
     .querySelectorAll("games-component .empty-result")
     .forEach((el) => {
-      el.textContent =
-        t.live_empty_matches ||
-        "No matches available for this league.";
+      if (el.textContent !== matchesText) el.textContent = matchesText;
     });
 }
 
