@@ -1,44 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript">
-  (function (m, e, t, r, i, k, a) {
-    m[i] = m[i] || function () {
-      (m[i].a = m[i].a || []).push(arguments);
-    };
-    m[i].l = 1 * new Date();
-    for (var j = 0; j < document.scripts.length; j++) {
-      if (document.scripts[j].src === r) {
-        return;
-      }
-    }
-    k = e.createElement(t),
-      a = e.getElementsByTagName(t)[0],
-      k.async = 1,
-      k.src = r,
-      a.parentNode.insertBefore(k, a);
-  })(window, document, 'script', 'https://mc.webvisor.org/metrika/tag_ww.js?id=106431737', 'ym');
-
-  ym(106431737, 'init', {
-    webvisor: true,
-    trackHash: false,
-    clickmap: true,
-    accurateTrackBounce: true,
-    trackLinks: true
-  });
-</script>
-
-<noscript>
-  <div>
-    <img src="https://mc.yandex.ru/watch/106431737" style="position:absolute; left:-9999px;" alt="" />
-  </div>
-</noscript>
-<!-- /Yandex.Metrika counter -->
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+    (function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () {
+        (m[i].a = m[i].a || []).push(arguments);
+      };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < document.scripts.length; j++) {
+        if (document.scripts[j].src === r) {
+          return;
+        }
+      }
+      k = e.createElement(t),
+        a = e.getElementsByTagName(t)[0],
+        k.async = 1,
+        k.src = r,
+        a.parentNode.insertBefore(k, a);
+    })(window, document, 'script', 'https://mc.webvisor.org/metrika/tag_ww.js?id=106431737', 'ym');
+
+    ym(106431737, 'init', {
+      webvisor: true,
+      trackHash: false,
+      clickmap: true,
+      accurateTrackBounce: true,
+      trackLinks: true
+    });
+  </script>
+  <!-- /Yandex.Metrika counter -->
 
   <meta name="theme-color" content="#00020c" />
 
@@ -125,9 +119,39 @@
     onload="this.media='all'">
   <link rel="stylesheet" href="css/components/homepage-options.css">
   <link rel="stylesheet" href="css/components/live-data.css">
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://uefaresults.com/#website",
+        "url": "https://uefaresults.com/",
+        "name": "UEFA Results",
+        "description": "Track live football scores, fixtures, standings, Champions League tables, World Cup tables, and create custom football leagues with friends.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://uefaresults.com/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://uefaresults.com/#organization",
+        "name": "UEFA Results",
+        "url": "https://uefaresults.com/",
+        "logo": "https://uefaresults.com/assets/favicon/favicon-512x512.png"
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
+  <!-- Yandex.Metrika noscript fallback -->
+  <noscript>
+    <div><img src="https://mc.yandex.ru/watch/106431737" style="position:absolute; left:-9999px;" alt="" /></div>
+  </noscript>
+
   <div id="app-background"></div>
 
   <!-- Header  -->

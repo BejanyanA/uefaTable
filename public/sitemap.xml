@@ -4,12 +4,4 @@
     <loc>https://uefaresults.com/</loc>
     <priority>1.0</priority>
   </url>
-  <url>
-    <loc>https://uefaresults.com/#live</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uefaresults.com/#custom-leagues</loc>
-    <priority>0.8</priority>
-  </url>
 </urlset>
