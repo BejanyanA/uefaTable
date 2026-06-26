@@ -416,8 +416,35 @@ api-sports-widget .standings-table th,
 /* While watchWidgetHost() is deciding whether the widget loaded, keep its
    content (notably the matches toolbar tabs) hidden so it never flashes before
    we either reveal real data or swap in the .widgetUnavailable message. */
-.liveWidgetPending > * {
+.liveWidgetPending>* {
   visibility: hidden;
+}
+
+api-sports-widget .standings-table tbody td:first-child {
+  min-width: 1px;
+  max-width: 2px;
+}
+
+.table-widget td .team-name {
+  font-weight: bold;
+  flex-grow: 1;
+  /* text-align: center; */
+  color: white;
+  font-size: 14px;
+  margin-left: 0px;
+  min-width: 200px;
+  max-width: 220px;
+}
+
+api-sports-widget .standings-table th,
+.standings-table td {
+  font-size: 14px;
+  padding: 5px 60px 5px 10px
+}
+
+api-sports-widget .standings-table th,
+.standings-table td {
+  border: unset
 }
 
 
@@ -698,5 +725,22 @@ api-sports-widget .standings-table th,
 
   api-sports-widget .modal-widget-close {
     color: #ff4d4d !important;
+  }
+
+  .table-widget td .team-name {
+    font-weight: bold;
+    flex-grow: 1;
+    /* text-align: center; */
+    color: white;
+    font-size: 10px;
+    margin-left: 4px;
+    min-width: 90px;
+    min-width: 120px;
+  }
+
+  api-sports-widget .standings-table th,
+  .standings-table td {
+    font-size: 10px;
+    padding: 5px 10px
   }
 }
