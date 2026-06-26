@@ -140,6 +140,36 @@
         "name": "UEFA Results",
         "url": "https://uefaresults.com/",
         "logo": "https://uefaresults.com/assets/favicon/favicon-512x512.png"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://uefaresults.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How can I create a custom football league with friends?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "On UEFA Results you can create your own custom football league for free. Choose a group or knockout format, set the number of teams, invite your friends, and track standings together in real time."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I follow live football scores and standings?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "UEFA Results shows live football scores, upcoming fixtures and final results, plus Champions League, Europa League, EURO Cup and World Cup tables, updated in real time."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is UEFA Results free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. UEFA Results is completely free. You can follow live scores and standings and create your own custom leagues at no cost."
+            }
+          }
+        ]
       }
     ]
   }
@@ -333,7 +363,7 @@
     <div class="homePage" id="homePage" style="display: none;">
       <!-- ✅ Separate block: Live / Custom options -->
       <div class="homeOptions" id="homeOptionsBlock">
-        <h1 class="seo-h1"> UEFA Results - Live Football Scores and Custom Leagues </h1>
+        <h1 class="seo-h1" id="seoH1"> UEFA Results - Live Football Scores and Custom Leagues </h1>
         <div class="choiceGrid" id="homePageOptions">
           <button id="btnLiveData" class="choiceCard choiceCard--live" type="button">
             <div class="choiceTop">
@@ -633,6 +663,36 @@
     </div>
   </div>
 
+
+  <!-- SEO content: always-visible, crawlable text describing the site -->
+  <section class="seo-content" aria-label="About UEFA Results">
+    <h2 id="seoHeading">Live Football Scores, Standings &amp; Custom Leagues</h2>
+    <p id="seoIntro">
+      UEFA Results is a free football platform where you can follow live football scores,
+      upcoming fixtures and final results in real time. Check Champions League tables,
+      Europa League standings, EURO Cup and World Cup tables, and keep up with every match
+      as it happens.
+    </p>
+
+    <h3 id="seoCustomHeading">Create your own custom football league</h3>
+    <p id="seoCustomText">
+      Beyond live scores, UEFA Results lets you build and manage your own custom football
+      leagues with friends. Create a Champions League-style group and knockout bracket,
+      invite your friends, choose your teams, and track standings together — all in one place.
+    </p>
+
+    <h3 id="seoFeaturesHeading">What you can do on UEFA Results</h3>
+    <ul>
+      <li><strong id="seoFeat1Label">Live football scores</strong><span id="seoFeat1Text"> — follow matches live as goals go in.</span></li>
+      <li><strong id="seoFeat2Label">Fixtures &amp; results</strong><span id="seoFeat2Text"> — upcoming matches and full-time results.</span></li>
+      <li><strong id="seoFeat3Label">Standings &amp; tables</strong><span id="seoFeat3Text"> — Champions League, Europa League, EURO and World Cup tables.</span></li>
+      <li><strong id="seoFeat4Label">Custom leagues</strong><span id="seoFeat4Text"> — create your own league or bracket and invite friends.</span></li>
+    </ul>
+    <p class="seo-links">
+      <a href="/live-scores" id="seoLinkLive">Live football scores &amp; standings</a>
+      <a href="/custom-leagues" id="seoLinkCustom">Create a custom football league</a>
+    </p>
+  </section>
 
   <footer class="page-footer">
     Powered by And Bejanyan © <span id="year"></span> All rights reserved
