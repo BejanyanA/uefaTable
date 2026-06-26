@@ -1230,6 +1230,14 @@ function seoContentTranslations() {
   setText("seoFeat4Text", t.seoFeat4Text);
   setText("seoLinkLive", t.seoLinkLive);
   setText("seoLinkCustom", t.seoLinkCustom);
+
+  // Point internal landing-page links at the version for the current language
+  // (en -> /live-scores, am -> /am/live-scores, fr -> /fr/live-scores)
+  const prefix = currentLang === "en" ? "" : `/${currentLang}`;
+  const liveLink = document.getElementById("seoLinkLive");
+  if (liveLink) liveLink.setAttribute("href", `${prefix}/live-scores`);
+  const customLink = document.getElementById("seoLinkCustom");
+  if (customLink) customLink.setAttribute("href", `${prefix}/custom-leagues`);
 }
 
 
