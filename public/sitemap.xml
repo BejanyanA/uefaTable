@@ -1,19 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://uefaresults.com/</loc>
     <lastmod>2026-06-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
     <loc>https://uefaresults.com/live-scores</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/live-scores"/>
     <lastmod>2026-06-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://uefaresults.com/am/live-scores</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/live-scores"/>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uefaresults.com/fr/live-scores</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/live-scores"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/live-scores"/>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://uefaresults.com/custom-leagues</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/custom-leagues"/>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uefaresults.com/am/custom-leagues</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/custom-leagues"/>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uefaresults.com/fr/custom-leagues</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uefaresults.com/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/custom-leagues"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://uefaresults.com/custom-leagues"/>
     <lastmod>2026-06-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

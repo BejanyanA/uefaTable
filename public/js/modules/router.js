@@ -864,6 +864,10 @@ export function initRouter() {
         const activeEl = document.getElementById(next.id);
         if (activeEl) activeEl.style.display = "block";
 
+        // SEO content block belongs on the homepage only
+        const seoContent = document.querySelector(".seo-content");
+        if (seoContent) seoContent.style.display = (nextKey === "home") ? "block" : "none";
+
         // ✅ enter next ALSO when hash changed (back/forward / tab change)
         if (next.onEnter && (prevKey !== nextKey || hashChanged)) {
             next.onEnter({ query: new URLSearchParams(qs), raw });
