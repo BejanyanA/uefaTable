@@ -1124,16 +1124,25 @@ function liveDataTranslation() {
 
 // Live empty results
 //
-// For the leagues we display, both the standings table and the matches list
-// always have data, so an `.empty-result` from either widget can only mean the
-// widget failed to load (e.g. the API subscription ended). In both cases we
-// show "Data is currently unavailable" immediately — we don't wait for the
-// widget to render a placeholder or for the watchdog to time out, which is
-// what caused the delay before the message appeared.
+// Two different "empty" states need two different messages:
+//
+//   • `.widgetUnavailable` — our OWN element, injected by watchWidgetHost() only
+//     when the widget genuinely failed to load (stuck / never mounted, e.g. the
+//     API subscription ended). -> "Data is currently unavailable".
+//
+//   • the widget's OWN `.empty-result` inside <standing-component> /
+//     <games-component> — the widget loaded fine but there are simply no
+//     standings/matches for the current selection (e.g. a league with no
+//     fixtures today / off-season). This is NOT a failure, so it must NOT say
+//     "unavailable"; it shows "No standings/matches available for this league".
 function translateEmptyResults() {
   const t = langMap[currentLang] || {};
   const unavailable =
     t.live_subscription_expired || "Data is currently unavailable";
+  const noStandings =
+    t.live_empty_standings || "No standings available for this league";
+  const noMatches =
+    t.live_empty_matches || "No matches available for this league";
 
   // NOTE: setting `.textContent` replaces child nodes and emits a childList
   // mutation EVEN WHEN the value is unchanged. Because this runs from a
@@ -1144,11 +1153,19 @@ function translateEmptyResults() {
     if (el.textContent !== target) el.textContent = target;
   };
 
+  // Genuine load failure (our element).
   document
-    .querySelectorAll(
-      "standing-component .empty-result, games-component .empty-result, .widgetUnavailable"
-    )
+    .querySelectorAll(".widgetUnavailable")
     .forEach((el) => setText(el, unavailable));
+
+  // Widget loaded, just no data for this selection. `:not(.widgetUnavailable)`
+  // guards against our own element (which also carries `.empty-result`).
+  document
+    .querySelectorAll("standing-component .empty-result:not(.widgetUnavailable)")
+    .forEach((el) => setText(el, noStandings));
+  document
+    .querySelectorAll("games-component .empty-result:not(.widgetUnavailable)")
+    .forEach((el) => setText(el, noMatches));
 }
 
 const observer = new MutationObserver(() => {

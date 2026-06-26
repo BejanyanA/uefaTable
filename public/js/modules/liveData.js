@@ -964,17 +964,30 @@ function watchWidgetHost(host, timeoutMs = 5000, type = "standings") {
 
    const evaluate = () => {
       if (hasData()) return succeed();
-      if (hasEmpty()) return fail(); // widget settled into its own empty state
 
-      // Widget has rendered its UI but shows no data and no loader -> it failed
-      // to load (e.g. subscription ended). Debounce briefly so we don't catch a
-      // transient frame between mount and the loader appearing.
-      if (hasMounted() && !isLoading()) {
+      // No table/game rows yet. We must distinguish two very different states:
+      //
+      //   • SETTLED EMPTY — the widget mounted its UI and shows its own empty
+      //     placeholder (or rendered nothing and is no longer loading). The
+      //     request SUCCEEDED, there are simply no games/standings for this
+      //     selection (e.g. a league with no fixtures today / off-season). This
+      //     is NOT a failure — we REVEAL the widget so its own (translated)
+      //     "no matches/standings" state shows.
+      //
+      //   • STUCK / NEVER MOUNTED — the widget never renders its UI and keeps
+      //     loading. THAT is the real failure (e.g. subscription ended), handled
+      //     by the backstop timer below.
+      //
+      // Debounce so a transient empty frame mid-(re)load isn't mistaken for the
+      // settled state; if real data lands first, hasData() -> succeed().
+      const settledEmpty = hasEmpty() || (hasMounted() && !isLoading());
+      if (settledEmpty) {
          if (!settleTimer) {
             settleTimer = setTimeout(() => {
                settleTimer = null;
-               if (!hasData() && !isLoading()) fail();
-            }, 600);
+               if (isLoading()) return;   // went back to loading; let backstop decide
+               succeed();                 // settled with no data => reveal "no games"
+            }, 800);
          }
       } else {
          clearSettle();
@@ -982,7 +995,12 @@ function watchWidgetHost(host, timeoutMs = 5000, type = "standings") {
    };
 
    const obs = new MutationObserver(evaluate);
-   const timer = setTimeout(fail, timeoutMs); // backstop: never loaded at all
+   // Backstop: only reached if the widget NEVER settled — stuck loading or never
+   // mounted at all. THAT is a genuine load failure (e.g. subscription ended).
+   const timer = setTimeout(() => {
+      if (hasData()) succeed();
+      else fail();
+   }, timeoutMs);
    obs.observe(host, { childList: true, subtree: true, attributes: false });
    evaluate();
 }
