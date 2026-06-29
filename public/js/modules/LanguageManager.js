@@ -125,16 +125,16 @@ export const langMap = {
     seoHeading: "Live Football Scores, Standings & Custom Leagues",
     seoIntro: "UEFA Results is a free football platform where you can follow live football scores, upcoming fixtures and final results in real time. Check Champions League tables, Europa League standings, EURO Cup and World Cup tables, and keep up with every match as it happens.",
     seoCustomHeading: "Create your own custom football league",
-    seoCustomText: "Beyond live scores, UEFA Results lets you build and manage your own custom football leagues with friends. Create a Champions League-style group and knockout bracket, invite your friends, choose your teams, and track standings together — all in one place.",
+    seoCustomText: "Beyond live scores, UEFA Results lets you build and manage your own custom football leagues with friends. Create a Champions League-style group and knockout bracket, invite your friends, choose your teams, and track standings together - all in one place.",
     seoFeaturesHeading: "What you can do on UEFA Results",
     seoFeat1Label: "Live football scores",
-    seoFeat1Text: " — follow matches live as goals go in.",
+    seoFeat1Text: " - follow matches live as goals go in.",
     seoFeat2Label: "Fixtures & results",
-    seoFeat2Text: " — upcoming matches and full-time results.",
+    seoFeat2Text: " - upcoming matches and full-time results.",
     seoFeat3Label: "Standings & tables",
-    seoFeat3Text: " — Champions League, Europa League, EURO and World Cup tables.",
+    seoFeat3Text: " - Champions League, Europa League, EURO and World Cup tables.",
     seoFeat4Label: "Custom leagues",
-    seoFeat4Text: " — create your own league or bracket and invite friends.",
+    seoFeat4Text: " - create your own league or bracket and invite friends.",
     seoLinkLive: "Live football scores & standings",
     seoLinkCustom: "Create a custom football league",
 
@@ -328,13 +328,13 @@ export const langMap = {
     seoCustomText: "Բացի ուղիղ հաշիվներից, UEFA Results-ը թույլ է տալիս ստեղծել և կառավարել ձեր սեփական անհատական ֆուտբոլային լիգաները ընկերների հետ։ Ստեղծեք Չեմպիոնների լիգայի ոճով խմբային և փլեյ-օֆֆ ցանց, հրավիրեք ձեր ընկերներին, ընտրեք ձեր թիմերը և միասին հետևեք աղյուսակին՝ մեկ վայրում։",
     seoFeaturesHeading: "Ի՞նչ կարող եք անել UEFA Results-ում",
     seoFeat1Label: "Ֆուտբոլի ուղիղ հաշիվներ",
-    seoFeat1Text: " — հետևեք խաղերին ուղիղ եթերում՝ գոլերի հետ միասին։",
+    seoFeat1Text: " - հետևեք խաղերին ուղիղ եթերում՝ գոլերի հետ միասին։",
     seoFeat2Label: "Խաղեր և արդյունքներ",
-    seoFeat2Text: " — սպասվող խաղեր և վերջնական արդյունքներ։",
+    seoFeat2Text: " - սպասվող խաղեր և վերջնական արդյունքներ։",
     seoFeat3Label: "Աղյուսակներ",
-    seoFeat3Text: " — Չեմպիոնների լիգա, Եվրոպայի լիգա, ԵՎՐՈ և Աշխարհի առաջնության աղյուսակներ։",
+    seoFeat3Text: " - Չեմպիոնների լիգա, Եվրոպայի լիգա, ԵՎՐՈ և Աշխարհի առաջնության աղյուսակներ։",
     seoFeat4Label: "Անհատական լիգաներ",
-    seoFeat4Text: " — ստեղծեք ձեր սեփական լիգան կամ ցանցը և հրավիրեք ընկերներին։",
+    seoFeat4Text: " - ստեղծեք ձեր սեփական լիգան կամ ցանցը և հրավիրեք ընկերներին։",
     seoLinkLive: "Ֆուտբոլի ուղիղ հաշիվներ և աղյուսակներ",
     seoLinkCustom: "Ստեղծել անհատական ֆուտբոլային լիգա",
 
@@ -527,13 +527,13 @@ export const langMap = {
     seoCustomText: "Au-delà des scores en direct, UEFA Results vous permet de créer et de gérer vos propres ligues de football personnalisées avec vos amis. Créez une phase de groupes et un tableau à élimination directe façon Ligue des champions, invitez vos amis, choisissez vos équipes et suivez les classements ensemble, le tout au même endroit.",
     seoFeaturesHeading: "Ce que vous pouvez faire sur UEFA Results",
     seoFeat1Label: "Scores de football en direct",
-    seoFeat1Text: " — suivez les matchs en direct au fil des buts.",
+    seoFeat1Text: " - suivez les matchs en direct au fil des buts.",
     seoFeat2Label: "Matchs et résultats",
-    seoFeat2Text: " — matchs à venir et résultats finaux.",
+    seoFeat2Text: " - matchs à venir et résultats finaux.",
     seoFeat3Label: "Classements",
-    seoFeat3Text: " — classements de la Ligue des champions, de la Ligue Europa, de l’EURO et de la Coupe du monde.",
+    seoFeat3Text: " - classements de la Ligue des champions, de la Ligue Europa, de l’EURO et de la Coupe du monde.",
     seoFeat4Label: "Ligues personnalisées",
-    seoFeat4Text: " — créez votre propre ligue ou tableau et invitez vos amis.",
+    seoFeat4Text: " - créez votre propre ligue ou tableau et invitez vos amis.",
     seoLinkLive: "Scores de football en direct et classements",
     seoLinkCustom: "Créer une ligue de football personnalisée",
 
@@ -1126,12 +1126,12 @@ function liveDataTranslation() {
 //
 // Two different "empty" states need two different messages:
 //
-//   • `.widgetUnavailable` — our OWN element, injected by watchWidgetHost() only
+//   • `.widgetUnavailable` - our OWN element, injected by watchWidgetHost() only
 //     when the widget genuinely failed to load (stuck / never mounted, e.g. the
 //     API subscription ended). -> "Data is currently unavailable".
 //
 //   • the widget's OWN `.empty-result` inside <standing-component> /
-//     <games-component> — the widget loaded fine but there are simply no
+//     <games-component> - the widget loaded fine but there are simply no
 //     standings/matches for the current selection (e.g. a league with no
 //     fixtures today / off-season). This is NOT a failure, so it must NOT say
 //     "unavailable"; it shows "No standings/matches available for this league".
