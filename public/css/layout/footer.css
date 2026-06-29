@@ -67,14 +67,12 @@ footer.page-footer {
 }
 
 .seo-links a {
-  color: #40c456;
+  color: #2a43fed8;
   text-decoration: none;
   font-weight: 600;
+  text-decoration-line: underline;
 }
 
-.seo-links a:hover {
-  text-decoration: underline;
-}
 
 
 @media (max-width: 480px) {
