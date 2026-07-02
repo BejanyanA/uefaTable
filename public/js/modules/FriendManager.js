@@ -61,9 +61,16 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
           if (reqResponse.success) {
             // Update UI to pending after request is sent
             showToast(t.friend_request_success || "Successfully Sent", "success");
-            addButton.remove();
+
+            // Reset the search UI back to its initial state
+            friendsSearchInput.value = '';
+            resultsContainer.innerHTML = '';
+            toggleSearchIcon(false);
+
             getFriends.initGetAllFriendsStatuses();
-            handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
+
+            // Jump to the Pending tab so the user sees the request they just sent
+            document.getElementById("pendingUsersTab")?.click();
           } else {
             console.error("Failed to send friend request.");
           }
