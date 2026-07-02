@@ -3,10 +3,11 @@ import { initNotifications } from './NotificationManager.js';
 import { customLeagues } from './CustomLeagues.js';
 import { connectChatSocket } from './Messages.js';
 import { connectPresenceSocket } from './UserStatus.js';
+import { STORAGE_KEYS, clearAuthSession, clearActiveLeagueTabs } from '../utils/storageKeys.js';
 
 // 🔹 JWT Check on Load
 export async function checkLoggedIn() {
-   const token = localStorage.getItem("authToken");
+   const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
    const authButtons = document.getElementById("authButtons");
    const bannerSection = document.querySelector(".banner-container");
 
@@ -18,7 +19,7 @@ export async function checkLoggedIn() {
    }
 
    try {
-      const data = await apiGet("/me", token); // ✅ Cleaner
+      const data = await apiGet("/me");
       if (data.success && data.user) {
          connectChatSocket();
          connectPresenceSocket();
@@ -28,9 +29,8 @@ export async function checkLoggedIn() {
          document.getElementById("profileMenu").style.display = "block";
          document.getElementById("messagesBtn").style.display = "block";
          // document.getElementById("homePageIcon").style.display = "none";
-         localStorage.setItem('user', JSON.stringify(data.user));
-         localStorage.removeItem("lastActiveLeagueTab");
-         localStorage.removeItem("lastActiveNationalLeagueTab");
+         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+         clearActiveLeagueTabs();
 
          const usernameEl = document.getElementById("headerUsernameTitle");
          if (usernameEl && data.user.username) {
@@ -38,19 +38,12 @@ export async function checkLoggedIn() {
          }
 
       } else {
-         localStorage.removeItem("authToken");
-         localStorage.removeItem("leaguesActiveTab");
-         localStorage.removeItem("lastActiveLeagueTab");
-         localStorage.removeItem("lastActiveNationalLeagueTab");
-         localStorage.removeItem("user");
-         localStorage.removeItem("currentBannerId");
-         localStorage.removeItem("leagueId");
-         localStorage.removeItem("selectedStageType");
+         clearAuthSession();
          if (authButtons) authButtons.style.display = "flex";
       }
    } catch (err) {
       console.error("Token check failed", err);
-      localStorage.removeItem("authToken");
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       if (authButtons) authButtons.style.display = "flex";
       if (bannerSection) bannerSection.style.display = "none";
    }
@@ -60,11 +53,11 @@ export function homepage() {
    const homeButton = document.getElementById("homePageIcon");
 
    homeButton.addEventListener("click", async () => {
-      const token = localStorage.getItem("authToken");
+      const authButtons = document.getElementById("authButtons");
       location.hash = "home";
 
       try {
-         const response = await apiGet("/me", token);
+         const response = await apiGet("/me");
          if (response.success && response.user) {
             connectChatSocket();
             connectPresenceSocket();
@@ -74,9 +67,8 @@ export function homepage() {
             document.getElementById("profileMenu").style.display = "block";
             document.getElementById("messagesBtn").style.display = "block";
             document.getElementById("homePageIcon").style.display = "none";
-            localStorage.setItem('user', JSON.stringify(response.user));
-            localStorage.removeItem("lastActiveLeagueTab");
-            localStorage.removeItem("lastActiveNationalLeagueTab");
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
+            clearActiveLeagueTabs();
 
             const usernameEl = document.getElementById("headerUsernameTitle");
             if (usernameEl && response.user.username) {
@@ -84,20 +76,13 @@ export function homepage() {
             }
 
          } else {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("leaguesActiveTab");
-            localStorage.removeItem("lastActiveLeagueTab");
-            localStorage.removeItem("lastActiveNationalLeagueTab");
-            localStorage.removeItem("user");
-            localStorage.removeItem("currentBannerId");
-            localStorage.removeItem("leagueId");
-            localStorage.removeItem("selectedStageType");
+            clearAuthSession();
             if (authButtons) authButtons.style.display = "flex";
 
          }
       } catch (err) {
          console.error("🔴 Error in Back button to /me:", err);
-         localStorage.removeItem("authToken");
+         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
          if (authButtons) authButtons.style.display = "flex";
       }
    });
@@ -105,18 +90,10 @@ export function homepage() {
 
 // 🔹 Logout
 export function logout() {
-   showLoading: true
    location.hash = "home";
 
+   clearAuthSession();
    [
-      "authToken",
-      "user",
-      "leaguesActiveTab",
-      "lastActiveLeagueTab",
-      "lastActiveNationalLeagueTab",
-      "currentBannerId",
-      "leagueId",
-      "selectedStageType",
       "groupId",
       "groupId:ucl-basic-my-A",
       "groupName",

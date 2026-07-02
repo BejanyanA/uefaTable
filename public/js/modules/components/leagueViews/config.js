@@ -1,6 +1,7 @@
 import { renderLeagueOnlyKnockouts } from '../renderLeagueKnockout.js';
 import { renderNationalOnlyKnockouts } from '../renderNationalKnockout.js';
 import { getClubBackInstancesHash, getNationalBackInstancesHash } from '../../router.js';
+import { STORAGE_KEYS } from '../../../utils/storageKeys.js';
 
 // Per-variant differences between the club (leagueType1) and national (leagueType2)
 // leagues-list / instances / standings / matches pages. Everything else about these
@@ -8,7 +9,7 @@ import { getClubBackInstancesHash, getNationalBackInstancesHash } from '../../ro
 export const clubConfig = {
   rootId: "leagueType1",
   routeSegment: "club",
-  activeLeagueTabKey: "lastActiveLeagueTab",
+  activeLeagueTabKey: STORAGE_KEYS.LAST_ACTIVE_LEAGUE_TAB,
   activeInstancesTabKey: "lastActiveInstancesTab",
   backBtnId: "backBtn",
   getGroupItems: (groupData) => groupData.clubs || [],
@@ -27,7 +28,7 @@ export const clubConfig = {
 export const nationalConfig = {
   rootId: "leagueType2",
   routeSegment: "national",
-  activeLeagueTabKey: "lastActiveNationalLeagueTab",
+  activeLeagueTabKey: STORAGE_KEYS.LAST_ACTIVE_NATIONAL_LEAGUE_TAB,
   activeInstancesTabKey: "lastActiveNationalInstancesTab",
   backBtnId: "nationalBackBtn",
   getGroupItems: (groupData) => groupData.countries || [],

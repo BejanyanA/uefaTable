@@ -19,7 +19,7 @@ export const getUserData = {
 
         try {
             // Assuming apiGet is available globally or passed in
-            const response = await apiGet("/user-details", token); 
+            const response = await apiGet("/user-details");
             
             if (response.success && response.data) {
                 // 🚀 SUCCESS: Call the global callback defined in ProfileManager.js

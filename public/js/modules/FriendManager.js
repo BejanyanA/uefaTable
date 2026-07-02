@@ -345,11 +345,10 @@ export const FriendManager = {
 
     // 🎯 MODIFIED: handleFriendAction is now the API executor
     async function handleFriendAction(friendId, actionType) {
-      const token = localStorage.getItem("authToken");
       const endpoint = `/user-${actionType}`;
 
       try {
-        const response = await apiPost(endpoint, { userId: friendId }, token);
+        const response = await apiPost(endpoint, { userId: friendId });
 
         if (response.success) {
 

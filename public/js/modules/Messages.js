@@ -4,6 +4,7 @@ import { encryptMessage, decryptMessage, getOrCreateKeyPair, deriveConversationK
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { requestPresenceStatuses, formatLastSeen, formatLastSeenDateTime, getUserTimeZone, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
+import { clearActiveLeagueTabs } from '../utils/storageKeys.js';
 
 let currentConversationId = null;
 let selectedConversationId = null;
@@ -129,8 +130,7 @@ export async function openMessagesPage() {
   document.getElementById("notificationBell").style.display = "block";
   document.getElementById("profileMenu").style.display = "block";
 
-  localStorage.removeItem("lastActiveLeagueTab");
-  localStorage.removeItem("lastActiveNationalLeagueTab");
+  clearActiveLeagueTabs();
 
   location.hash = "messages";
 

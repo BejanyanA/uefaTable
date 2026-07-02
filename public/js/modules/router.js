@@ -504,52 +504,6 @@ function registerNationalGroupDetailRoutes(routes) {
 
 
 
-// Me
-let _meCheckInFlight = false;
-
-function shouldValidateMe(nextKey, nextRoute) {
-    if (nextRoute?.id === "homePage") return true;
-    if (nextKey === "leagues") return true;
-    if (nextRoute?.id === "stageContainer") return true;
-    return false;
-}
-
-
-function validateMeNonBlockingOrRedirect() {
-    if (_meCheckInFlight) return;
-
-    const token = localStorage.getItem("authToken");
-    if (!token || token === "null" || token === "undefined") return;
-
-    _meCheckInFlight = true;
-
-    fetch(`${API_BASE}/me`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-    })
-        .then(async (r) => {
-            const data = await r.json().catch(() => null);
-            const ok = !!(r.ok && data?.success && (data?.user || data?.data));
-            if (!ok) {
-                localStorage.removeItem("authToken");
-                location.hash = "#home";
-            }
-        })
-        .catch(() => {
-            localStorage.removeItem("authToken");
-            location.hash = "#home";
-        })
-        .finally(() => {
-            _meCheckInFlight = false;
-        });
-}
-
-
-
-
 
 
 
@@ -839,12 +793,6 @@ export function initRouter() {
         const next = routes[nextKey];
 
         const hashChanged = raw !== prevHash;                   // ✅ NEW
-
-        // ✅ NEW: call /me ONLY for those 3 destinations
-        // if (isLoggedIn() && shouldValidateMe(nextKey, next)) {
-        //     validateMeNonBlockingOrRedirect();
-        // }
-
 
         // guard (auth check)
         if (next.guard && !next.guard()) return;

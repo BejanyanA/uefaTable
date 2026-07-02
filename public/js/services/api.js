@@ -2,6 +2,7 @@ import { API_BASE } from './config.js';
 import { showLoader, hideLoader } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "../modules/HomeOptions.js";
+import { clearAuthSession } from '../utils/storageKeys.js';
 
 
 async function handleResponse(response) {
@@ -22,14 +23,7 @@ async function handleResponse(response) {
     setHomeOptionsVisible(true);
     setCustomCompetitionVisible(false);
 
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("leaguesActiveTab");
-    localStorage.removeItem("lastActiveLeagueTab");
-    localStorage.removeItem("lastActiveNationalLeagueTab");
-    localStorage.removeItem("user");
-    localStorage.removeItem("currentBannerId");
-    localStorage.removeItem("leagueId");
-    localStorage.removeItem("selectedStageType");
+    clearAuthSession();
     return { success: false, status: 401, message: "unauthorized" };
   }
   return data;
