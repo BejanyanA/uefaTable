@@ -43,6 +43,16 @@ export function getCurrentRouteRaw() {
 export function navigateTo(input, { replace = false } = {}) {
     const slug = String(input).replace(/^#/, '').replace(/^\//, '') || "home";
     const path = `/${currentLang}/${slug}`;
+
+    // Setting location.hash to its current value used to be a silent no-op
+    // (browsers don't fire hashchange), which is what made it safe for a
+    // route's own onEnter to call this with its own route's slug (e.g.
+    // openMessagesPage() re-asserting "messages"). pushState/replaceState
+    // have no such built-in dedup, and render() re-invokes onEnter before
+    // prevPath is updated -- so without this guard, that pattern recurses
+    // forever. Skip the no-op case explicitly to preserve the old semantics.
+    if (path === location.pathname + location.search) return;
+
     if (replace) history.replaceState(null, '', path);
     else history.pushState(null, '', path);
     render();
