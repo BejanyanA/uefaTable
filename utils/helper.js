@@ -1,14 +1,32 @@
 // utils/helper.js
 
-function handleCorsHeaders(origin = "*") {
+const ALLOWED_ORIGINS = new Set([
+  "https://uefaresults.com",
+  "https://www.uefaresults.com",
+]);
+
+export function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === "localhost" || hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+function handleCorsHeaders(origin) {
+  const allowedOrigin = isAllowedOrigin(origin) ? origin : "https://uefaresults.com";
   return {
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Vary": "Origin",
   };
 }
 
-function jsonResponse(obj, status = 200, origin = "*") {
+function jsonResponse(obj, status = 200, origin) {
   return new Response(JSON.stringify(obj), {
     status,
     headers: new Headers({

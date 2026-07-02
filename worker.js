@@ -1,4 +1,4 @@
-import { handleCorsHeaders, jsonResponse } from './utils/helper.js';
+import { handleCorsHeaders, jsonResponse, isAllowedOrigin } from './utils/helper.js';
 import { verifyToken } from './utils/jwt.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
@@ -131,11 +131,22 @@ export async function onRequest(context) {
   const method = request.method;
   const path = url.pathname;
 
+  const origin = request.headers.get("Origin");
+
   // Handle CORS preflight
   if (method === "OPTIONS") {
     return new Response(null, {
       status: 204,
-      headers: handleCorsHeaders(request.headers.get("Origin")),
+      headers: handleCorsHeaders(origin),
+    });
+  }
+
+  // Reject browser-initiated requests from unknown origins.
+  // Requests without an Origin header (server-to-server, curl) are allowed through.
+  if (origin && !isAllowedOrigin(origin)) {
+    return new Response(JSON.stringify({ success: false, message: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -161,7 +172,7 @@ export async function onRequest(context) {
         headers: {
           "Content-Type": "application/json",
           "Allow": allowedMethods,
-          ...handleCorsHeaders(request.headers.get("Origin")),
+          ...handleCorsHeaders(origin),
         }
       });
     }
@@ -170,7 +181,7 @@ export async function onRequest(context) {
   }
 
   // Append CORS headers to all responses
-  const corsHeaders = handleCorsHeaders(request.headers.get("Origin"));
+  const corsHeaders = handleCorsHeaders(origin);
   Object.entries(corsHeaders).forEach(([k, v]) => response.headers.set(k, v));
 
   return response;
@@ -179,6 +190,7 @@ export async function onRequest(context) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const origin = request.headers.get("Origin");
 
     // === SSE subscribe (forward to Durable Object) ===
     if (url.pathname === "/notifications/stream" && request.method === "GET") {
@@ -209,30 +221,30 @@ export default {
     if (url.pathname === "/notifications/count" && request.method === "GET") {
       const auth = request.headers.get("Authorization");
       if (!auth?.startsWith("Bearer "))
-        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401, origin);
 
       const token = auth.split(" ")[1];
       const me = await verifyToken(token, env.JWT_SECRET);
-      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401, origin);
 
       const seenAt = await getSeenAt(env, me.id);
       const count = await getUnreadCount(env, me.id, seenAt);
-      return jsonResponse({ success: true, data: { requestsCount: count, seenAt } });
+      return jsonResponse({ success: true, data: { requestsCount: count, seenAt } }, 200, origin);
     }
 
     // === Mark notifications as seen ===
     if (url.pathname === "/notifications/mark-seen" && request.method === "POST") {
       const auth = request.headers.get("Authorization");
       if (!auth?.startsWith("Bearer "))
-        return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+        return jsonResponse({ success: false, message: "Unauthorized" }, 401, origin);
 
       const token = auth.split(" ")[1];
       const me = await verifyToken(token, env.JWT_SECRET);
-      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401);
+      if (!me) return jsonResponse({ success: false, message: "Unauthorized" }, 401, origin);
 
       await markSeenNow(env, me.id);
       await publishToUser(env, me.id, { type: "friend_requests", count: 0 });
-      return jsonResponse({ success: true });
+      return jsonResponse({ success: true }, 200, origin);
     }
 
     if (url.pathname === "/chat-socket") {
