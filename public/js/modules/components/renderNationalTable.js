@@ -426,7 +426,7 @@ export function renderNationalInstances(instanceData, options = {}) {
         <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
         ${groupData.countries.map((country, index) => {
           const teamLogo = country.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team_logo"> ${country.name}</li>`;
+          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team_logo_group"> ${country.name}</li>`;
         })
             .join("")}
         </ul>
