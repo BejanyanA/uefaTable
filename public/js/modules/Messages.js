@@ -1,6 +1,6 @@
 import { apiGet, apiPost } from "../services/api.js";
 import { API_BASE } from "../services/config.js";
-import { encryptMessage, decryptMessage } from "../services/encryption.js";
+import { encryptMessage, decryptMessage, getOrCreateKeyPair, deriveConversationKey } from "../services/encryption.js";
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { requestPresenceStatuses, formatLastSeen, formatLastSeenDateTime, getUserTimeZone, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
@@ -19,6 +19,8 @@ let conversationRequestId = 0;
 let currentFriendId = null;
 let pendingVisibleMessages = [];
 let chatSocket = null;
+
+const conversationKeys = new Map();
 let chatPingTimer = null;
 let typingTimer = null;
 let lastTypingSentAt = 0;
@@ -220,9 +222,24 @@ export async function updateHeaderMessagesBadge() {
   }
 }
 
+async function ensurePublicKeyUploaded() {
+  if (sessionStorage.getItem("publicKeyUploaded")) return;
+  try {
+    const keyPair = await getOrCreateKeyPair();
+    const result = await apiPost("/user-public-key", { publicKey: keyPair.publicKeyJwk }, { showLoading: false });
+    if (result.success) {
+      sessionStorage.setItem("publicKeyUploaded", "1");
+    }
+  } catch {
+    // non-fatal — will retry next session
+  }
+}
+
 export function connectChatSocket() {
   const token = localStorage.getItem("authToken");
   if (!token || chatSocket) return;
+
+  ensurePublicKeyUploaded();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user?.id) {
@@ -752,6 +769,19 @@ async function openConversation(
   updateMessageInputVisibility(friendshipStatus);
   bindMessagesScrollOnce();
 
+  try {
+    const keyPair = await getOrCreateKeyPair();
+    const pkData = await apiGet(`/user-public-key?userId=${friendId}`, { showLoading: false });
+    if (pkData?.success && pkData.publicKey) {
+      const key = await deriveConversationKey(keyPair.privateKey, pkData.publicKey);
+      conversationKeys.set(Number(conversationId), key);
+    } else {
+      conversationKeys.set(Number(conversationId), null);
+    }
+  } catch {
+    conversationKeys.set(Number(conversationId), null);
+  }
+
   const data = await apiPost("/conversation-messages", {
     conversationId
   })
@@ -809,9 +839,8 @@ async function createMessageRow(message) {
   const text = document.createElement("div");
   text.className = "message-text";
 
-  const decryptedText = await decryptMessage(
-    message.encryptedMessage
-  );
+  const convKey = conversationKeys.get(Number(message.conversationId)) ?? null;
+  const decryptedText = await decryptMessage(message.encryptedMessage, convKey);
 
   text.textContent = decryptedText;
 
@@ -849,7 +878,8 @@ async function sendMessage() {
   if (!text) return;
 
   const sentConversationId = currentConversationId;
-  const encryptedMessage = await encryptMessage(text);
+  const key = conversationKeys.get(Number(sentConversationId)) ?? null;
+  const encryptedMessage = await encryptMessage(text, key);
 
   const response = await apiPost(
     "/messages",

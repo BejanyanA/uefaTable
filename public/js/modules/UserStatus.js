@@ -163,7 +163,7 @@ export function getOfflineText() {
 }
 
 export function getLastSeenText() {
-    return tr("last_seen", "Last seen");
+    return tr("last_seen", "Last visit");
 }
 
 export function refreshPresenceTexts() {
@@ -179,7 +179,7 @@ export function refreshPresenceTexts() {
             statusEl.textContent = presence.isOnline
                 ? (langMap[currentLang]?.online || "Online")
                 : presence.lastSeen
-                    ? `${langMap[currentLang]?.last_seen || "Last seen"} ${formatLastSeen(presence.lastSeen)}`
+                    ? `${langMap[currentLang]?.last_seen || "Last visit"} ${formatLastSeen(presence.lastSeen)}`
                     : (langMap[currentLang]?.offline || "Offline");
         });
 
@@ -222,7 +222,7 @@ function updateConversationUserStatus(userId, isOnline, lastSeen) {
                 status.textContent = isOnline
                     ? getOnlineText()
                     : lastSeen
-                        ? `${langMap[currentLang]?.last_seen || "Last seen"} ${formatLastSeen(lastSeen)}`
+                        ? `${langMap[currentLang]?.last_seen || "Last visit"} ${formatLastSeen(lastSeen)}`
                         : getOfflineText();
             }
         });

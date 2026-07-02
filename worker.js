@@ -47,6 +47,7 @@ import { handleConversations } from './routes_endpoints/conversations.js';
 import { handleMessages } from './routes_endpoints/messages.js';
 import { handleConversationMessages } from './routes_endpoints/conversation-messages.js';
 import { handleMyConversations } from './routes_endpoints/my_conversations.js';
+import { handleSavePublicKey, handleGetPublicKey } from './routes_endpoints/user_public_key.js';
 
 
 // Route registry with path as key and allowed methods as subkeys
@@ -119,6 +120,7 @@ const routeRegistry = {
   "/messages": { POST: handleMessages },
   "/conversation-messages": { POST: handleConversationMessages },
   "/my-conversations": { POST: handleMyConversations },
+  "/user-public-key": { POST: handleSavePublicKey, GET: handleGetPublicKey },
 
 
 };

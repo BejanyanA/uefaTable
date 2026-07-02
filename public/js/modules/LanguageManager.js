@@ -166,7 +166,7 @@ export const langMap = {
     chatEmptyFriends: "No friends yet",
     online: "Online",
     offline: "Offline",
-    last_seen: "Last seen",
+    last_seen: "Last visit",
     just_now: "just now",
     min_ago: "min. ago",
     hour_ago: "h. ago",
