@@ -61,7 +61,12 @@ export async function handleGetPublicKey(request, env) {
         SELECT public_key FROM users WHERE id = ?
     `).bind(userId).first();
 
-    const publicKey = targetUser?.public_key ? JSON.parse(targetUser.public_key) : null;
+    let publicKey = null;
+    try {
+        publicKey = targetUser?.public_key ? JSON.parse(targetUser.public_key) : null;
+    } catch {
+        publicKey = null;
+    }
 
     return Response.json({ success: true, publicKey });
 }

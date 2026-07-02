@@ -133,24 +133,24 @@ export async function encryptMessage(text, conversationKey) {
 export async function decryptMessage(cipherText, conversationKey) {
     if (!cipherText) return "";
 
-    const bytes = Uint8Array.from(atob(cipherText), c => c.charCodeAt(0));
-    const iv = bytes.slice(0, 12);
-    const encrypted = bytes.slice(12);
-
-    if (conversationKey) {
-        try {
-            const decrypted = await crypto.subtle.decrypt(
-                { name: "AES-GCM", iv },
-                conversationKey,
-                encrypted
-            );
-            return new TextDecoder().decode(decrypted);
-        } catch {
-            // fall through to legacy
-        }
-    }
-
     try {
+        const bytes = Uint8Array.from(atob(cipherText), c => c.charCodeAt(0));
+        const iv = bytes.slice(0, 12);
+        const encrypted = bytes.slice(12);
+
+        if (conversationKey) {
+            try {
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv },
+                    conversationKey,
+                    encrypted
+                );
+                return new TextDecoder().decode(decrypted);
+            } catch {
+                // fall through to legacy
+            }
+        }
+
         const legacyKey = await getLegacyKey();
         const decrypted = await crypto.subtle.decrypt(
             { name: "AES-GCM", iv },
