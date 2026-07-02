@@ -248,8 +248,8 @@ function renderTab(tab) {
       <!-- LEFT: leagues list -->
       <div class="standingsLeft" id="standingsLeaguesList">
 
-        <button class="standingsLeagueBtn active" type="button" data-league-id="140">
-          <span class="leagueName">La Liga</span>
+        <button class="standingsLeagueBtn active" type="button" data-league-id="1">
+          <span class="leagueName">FIFA World Cup</span>
         </button>
 
         <button class="standingsLeagueBtn" type="button" data-league-id="39">
@@ -272,18 +272,18 @@ function renderTab(tab) {
           <span class="leagueName">Eredivisie</span>
         </button>
 
+        <button class="standingsLeagueBtn" type="button" data-league-id="140">
+          <span class="leagueName">La Liga</span>
+        </button>
+
         <button class="standingsLeagueBtn" type="button" data-league-id="2">
           <span class="leagueName">Champions League</span>
         </button>
-        
+
         <button class="standingsLeagueBtn" type="button" data-league-id="3">
           <span class="leagueName">Europa League</span>
         </button>
 
-        <button class="standingsLeagueBtn" type="button" data-league-id="1">
-          <span class="leagueName">FIFA World Cup</span>
-        </button>
-        
         <button class="standingsLeagueBtn" type="button" data-league-id="4">
           <span class="leagueName">EURO</span>
         </button>
@@ -529,12 +529,13 @@ function removeColumnsByHeaders(scopeRoot, headerSelectors) {
 
 //// Matches
 const DEFAULT_MATCH_LEAGUE = {
-   leagueId: "140",
-   leagueTitle: "La Liga",
-   logoUrl: "assets/league_logos/laliga.png",
+   leagueId: "1",
+   leagueTitle: "World Cup",
+   logoUrl: "assets/league_logos/worldCup.png",
 };
 
 const MATCHES_MENU = [
+   { key: "worldcup", title: "World Cup", leagueId: 1, logoUrl: "assets/league_logos/worldCup.png" },
    {
       key: "spain",
       title: "Spain",
@@ -597,7 +598,6 @@ const MATCHES_MENU = [
    },
    { key: "ucl", title: "Champions League", leagueId: 2, logoUrl: "assets/league_logos/championsLeague.png" },
    { key: "uel", title: "Europa League", leagueId: 3, logoUrl: "assets/league_logos/europaLeague.png" },
-   { key: "uecl", title: "World Cup", leagueId: 1, logoUrl: "assets/league_logos/worldCup.png" },
    { key: "uecl", title: "EURO", leagueId: 4, logoUrl: "assets/league_logos/euro.png" },
    { key: "uecl", title: "Confederations Cup", leagueId: 21, logoUrl: "assets/league_logos/confederationsCup.png" },
    { key: "uecl", title: "Nations League", leagueId: 5, logoUrl: "assets/league_logos/nationsLeague.png" },
@@ -752,9 +752,9 @@ function renderMatchesWidget(leagueId, leagueTitle, logoName) {
 }
 
 function openDefaultMatches() {
-   // 1️⃣ Try to find Spain → La Liga button explicitly
+   // 1️⃣ Try to find the default flat league button (World Cup) explicitly
    const defaultBtn = document.querySelector(
-      '.matchMenuChildBtn[data-league-id="' + DEFAULT_MATCH_LEAGUE.leagueId + '"]'
+      '.matchMenuSingleBtn[data-league-id="' + DEFAULT_MATCH_LEAGUE.leagueId + '"]'
    );
 
    if (defaultBtn) {
@@ -765,11 +765,6 @@ function openDefaultMatches() {
          DEFAULT_MATCH_LEAGUE.leagueTitle,
          DEFAULT_MATCH_LEAGUE.logoName
       );
-
-      // Ensure parent dropdown (Spain) is open
-      const group = defaultBtn.closest(".matchMenuGroup");
-      const children = group?.querySelector(".matchMenuChildren");
-      if (children) children.style.display = "block";
 
       return;
    }
