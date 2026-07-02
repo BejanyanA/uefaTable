@@ -13,10 +13,43 @@ import { renderNationalGroupStandingsPage } from './components/renderNationalSta
 import { openMessagesPage } from './Messages.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
+import { langMap, currentLang, changeLang } from './LanguageManager.js';
 
+// Every real path is prefixed with the current language ("/en/...", "/fr/...",
+// "/am/..."), matching LanguageManager.js's existing getLangFromURL()/
+// updateURLWithLang() convention. This splits a pathname into that language
+// segment (if present/recognized) and the remaining route segments.
+function splitLangAndRoute(pathname) {
+    const segments = pathname.split('/').filter(Boolean);
+    const hasLangPrefix = Object.prototype.hasOwnProperty.call(langMap, segments[0]);
+    return {
+        lang: hasLangPrefix ? segments[0] : null,
+        routeSlug: (hasLangPrefix ? segments.slice(1) : segments).join('/'),
+    };
+}
+
+// Current route (language segment stripped), e.g. "friends" or
+// "ucl-basic-my-club-group-A-standing". Exposed for code outside router.js
+// that needs to know the active route without re-deriving it (e.g. tab state).
+export function getCurrentRouteRaw() {
+    return splitLangAndRoute(location.pathname).routeSlug;
+}
+
+// Navigate to a real path. Accepts the same slugs previously passed to
+// `location.hash = "..."` (with or without a leading "#"), so callers don't
+// need to change their route strings. The current language is prepended
+// automatically. pushState/replaceState don't fire any native event, so we
+// call render() directly afterwards.
+export function navigateTo(input, { replace = false } = {}) {
+    const slug = String(input).replace(/^#/, '').replace(/^\//, '') || "home";
+    const path = `/${currentLang}/${slug}`;
+    if (replace) history.replaceState(null, '', path);
+    else history.pushState(null, '', path);
+    render();
+}
 
 const guardLoggedIn = () => {
-    if (!isLoggedIn()) { location.hash = "#home"; return false; }
+    if (!isLoggedIn()) { navigateTo("home"); return false; }
     return true;
 };
 
@@ -131,7 +164,7 @@ async function openInstances({ comp, stage, access, tab }) {
     const leagueId = getLeagueIdForContext({ comp, stage, access });
 
     if (!leagueId) {
-        location.hash = `#${comp}-${stage}-${access}`;
+        navigateTo(`${comp}-${stage}-${access}`);
         return;
     }
 
@@ -234,7 +267,7 @@ async function openNationalInstances({ comp, stage, access, tab }) {
     const leagueId = getLeagueIdForContext({ comp, stage, access });
 
     if (!leagueId) {
-        location.hash = `#${comp}-${stage}-${access}`;
+        navigateTo(`${comp}-${stage}-${access}`);
         return;
     }
 
@@ -408,7 +441,7 @@ function getStoredGroupId() {
 async function openClubGroupDetail({ comp, stage, access, view, groupLetter }) {
     const stageType = STAGE_TO_TYPE[stage];
     if (stageType !== 1) {
-        location.hash = `#${comp}-${stage}-${access}-club-knockouts`;
+        navigateTo(`${comp}-${stage}-${access}-club-knockouts`);
         return;
     }
 
@@ -418,7 +451,7 @@ async function openClubGroupDetail({ comp, stage, access, view, groupLetter }) {
     const { groupId, groupName } = getGroupSelectionForContext(ctx, groupLetter);
 
     if (!leagueId || !groupId) {
-        location.hash = `#${comp}-${stage}-${access}-club-group`;
+        navigateTo(`${comp}-${stage}-${access}-club-group`);
         return;
     }
 
@@ -429,7 +462,7 @@ async function openClubGroupDetail({ comp, stage, access, view, groupLetter }) {
 async function openNationalGroupDetail({ comp, stage, access, view, groupLetter }) {
     const stageType = STAGE_TO_TYPE[stage];
     if (stageType !== 1) {
-        location.hash = `#${comp}-${stage}-${access}-national-knockouts`;
+        navigateTo(`${comp}-${stage}-${access}-national-knockouts`);
         return;
     }
 
@@ -439,7 +472,7 @@ async function openNationalGroupDetail({ comp, stage, access, view, groupLetter 
     const { groupId, groupName } = getGroupSelectionForContext(ctx, groupLetter);
 
     if (!leagueId || !groupId) {
-        location.hash = `#${comp}-${stage}-${access}-national-group`;
+        navigateTo(`${comp}-${stage}-${access}-national-group`);
         return;
     }
 
@@ -529,7 +562,31 @@ const routes = {
         id: "liveDataPage",
         onEnter: () => {
             sessionStorage.setItem("actionForLive", "openLive");
-            openLiveData();
+            openLiveData("allGames");
+        },
+        onLeave: () => {
+            sessionStorage.removeItem("actionForLive");
+            closeLiveData();
+        }
+    },
+
+    "live-standings": {
+        id: "liveDataPage",
+        onEnter: () => {
+            sessionStorage.setItem("actionForLive", "openLive");
+            openLiveData("standings");
+        },
+        onLeave: () => {
+            sessionStorage.removeItem("actionForLive");
+            closeLiveData();
+        }
+    },
+
+    "live-matches": {
+        id: "liveDataPage",
+        onEnter: () => {
+            sessionStorage.setItem("actionForLive", "openLive");
+            openLiveData("matches");
         },
         onLeave: () => {
             sessionStorage.removeItem("actionForLive");
@@ -542,7 +599,7 @@ const routes = {
         id: "messagesPage",
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -565,7 +622,7 @@ const routes = {
         id: "profileContainer",
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -580,7 +637,7 @@ const routes = {
         id: "profileContainer",
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -595,7 +652,7 @@ const routes = {
         id: "friendsContainer",
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -613,7 +670,7 @@ const routes = {
         id: "homePage", // IMPORTANT: keep homePage visible because bannerContainer is inside homePage in your layout
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -633,7 +690,7 @@ const routes = {
         id: "stageContainer", // IMPORTANT: keep homePage visible because bannerContainer is inside homePage in your layout
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -644,7 +701,7 @@ const routes = {
         id: "stageContainer", // IMPORTANT: keep homePage visible because bannerContainer is inside homePage in your layout
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -655,7 +712,7 @@ const routes = {
         id: "stageContainer", // IMPORTANT: keep homePage visible because bannerContainer is inside homePage in your layout
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -666,7 +723,7 @@ const routes = {
         id: "stageContainer", // IMPORTANT: keep homePage visible because bannerContainer is inside homePage in your layout
         guard: () => {
             if (!isLoggedIn()) {
-                location.hash = "home";
+                navigateTo("home");
                 return false;
             }
             return true;
@@ -781,50 +838,72 @@ registerNationalGroupDetailRoutes(routes);
 
 
 
-export function initRouter() {
-    let prevKey = null;
-    let prevHash = null; // ✅ NEW
+let prevKey = null;
+let prevPath = null;
 
-    function render() {
-        const raw = (location.hash || "#home").slice(1);        // "friends?tab=pending"
-        const [keyOnly, qs = ""] = raw.split("?");              // ✅ NEW
-        const key = keyOnly || "home";
-        const nextKey = routes[key] ? key : "home";
-        const next = routes[nextKey];
+function render() {
+    const { lang, routeSlug } = splitLangAndRoute(location.pathname);
+    // Keep LanguageManager in sync when the URL's language segment changed
+    // out from under us (e.g. browser back/forward across a language switch).
+    if (lang && lang !== currentLang) changeLang(lang);
 
-        const hashChanged = raw !== prevHash;                   // ✅ NEW
+    const raw = (routeSlug + location.search) || "home";  // "friends?tab=pending"
+    const [keyOnly, qs = ""] = raw.split("?");
+    const key = keyOnly || "home";
+    const nextKey = routes[key] ? key : "home";
+    const next = routes[nextKey];
 
-        // guard (auth check)
-        if (next.guard && !next.guard()) return;
+    const pathChanged = raw !== prevPath;
 
-        // leave previous
-        if (prevKey && routes[prevKey]?.onLeave && prevKey !== nextKey) {
-            routes[prevKey].onLeave();
-        }
+    // guard (auth check)
+    if (next.guard && !next.guard()) return;
 
-        // hide all sections
-        Object.values(routes).forEach((r) => {
-            const el = document.getElementById(r.id);
-            if (el) el.style.display = "none";
-        });
-
-        // show active
-        const activeEl = document.getElementById(next.id);
-        if (activeEl) activeEl.style.display = "block";
-
-        // SEO content block belongs on the homepage only
-        const seoContent = document.querySelector(".seo-content");
-        if (seoContent) seoContent.style.display = (nextKey === "home") ? "block" : "none";
-
-        // ✅ enter next ALSO when hash changed (back/forward / tab change)
-        if (next.onEnter && (prevKey !== nextKey || hashChanged)) {
-            next.onEnter({ query: new URLSearchParams(qs), raw });
-        }
-
-        prevKey = nextKey;
-        prevHash = raw; // ✅ NEW
+    // leave previous
+    if (prevKey && routes[prevKey]?.onLeave && prevKey !== nextKey) {
+        routes[prevKey].onLeave();
     }
 
-    window.addEventListener("hashchange", render);
+    // hide all sections
+    Object.values(routes).forEach((r) => {
+        const el = document.getElementById(r.id);
+        if (el) el.style.display = "none";
+    });
+
+    // show active
+    const activeEl = document.getElementById(next.id);
+    if (activeEl) activeEl.style.display = "block";
+
+    // SEO content block belongs on the homepage only
+    const seoContent = document.querySelector(".seo-content");
+    if (seoContent) seoContent.style.display = (nextKey === "home") ? "block" : "none";
+
+    // ✅ enter next ALSO when path changed (back/forward / tab change)
+    if (next.onEnter && (prevKey !== nextKey || pathChanged)) {
+        next.onEnter({ query: new URLSearchParams(qs), raw });
+    }
+
+    prevKey = nextKey;
+    prevPath = raw;
+}
+
+export function initRouter() {
+    // Normalize the boot URL once: always end up with "/<lang>/<route>",
+    // folding in whichever of these are present:
+    //  - an existing route path without a language prefix ("/leagues")
+    //  - a language prefix from LanguageManager's old updateURLWithLang()
+    //    paired with a legacy "#slug" hash route ("/fr#leagues")
+    //  - a bare legacy "#slug" hash route with no path at all ("/#leagues")
+    const { lang, routeSlug } = splitLangAndRoute(location.pathname);
+    const legacyHashSlug = location.hash ? location.hash.slice(1) : '';
+    const finalLang = lang || currentLang;
+    // Bare domain / bare language prefix ("/", "/en") lands explicitly on "/home".
+    const finalRouteSlug = routeSlug || legacyHashSlug || "home";
+    const targetPath = `/${finalLang}/${finalRouteSlug}`;
+
+    if (targetPath !== location.pathname || location.hash) {
+        history.replaceState(null, '', `${targetPath}${location.search}`);
+    }
+
+    window.addEventListener("popstate", render);
     render();
 }

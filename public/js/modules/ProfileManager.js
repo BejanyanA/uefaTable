@@ -7,6 +7,7 @@ import { setError, clearErrors } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 import { homepage } from "./MeHomepage.js";
+import { navigateTo, getCurrentRouteRaw } from "./router.js";
 
 const ACTIVE_CLASS = "active-tab";
 
@@ -29,7 +30,7 @@ export const ProfileManager = {
         e.preventDefault();                 // ✅ important if it's <a href="...">
 
 
-        location.hash = "profile";
+        navigateTo("profile");
       });
     }
   },
@@ -290,12 +291,12 @@ export const ProfileManager = {
         if (btn.disabled) return;
 
         // ✅ router-only: do NOT call showProfileTab here
-        location.hash = (btn.dataset.tab === "achievements") ? "achievements" : "profile";
+        navigateTo((btn.dataset.tab === "achievements") ? "achievements" : "profile");
       });
     });
 
-    const hashKey = (location.hash || "").replace("#", "");
-    if (hashKey === "achievements") activeTab = "achievements";
+    const routeKey = getCurrentRouteRaw();
+    if (routeKey === "achievements") activeTab = "achievements";
     else activeTab = "personal";
 
     // Initialize the view with the personal tab

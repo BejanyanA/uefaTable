@@ -3,6 +3,7 @@ import { LeagueManager } from '../../LeagueManager.js';
 import {
   setLeagueIdForContext, getLeagueIdForContext,
   setGroupSelectionForContext, getGroupLetterFromName,
+  navigateTo,
 } from '../../router.js';
 import { customLeagues } from '../../CustomLeagues.js';
 import { computeComp } from './config.js';
@@ -62,11 +63,11 @@ export function renderTable(data, config) {
     localStorage.removeItem(config.activeLeagueTabKey);
 
     const bannerId = Number(localStorage.getItem("currentBannerId"));
-    if (bannerId === 1) location.hash = "#champions-league";
-    else if (bannerId === 2) location.hash = "#europe-league";
-    else if (bannerId === 3) location.hash = "#euro-cup";
-    else if (bannerId === 4) location.hash = "#world-cup";
-    else location.hash = "#leagues";
+    if (bannerId === 1) navigateTo("champions-league");
+    else if (bannerId === 2) navigateTo("europe-league");
+    else if (bannerId === 3) navigateTo("euro-cup");
+    else if (bannerId === 4) navigateTo("world-cup");
+    else navigateTo("leagues");
   });
 
   section.appendChild(backBtn);
@@ -127,7 +128,7 @@ export function renderTable(data, config) {
       // for knockout-only leagues, default to knockouts
       const defaultInstancesTab = (stageType === 2) ? "knockouts" : "group";
 
-      location.hash = `#${comp}-${stage}-${access}-${config.routeSegment}-${defaultInstancesTab}`;
+      navigateTo(`${comp}-${stage}-${access}-${config.routeSegment}-${defaultInstancesTab}`);
     });
 
     leagueRow.appendChild(leagueBox);
@@ -186,10 +187,10 @@ export function renderTable(data, config) {
   // Tab filtering (show/hide items, keep grid/row layout intact)
   const ACTIVE = (typeof window !== "undefined" && window.ACTIVE_CLASS) || "active-tab";
 
-  const hash = (location.hash || "").toLowerCase();
+  const routePath = (location.pathname || "").toLowerCase();
   const routeTab =
-    hash.endsWith("-invited") ? "invited" :
-      hash.endsWith("-my") ? "owners" :
+    routePath.endsWith("-invited") ? "invited" :
+      routePath.endsWith("-my") ? "owners" :
         null;
 
   let activeTab = routeTab || localStorage.getItem(config.activeLeagueTabKey) || "owners";
@@ -246,13 +247,13 @@ export function renderTable(data, config) {
   myTabBtn.addEventListener("click", () => {
     const prefix = getRoutePrefix();
     if (!prefix) return;
-    location.hash = `#${prefix}-${getStageSuffix()}-my`;
+    navigateTo(`${prefix}-${getStageSuffix()}-my`);
   });
 
   invitedTabBtn.addEventListener("click", () => {
     const prefix = getRoutePrefix();
     if (!prefix) return;
-    location.hash = `#${prefix}-${getStageSuffix()}-invited`;
+    navigateTo(`${prefix}-${getStageSuffix()}-invited`);
   });
 
   // Initial view
@@ -296,7 +297,7 @@ export function renderInstances(instanceData, options = {}, config) {
     const stage = stageType === 1 ? "basic" : "only";
     const access = leagueTab === "owners" ? "my" : "invited";
 
-    location.hash = `#${comp}-${stage}-${access}`; // your leagues list routes
+    navigateTo(`${comp}-${stage}-${access}`); // your leagues list routes
   });
   wrapper.appendChild(backBtn);
 
@@ -396,7 +397,7 @@ export function renderInstances(instanceData, options = {}, config) {
 
           setGroupSelectionForContext({ comp, stage, access }, { groupId, groupName: gName, groupLetter: letter });
 
-          location.hash = `#${comp}-${stage}-${access}-${config.routeSegment}-group-${letter}-standing`;
+          navigateTo(`${comp}-${stage}-${access}-${config.routeSegment}-group-${letter}-standing`);
         });
 
         groupsRow.appendChild(groupDiv);
@@ -426,7 +427,7 @@ export function renderInstances(instanceData, options = {}, config) {
       const { comp, stage, access } = getInstancesBase();
       if (!comp) return;
 
-      location.hash = `#${comp}-${stage}-${access}-${config.routeSegment}-${tab}`;
+      navigateTo(`${comp}-${stage}-${access}-${config.routeSegment}-${tab}`);
     });
   });
 

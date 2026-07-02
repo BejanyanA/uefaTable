@@ -3,6 +3,7 @@ import { showLoader, hideLoader } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "../modules/HomeOptions.js";
 import { clearAuthSession } from '../utils/storageKeys.js';
+import { navigateTo } from '../modules/router.js';
 
 
 async function handleResponse(response) {
@@ -18,7 +19,7 @@ async function handleResponse(response) {
 
   // 🔴 Handle unauthorized
   if (response.status === 401) {
-    location.hash = "home";
+    navigateTo("home");
     logout();
     setHomeOptionsVisible(true);
     setCustomCompetitionVisible(false);

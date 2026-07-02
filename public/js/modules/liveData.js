@@ -1,5 +1,8 @@
 import { langMap, currentLang } from "./LanguageManager.js";
 import { apiGet } from "../services/api.js";
+import { navigateTo } from "./router.js";
+
+const TAB_TO_ROUTE = { allGames: "live", standings: "live-standings", matches: "live-matches" };
 
 let widgetsBootstrapped = false;
 let currentTab = "allGames";
@@ -55,14 +58,14 @@ export async function loadLeagueLogos() {
 }
 
 // ---------- public API ----------
-export async function openLiveData() {
+export async function openLiveData(tab = "allGames") {
    setLiveDataVisible(true);
 
    await loadApiSportsWidgetsOnce();
 
    initLiveTabsOnce();
 
-   setActiveTab("allGames");
+   setActiveTab(tab);
 
    await new Promise(requestAnimationFrame);
 
@@ -380,7 +383,7 @@ function initLiveTabsOnce() {
    livePage.addEventListener("click", (e) => {
       const btn = e.target.closest(".liveTabBtn");
       if (!btn) return;
-      setActiveTab(btn.dataset.tab);
+      navigateTo(TAB_TO_ROUTE[btn.dataset.tab] || "live");
    });
 }
 

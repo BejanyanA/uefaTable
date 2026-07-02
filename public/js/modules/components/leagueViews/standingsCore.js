@@ -1,7 +1,7 @@
 import { showToast } from '../../../utils/toast.js';
 import { apiPost } from '../../../services/api.js';
 import { langMap, currentLang } from '../../LanguageManager.js';
-import { setGroupSelectionForContext, getGroupSelectionForContext, getGroupLetterFromName } from '../../router.js';
+import { setGroupSelectionForContext, getGroupSelectionForContext, getGroupLetterFromName, navigateTo } from '../../router.js';
 import { computeComp } from './config.js';
 
 export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}, config) {
@@ -54,7 +54,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
   const backBtn = document.getElementById(config.backBtnId);
   backBtn.textContent = translation.backButton;
   backBtn.addEventListener("click", async () => {
-    location.hash = config.getBackInstancesHash();
+    navigateTo(config.getBackInstancesHash());
   });
 
   setActiveTab(initialTab);
@@ -80,7 +80,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
 
       setGroupSelectionForContext({ comp, stage, access }, { groupId, groupName, groupLetter: letter });
 
-      location.hash = `#${comp}-${stage}-${access}-${config.routeSegment}-group-${letter}-${view}`;
+      navigateTo(`${comp}-${stage}-${access}-${config.routeSegment}-group-${letter}-${view}`);
     });
   });
 

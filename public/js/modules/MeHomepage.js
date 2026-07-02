@@ -4,6 +4,7 @@ import { customLeagues } from './CustomLeagues.js';
 import { connectChatSocket } from './Messages.js';
 import { connectPresenceSocket } from './UserStatus.js';
 import { STORAGE_KEYS, clearAuthSession, clearActiveLeagueTabs } from '../utils/storageKeys.js';
+import { navigateTo } from './router.js';
 
 // 🔹 JWT Check on Load
 export async function checkLoggedIn() {
@@ -54,7 +55,7 @@ export function homepage() {
 
    homeButton.addEventListener("click", async () => {
       const authButtons = document.getElementById("authButtons");
-      location.hash = "home";
+      navigateTo("home");
 
       try {
          const response = await apiGet("/me");
@@ -90,7 +91,7 @@ export function homepage() {
 
 // 🔹 Logout
 export function logout() {
-   location.hash = "home";
+   navigateTo("home");
 
    clearAuthSession();
    [
