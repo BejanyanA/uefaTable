@@ -243,6 +243,7 @@
   background: #2a2a2ad2;
   color: #fff;
   cursor: pointer;
+  backdrop-filter: blur(6px)
 }
 
 .chat-tab-btn.active {

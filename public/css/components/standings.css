@@ -29,6 +29,7 @@
   text-align: center;
   box-sizing: content-box;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px)
 }
 
 .tab-btn:hover {
@@ -249,6 +250,7 @@
     position: fixed;
     margin-top: -17px;
     margin-left: -11px;
+    backdrop-filter: blur(6px)
   }
 
   .backButtn {
@@ -266,6 +268,7 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     position: fixed;
     margin-left: -11px;
+    backdrop-filter: blur(6px)
   }
 
   #nationalBackBtn {
@@ -280,6 +283,7 @@
     position: fixed;
     margin-top: -17px;
     margin-left: -11px;
+    backdrop-filter: blur(6px)
   }
 
   .standings-wrapper {

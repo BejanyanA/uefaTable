@@ -35,6 +35,7 @@
   position: fixed;
   white-space: nowrap;
   width: 60px;
+  z-index: 10000;
 }
 
 .liveWidgetCard {
@@ -543,6 +544,7 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     left: 3px;
     top: 65px;
     width: 40px;
+    backdrop-filter: blur(6px)
   }
 
   .liveTitle {
@@ -685,6 +687,7 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     left: 3px;
     top: 65px;
     width: 40px;
+    backdrop-filter: blur(6px)
   }
 
   .liveTitle {
