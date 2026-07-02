@@ -87,6 +87,16 @@ function generateAllPairs(arr) {
 }
 const toInt = v => (Number.isFinite(v) ? Math.trunc(v) : 0);
 
+// Approved (bidirectional) friend ids for a user — used to gate who can be granted league_access
+async function getApprovedFriendIds(env, userId) {
+  const approvedFriends = await env.core_data.prepare(`
+    SELECT friend_id AS id FROM friends WHERE user_id = ? AND status = 'approved'
+    UNION
+    SELECT user_id AS id FROM friends WHERE friend_id = ? AND status = 'approved'
+  `).bind(userId, userId).all();
+  return new Set(approvedFriends.results.map(row => row.id));
+}
+
 // Build and exec INSERT ... VALUES (...) in small literal chunks (no placeholders)
 async function execInsertValuesChunks(db, { table, columns, tuples, chunkSize = 80, suffix = "" }) {
   if (!tuples || tuples.length === 0) return;
@@ -156,6 +166,14 @@ export async function handleLeaguesCreate(request, env) {
 
   const db = env.core_data;
   const userId = payload.id;
+
+  if (Array.isArray(friendIds) && friendIds.length > 0) {
+    const approvedIds = await getApprovedFriendIds(env, userId);
+    const invalid = friendIds.some(id => !approvedIds.has(toInt(id)));
+    if (invalid) {
+      return jsonResponse({ success: false, error: "invalid_friends", message: "All provided friend IDs must be approved friends." }, 400);
+    }
+  }
 
   // National-team tournaments: single-leg neutral matches
   const isNational = bannerId === 3 || bannerId === 4;
@@ -358,6 +376,14 @@ export async function handleCreateRoundKnockouts(request, env) {
 
   if (Object.keys(errors).length > 0) {
     return jsonResponse({ success: false, errors }, 400);
+  }
+
+  if (Array.isArray(friendIds) && friendIds.length > 0) {
+    const approvedIds = await getApprovedFriendIds(env, userId);
+    const invalid = friendIds.some(id => !approvedIds.has(toInt(id)));
+    if (invalid) {
+      return jsonResponse({ success: false, error: "invalid_friends", message: "All provided friend IDs must be approved friends." }, 400);
+    }
   }
 
   const isNational = bannerId === 3 || bannerId === 4;

@@ -108,6 +108,8 @@ export async function handleUpdateUserDetails(request, env) {
             if (!newPassword) errors.newPassword = "New password is required";
             else if (newPassword.length > 30)
                 errors.newPassword = "Password must not exceed 30 characters";
+            else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]).{8,}$/.test(newPassword))
+                errors.newPassword = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character";
             else if (currentPassword === newPassword)
                 errors.newPassword = "New password must be different from current password";
         }
