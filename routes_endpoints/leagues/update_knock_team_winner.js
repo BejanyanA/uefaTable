@@ -45,6 +45,11 @@ export async function handleUpdateKnockoutWinner(request, env) {
         if (!access) return jsonResponse({ success: false, error: "access_denied" }, 403);
     }
 
+    if (winner_team_id !== undefined && winner_team_id !== null &&
+        winner_team_id !== leg.team1_id && winner_team_id !== leg.team2_id) {
+        return jsonResponse({ success: false, error: "winner_team_id_not_in_tie" }, 400);
+    }
+
     // 2) Load BOTH legs for THIS tie (same two teams) – identical filter style
     const pairBinds = [leg.team1_id, leg.team2_id, leg.team2_id, leg.team1_id];
     const tieLegsRes = await env.core_data.prepare(`

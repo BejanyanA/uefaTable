@@ -9,6 +9,7 @@ import { getEuropeCountries } from './GetEuropeCountries.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { renderNationalTable } from './components/renderNationalTable.js';
 import { customLeagues } from './CustomLeagues.js';
+import { navigateTo } from './router.js';
 
 
 export const LeagueManager = {
@@ -259,7 +260,7 @@ export const LeagueManager = {
     backBtn.textContent = translation.backButton;
 
     backBtn.addEventListener("click", async () => {
-      location.hash = "leagues";
+      navigateTo("leagues");
 
 
       const token = localStorage.getItem("authToken");
@@ -293,10 +294,10 @@ export const LeagueManager = {
 
       localStorage.setItem("currentBannerId", bannerId);
 
-      if (bannerId === 1) location.hash = "#champions-league";
-      else if (bannerId === 2) location.hash = "#europe-league";
-      else if (bannerId === 3) location.hash = "#euro-cup";
-      else if (bannerId === 4) location.hash = "#world-cup";
+      if (bannerId === 1) navigateTo("champions-league");
+      else if (bannerId === 2) navigateTo("europe-league");
+      else if (bannerId === 3) navigateTo("euro-cup");
+      else if (bannerId === 4) navigateTo("world-cup");
 
     });
 
@@ -307,20 +308,20 @@ export const LeagueManager = {
       const bannerId = Number(localStorage.getItem("currentBannerId"));
       
 
-      if (bannerId === 1) location.hash = "#ucl-basic-my";  // default tab = my
-      else if (bannerId === 2) location.hash = "#uel-basic-my";
-      else if (bannerId === 3) location.hash = "#euro-basic-my";  // default tab = my
-      else if (bannerId === 4) location.hash = "#wc-basic-my";
+      if (bannerId === 1) navigateTo("ucl-basic-my");  // default tab = my
+      else if (bannerId === 2) navigateTo("uel-basic-my");
+      else if (bannerId === 3) navigateTo("euro-basic-my");  // default tab = my
+      else if (bannerId === 4) navigateTo("wc-basic-my");
     });
 
     document.getElementById("stageBanner2").addEventListener("click", () => {
       const bannerId = Number(localStorage.getItem("currentBannerId"));
 
 
-      if (bannerId === 1) location.hash = "#ucl-only-my";
-      else if (bannerId === 2) location.hash = "#uel-only-my";
-      else if (bannerId === 3) location.hash = "#euro-only-my";
-      else if (bannerId === 4) location.hash = "#wc-only-my";
+      if (bannerId === 1) navigateTo("ucl-only-my");
+      else if (bannerId === 2) navigateTo("uel-only-my");
+      else if (bannerId === 3) navigateTo("euro-only-my");
+      else if (bannerId === 4) navigateTo("wc-only-my");
     });
   },
 

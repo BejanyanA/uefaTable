@@ -607,8 +607,11 @@ function getLangFromURL() {
 let currentLang = getLangFromURL();
 
 function updateURLWithLang(lang) {
-  const { origin, hash } = window.location;
-  const newUrl = `${origin}/${lang}${hash || ""}`;
+  const { origin, pathname, search } = window.location;
+  const segments = pathname.split("/").filter(Boolean);
+  const hasLangPrefix = Object.prototype.hasOwnProperty.call(langMap, segments[0]);
+  const routeSlug = (hasLangPrefix ? segments.slice(1) : segments).join("/");
+  const newUrl = `${origin}/${lang}${routeSlug ? "/" + routeSlug : ""}${search || ""}`;
   window.history.replaceState(null, "", newUrl);
 }
 

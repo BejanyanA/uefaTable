@@ -89,15 +89,19 @@ export async function handleGetAllFriendsStatuses(request, env) {
 
     const loggedInUserId = payload.id;
 
-    // We include an extra derived column `byMe`
+    // We include an extra derived column `byMe`.
+    // Its meaning is status-dependent (matches how the frontend uses it):
+    //  - pending:  "did I send this request" (user_id = me)
+    //  - rejected: "did I reject this request" (rejected_by_user_id = me)
+    //  - approved: not used by the frontend, but kept consistent with "did I send it"
     const friends = await env.core_data.prepare(`
     SELECT
     u.id,
     u.username,
     f.status,
     CASE
-        WHEN f.rejected_by_user_id = ? THEN 1
-        ELSE 0
+        WHEN f.status = 'rejected' THEN (f.rejected_by_user_id = ?)
+        ELSE (f.user_id = ?)
     END AS byMe
     FROM friends f
     JOIN users u ON u.id =
@@ -106,7 +110,7 @@ export async function handleGetAllFriendsStatuses(request, env) {
         ELSE f.user_id
     END
     WHERE f.user_id = ? OR f.friend_id = ?
-  `).bind(loggedInUserId, loggedInUserId, loggedInUserId, loggedInUserId).all();
+  `).bind(loggedInUserId, loggedInUserId, loggedInUserId, loggedInUserId, loggedInUserId).all();
 
     if (friends.results.length === 0) {
         return jsonResponse({ success: false, message: "no_friends_found" }, 404);

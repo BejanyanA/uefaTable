@@ -2,6 +2,7 @@ import { langMap, currentLang } from "./LanguageManager.js";
 import { apiGet } from '../services/api.js';
 import { customLeagues } from './CustomLeagues.js';
 import { checkLoggedIn } from './MeHomepage.js';
+import { navigateTo } from './router.js';
 
 export function isLoggedIn() {
    const token = localStorage.getItem("authToken");
@@ -52,12 +53,12 @@ export function initHomeOptionButtons() {
       if (!isLoggedIn()) {
          sessionStorage.setItem("actionForLive", "openLive");
       }
-      location.hash = "live";   // router will show liveDataPage
+      navigateTo("live");   // router will show liveDataPage
    });
 
    // Back button from Live page
    document.getElementById("btnBackFromLive")?.addEventListener("click", () => {
-      location.hash = "home";   // router will show homePage
+      navigateTo("home");   // router will show homePage
       sessionStorage.removeItem("actionForLive");
       setHomeOptionsVisible(true);
    });
@@ -72,7 +73,7 @@ export function initHomeOptionButtons() {
 
       try {
          customLeagues()
-         location.hash = "leagues";
+         navigateTo("leagues");
       } catch (error) {
          console.error("Failed to load custom leagues:", error);
          showToast("Failed to load leagues", "error");
@@ -85,7 +86,7 @@ export function initHomeOptionButtons() {
    if (backBtn) {
       backBtn.textContent = translation.backButton;
       backBtn.addEventListener("click", async () => {
-         location.hash = "home";
+         navigateTo("home");
          if (!checkLoggedIn()) {
             showHomePage()
          }

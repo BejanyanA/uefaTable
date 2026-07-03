@@ -8,6 +8,8 @@ import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } fr
 import { customLeagues } from './CustomLeagues.js';
 import { connectChatSocket, updateHeaderMessagesBadge } from './Messages.js';
 import { connectPresenceSocket } from './UserStatus.js';
+import { clearAuthSession } from '../utils/storageKeys.js';
+import { navigateTo } from './router.js';
 
 
 export const AuthManager = {
@@ -86,12 +88,12 @@ export const AuthManager = {
             await customLeagues();               // call your custom‑league API here
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(true);
-            location.hash = "leagues";
+            navigateTo("leagues");
 
             // Scenario 3: user just clicked the login button normally
           } else {
             // Fetch the user profile
-            const me = await apiGet("/me", localStorage.getItem("authToken"));
+            const me = await apiGet("/me");
             if (me.success) {
               // Update UI with user data
               connectChatSocket();
@@ -132,7 +134,7 @@ export const AuthManager = {
             setLiveVisible(true);
             setHomeOptionsVisible(false);
             setCustomCompetitionVisible(false);
-            location.hash = "live";
+            navigateTo("live");
           }
 
           // Close the modal regardless of scenario
@@ -140,14 +142,7 @@ export const AuthManager = {
 
         } else {
           showToast(translation.invalid_email_or_password || "Login failed", "error");
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("leaguesActiveTab");
-          localStorage.removeItem("lastActiveLeagueTab");
-          localStorage.removeItem("lastActiveNationalLeagueTab");
-          localStorage.removeItem("user");
-          localStorage.removeItem("currentBannerId");
-          localStorage.removeItem("leagueId");
-          localStorage.removeItem("selectedStageType");
+          clearAuthSession();
         }
       } catch (err) {
         showToast(translation.something_went_wrong, "error");

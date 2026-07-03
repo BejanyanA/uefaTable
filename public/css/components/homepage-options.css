@@ -185,6 +185,7 @@
         margin-top: -17px;
         margin-left: -11px;
         position: fixed;
+        backdrop-filter: blur(6px)
     }
 
     .choiceCard {
@@ -217,7 +218,7 @@
     .choiceBottom {
         font-size: 13px;
     }
-    
+
     .loading #choiceiconLive {
         animation: none;
     }

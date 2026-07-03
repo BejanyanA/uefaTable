@@ -3,6 +3,12 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- All the app's CSS/JS/image references use root-relative paths without a
+       leading "/" (e.g. "assets/icons/edit.svg", "css/style.css"). That only
+       resolves correctly when the document's URL is "/" -- now that routes
+       live at real paths like "/en/leagues", this pins resolution to the
+       site root regardless of the current route. -->
+  <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Yandex.Metrika counter -->
@@ -773,7 +779,9 @@
     });
 
     function isLiveRoute() {
-      return location.hash === "#live" || location.hash.includes("liveData");
+      const routeSlug = location.pathname.split("/").filter(Boolean).pop() || "";
+      return routeSlug === "live" || routeSlug === "live-standings" || routeSlug === "live-matches"
+        || location.pathname.includes("liveData");
     }
 
     function loadApiSportsWidgetsOnce() {

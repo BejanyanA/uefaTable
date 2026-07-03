@@ -6,6 +6,7 @@ import { FriendManager } from './FriendManager.js';
 import { showToast } from '../utils/toast.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
+import { navigateTo } from "./router.js";
 
 const loaderOff = { showLoading: false };
 
@@ -175,7 +176,7 @@ function handleBellClick() {
     markSeenIfUnread();
 
     // ✅ route only
-    location.hash = "friends?tab=pending";
+    navigateTo("friends?tab=pending");
   });
 }
 

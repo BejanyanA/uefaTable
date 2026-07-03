@@ -44,16 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
    }
 
 
-   window.addEventListener("hashchange", () => {
-      if (window.ym) {
-         ym(106431737, "hit", location.pathname + location.hash);
-      }
-   });
-
-   // optional: send initial page view once
-   if (typeof window.ym === "function") {
-      ym(106431737, "hit", location.pathname + (location.hash || "#home"));
-   }
+   // Yandex Metrika auto-tracks real navigation via the History API
+   // (pushState/replaceState) on its own -- unlike hash routing, which it
+   // only tracks if trackHash is enabled (it isn't here). Manually firing
+   // ym(...,"hit",...) on every route change would double-count every
+   // navigation (and, with webvisor enabled, double the session-recording
+   // flush rate), so there's nothing to wire up here anymore.
 });
 
 // 🔹 Language Dropdown

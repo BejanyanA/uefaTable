@@ -7,6 +7,7 @@ import { setError, clearErrors } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 import { homepage } from "./MeHomepage.js";
+import { navigateTo, getCurrentRouteRaw } from "./router.js";
 
 const ACTIVE_CLASS = "active-tab";
 
@@ -29,7 +30,7 @@ export const ProfileManager = {
         e.preventDefault();                 // ✅ important if it's <a href="...">
 
 
-        location.hash = "profile";
+        navigateTo("profile");
       });
     }
   },
@@ -247,29 +248,6 @@ export const ProfileManager = {
 
     let activeTab = "personal";
 
-    // ✅ Define the global callback FIRST (so fetches can call it immediately)
-    window.__setPersonalDetails = function (payload) {
-      const userData = payload?.data?.user;
-      if (!userData || activeTab !== "personal") return;
-
-      // guard against DOM not ready (e.g., user switched tab fast)
-      const leftCol = document.getElementById("personalInfoColumn");
-      const rightCol = document.getElementById("passwordChangeColumn");
-      if (!leftCol || !rightCol) return;
-
-      const translation = langMap[currentLang];
-      renderPersonalDetails(
-        userData,
-        leftCol,
-        translation,
-        {
-          setActive: (input, icon) => { /* keep your state hook if needed */ },
-          resetActive: () => { /* no-op, handled in new reset */ }
-        }
-      );
-      renderPasswordDetails(userData, rightCol, translation);
-    };
-
     // 🎯 Tab Switching Logic - NOW MANAGES COLUMN VISIBILITY
     const showProfileTab = (tabName) => {
       ProfileManager.__selectProfileTab = (tabKey) => {
@@ -313,12 +291,12 @@ export const ProfileManager = {
         if (btn.disabled) return;
 
         // ✅ router-only: do NOT call showProfileTab here
-        location.hash = (btn.dataset.tab === "achievements") ? "achievements" : "profile";
+        navigateTo((btn.dataset.tab === "achievements") ? "achievements" : "profile");
       });
     });
 
-    const hashKey = (location.hash || "").replace("#", "");
-    if (hashKey === "achievements") activeTab = "achievements";
+    const routeKey = getCurrentRouteRaw();
+    if (routeKey === "achievements") activeTab = "achievements";
     else activeTab = "personal";
 
     // Initialize the view with the personal tab
@@ -476,11 +454,9 @@ function renderPersonalDetails(userData, container, translation, stateHandlers) 
           input.disabled = true;
 
           try {
-            const token = localStorage.getItem("authToken");
-
             // 3. Send API request only for the field being edited
             const payload = { [key]: currentValue };
-            const updateData = await apiPost("/user-update", payload, token); // Assuming a generic update endpoint
+            const updateData = await apiPost("/user-update", payload); // Assuming a generic update endpoint
 
             if (updateData.success) {
               showToast(translation.update_success || "Successfully Updated", "success");
@@ -786,13 +762,12 @@ function renderPasswordDetails(userData, container, translation) {
     saveButton.disabled = true; // Prevent double submission
 
     try {
-      const token = localStorage.getItem("authToken");
       const payload = {
         currentPassword: inputs.currentPassword.value,
         newPassword: inputs.newPassword.value,
       };
 
-      const updateData = await apiPost("/user-update", payload, token); // Assuming new API endpoint
+      const updateData = await apiPost("/user-update", payload); // Assuming new API endpoint
 
       if (updateData.success) {
         showToast(translation.password_updated_success || "Password successfully changed", "success");

@@ -46,6 +46,11 @@ export async function handleUpdateNationalOnlyKnockoutWinner(request, env) {
     if (!access) return jsonResponse({ success: false, error: "access_denied" }, 403);
   }
 
+  if (winner_team_id !== undefined && winner_team_id !== null &&
+      winner_team_id !== match.team1_id && winner_team_id !== match.team2_id) {
+    return jsonResponse({ success: false, error: "winner_team_id_not_in_tie" }, 400);
+  }
+
   // 2) Decide winner
   let finalWinner = winner_team_id ?? null;
 

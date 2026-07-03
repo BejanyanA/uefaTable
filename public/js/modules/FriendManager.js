@@ -5,6 +5,7 @@ import { showToast } from '../utils/toast.js';
 import { markSeenIfUnread } from './NotificationManager.js';
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "./HomeOptions.js";
 import { homepage } from "./MeHomepage.js";
+import { navigateTo } from "./router.js";
 
 const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSearchIcon) => {
   const username = friendsSearchInput.value.trim();
@@ -61,9 +62,16 @@ const handleUserSearch = async (friendsSearchInput, resultsContainer, toggleSear
           if (reqResponse.success) {
             // Update UI to pending after request is sent
             showToast(t.friend_request_success || "Successfully Sent", "success");
-            addButton.remove();
+
+            // Reset the search UI back to its initial state
+            friendsSearchInput.value = '';
+            resultsContainer.innerHTML = '';
+            toggleSearchIcon(false);
+
             getFriends.initGetAllFriendsStatuses();
-            handleUserSearch(friendsSearchInput, resultsContainer, toggleSearchIcon)
+
+            // Jump to the Pending tab so the user sees the request they just sent
+            document.getElementById("pendingUsersTab")?.click();
           } else {
             console.error("Failed to send friend request.");
           }
@@ -129,7 +137,7 @@ export const FriendManager = {
         e.preventDefault?.();
 
 
-        location.hash = "friends"; // ✅ routing only
+        navigateTo("friends"); // ✅ routing only
       });
 
       homepage()
@@ -197,10 +205,8 @@ export const FriendManager = {
     // State
     let friendsData = []; // will be set when the request returns
 
-    // ✅ read tab from hash: "#friends?tab=pending"
-    const raw = (location.hash || "#friends").slice(1);
-    const qs = raw.split("?")[1] || "";
-    const params = new URLSearchParams(qs);
+    // ✅ read tab from query string: "/friends?tab=pending"
+    const params = new URLSearchParams(location.search);
     const tabFromUrl = (params.get("tab") || "").toLowerCase();
 
     let activeTab = ["approved", "pending", "rejected"].includes(tabFromUrl)
@@ -345,11 +351,10 @@ export const FriendManager = {
 
     // 🎯 MODIFIED: handleFriendAction is now the API executor
     async function handleFriendAction(friendId, actionType) {
-      const token = localStorage.getItem("authToken");
       const endpoint = `/user-${actionType}`;
 
       try {
-        const response = await apiPost(endpoint, { userId: friendId }, token);
+        const response = await apiPost(endpoint, { userId: friendId });
 
         if (response.success) {
 
