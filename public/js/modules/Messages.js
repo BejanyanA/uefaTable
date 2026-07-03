@@ -4,7 +4,7 @@ import { encryptMessage, decryptMessage, getOrCreateKeyPair, deriveConversationK
 import { showToast } from '../utils/toast.js';
 import { langMap, currentLang } from '../modules/LanguageManager.js';
 import { requestPresenceStatuses, formatLastSeen, formatLastSeenDateTime, getUserTimeZone, getPresenceStatus, getOnlineText, getOfflineText, getLastSeenText } from '../modules/UserStatus.js';
-import { clearActiveLeagueTabs } from '../utils/storageKeys.js';
+import { STORAGE_KEYS, clearActiveLeagueTabs } from '../utils/storageKeys.js';
 import { navigateTo } from '../modules/router.js';
 
 let currentConversationId = null;
@@ -177,7 +177,7 @@ export async function openMessagesPage() {
     chatHeaderStatus.textContent = "";
   }
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
 
   if (user?.id) {
     myUserId = Number(user.id);
@@ -237,12 +237,12 @@ async function ensurePublicKeyUploaded() {
 }
 
 export function connectChatSocket() {
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
   if (!token || chatSocket) return;
 
   ensurePublicKeyUploaded();
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER) || "{}");
   if (user?.id) {
     myUserId = Number(user.id);
   }
@@ -376,7 +376,7 @@ export function connectChatSocket() {
     chatSocket = null;
 
     setTimeout(() => {
-      if (localStorage.getItem("authToken")) {
+      if (localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)) {
         connectChatSocket();
       }
     }, 2000);
@@ -534,21 +534,35 @@ async function loadConversations(force = false) {
 
       const statusClass = isOnline ? "online-status" : "";
 
-      item.innerHTML = `
-        <div class="conversation-user">
-          <span class="online-dot ${isOnline ? "online" : "offline"}"></span>
+      const userDiv = document.createElement("div");
+      userDiv.className = "conversation-user";
 
-          <div class="conversation-user-info">
-            <span class="conversation-name">${conversation.friendUsername}</span>
-            <small class="conversation-status ${statusClass}">${statusText}</small>
-          </div>
-        </div>
+      const dot = document.createElement("span");
+      dot.className = `online-dot ${isOnline ? "online" : "offline"}`;
+      userDiv.appendChild(dot);
 
-        ${Number(conversation.unreadCount) > 0
-          ? `<span class="unread-badge">${conversation.unreadCount}</span>`
-          : ""
-        }
-      `;
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "conversation-user-info";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "conversation-name";
+      nameSpan.textContent = conversation.friendUsername;
+      infoDiv.appendChild(nameSpan);
+
+      const statusSmall = document.createElement("small");
+      statusSmall.className = `conversation-status ${statusClass}`;
+      statusSmall.textContent = statusText;
+      infoDiv.appendChild(statusSmall);
+
+      userDiv.appendChild(infoDiv);
+      item.appendChild(userDiv);
+
+      if (Number(conversation.unreadCount) > 0) {
+        const badge = document.createElement("span");
+        badge.className = "unread-badge";
+        badge.textContent = conversation.unreadCount;
+        item.appendChild(badge);
+      }
 
       if (Number(conversation.conversationId) === Number(selectedConversationId)) {
         item.classList.add("active");
@@ -643,14 +657,24 @@ async function loadApprovedFriends() {
     const userInfo = document.createElement("div");
     userInfo.className = "conversation-user";
 
-    userInfo.innerHTML = `
-    <span class="online-dot ${isOnline ? "online" : "offline"}"></span>
+    const friendDot = document.createElement("span");
+    friendDot.className = `online-dot ${isOnline ? "online" : "offline"}`;
+    userInfo.appendChild(friendDot);
 
-    <div class="conversation-user-info">
-    <span class="conversation-name">${friend.username}</span>
-    <small class="conversation-status">${statusText}</small>
-    </div>
-    `;
+    const friendInfoDiv = document.createElement("div");
+    friendInfoDiv.className = "conversation-user-info";
+
+    const friendNameSpan = document.createElement("span");
+    friendNameSpan.className = "conversation-name";
+    friendNameSpan.textContent = friend.username;
+    friendInfoDiv.appendChild(friendNameSpan);
+
+    const friendStatusSmall = document.createElement("small");
+    friendStatusSmall.className = "conversation-status";
+    friendStatusSmall.textContent = statusText;
+    friendInfoDiv.appendChild(friendStatusSmall);
+
+    userInfo.appendChild(friendInfoDiv);
 
     const startBtn = document.createElement("button");
     startBtn.className = "start-chat-btn";

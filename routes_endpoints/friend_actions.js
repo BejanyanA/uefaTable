@@ -210,10 +210,11 @@ export async function handleRejectFriend(request, env) {
     const relation = await env.core_data.prepare(`
     SELECT id, user_id, friend_id, status
     FROM friends
-    WHERE user_id = ? AND friend_id = ?
+    WHERE (user_id = ? AND friend_id = ?)
+       OR (user_id = ? AND friend_id = ?)
     ORDER BY datetime(created_at) DESC
     LIMIT 1
-  `).bind(requesterId, receiverId).first();
+  `).bind(requesterId, receiverId, receiverId, requesterId).first();
 
     if (!relation) {
         return jsonResponse({ success: false, message: "no_pending_request_found" }, 404);
@@ -299,8 +300,8 @@ export async function handleDeleteFriend(request, env) {
       WHERE (user_id = ? AND friend_id = ?)
          OR (user_id = ? AND friend_id = ?)
     `).bind(loggedInUserId, targetUserId, targetUserId, loggedInUserId).run();
-        await publishToUser(env, targetUserId, { type: "friend_requests", count: 0 });
     }
+    await publishToUser(env, targetUserId, { type: "friend_requests", count: 0 });
 
     // 6) Return idempotent success (OK even if nothing was there)
     return jsonResponse({
