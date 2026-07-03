@@ -1,8 +1,14 @@
 // routes/login.js
 import { jsonResponse, parseBody, hashWithSalt } from '../utils/helper.js';
+import { isRateLimited } from '../utils/rateLimit.js';
 import jwt from '@tsndr/cloudflare-worker-jwt';
 
 export async function handleLogin(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  if (await isRateLimited(env, `login:${ip}`, 10, 15 * 60)) {
+    return jsonResponse({ success: false, message: "too_many_attempts" }, 429);
+  }
+
   const { email, password } = await parseBody(request);
 
   const errors = {};

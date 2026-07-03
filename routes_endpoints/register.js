@@ -1,7 +1,13 @@
 // routes/register.js
 import { jsonResponse, parseBody, hashWithSalt } from '../utils/helper.js';
+import { isRateLimited } from '../utils/rateLimit.js';
 
 export async function handleRegister(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  if (await isRateLimited(env, `register:${ip}`, 5, 60 * 60)) {
+    return jsonResponse({ success: false, message: "too_many_attempts" }, 429);
+  }
+
   const { username, email, password } = await parseBody(request);
 
   const errors = {};
@@ -93,7 +99,7 @@ export async function handleRegister(request, env) {
 
   const saltArray = crypto.getRandomValues(new Uint8Array(16));
   const salt = Array.from(saltArray).map(b => b.toString(16).padStart(2, "0")).join("");
-  const password_hash = await hashWithSalt(password, salt);
+  const password_hash = await hashWithSalt(trimmedPassword, salt);
 
   try {
     await env.core_data
