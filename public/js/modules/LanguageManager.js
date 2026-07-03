@@ -197,6 +197,9 @@ export const langMap = {
     friend_rejected_success: "User Rejected Successfully",
     friend_deleted_success: "User Deleted Successfully",
     wrong_current_password: "Current password is wrong",
+    footerAbout: "About",
+    footerContact: "Contact",
+    footerPrivacy: "Privacy Policy",
   },
 
   am: {
@@ -396,6 +399,9 @@ export const langMap = {
     friend_rejected_success: "Օգտատերը հաջողությամբ մերժվել է",
     friend_deleted_success: "Օգտատերը հաջողությամբ ջնջվել է",
     wrong_current_password: "Ընթացիկ գաղտնաբառը սխալ է",
+    footerAbout: "Մեր մասին",
+    footerContact: "Կապ",
+    footerPrivacy: "Գաղտնիություն",
   },
 
   fr: {
@@ -596,6 +602,9 @@ export const langMap = {
     friend_rejected_success: "Utilisateur rejeté avec succès",
     friend_deleted_success: "Utilisateur supprimé avec succès",
     wrong_current_password: "Mot de passe actuel erroné",
+    footerAbout: "À propos",
+    footerContact: "Contact",
+    footerPrivacy: "Confidentialité",
   }
 };
 
@@ -1258,6 +1267,17 @@ function seoContentTranslations() {
   if (liveLink) liveLink.setAttribute("href", `${prefix}/live-scores`);
   const customLink = document.getElementById("seoLinkCustom");
   if (customLink) customLink.setAttribute("href", `${prefix}/custom-leagues`);
+
+  setText("footerAbout", t.footerAbout);
+  setText("footerContact", t.footerContact);
+  setText("footerPrivacy", t.footerPrivacy);
+
+  const footerAboutEl = document.getElementById("footerAbout");
+  if (footerAboutEl) footerAboutEl.setAttribute("href", `${prefix}/about`);
+  const footerContactEl = document.getElementById("footerContact");
+  if (footerContactEl) footerContactEl.setAttribute("href", `${prefix}/contact`);
+  const footerPrivacyEl = document.getElementById("footerPrivacy");
+  if (footerPrivacyEl) footerPrivacyEl.setAttribute("href", `${prefix}/privacy`);
 }
 
 

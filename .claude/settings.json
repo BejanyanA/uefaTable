@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -)",
+      "PowerShell(python \"C:\\\\Users\\\\PC\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-PC-Documents-Project-UEFA\\\\9f07b8e2-12a9-446a-b308-92e33db7bf5d\\\\scratchpad\\\\gen_am_pages.py\" 2>&1)",
+      "Bash(python -c ' *)",
+      "Bash(python \"C:\\\\Users\\\\PC\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-PC-Documents-Project-UEFA\\\\9f07b8e2-12a9-446a-b308-92e33db7bf5d\\\\scratchpad\\\\fix_am_pages.py\")"
+    ]
+  }
+}
