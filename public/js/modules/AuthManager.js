@@ -8,7 +8,7 @@ import { setHomeOptionsVisible, setCustomCompetitionVisible, setLiveVisible } fr
 import { customLeagues } from './CustomLeagues.js';
 import { connectChatSocket, updateHeaderMessagesBadge } from './Messages.js';
 import { connectPresenceSocket } from './UserStatus.js';
-import { clearAuthSession } from '../utils/storageKeys.js';
+import { STORAGE_KEYS, clearAuthSession } from '../utils/storageKeys.js';
 import { navigateTo } from './router.js';
 
 
@@ -64,7 +64,7 @@ export const AuthManager = {
         });
 
         if (loginData.success && loginData.token) {
-          localStorage.setItem("authToken", loginData.token);
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, loginData.token);
 
           connectChatSocket();
           connectPresenceSocket();
@@ -100,7 +100,7 @@ export const AuthManager = {
               connectPresenceSocket();
               await updateHeaderMessagesBadge();
 
-              localStorage.setItem("user", JSON.stringify(me.user));
+              localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(me.user));
               document.getElementById("headerUsername").style.display = "block";
               document.getElementById("notificationBell").style.display = "block";
               document.getElementById("profileMenu").style.display = "block";

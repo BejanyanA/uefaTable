@@ -44,7 +44,7 @@ export async function checkLoggedIn() {
       }
    } catch (err) {
       console.error("Token check failed", err);
-      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      clearAuthSession();
       if (authButtons) authButtons.style.display = "flex";
       if (bannerSection) bannerSection.style.display = "none";
    }
@@ -83,7 +83,7 @@ export function homepage() {
          }
       } catch (err) {
          console.error("🔴 Error in Back button to /me:", err);
-         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+         clearAuthSession();
          if (authButtons) authButtons.style.display = "flex";
       }
    });
@@ -94,18 +94,19 @@ export function logout() {
    navigateTo("home");
 
    clearAuthSession();
-   [
-      "groupId",
-      "groupId:ucl-basic-my-A",
-      "groupName",
-      "groupName:ucl-basic-my-A",
-      "lastActiveInstancesTab",
-      "lastGroupLetter:ucl-basic-my",
-      "lastLeagueKey",
-      "leagueId:ucl-basic-my",
-      "leagueId:wc-basic-my",
-      "lastActiveNationalInstancesTab"
-   ].forEach(key => localStorage.removeItem(key));
+
+   const keysToRemove = [];
+   for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("leagueId:") || k.startsWith("groupId:") ||
+                k.startsWith("groupName:") || k.startsWith("lastGroupLetter:"))) {
+         keysToRemove.push(k);
+      }
+   }
+   keysToRemove.forEach(k => localStorage.removeItem(k));
+   localStorage.removeItem("lastActiveInstancesTab");
+   localStorage.removeItem("lastActiveNationalInstancesTab");
+   localStorage.removeItem("lastLeagueKey");
 
    requestAnimationFrame(() => {
       location.reload();

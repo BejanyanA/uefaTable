@@ -4,6 +4,10 @@ import { langMap, currentLang } from '../../LanguageManager.js';
 import { setGroupSelectionForContext, getGroupSelectionForContext, getGroupLetterFromName, navigateTo } from '../../router.js';
 import { computeComp } from './config.js';
 
+function escapeHtml(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpts, opts = {}, config) {
   // Backward compatible: (leagueId, groupId, opts) OR (leagueId, groupId, groupName, opts)
   let groupName = "";
@@ -43,10 +47,11 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
       <button class="tab-btn" data-tab="matches" id="matchesTabBtn"></button>
     </div>
     <div class="group-standings-header">
-      <h2>${groupName}</h2>
+      <h2 id="groupNameHeading"></h2>
     </div>
     <div class="tab-content" id="tabContent">Loading...</div>
   `;
+  document.getElementById("groupNameHeading").textContent = groupName;
 
   document.getElementById("standingsTabBtn").innerText = translation.standings || "Standings";
   document.getElementById("matchesTabBtn").innerText = translation.matches || "Matches";
@@ -94,7 +99,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
         if (response.success) {
           contentDiv.innerHTML = renderStandingsTable(response.data.standings);
         } else {
-          contentDiv.innerHTML = "Failed to load standings.";
+          contentDiv.textContent = translation.load_standings_failed || "Failed to load standings.";
         }
       } else if (tab === "matches") {
         // Show loading message immediately
@@ -112,11 +117,11 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
           contentDiv.innerHTML = ""; // Now clear and render
           await renderMatchesTable(matchesResponse.data, contentDiv, leagueId, playersResponse.data.players);
         } else {
-          contentDiv.innerHTML = "Failed to load matches.";
+          contentDiv.textContent = translation.load_matches_failed || "Failed to load matches.";
         }
       }
     } catch (err) {
-      contentDiv.innerHTML = "Error fetching data.";
+      contentDiv.textContent = translation.error_fetching_data || "Error fetching data.";
     }
   }
 
@@ -140,9 +145,9 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
         </thead>
         <tbody>
           ${standings.map((team, index) => {
-      const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+      const teamLogo = escapeHtml(team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png');
       return `<tr>
-              <td>${index + 1}. <img src="${teamLogo}" class="team_logo"> ${team[config.teamNameField]}</td>
+              <td>${index + 1}. <img src="${teamLogo}" class="team_logo"> ${escapeHtml(team[config.teamNameField])}</td>
               <td>${team.played ?? 0}</td>
               <td>${team.wins ?? 0}</td>
               <td>${team.draws ?? 0}</td>
@@ -162,9 +167,9 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
     <div class="fixed-clubs">
       <div class="club-header" id="teamMobile">${translation.teams || "Teams"}</div>
       ${standings.map((team, index) => {
-        const teamLogo = team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        const teamLogo = escapeHtml(team.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png');
         return `
-        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team_logo"> ${team[config.teamNameField]}</div>
+        <div class="club-name">${index + 1}. <img src="${teamLogo}" class="team_logo"> ${escapeHtml(team[config.teamNameField])}</div>
       `}).join("")}
     </div>
 
@@ -227,22 +232,24 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
       </thead>
       <tbody>
         ${matches.map(match => {
-        const team1Logo = match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-        const team2Logo = match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        const team1Logo = escapeHtml(match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png');
+        const team2Logo = escapeHtml(match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png');
+        const t1user = escapeHtml(match.team1_username || "");
+        const t2user = escapeHtml(match.team2_username || "");
         return `
           <tr data-match-id="${match.id}">
             <td>
-              <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
-                <option value="">${match.team1_username || "Select user"}</option>
+              <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${t1user}" ${editable ? "" : "disabled"}>
+                <option value="">${t1user || "Select user"}</option>
               </select>
             </td>
-            <td><img src="${team1Logo}" class="team_logo"> ${match.team1_name}</td>
+            <td><img src="${team1Logo}" class="team_logo"> ${escapeHtml(match.team1_name)}</td>
             <td><input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}></td>
             <td><input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}></td>
-            <td><img src="${team2Logo}" class="team_logo"> ${match.team2_name}</td>
+            <td><img src="${team2Logo}" class="team_logo"> ${escapeHtml(match.team2_name)}</td>
             <td>
-              <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
-                <option value="">${match.team2_username || "Select user"}</option>
+              <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${t2user}" ${editable ? "" : "disabled"}>
+                <option value="">${t2user || "Select user"}</option>
               </select>
             </td>
           </tr>
@@ -260,22 +267,24 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
         const matchWrapper = document.createElement("div");
         matchWrapper.className = "match-block";
         matchWrapper.dataset.matchId = match.id;
-        const team1Logo = match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-        const team2Logo = match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
+        const team1Logo = escapeHtml(match.team1_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png');
+        const team2Logo = escapeHtml(match.team2_logo || 'https://uefaresults.com/assets/logos/defaultLogo.png');
+        const t1user = escapeHtml(match.team1_username || "");
+        const t2user = escapeHtml(match.team2_username || "");
 
         matchWrapper.innerHTML = `
         <div class="match-line">
-          <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${match.team1_username || ''}" ${editable ? "" : "disabled"}>
-            <option value="">${match.team1_username || "Select Player"}</option>
+          <select class="user-dropdown" name="team1_user" data-team-id="${match.team1_id}" data-initial-username="${t1user}" ${editable ? "" : "disabled"}>
+            <option value="">${t1user || "Select Player"}</option>
           </select>
-          <div class="team-name"><img src="${team1Logo}" class="team_logo"> ${match.team1_name}</div>
+          <div class="team-name"><img src="${team1Logo}" class="team_logo"> ${escapeHtml(match.team1_name)}</div>
           <input type="number" class="score-input" name="team1" value="${match.team1_score}" ${editable ? "" : "disabled"}>
         </div>
         <div class="match-line">
-          <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${match.team2_username || ''}" ${editable ? "" : "disabled"}>
-            <option value="">${match.team2_username || "Select Player"}</option>
+          <select class="user-dropdown" name="team2_user" data-team-id="${match.team2_id}" data-initial-username="${t2user}" ${editable ? "" : "disabled"}>
+            <option value="">${t2user || "Select Player"}</option>
           </select>
-          <div class="team-name"><img src="${team2Logo}" class="team_logo"> ${match.team2_name}</div>
+          <div class="team-name"><img src="${team2Logo}" class="team_logo"> ${escapeHtml(match.team2_name)}</div>
           <input type="number" class="score-input" name="team2" value="${match.team2_score}" ${editable ? "" : "disabled"}>
         </div>
       `;
@@ -329,8 +338,8 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
             return;
           }
 
+          const translation = langMap[currentLang];
           try {
-            const translation = langMap[currentLang];
             const res = await apiPost(config.endpoints.updateScore, payload);
             if (res.success) {
               input.dataset.initial = newVal;
@@ -340,6 +349,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
             }
           } catch (err) {
             console.error("⚠️ Error while updating score:", err);
+            showToast(translation.score_update_failed || "Failed to update score", "error");
           }
         });
       });
@@ -350,7 +360,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
 
         if (!dropdown.dataset.optionsBuilt) {
           const defaultOption = `<option value="" id="selectUserDesk">${translation.selectUser || "Select Player"}</option>`;
-          const options = players.map(p => `<option value="${p.id}">${p.username}</option>`).join("");
+          const options = players.map(p => `<option value="${p.id}">${escapeHtml(p.username)}</option>`).join("");
           dropdown.innerHTML = defaultOption + options;
           dropdown.dataset.optionsBuilt = "1";
         }
@@ -402,6 +412,7 @@ export async function renderGroupStandingsPage(leagueId, groupId, groupNameOrOpt
             }
           } catch (err) {
             dropdown.value = base;
+            showToast(translation.player_assign_failed || "Failed to attach user", "error");
             console.error("⚠️ Error while attaching user:", err);
           }
         });

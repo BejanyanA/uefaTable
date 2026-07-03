@@ -2,7 +2,7 @@ import { API_BASE } from './config.js';
 import { showLoader, hideLoader } from '../utils/helper.js';
 import { logout } from '../modules/MeHomepage.js'
 import { setHomeOptionsVisible, setCustomCompetitionVisible } from "../modules/HomeOptions.js";
-import { clearAuthSession } from '../utils/storageKeys.js';
+import { STORAGE_KEYS, clearAuthSession } from '../utils/storageKeys.js';
 import { navigateTo } from '../modules/router.js';
 
 
@@ -36,7 +36,7 @@ export async function apiPost(endpoint, body = {}, options = {}) {
   if (showLoading) showLoader();
 
   try {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -62,7 +62,7 @@ export async function apiGet(endpoint, options = {}) {
   if (showLoading) showLoader();
 
   try {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 

@@ -103,10 +103,10 @@ async function openNationalLeagues({ bannerId, stageType, tab }) {
         if (res?.success && res?.data) {
             renderNationalTable(res.data);
         } else {
-            window.showToast?.(t.not_found || "Not found", "info");
+            showToast(t.not_found || "Not found", "info");
         }
     } catch (e) {
-        window.showToast?.(t.something_went_wrong || "Something went wrong", "error");
+        showToast(t.something_went_wrong || "Something went wrong", "error");
         console.error(e);
     }
 }

@@ -321,7 +321,11 @@ export async function renderKnockoutBracket(leagueId, rootEl, adapter) {
         const teamLogo = teamObj?.logo_url || 'https://uefaresults.com/assets/logos/defaultLogo.png';
 
         if (name) {
-          d.innerHTML = `<img src="${teamLogo}" class="team-logo-knockout"> ${name}`;
+          const img = document.createElement("img");
+          img.src = teamLogo;
+          img.className = "team-logo-knockout";
+          d.appendChild(img);
+          d.appendChild(document.createTextNode(` ${name}`));
         } else if (useGroupFallback && grp) {
           d.textContent = `${grp} Team ${position}`;
           d.classList.add("placeholder-text");
@@ -368,7 +372,10 @@ export async function renderKnockoutBracket(leagueId, rootEl, adapter) {
                 refreshTieUI();
                 if (tieLikelySettled(tie)) await maybeReloadNextRound(tie);
               }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+              console.error(e);
+              showToast(t.score_update_failed || "Failed to update score", "error");
+            }
           });
         }
         return el;

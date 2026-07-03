@@ -16,7 +16,7 @@ export async function customLeagues() {
    }
 
    try {
-      const data = await apiGet("/custom-leagues");
+      const data = await apiGet("/custom-leagues", { showLoading: false });
       if (data.success && data.user) {
          document.getElementById("homePage").style.display = "none";
          document.getElementById("headerUsername").style.display = "block";

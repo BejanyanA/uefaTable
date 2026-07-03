@@ -8,6 +8,10 @@ import {
 import { customLeagues } from '../../CustomLeagues.js';
 import { computeComp } from './config.js';
 
+function escapeHtml(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function showMobileTooltip(translation, targetElement, messageKey) {
   if (document.querySelector(".mobile-tooltip")) return;
 
@@ -175,13 +179,13 @@ export function renderTable(data, config) {
 
   // Per-tab empty placeholders (only used if one group is empty)
   const ownersEmpty = document.createElement("div");
-  ownersEmpty.id = "noLeaguedata";
-  ownersEmpty.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+  ownersEmpty.id = "noLeaguedata-owners";
+  ownersEmpty.innerHTML = `<h2>${translation.leagueNotExist || "No leagues found"}</h2>`;
   section.appendChild(ownersEmpty);
 
   const invitedEmpty = document.createElement("div");
-  invitedEmpty.id = "noLeaguedata";
-  invitedEmpty.innerHTML = `<h2 id="leagueNotExist">${translation.leagueNotExist || "No leagues found"}</h2>`;
+  invitedEmpty.id = "noLeaguedata-invited";
+  invitedEmpty.innerHTML = `<h2>${translation.leagueNotExist || "No leagues found"}</h2>`;
   section.appendChild(invitedEmpty);
 
   // Tab filtering (show/hide items, keep grid/row layout intact)
@@ -371,11 +375,11 @@ export function renderInstances(instanceData, options = {}, config) {
         groupDiv.dataset.groupName = groupName;
 
         groupDiv.innerHTML = `
-        <h3>${groupName}</h3>
+        <h3>${escapeHtml(groupName)}</h3>
         <ul class="club-list" style="list-style: none; padding: 0; margin: 0;">
         ${config.getGroupItems(groupData).map((item, index) => {
-          const teamLogo = item.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png';
-          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team_logo_group"> ${item.name}</li>`;
+          const teamLogo = escapeHtml(item.logo || 'https://uefaresults.com/assets/logos/defaultLogo.png');
+          return `<li>${index + 1}.&nbsp;&nbsp;<img src="${teamLogo}" class="team_logo_group"> ${escapeHtml(item.name)}</li>`;
         })
           .join("")}
         </ul>
