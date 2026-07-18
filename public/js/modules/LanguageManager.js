@@ -1264,20 +1264,20 @@ function seoContentTranslations() {
   // (en -> /live-scores, am -> /am/live-scores, fr -> /fr/live-scores)
   const prefix = currentLang === "en" ? "" : `/${currentLang}`;
   const liveLink = document.getElementById("seoLinkLive");
-  if (liveLink) liveLink.setAttribute("href", `${prefix}/live-scores`);
+  if (liveLink) liveLink.setAttribute("href", `${prefix}/live-scores/`);
   const customLink = document.getElementById("seoLinkCustom");
-  if (customLink) customLink.setAttribute("href", `${prefix}/custom-leagues`);
+  if (customLink) customLink.setAttribute("href", `${prefix}/custom-leagues/`);
 
   setText("footerAbout", t.footerAbout);
   setText("footerContact", t.footerContact);
   setText("footerPrivacy", t.footerPrivacy);
 
   const footerAboutEl = document.getElementById("footerAbout");
-  if (footerAboutEl) footerAboutEl.setAttribute("href", `${prefix}/about`);
+  if (footerAboutEl) footerAboutEl.setAttribute("href", `${prefix}/about/`);
   const footerContactEl = document.getElementById("footerContact");
-  if (footerContactEl) footerContactEl.setAttribute("href", `${prefix}/contact`);
+  if (footerContactEl) footerContactEl.setAttribute("href", `${prefix}/contact/`);
   const footerPrivacyEl = document.getElementById("footerPrivacy");
-  if (footerPrivacyEl) footerPrivacyEl.setAttribute("href", `${prefix}/privacy`);
+  if (footerPrivacyEl) footerPrivacyEl.setAttribute("href", `${prefix}/privacy/`);
 }
 
 
