@@ -129,3 +129,14 @@
     /* ℹ️ icon */
   }
 }
+/* Icon placement for the three toast types. The icon files are white line
+   icons in assets/icons/. Kept after the mobile block, with a more specific
+   selector, so it applies at every width. */
+.toast.toast-success,
+.toast.toast-error,
+.toast.toast-info {
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 18px 18px;
+  padding-left: 42px;
+}
