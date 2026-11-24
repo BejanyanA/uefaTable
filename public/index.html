@@ -180,6 +180,26 @@
     ]
   }
   </script>
+  <!-- First paint: the home banners and the SEO text are plain HTML and show
+       immediately on the home route. On any other app route (e.g. /en/live)
+       hide them before the first paint; the router then controls visibility
+       with inline styles, which override this rule.
+       data-cfasync="false" keeps Cloudflare Rocket Loader from delaying it. -->
+  <style>
+    html.not-home-route #homePage,
+    html.not-home-route .seo-content {
+      display: none;
+    }
+  </style>
+  <script data-cfasync="false">
+    (function () {
+      var langs = { en: 1, am: 1, fr: 1 };
+      var seg = location.pathname.split('/').filter(Boolean);
+      if (langs[seg[0]]) seg.shift();
+      var route = seg.join('/') || (location.hash ? location.hash.slice(1) : '') || 'home';
+      if (route !== 'home') document.documentElement.classList.add('not-home-route');
+    })();
+  </script>
 </head>
 
 <body>
@@ -366,9 +386,12 @@
     </div>
 
     <!-- 🔹 Home Page Banners -->
-    <div class="homePage" id="homePage" style="display: none;">
+    <!-- Visible in the initial HTML so the home banners paint with the first
+         frame instead of waiting for the app's JavaScript. On other routes the
+         inline script in <head> hides it until the router takes over. -->
+    <div class="homePage" id="homePage">
       <!-- ✅ Separate block: Live / Custom options -->
-      <div class="homeOptions" id="homeOptionsBlock">
+      <div class="homeOptions" id="homeOptionsBlock" style="display: grid;">
         <h1 class="seo-h1" id="seoH1"> UEFA Results - Live Football Scores and Custom Leagues </h1>
         <div class="choiceGrid" id="homePageOptions">
           <button id="btnLiveData" class="choiceCard choiceCard--live" type="button">
@@ -379,7 +402,7 @@
                 <div class="choiceSub" id="liveFootballTitle">Live scores, Upcoming matches, Results</div>
               </div>
             </div>
-            <div class="choiceSubDescr" id="liveFootballDescription">Live scores, upcoming matches, results.</div>
+            <div class="choiceSubDescr" id="liveFootballDescription">Stay connected with live matches, real-time scores, and instant game updates from leagues around the world. Everything updates automatically as the action happens.</div>
             <div class="choiceBottom">
               <span class="choiceHint" id="openLiveFootball">Open Live Football</span>
               <span class="choiceArrow">→</span>
@@ -394,8 +417,7 @@
                 <div class="choiceSub" id="customLeagueTitle">Create & Manage your own leagues</div>
               </div>
             </div>
-            <div class="choiceSubDescr" id="customLeagueDescription">Build your own league, invite friends and track
-              standings.</div>
+            <div class="choiceSubDescr" id="customLeagueDescription">Build your own league, invite friends, assign teams, and track standings and matches in one place. You control the rules, results, and competition format.</div>
             <div class="choiceBottom">
               <span class="choiceHint" id="openCustomleague">Open Custom Leagues</span>
               <span class="choiceArrow">→</span>
