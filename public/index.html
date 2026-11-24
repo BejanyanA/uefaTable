@@ -741,6 +741,103 @@
     Powered by And Bejanyan © <span id="year"></span> All rights reserved
   </footer>
 
+  <!-- First paint for /am and /fr: the HTML above is English, and the app's
+       JavaScript translates it only after it has loaded, which made the text
+       swap and shift on first open. This small script translates the visible
+       home content during parsing instead. The strings are copied from langMap
+       in js/modules/LanguageManager.js (which still applies them again later):
+       when you change one of these texts there, change it here too.
+       data-cfasync="false" keeps Cloudflare Rocket Loader from delaying it. -->
+  <script data-cfasync="false">
+    (function () {
+      var lang = location.pathname.split('/')[1];
+      var T = {
+        "am": {
+          "seoH1": "UEFA Results - Ֆուտբոլի ուղիղ հաշիվներ և անհատական լիգաներ",
+          "liveFootball": "Հաշիվներ և Աղյուսակներ",
+          "liveFootballTitle": "Հաշիվներ, Սպասվող խաղեր, Արդյունքներ",
+          "liveFootballDescription": "Մնացեք կապի մեջ ուղիղ խաղերի, իրական ժամանակում թարմացվող հաշիվների և ակնթարթային խաղային նորությունների հետ աշխարհի տարբեր լիգաներից։ Ամեն ինչ թարմացվում է ավտոմատ՝ խաղի ընթացքին համընթաց։",
+          "openLiveFootball": "Բացել լայվ ֆուտբոլ",
+          "customLeague": "Անհատական լիգա",
+          "customLeagueTitle": "Ստեղծեք և կառավարեք ձեր սեփական լիգաները",
+          "customLeagueDescription": "Ստեղծեք ձեր սեփական լիգան, հրավիրեք ընկերներին, նշանակեք թիմեր և մեկ վայրում հետևեք վարկանիշին ու խաղերին։ Դուք եք վերահսկում կանոնները, արդյունքները և մրցաշարի ձևաչափը։",
+          "openCustomleague": "Բացել անհատական լիգաները",
+          "seoHeading": "Ֆուտբոլի ուղիղ հաշիվներ, աղյուսակներ և անհատական լիգաներ",
+          "seoIntro": "UEFA Results-ը անվճար ֆուտբոլային հարթակ է, որտեղ կարող եք իրական ժամանակում հետևել ֆուտբոլի ուղիղ հաշիվներին, սպասվող խաղերին և վերջնական արդյունքներին։ Դիտեք Չեմպիոնների լիգայի, Եվրոպայի լիգայի, ԵՎՐՈ-ի և Աշխարհի առաջնության աղյուսակները և հետևեք յուրաքանչյուր խաղի՝ ընթացքին համընթաց։",
+          "seoCustomHeading": "Ստեղծեք ձեր սեփական անհատական ֆուտբոլային լիգան",
+          "seoCustomText": "Բացի ուղիղ հաշիվներից, UEFA Results-ը թույլ է տալիս ստեղծել և կառավարել ձեր սեփական անհատական ֆուտբոլային լիգաները ընկերների հետ։ Ստեղծեք Չեմպիոնների լիգայի ոճով խմբային և փլեյ-օֆֆ ցանց, հրավիրեք ձեր ընկերներին, ընտրեք ձեր թիմերը և միասին հետևեք աղյուսակին՝ մեկ վայրում։",
+          "seoFeaturesHeading": "Ի՞նչ կարող եք անել UEFA Results-ում",
+          "seoFeat1Label": "Ֆուտբոլի ուղիղ հաշիվներ",
+          "seoFeat1Text": " - հետևեք խաղերին ուղիղ եթերում՝ գոլերի հետ միասին։",
+          "seoFeat2Label": "Խաղեր և արդյունքներ",
+          "seoFeat2Text": " - սպասվող խաղեր և վերջնական արդյունքներ։",
+          "seoFeat3Label": "Աղյուսակներ",
+          "seoFeat3Text": " - Չեմպիոնների լիգա, Եվրոպայի լիգա, ԵՎՐՈ և Աշխարհի առաջնության աղյուսակներ։",
+          "seoFeat4Label": "Անհատական լիգաներ",
+          "seoFeat4Text": " - ստեղծեք ձեր սեփական լիգան կամ ցանցը և հրավիրեք ընկերներին։",
+          "seoLinkLive": "Ֆուտբոլի ուղիղ հաշիվներ և աղյուսակներ",
+          "seoLinkCustom": "Ստեղծել անհատական ֆուտբոլային լիգա",
+          "footerAbout": "Մեր մասին",
+          "footerContact": "Կապ",
+          "footerPrivacy": "Գաղտնիություն",
+          "loginBtn": "Մուտք",
+          "registerBtn": "Գրանցվել"
+        },
+        "fr": {
+          "seoH1": "UEFA Results - Scores de football en direct et ligues personnalisées",
+          "liveFootball": "Scores & Classement",
+          "liveFootballTitle": "Scores en direct, Matchs à venir, Résultats",
+          "liveFootballDescription": "Restez connecté avec des matchs en direct, des scores en temps réel et des mises à jour instantanées des matchs des ligues du monde entier. Tout se met à jour automatiquement au fil de l’action.",
+          "openLiveFootball": "Accéder au football en direct",
+          "customLeague": "Ligue personnalisée",
+          "customLeagueTitle": "Créez et gérez vos propres ligues",
+          "customLeagueDescription": "Créez votre propre ligue, invitez des amis, assignez des équipes et suivez les classements et les matchs en un seul endroit. Vous contrôlez les règles, les résultats et le format de la compétition.",
+          "openCustomleague": "Ouvrir les ligues personnalisées",
+          "seoHeading": "Scores de football en direct, classements et ligues personnalisées",
+          "seoIntro": "UEFA Results est une plateforme de football gratuite où vous pouvez suivre les scores de football en direct, les matchs à venir et les résultats finaux en temps réel. Consultez les classements de la Ligue des champions, de la Ligue Europa, de l’EURO et de la Coupe du monde, et suivez chaque match au fil de l’action.",
+          "seoCustomHeading": "Créez votre propre ligue de football personnalisée",
+          "seoCustomText": "Au-delà des scores en direct, UEFA Results vous permet de créer et de gérer vos propres ligues de football personnalisées avec vos amis. Créez une phase de groupes et un tableau à élimination directe façon Ligue des champions, invitez vos amis, choisissez vos équipes et suivez les classements ensemble, le tout au même endroit.",
+          "seoFeaturesHeading": "Ce que vous pouvez faire sur UEFA Results",
+          "seoFeat1Label": "Scores de football en direct",
+          "seoFeat1Text": " - suivez les matchs en direct au fil des buts.",
+          "seoFeat2Label": "Matchs et résultats",
+          "seoFeat2Text": " - matchs à venir et résultats finaux.",
+          "seoFeat3Label": "Classements",
+          "seoFeat3Text": " - classements de la Ligue des champions, de la Ligue Europa, de l’EURO et de la Coupe du monde.",
+          "seoFeat4Label": "Ligues personnalisées",
+          "seoFeat4Text": " - créez votre propre ligue ou tableau et invitez vos amis.",
+          "seoLinkLive": "Scores de football en direct et classements",
+          "seoLinkCustom": "Créer une ligue de football personnalisée",
+          "footerAbout": "À propos",
+          "footerContact": "Contact",
+          "footerPrivacy": "Confidentialité",
+          "loginBtn": "Connexion",
+          "registerBtn": "S’inscrire"
+        }
+      };
+      var t = T[lang];
+      if (!t) return;
+
+      document.documentElement.lang = lang === 'am' ? 'hy' : lang;
+      for (var id in t) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = t[id];
+      }
+
+      var hrefs = {
+        seoLinkLive: '/live-scores/', seoLinkCustom: '/custom-leagues/',
+        footerAbout: '/about/', footerContact: '/contact/', footerPrivacy: '/privacy/'
+      };
+      for (var linkId in hrefs) {
+        var link = document.getElementById(linkId);
+        if (link) link.setAttribute('href', '/' + lang + hrefs[linkId]);
+      }
+
+      var flag = document.getElementById('langTrigger');
+      if (flag) flag.src = 'assets/flags/' + lang + '.svg';
+    })();
+  </script>
+
 
 
   <!-- Load language system, validations, then main logic -->
