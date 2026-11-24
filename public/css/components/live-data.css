@@ -426,6 +426,18 @@ api-sports-widget .standings-table tbody td:first-child {
   max-width: 2px;
 }
 
+/* Live standings: give the position number its own 20px column. The rule
+   above squeezes that column to about 8px, but the number sits in a 16px box,
+   so two-digit positions ran into the club logo. Phones up to 420px wide have
+   their own spacing further down and are left alone. */
+@media (min-width: 421px) {
+  api-sports-widget .standings-table tbody td:first-child {
+    width: 20px;
+    min-width: 20px;
+    max-width: none;
+  }
+}
+
 .table-widget td .team-name {
   font-weight: bold;
   flex-grow: 1;
