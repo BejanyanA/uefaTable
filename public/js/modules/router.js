@@ -14,6 +14,10 @@ import { openMessagesPage } from './Messages.js';
 import { apiGet, apiPost } from '../services/api.js';
 import { API_BASE } from '../services/config.js';
 import { langMap, currentLang, changeLang } from './LanguageManager.js';
+import {
+    LEAGUE, ALL_ROUTE_KEYS, classifyRouteKey,
+    leagueInstanceKey, leagueGroupDetailKey, isValidInstance,
+} from '../shared/appRoutes.js';
 
 // Every real path is prefixed with the current language ("/en/...", "/fr/...",
 // "/am/..."), matching LanguageManager.js's existing getLangFromURL()/
@@ -220,16 +224,14 @@ async function openInstances({ comp, stage, access, tab }) {
 
 // ✅ auto-register 32 routes
 function registerInstanceRoutes(routes) {
-    const comps = ["ucl", "uel", "euro", "wc"];
-    const stages = ["basic", "only"];
-    const access = ["my", "invited"];
-    const tabs = ["group", "knockouts"];
+    // Lists come from shared/appRoutes.js so the server (_worker.js) knows the same routes.
+    const { clubComps: comps, stages, access, tabs } = LEAGUE;
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 tabs.forEach(tab => {
-                    const key = `${comp}-${stage}-${acc}-club-${tab}`;
+                    const key = leagueInstanceKey(comp, stage, acc, "club", tab);
                     routes[key] = {
                         id: "leagueType1",          // league instances render inside leagueType1
                         guard: guardLoggedIn,
@@ -321,19 +323,16 @@ async function openNationalInstances({ comp, stage, access, tab }) {
 }
 
 function registerNationalInstanceRoutes(routes) {
-    const comps = ["euro", "wc"];
-    const stages = ["basic", "only"];
-    const access = ["my", "invited"];
-    const tabs = ["group", "knockouts"];
+    const { nationalComps: comps, stages, access, tabs } = LEAGUE;
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 tabs.forEach(tab => {
                     // ✅ knockout-only → group route is invalid
-                    if (stage === "only" && tab === "group") return;
+                    if (!isValidInstance("national", stage, tab)) return;
 
-                    const key = `${comp}-${stage}-${acc}-national-${tab}`;
+                    const key = leagueInstanceKey(comp, stage, acc, "national", tab);
                     routes[key] = {
                         id: "leagueType2",
                         guard: guardLoggedIn,
@@ -494,18 +493,14 @@ async function openNationalGroupDetail({ comp, stage, access, view, groupLetter 
 
 // ✅ Club: auto-register group standing/matches routes
 function registerClubGroupDetailRoutes(routes) {
-    const comps = ["ucl", "uel", "euro", "wc"];
-    const stages = ["basic"];
-    const access = ["my", "invited"];
-    const views = ["standing", "matches"];
-    const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const { clubComps: comps, groupDetailStages: stages, access, views, letters } = LEAGUE;
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 views.forEach(view => {
                     letters.forEach(letter => {
-                        const key = `${comp}-${stage}-${acc}-club-group-${letter}-${view}`;
+                        const key = leagueGroupDetailKey(comp, stage, acc, "club", letter, view);
                         routes[key] = {
                             id: "leagueType1",
                             guard: guardLoggedIn,
@@ -520,18 +515,14 @@ function registerClubGroupDetailRoutes(routes) {
 
 // ✅ National: auto-register group standing/matches routes
 function registerNationalGroupDetailRoutes(routes) {
-    const comps = ["euro", "wc"];
-    const stages = ["basic"];
-    const access = ["my", "invited"];
-    const views = ["standing", "matches"];
-    const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const { nationalComps: comps, groupDetailStages: stages, access, views, letters } = LEAGUE;
 
     comps.forEach(comp => {
         stages.forEach(stage => {
             access.forEach(acc => {
                 views.forEach(view => {
                     letters.forEach(letter => {
-                        const key = `${comp}-${stage}-${acc}-national-group-${letter}-${view}`;
+                        const key = leagueGroupDetailKey(comp, stage, acc, "national", letter, view);
                         routes[key] = {
                             id: "leagueType2",
                             guard: guardLoggedIn,
@@ -844,6 +835,21 @@ registerNationalInstanceRoutes(routes);
 
 registerClubGroupDetailRoutes(routes);
 registerNationalGroupDetailRoutes(routes);
+
+// The server only serves the app for routes listed in shared/appRoutes.js;
+// anything else is a real 404 on direct open or refresh. Flag any mismatch
+// loudly during development instead of finding out from a broken link.
+(function checkRoutesMatchSharedList() {
+    const registered = Object.keys(routes);
+    const missingOnServer = registered.filter((key) => !classifyRouteKey(key));
+    const missingHandler = ALL_ROUTE_KEYS.filter((key) => !routes[key]);
+    if (missingOnServer.length) {
+        console.error("[router] Routes missing from js/shared/appRoutes.js (they will 404 on direct open):", missingOnServer);
+    }
+    if (missingHandler.length) {
+        console.error("[router] Routes listed in js/shared/appRoutes.js without a handler in router.js:", missingHandler);
+    }
+})();
 
 
 

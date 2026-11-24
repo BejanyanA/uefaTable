@@ -336,14 +336,14 @@ export const LeagueManager = {
     const leagueNameError = document.getElementById("leagueNameUpdateError");
     const accessContainer = document.getElementById("accessUsersContainer");
     const friendsContainer = document.getElementById("friendsListContainer");
-    const frineds = document.getElementById("friends");
+    const frineds = document.getElementById("editFriendsTitle");
     const usersWithAccess = document.getElementById("usersWithAccess");
     const cancelBtn = document.getElementById("cancelEditBtn");
     const confirmBtn = document.getElementById("confirmEditBtn");
 
     title.textContent = translation.edit_league_title || "Edit League";
     usersWithAccess.textContent = translation.usersWithAccess || "Users with Access";
-    frineds.textContent = translation.friends || "Friends";
+    frineds.textContent = translation.allFriends || "All friends";
     confirmBtn.textContent = translation.update || "Update";
     cancelBtn.textContent = translation.cancel || "Cancel";
     clearErrors(["leagueNameUpdateError"]);

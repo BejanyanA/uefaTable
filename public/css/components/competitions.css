@@ -18,7 +18,7 @@
 
     }
 
-    #banner-title {
+    .banner .banner-title {
         display: block;
         font-size: 24px;
         color: white;
@@ -93,7 +93,7 @@
     /* Mobile */
     @media (max-width: 480px) {
 
-        #banner-title {
+        .banner .banner-title {
             display: block;
             text-align: center;
             font-size: 16px;
