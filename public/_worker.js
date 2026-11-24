@@ -16,7 +16,10 @@ const LANGS = new Set(["en", "am", "fr"]);
 
 // Translated static landing pages (public/am/<slug>/, public/fr/<slug>/).
 // These must reach the static files, never the app shell.
-const STATIC_SLUGS = new Set(["live-scores", "custom-leagues", "about", "contact", "privacy"]);
+const STATIC_SLUGS = new Set([
+  "live-scores", "custom-leagues", "about", "contact", "privacy",
+  "champions-league-tournament", "world-cup-bracket", "tournament-bracket-maker",
+]);
 
 // App routes anyone can open. They keep the shell's canonical ("/") and are
 // not marked noindex.
