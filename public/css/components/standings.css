@@ -93,6 +93,18 @@
   font-size: 14px;
 }
 
+/* Custom-league tables: centre each number under its header.
+   A rule in live-data.css (".standings-table td", written for the live
+   widget) also reaches these cells and pads them 10px left / 60px right,
+   which pushed every number 25px left of its header. Split the same 70px
+   evenly, so the columns keep their width. The first column (team name) is
+   left as it is. ".desktop-only" keeps this rule away from the live widget's
+   own table, which shares the .standings-table class. */
+.standings-table.desktop-only td:not(:first-child) {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+
 .standings-table tbody td:first-child {
   position: relative;
 }
