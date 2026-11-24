@@ -560,6 +560,12 @@ const routes = {
             // Hide the home icon on the home page
             const homeIcon = document.getElementById("homePageIcon");
             if (homeIcon) homeIcon.style.display = "none";
+
+            // Home always shows the two option banners. Other flows hide them
+            // (e.g. logging in while on the Live page) and not every way back
+            // to home restores them, so restore them here.
+            setHomeOptionsVisible(true);
+            setCustomCompetitionVisible(false);
         },
         onLeave: () => {
             // Show the home icon when leaving the home page

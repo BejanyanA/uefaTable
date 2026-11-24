@@ -800,6 +800,11 @@ function renderPasswordDetails(userData, container, translation) {
       saveButton.disabled = false;
     }
   });
+}
+
+// Achievements helpers live at module level so ProfileManager.showAchievementsTab
+// exists as soon as the module loads (it used to be defined inside
+// renderPasswordDetails, so opening /achievements directly failed).
 
   const BANNER_MAP = [
     { id: 1, name: "Champions League", trophyUrl: 'assets/images/champLeaOnlyCup.avif' },
@@ -991,4 +996,3 @@ function renderPasswordDetails(userData, container, translation) {
       renderAchievementBanners([], translation);
     }
   };
-}
