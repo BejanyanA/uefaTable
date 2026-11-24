@@ -443,6 +443,18 @@ api-sports-widget .standings-table th,
   padding: 5px 60px 5px 10px
 }
 
+/* Live standings only: the rule above gives the widget's header cells 10px on
+   the left and 60px on the right, which centred each header label 25px to the
+   left of the numbers below it. Split the same 70px evenly so labels sit over
+   their numbers and column widths do not change.
+   Scoped to the widget on purpose: the custom-league tables share the
+   .standings-table class and must not be affected. Same specificity as the
+   small-screen rule further down, so that one still wins on narrow phones. */
+api-sports-widget .standings-table th {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+
 api-sports-widget .standings-table th,
 api-sports-widget .standings-table td {
   border: unset
