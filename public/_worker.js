@@ -34,34 +34,91 @@ const PRIVATE_ROUTES = new Set([
 const LEAGUE_ROUTE =
   /^(ucl|uel|euro|wc)-(basic|only)-(my|invited)(-(club|national)-(group|knockouts|group-[A-H]-(standing|matches)))?$/;
 
-// Returns "public", "private" or null (not an app route).
+// Translated homepages. "/fr/" and "/am/" are indexable pages of their own:
+// the worker gives the shell its own lang, title, description and canonical.
+// (The visible text is translated by the inline script at the end of
+// index.html; the hreflang links are static in index.html.)
+const SITE = "https://uefaresults.com";
+const LOCALIZED_HOME = {
+  fr: {
+    htmlLang: "fr",
+    title: "UEFA Results - Scores de football en direct et ligues personnalisées",
+    description:
+      "Suivez les scores de football en direct, les matchs et les classements de la Ligue des champions et de la Coupe du monde, et créez vos ligues entre amis.",
+  },
+  am: {
+    htmlLang: "hy",
+    title: "UEFA Results - Ֆուտբոլի ուղիղ հաշիվներ և անհատական լիգաներ",
+    description:
+      "Հետևեք ֆուտբոլի ուղիղ հաշիվներին, խաղերին և աղյուսակներին, դիտեք Չեմպիոնների լիգայի և Աշխարհի առաջնության աղյուսակները և ստեղծեք ձեր լիգաները ընկերների հետ։",
+  },
+};
+
+// Returns { kind: "public" | "private" | null, lang, isHome }.
+// kind null means "not an app route".
 function classifyAppRoute(pathname) {
   const segments = pathname.split("/").filter(Boolean);
-  const hasLang = LANGS.has(segments[0]);
-  const rest = hasLang ? segments.slice(1) : segments;
+  const lang = LANGS.has(segments[0]) ? segments[0] : null;
+  const rest = lang ? segments.slice(1) : segments;
+  const none = { kind: null, lang, isHome: false };
 
-  if (rest.length === 0) return hasLang ? "public" : null; // "/en" -> app home; "/" -> static index
-  if (rest.length > 1) return null;
+  if (rest.length === 0) {
+    // "/en" -> app home; "/" -> static index.html
+    return lang ? { kind: "public", lang, isHome: true } : none;
+  }
+  if (rest.length > 1) return none;
 
   const slug = rest[0];
-  if (STATIC_SLUGS.has(slug)) return null;
-  if (PUBLIC_ROUTES.has(slug)) return "public";
-  if (PRIVATE_ROUTES.has(slug) || LEAGUE_ROUTE.test(slug)) return "private";
-  return null;
+  if (STATIC_SLUGS.has(slug)) return none;
+  if (PUBLIC_ROUTES.has(slug)) return { kind: "public", lang, isHome: slug === "home" };
+  if (PRIVATE_ROUTES.has(slug) || LEAGUE_ROUTE.test(slug)) return { kind: "private", lang, isHome: false };
+  return none;
+}
+
+const setAttr = (name, value) => ({
+  element(el) {
+    el.setAttribute(name, value);
+  },
+});
+
+function localizeHome(response, lang) {
+  const meta = LOCALIZED_HOME[lang];
+  const canonical = `${SITE}/${lang}/`;
+  return new HTMLRewriter()
+    .on("html", setAttr("lang", meta.htmlLang))
+    .on("title", {
+      element(el) {
+        el.setInnerContent(meta.title);
+      },
+    })
+    .on('meta[name="description"]', setAttr("content", meta.description))
+    .on('link[rel="canonical"]', setAttr("href", canonical))
+    .on('meta[property="og:title"]', setAttr("content", meta.title))
+    .on('meta[property="og:description"]', setAttr("content", meta.description))
+    .on('meta[property="og:url"]', setAttr("content", canonical))
+    .on('meta[name="twitter:title"]', setAttr("content", meta.title))
+    .on('meta[name="twitter:description"]', setAttr("content", meta.description))
+    .transform(response);
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const kind = classifyAppRoute(url.pathname);
+    const { kind, lang, isHome } = classifyAppRoute(url.pathname);
 
     // Not an app route: static file, static page, redirect or 404.html.
     if (!kind) return env.ASSETS.fetch(request);
 
+    // One address per translated homepage: "/fr" -> "/fr/".
+    if (LOCALIZED_HOME[lang] && url.pathname === `/${lang}`) {
+      return Response.redirect(`${url.origin}/${lang}/${url.search}`, 301);
+    }
+
     // App route: answer with the app shell (index.html) at this URL.
     const shell = await env.ASSETS.fetch(new Request(new URL("/", url), request));
-    const response = new Response(shell.body, shell);
+    let response = new Response(shell.body, shell);
     if (kind === "private") response.headers.set("X-Robots-Tag", "noindex");
+    if (isHome && LOCALIZED_HOME[lang]) response = localizeHome(response, lang);
     return response;
   },
 };

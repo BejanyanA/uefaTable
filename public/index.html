@@ -54,6 +54,13 @@
 
   <link rel="canonical" href="https://uefaresults.com/">
 
+  <!-- Language versions of the homepage. For /fr/ and /am/ the routing worker
+       (_worker.js) rewrites the title, description, canonical and lang. -->
+  <link rel="alternate" hreflang="en" href="https://uefaresults.com/">
+  <link rel="alternate" hreflang="hy" href="https://uefaresults.com/am/">
+  <link rel="alternate" hreflang="fr" href="https://uefaresults.com/fr/">
+  <link rel="alternate" hreflang="x-default" href="https://uefaresults.com/">
+
   <!-- Open Graph -->
   <meta property="og:title" content="UEFA Results - Live Football Scores & Custom Leagues">
 
@@ -85,12 +92,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon/favicon-64x64.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon/favicon-96x96.png">
-  <link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon/favicon-128x128.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192x192.png">
-  <link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon/favicon-256x256.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/favicon-512x512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
   <link rel="manifest" href="/site.webmanifest">
 
 
@@ -145,7 +148,7 @@
         "@id": "https://uefaresults.com/#organization",
         "name": "UEFA Results",
         "url": "https://uefaresults.com/",
-        "logo": "https://uefaresults.com/assets/favicon/favicon-512x512.png"
+        "logo": "https://uefaresults.com/assets/favicon/android-chrome-512x512.png"
       },
       {
         "@type": "FAQPage",
@@ -218,15 +221,15 @@
           <img src="assets/flags/en.svg" alt="Language" id="langTrigger" class="lang-flag" onclick="toggleDropdown()" />
           <div id="langDropdown" class="dropdown-menu">
             <div class="language-option" onclick="setLanguage('en')">
-              <img src="assets/flags/en.svg" />
+              <img src="assets/flags/en.svg" alt="English" />
               <span>English</span>
             </div>
             <div class="language-option" onclick="setLanguage('am')">
-              <img src="assets/flags/am.svg" />
+              <img src="assets/flags/am.svg" alt="Հայերեն" />
               <span>Հայերեն</span>
             </div>
             <div class="language-option" onclick="setLanguage('fr')">
-              <img src="assets/flags/fr.svg" />
+              <img src="assets/flags/fr.svg" alt="Français" />
               <span>Français</span>
             </div>
           </div>
@@ -332,7 +335,7 @@
               <input type="password" id="loginPassword" placeholder=" " autocomplete="current-password" />
               <label for="loginPassword" id="loginPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="loginEyeToggle"
+            <img src="assets/icons/eye-off.png" alt="Show password" class="toggle-password" id="loginEyeToggle"
               onclick="togglePassword('loginPassword', this)" />
           </div>
           <div class="error" id="loginPasswordError"></div>
@@ -365,7 +368,7 @@
               <input type="password" id="regPassword" placeholder=" " autocomplete="new-password" />
               <label for="regPassword" id="regPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="regEyeToggle"
+            <img src="assets/icons/eye-off.png" alt="Show password" class="toggle-password" id="regEyeToggle"
               onclick="togglePassword('regPassword', this)" />
           </div>
           <div class="error" id="regPasswordError"></div>
@@ -375,7 +378,7 @@
               <input type="password" id="regConfirmPassword" placeholder=" " autocomplete="new-password" />
               <label for="regConfirmPassword" id="regConfirmPasswordLabel"></label>
             </div>
-            <img src="assets/icons/eye-off.png" class="toggle-password" id="regConfirmEyeToggle"
+            <img src="assets/icons/eye-off.png" alt="Show password" class="toggle-password" id="regConfirmEyeToggle"
               onclick="togglePassword('regConfirmPassword', this)" />
           </div>
           <div class="error" id="regConfirmPasswordError"></div>
