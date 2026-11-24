@@ -92,7 +92,7 @@
 #knockoutTab .side-round .round-body { --rowH: 18px; }    /* keep in sync with your JS ROW_H_PX */
 
 /* tune link length (how far the line reaches into the gap toward the adjacent column) */
-:root { --linkLen: 18px; }  /* feel free to bump to 20–24px if you widen column gaps */
+:root { --linkLen: 18px; }  /* feel free to bump to 20-24px if you widen column gaps */
 
 /* A helper that draws a vertical line + two horizontal ticks in one pseudo-element */
 @supports (background: linear-gradient(#fff, #fff)) {
@@ -170,7 +170,7 @@
   }
 }
 
-:root { --finalLink: 18px; }  /* tweak 24–36px to taste */ 
+:root { --finalLink: 18px; }  /* tweak 24-36px to taste */ 
 
 /* draw short lines out of the FINAL card to left & right */
 #knockoutTab .center-final .ko-card::before,
@@ -247,7 +247,7 @@
 
 :root {
   --koW: 350px;     /* card width (matches what you already use) */
-  --koH: 68px;      /* card height – tune to your taste (60–76px works well) */
+  --koH: 68px;      /* card height - tune to your taste (60-76px works well) */
 }
 
 #knockoutTab .ko-card,
@@ -280,7 +280,7 @@
 
 
 
-:root { --rightRailOffset: 25px; }  /* try 24–60px to taste */
+:root { --rightRailOffset: 25px; }  /* try 24-60px to taste */
 
 #knockoutTab .right-side {
   margin-left: var(--rightRailOffset);
@@ -288,7 +288,7 @@
 
 
 
-:root { --leftRailOffset: 2px; }  /* try 24–60px to taste */
+:root { --leftRailOffset: 2px; }  /* try 24-60px to taste */
 
 #knockoutTab .left-side {
   margin-right: var(--leftRailOffset);
@@ -340,7 +340,7 @@
 
 /* LEFT rows: [User][Team][Home][Away][CB] */
 #knockoutTab .ko-team-row {
-  gap: 4px;  /* was 6px – frees a bit of space */
+  gap: 4px;  /* was 6px - frees a bit of space */
   grid-template-columns: var(--userW) minmax(150px,1fr) 30px 30px 18px;
 }
 
@@ -383,7 +383,7 @@
   #knockoutTab .ko-row-2{display:grid;gap:10px}
 
 
-  :root { --rightRailOffset: 15px; }  /* try 24–60px to taste */
+  :root { --rightRailOffset: 15px; }  /* try 24-60px to taste */
 
   #knockoutTab .right-side {
   margin-left: var(--rightRailOffset);
