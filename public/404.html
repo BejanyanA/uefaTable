@@ -77,16 +77,65 @@
 <body>
   <main>
     <p class="code">404</p>
-    <h1>Page not found</h1>
-    <p>The page you are looking for does not exist or has been moved.</p>
-    <a class="cta" href="/">Go to UEFA Results →</a>
+    <h1 id="nfTitle">Page not found</h1>
+    <p id="nfText">The page you are looking for does not exist or has been moved.</p>
+    <a class="cta" id="nfHome" href="/">Go to UEFA Results →</a>
     <nav>
-      <a href="/live-scores/">Live scores</a>
-      <a href="/custom-leagues/">Custom leagues</a>
-      <a href="/about/">About</a>
-      <a href="/contact/">Contact</a>
+      <a id="nfLive" href="/live-scores/">Live scores</a>
+      <a id="nfCustom" href="/custom-leagues/">Custom leagues</a>
+      <a id="nfAbout" href="/about/">About</a>
+      <a id="nfContact" href="/contact/">Contact</a>
     </nav>
   </main>
+
+  <!-- Translate the page for /am/... and /fr/... URLs. It runs during parsing,
+       so the page never shows in English first. data-cfasync="false" keeps
+       Cloudflare Rocket Loader from delaying it. -->
+  <script data-cfasync="false">
+    (function () {
+      var lang = location.pathname.split('/')[1];
+      var T = {
+        fr: {
+          title: "Page introuvable | UEFA Results",
+          nfTitle: "Page introuvable",
+          nfText: "La page que vous recherchez n'existe pas ou a été déplacée.",
+          nfHome: "Aller sur UEFA Results →",
+          nfLive: "Scores en direct",
+          nfCustom: "Ligues personnalisées",
+          nfAbout: "À propos",
+          nfContact: "Contact"
+        },
+        am: {
+          title: "Էջը չի գտնվել | UEFA Results",
+          nfTitle: "Էջը չի գտնվել",
+          nfText: "Ձեր փնտրած էջը գոյություն չունի կամ տեղափոխվել է։",
+          nfHome: "Անցնել UEFA Results →",
+          nfLive: "Ուղիղ հաշիվներ",
+          nfCustom: "Անհատական լիգաներ",
+          nfAbout: "Մեր մասին",
+          nfContact: "Կապ"
+        }
+      };
+      var t = T[lang];
+      if (!t) return;
+
+      document.documentElement.lang = lang === 'am' ? 'hy' : lang;
+      document.title = t.title;
+      for (var id in t) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = t[id];
+      }
+
+      var hrefs = {
+        nfHome: '', nfLive: '/live-scores/', nfCustom: '/custom-leagues/',
+        nfAbout: '/about/', nfContact: '/contact/'
+      };
+      for (var linkId in hrefs) {
+        var link = document.getElementById(linkId);
+        if (link) link.setAttribute('href', '/' + lang + hrefs[linkId]);
+      }
+    })();
+  </script>
 </body>
 
 </html>
