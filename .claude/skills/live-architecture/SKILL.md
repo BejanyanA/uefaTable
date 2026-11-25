@@ -96,6 +96,7 @@ routes_endpoints/live/
   service.js         What to fetch, cache times, budget guard, correcting old copies
   arrange.js         Pure: which matches, which groups, which order, when to ask again
   day.js             Pure: the viewer's day from a date and a time zone
+  details.js         Pure: the match details answer, player marks, its fresh times
   model.js           Our shapes: builders and checks for match, team, event, competition
   competitions.js    The competitions we feature: our keys, names, order
   cache.js           Stored copies in D1, one refresher at a time
@@ -120,6 +121,8 @@ export async function getLiveMatches(env) { /* every match in play, with goals a
 export async function getMatchesByIds(env, { ids }) { /* the current state of a few matches */ }
 export const MAX_IDS_PER_CALL = 20;
 // each resolves to { matches, competitions, quota: { limitPerDay, remainingToday } | null }
+export async function getMatchDetails(env, { id }) { /* one match: events, line-ups, statistics */ }
+// resolves to { found: { match, competition, details } | null, quota }
 ```
 
 Keep that list short. Add a function only when a screen needs it.
@@ -184,9 +187,11 @@ New Live web code goes in its own folder, in layers that only look downward:
 public/js/live/
   api.js       The only file that knows Live addresses. Returns our model
   store.js     State, refresh timer, comparing old and new. No DOM
+  matchStore.js  The same for one match's details. No DOM
   format.js    Small pure helpers: local time, phase -> text key, score text
   settings.js  The visitor's settings on this device (time zone); no drawing
-  views/       DOM only: dayView.js, later standingsTable.js, picker.js ...
+  views/       DOM only: dayView.js, matchView.js, dom.js (shared helpers),
+               later standingsTable.js, picker.js ...
   headerTabs.js  DOM only: the tabs at the top of the screen, Back and menu buttons
   views/liveMenu.js  DOM only: the phone menu and the time zone sheet
 ```

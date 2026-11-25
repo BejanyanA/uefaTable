@@ -941,3 +941,34 @@
   }
 
 }
+
+/* ---------------------------------------------------------------- opening a match */
+
+/* A whole match block opens its details: lighter under the pointer, and
+   while pressed, as an iOS cell does. */
+.lv .lv-match {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .lv .lv-match:hover {
+    background: #2c2c2e;
+  }
+}
+
+.lv .lv-match:active {
+  background: #3a3a3c;
+}
+
+.lv .lv-match:focus-visible {
+  outline: 2px solid var(--lv-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lv .lv-match {
+    transition: none;
+  }
+}

@@ -76,7 +76,22 @@ export function makeSide({ team, score = null, penalties = null, winner = null }
   };
 }
 
-export function makeEvent({ type, side, minute = null, addedTime = null, player = null, detail = null }) {
+// What a VAR check decided (`detail` of a `var` event).
+export const VAR_DECISION = Object.freeze({
+  GOAL_CANCELLED: "goal_cancelled",
+  GOAL_CONFIRMED: "goal_confirmed",
+  PENALTY_CONFIRMED: "penalty_confirmed",
+  PENALTY_CANCELLED: "penalty_cancelled",
+  CARD_UPGRADED: "card_upgraded",
+});
+
+// `player` is who the event is about; for a substitution, the player coming
+// on, with `playerOff` the one going off. `assist` is the passer of a goal.
+// The ids link an event to a player in the line-ups.
+export function makeEvent({
+  type, side, minute = null, addedTime = null, player = null, detail = null,
+  playerId = null, assist = null, playerOff = null, playerOffId = null,
+}) {
   return {
     type,
     side,
@@ -84,8 +99,65 @@ export function makeEvent({ type, side, minute = null, addedTime = null, player 
     addedTime: Number.isInteger(addedTime) ? addedTime : null,
     player: player || null,
     detail: detail || null,
+    playerId: playerId || null,
+    assist: assist || null,
+    playerOff: playerOff || null,
+    playerOffId: playerOffId || null,
   };
 }
+
+// An event as lists carry it: the fields documented for lists, nothing more.
+export function listEvent(e) {
+  return { type: e.type, side: e.side, minute: e.minute, addedTime: e.addedTime, player: e.player, detail: e.detail };
+}
+
+export const POSITION = Object.freeze({
+  GOALKEEPER: "goalkeeper",
+  DEFENDER: "defender",
+  MIDFIELDER: "midfielder",
+  FORWARD: "forward",
+});
+
+// One player in a line-up. `grid` places a starter on the pitch: `row` 1 is
+// the goalkeeper's line, counting forward; `col` 1 is at the team's left.
+export function makeLineupPlayer({ id = null, name, number = null, position = null, grid = null }) {
+  return {
+    id: id || null,
+    name: String(name ?? ""),
+    number: Number.isInteger(number) ? number : null,
+    position: Object.values(POSITION).includes(position) ? position : null,
+    grid: grid && Number.isInteger(grid.row) && Number.isInteger(grid.col) ? { row: grid.row, col: grid.col } : null,
+  };
+}
+
+export function makeLineup({ formation = null, coach = null, starters = [], substitutes = [] }) {
+  return { formation: formation || null, coach: coach || null, starters, substitutes };
+}
+
+// How a statistic's numbers read.
+export const STAT_FORMAT = Object.freeze({ COUNT: "count", PERCENT: "percent", DECIMAL: "decimal" });
+
+// Team statistics in the order clients show them, and how each reads.
+export const STATS = Object.freeze([
+  ["possession", STAT_FORMAT.PERCENT],
+  ["expected_goals", STAT_FORMAT.DECIMAL],
+  ["shots", STAT_FORMAT.COUNT],
+  ["shots_on_target", STAT_FORMAT.COUNT],
+  ["shots_off_target", STAT_FORMAT.COUNT],
+  ["shots_blocked", STAT_FORMAT.COUNT],
+  ["shots_inside_box", STAT_FORMAT.COUNT],
+  ["shots_outside_box", STAT_FORMAT.COUNT],
+  ["corners", STAT_FORMAT.COUNT],
+  ["offsides", STAT_FORMAT.COUNT],
+  ["fouls", STAT_FORMAT.COUNT],
+  ["free_kicks", STAT_FORMAT.COUNT],
+  ["saves", STAT_FORMAT.COUNT],
+  ["passes", STAT_FORMAT.COUNT],
+  ["passes_accurate", STAT_FORMAT.COUNT],
+  ["pass_accuracy", STAT_FORMAT.PERCENT],
+  ["yellow_cards", STAT_FORMAT.COUNT],
+  ["red_cards", STAT_FORMAT.COUNT],
+]);
 
 export function makeMatch({
   id, competition, round = null, kickoff, phase, period = null,

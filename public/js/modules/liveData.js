@@ -61,22 +61,90 @@ export async function loadLeagueLogos() {
 // The day view: our own screen for the first tab. Loaded only when Live is
 // opened, so the home page does not carry it.
 let dayViewModule = null;
+let matchViewModule = null;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const MATCH_RE = /^[A-Za-z0-9_-]{1,40}$/;
 
-async function showDayView(date) {
+// The match open on top of the day view, from the address (?match=).
+let openMatch = null; // { id, date, fromList }
+// Where the day's list was scrolled to when a match was opened from it.
+let listScrollY = 0;
+
+function liveAddress({ date = null, match = null } = {}) {
+   const params = new URLSearchParams();
+   if (date) params.set("date", date);
+   if (match) params.set("match", match);
+   const query = params.toString();
+   return query ? `live?${query}` : "live";
+}
+
+async function showDayView(date, matchId = null) {
    const container = document.getElementById("leaguesWidgetContainer");
    if (!container) return;
    dayViewModule = dayViewModule || await import("../live/views/dayView.js");
    // The visitor may have moved to another tab while the module loaded.
    if (currentTab !== "allGames") return;
+   const day = DATE_RE.test(date || "") ? date : null;
    dayViewModule.showDay(container, {
-      date: DATE_RE.test(date || "") ? date : null,
+      date: day,
       // The chosen day goes into the address, so Back and shared links work.
-      onPickDate: (day) => navigateTo(day ? `live?date=${day}` : "live"),
+      onPickDate: (pick) => navigateTo(liveAddress({ date: pick })),
+      // So does an opened match; Back closes it again.
+      onOpenMatch: (id, onDate) => {
+         listScrollY = currentScrollY();
+         openMatch = { id, date: onDate, fromList: true };
+         navigateTo(liveAddress({ date: onDate, match: id }));
+      },
    });
+   await showMatchView(container, MATCH_RE.test(matchId || "") ? matchId : null, day);
 }
 
+async function showMatchView(container, matchId, date) {
+   if (!matchId) {
+      const wasOpen = Boolean(matchViewModule && matchViewModule.isMatchOpen());
+      if (matchViewModule) matchViewModule.hideMatch();
+      // Back on the day's list where it was left.
+      if (wasOpen && openMatch && openMatch.fromList) {
+         const y = listScrollY;
+         requestAnimationFrame(() => scrollToY(y));
+      }
+      openMatch = null;
+      return;
+   }
+   // Opened straight from an address (a shared link, a reload).
+   if (!openMatch || openMatch.id !== matchId) openMatch = { id: matchId, date, fromList: false };
+   matchViewModule = matchViewModule || await import("../live/views/matchView.js");
+   if (currentTab !== "allGames" || !openMatch || openMatch.id !== matchId) return;
+   matchViewModule.showMatch(container, { id: matchId });
+   scrollToY(0);
+}
+
+// Back from a match: to the list it was opened from, or to its day.
+function closeMatch() {
+   if (!openMatch) return;
+   if (openMatch.fromList) history.back();
+   else navigateTo(liveAddress({ date: openMatch.date }), { replace: true });
+}
+
+// While a match is open, the Live Back buttons (the page's own and the
+// arrow in the phone tab bar, which clicks it) close the match instead of
+// leaving Live. Escape does the same.
+document.addEventListener("click", (e) => {
+   if (!openMatch || !e.target.closest || !e.target.closest("#btnBackFromLive")) return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   closeMatch();
+}, true);
+document.addEventListener("keydown", (e) => {
+   if (e.key !== "Escape" || !openMatch || e.defaultPrevented) return;
+   // An open menu or sheet takes Escape first.
+   if (document.querySelector(".lv-menu, .lv-sheet")) return;
+   closeMatch();
+});
+
 function hideDayView() {
+   if (matchViewModule) matchViewModule.hideMatch();
+   openMatch = null;
    if (dayViewModule) dayViewModule.hideDay();
 }
 
@@ -143,7 +211,7 @@ function disableHeaderTabs() {
    if (headerTabs) headerTabs.setEnabled(false);
 }
 
-export async function openLiveData(tab = "allGames", { date = null } = {}) {
+export async function openLiveData(tab = "allGames", { date = null, match = null } = {}) {
    setLiveDataVisible(true);
    // The styles lay the page out a little differently for our own day view.
    const livePage = document.getElementById("liveDataPage");
@@ -158,7 +226,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
       document.querySelectorAll(".liveTabBtn").forEach((btn) => {
          btn.classList.toggle("active", btn.dataset.tab === tab);
       });
-      await showDayView(date);
+      await showDayView(date, match);
       return;
    }
 

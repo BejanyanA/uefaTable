@@ -121,3 +121,46 @@ export function updatedAgo(updatedAtIso, now) {
   if (!Number.isFinite(minutes) || minutes < 1) return { key: "live_updated_now" };
   return { key: "live_updated_min", n: minutes };
 }
+
+// When an event happened: "67'", "90+2'".
+export function eventMinute(event) {
+  if (!Number.isInteger(event.minute)) return "";
+  const added = Number.isInteger(event.addedTime) && event.addedTime > 0 ? `+${event.addedTime}` : "";
+  return `${event.minute}${added}'`;
+}
+
+// A statistic's value as text: "35%", "2.15", "406".
+export function statText(stat, which, lang) {
+  const value = stat[which];
+  if (!Number.isFinite(value)) return "-";
+  if (stat.format === "percent") return `${Math.round(value)}%`;
+  if (stat.format === "decimal") {
+    return new Intl.NumberFormat(localeFor(lang), { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+  }
+  return new Intl.NumberFormat(localeFor(lang)).format(value);
+}
+
+// Each side's share of a statistic, 0 to 1, for the bars. Both 0: no bars.
+export function statShares(stat) {
+  const home = Math.max(0, Number(stat.home) || 0);
+  const away = Math.max(0, Number(stat.away) || 0);
+  const total = home + away;
+  if (total === 0) return { home: 0, away: 0 };
+  return { home: home / total, away: away / total };
+}
+
+// Kick-off as a full date and time in the viewer's time zone:
+// "Thursday 26 November, 21:45". Built from dateParts, so browsers without
+// Armenian date names still answer in Armenian.
+export function kickoffDateTime(iso, lang, timeZone) {
+  return `${dateParts(localDate(iso, timeZone), lang).full}, ${kickoffTime(iso, lang, timeZone)}`;
+}
+
+// The viewer's calendar date of a moment ("2026-11-25").
+export function localDate(iso, timeZone) {
+  const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+  if (timeZone) options.timeZone = timeZone;
+  const parts = new Intl.DateTimeFormat("en-CA", options).formatToParts(new Date(iso));
+  const get = (type) => parts.find((p) => p.type === type)?.value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}

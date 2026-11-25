@@ -7,11 +7,12 @@
 // clients repeat every few seconds, and counting them would cost a database
 // write each. What protects the provider allowance instead is that every
 // input is checked against a short fixed list (dates within a set range,
-// real time zones), so no request can cause a provider call we did not plan.
+// real time zones, match ids we have listed), so no request can cause a
+// provider call we did not plan.
 
 import { jsonResponse } from "../../utils/helper.js";
 import { isValidDate, isValidTimeZone } from "./day.js";
-import { LiveError, getCompetitions, getDay, getLive } from "./service.js";
+import { LiveError, getCompetitions, getDay, getLive, getMatch } from "./service.js";
 
 const PREFIX = "/live/v1";
 
@@ -52,6 +53,10 @@ export async function handleLive(request, env, ctx) {
     }
 
     if (path === "/matches/live") return ok(await getLive(env, ctx, { now }));
+
+    // One match: /matches/{id}. Ids are opaque, but always short plain text.
+    const one = /^\/matches\/([A-Za-z0-9_-]{1,40})$/.exec(path);
+    if (one) return ok(await getMatch(env, ctx, { id: one[1], now }));
 
     return fail("not_found", 404);
   } catch (err) {

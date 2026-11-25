@@ -13,7 +13,7 @@ document alone.
 | `GET /live/v1/matches/live` | Built, on dev |
 | `GET /live/v1/competitions/{key}/standings` | Designed below, not built |
 | `GET /live/v1/competitions/{key}/matches` | Sketch |
-| `GET /live/v1/matches/{id}` | Sketch |
+| `GET /live/v1/matches/{id}` (match details) | Built, on dev |
 
 Nothing is on production yet. Once an endpoint is on production its section is
 a promise and changes only by adding.
@@ -71,7 +71,7 @@ Failure:
 | --- | --- | --- |
 | `bad_request` | 400 | A parameter is not valid (date, time zone) |
 | `out_of_range` | 400 | The date is outside the days we serve |
-| `not_found` | 404 | No such address |
+| `not_found` | 404 | No such address, or a match id we have never listed |
 | `method_not_allowed` | 405 | Only `GET` is accepted |
 | `unavailable` | 503 | We have no copy of this data and could not get one; ask again shortly |
 
@@ -256,6 +256,91 @@ How a client uses it: for each match in `ended` and `matches`, replace its own
 copy of the match with the same `id`. Ignore matches it is not showing. That
 is all; no ordering or state rules are needed on the client.
 
+### `GET /live/v1/matches/{id}` - match details
+
+One match with everything we know about it: all its events, the line-ups,
+team statistics, venue and referee. `{id}` is a match `id` from any list.
+Only matches that appeared in a list can be opened; any other id answers
+`not_found`.
+
+```json
+{
+  "success": true,
+  "data": {
+    "match": {
+      "id": "m_1635682", "competition": "champions-league", "round": "League Stage - 5",
+      "kickoff": "2026-11-25T20:00:00Z", "phase": "finished", "period": null, "minute": null, "addedTime": null,
+      "home": { "team": { "id": "t_79", "name": "Lille", "logo": "https://..." }, "score": 2, "penalties": null, "winner": true },
+      "away": { "team": { "id": "t_157", "name": "Bayern München", "logo": "https://..." }, "score": 1, "penalties": null, "winner": false },
+      "decidedBy": "regular",
+      "events": [
+        { "type": "goal", "side": "away", "minute": 15, "addedTime": null, "player": "Dayot Upamecano", "detail": null, "playerId": "p_1149", "assist": "Tom Bischof", "playerOff": null, "playerOffId": null },
+        { "type": "var", "side": "away", "minute": 48, "addedTime": null, "player": "Joshua Kimmich", "detail": "goal_cancelled", "playerId": "p_502", "assist": null, "playerOff": null, "playerOffId": null },
+        { "type": "substitution", "side": "away", "minute": 76, "addedTime": null, "player": "Jamal Musiala", "detail": null, "playerId": "p_181812", "assist": null, "playerOff": "Tom Bischof", "playerOffId": "p_325975" }
+      ]
+    },
+    "competition": { "key": "champions-league", "name": "Champions League", "kind": "cup", "country": null, "logo": "https://...", "featured": true, "hasStandings": true },
+    "venue": { "name": "Stade Pierre-Mauroy", "city": "Lille" },
+    "referee": "Marco Guida",
+    "halfTime": { "home": 0, "away": 1 },
+    "lineups": {
+      "home": {
+        "formation": "4-3-3",
+        "coach": "Davide Ancelotti",
+        "starters": [
+          { "id": "p_1337", "name": "B. Özer", "number": 1, "position": "goalkeeper", "grid": { "row": 1, "col": 1 }, "goals": 0, "ownGoals": 0, "card": null, "offAt": null, "onAt": null }
+        ],
+        "substitutes": [
+          { "id": "p_20600", "name": "R. Perraud", "number": 15, "position": "defender", "grid": null, "goals": 0, "ownGoals": 0, "card": null, "offAt": null, "onAt": 90 }
+        ]
+      },
+      "away": { }
+    },
+    "statistics": [
+      { "key": "possession", "format": "percent", "home": 35, "away": 65 },
+      { "key": "expected_goals", "format": "decimal", "home": 2.15, "away": 1.19 },
+      { "key": "shots", "format": "count", "home": 15, "away": 12 }
+    ]
+  },
+  "meta": { "updatedAt": "2026-11-25T23:03:14Z", "refreshAfterSeconds": null, "stale": false }
+}
+```
+
+- `match`: the shared match shape, with `competition` and **all** events in
+  the order they happened. While the match is on, score, minute and events
+  are as new as the live list (15 seconds); the rest is refreshed every two
+  minutes.
+- Events here carry more than in lists:
+  - `playerId` links the event to a player in `lineups`.
+  - `assist` (goals): who passed, or `null`.
+  - `substitution`: `player` comes on, `playerOff` goes off (`playerOffId`).
+  - `var`: `detail` is what the check decided, one of `goal_cancelled`,
+    `goal_confirmed`, `penalty_confirmed`, `penalty_cancelled`,
+    `card_upgraded`, or `null`.
+  - An `own_goal` has the `side` it counted for; its player is from the other
+    team.
+  - `player` may name a coach (cards) and have no `playerId`.
+- `venue`, `referee`: may be `null`.
+- `halfTime`: the score at half-time, `null` before it.
+- `lineups`: `null` until they are published (usually about an hour before
+  kick-off). `home` or `away` may be `null` on its own.
+  - `position`: `goalkeeper`, `defender`, `midfielder`, `forward`, or `null`.
+  - `grid` (starters only): `row` 1 is the goalkeeper's line, counting
+    forward; `col` counts across the line. `null` when unknown.
+  - What the player did, worked out from the events: `goals`, `ownGoals`,
+    `card` (`yellow`, `red` or `null`; a second yellow is `red`), `offAt` and
+    `onAt` (the minute they went off or came on, or `null`).
+- `statistics`: in display order, `[]` before the match starts. `format` says
+  how to show the numbers: `count`, `percent` (35 means 35%) or `decimal`.
+  `key` is one of `possession`, `expected_goals`, `shots`,
+  `shots_on_target`, `shots_off_target`, `shots_blocked`,
+  `shots_inside_box`, `shots_outside_box`, `corners`, `offsides`, `fouls`,
+  `free_kicks`, `saves`, `passes`, `passes_accurate`, `pass_accuracy`,
+  `yellow_cards`, `red_cards`. A client skips a key it does not know.
+- `meta.refreshAfterSeconds`: 15 while the match is on or about to start,
+  120 in the hour and a half before kick-off (line-ups), 1800 further ahead,
+  `null` once it is over.
+
 ### `GET /live/v1/competitions/{key}/standings` (not built)
 
 Query: `season` (optional). Without it, the current season. A season is named
@@ -300,12 +385,14 @@ by the year it starts in (`2026` for 2026/27).
 
 - `GET /live/v1/competitions/{key}/matches?season=` - fixtures and results of
   one competition, grouped by round.
-- `GET /live/v1/matches/{id}` - one match with all its events.
 - Follows and alerts, signed-in only. What a user follows is stored by the API
   so the website and the apps agree.
 
 ## Change log
 
+- 2026-11-26: `GET /live/v1/matches/{id}` (match details) built on dev.
+  Events gained the optional fields `playerId`, `assist`, `playerOff` and
+  `playerOffId` (details only; lists keep their six fields).
 - 2026-11-26: today's list also holds matches still running from before
   midnight.
 

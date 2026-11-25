@@ -569,7 +569,7 @@ const routes = {
         id: "liveDataPage",
         onEnter: ({ query } = {}) => {
             sessionStorage.setItem("actionForLive", "openLive");
-            openLiveData("allGames", { date: query ? query.get("date") : null });
+            openLiveData("allGames", { date: query ? query.get("date") : null, match: query ? query.get("match") : null });
         },
         onLeave: () => {
             sessionStorage.removeItem("actionForLive");

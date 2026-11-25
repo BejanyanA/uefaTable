@@ -23,6 +23,16 @@ export async function read(env, key) {
   }
 }
 
+// True if a stored day or the live list holds this match id. Asked only
+// before the first fetch of a match's details, so nobody can make us call the
+// provider for ids we never listed. The search runs inside the database.
+export async function listsMatch(env, id) {
+  const row = await env.core_data
+    .prepare(`SELECT 1 AS found FROM live_cache WHERE (key LIKE 'date:%' OR key = 'live') AND instr(body, ?) > 0 LIMIT 1`)
+    .bind(`"id":${JSON.stringify(String(id))}`).first();
+  return Boolean(row);
+}
+
 // True if this request may refresh the key now.
 export async function claim(env, key, now) {
   const until = now + CLAIM_MS;

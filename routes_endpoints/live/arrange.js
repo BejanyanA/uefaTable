@@ -5,7 +5,7 @@
 // live here, once. Pure functions: no fetch, no database, the time is passed in.
 
 import { featuredIndex } from "./competitions.js";
-import { isInPlay, isOver, LIST_EVENTS, PHASE } from "./model.js";
+import { isInPlay, isOver, LIST_EVENTS, listEvent, PHASE } from "./model.js";
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -60,7 +60,7 @@ export function mayBeInPlay(match, now) {
 // match details endpoint.
 export function forList(match) {
   if (!Array.isArray(match.events)) return match;
-  return { ...match, events: match.events.filter((e) => LIST_EVENTS.has(e.type)) };
+  return { ...match, events: match.events.filter((e) => LIST_EVENTS.has(e.type)).map(listEvent) };
 }
 
 // One shared collator: making one per comparison is slow.

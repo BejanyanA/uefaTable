@@ -36,3 +36,8 @@ export function fetchDay({ date = null, tz }) {
 export function fetchLive() {
   return get("/live/v1/matches/live");
 }
+
+// One match with all its events, line-ups and statistics.
+export function fetchMatch(id) {
+  return get(`/live/v1/matches/${encodeURIComponent(id)}`);
+}

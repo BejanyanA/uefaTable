@@ -9,7 +9,7 @@ or approve it. Every step is first done on dev
 (https://dev.uefatable.pages.dev); production steps are listed separately and
 each needs your yes.
 
-**Last updated:** 2026-11-25
+**Last updated:** 2026-11-26
 
 ## Where we are
 
@@ -19,7 +19,7 @@ each needs your yes.
 | 1 | Day view: the opening screen (current day, switch days, live and finished matches) | **On dev, waiting for you** |
 | 2 | Standings tab | Not started |
 | 3 | Matches tab (fixtures and results per league) | Not started |
-| 4 | Match details (goals, cards, line-ups) | Not started |
+| 4 | Match details (goals, cards, line-ups) | **On dev, waiting for you** |
 | 5 | Remove the widgets, new key | Not started |
 | 6 | Follows and in-site alerts | Not started, optional |
 | 7 | Phone and browser push | Not started, optional |
@@ -124,6 +124,11 @@ live, so nothing is missing for visitors in between.
 - **The Live block has no outline.** (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
+- **Match details** (2026-11-26): a match opens in place of the day's list,
+  with Summary / Line-ups / Statistics in the row under the header. The score
+  card is first; line-ups are drawn on a pitch (standing up on phones, lying
+  down on wide screens) with substitutes and coaches under it; statistics
+  have a bar for each team, the side ahead brighter.
 - The viewer's day is worked out on the server from their date and time zone;
   data is fetched once per calendar date for everyone.
 - The server sends ready-to-show data; clients only draw.
@@ -258,11 +263,20 @@ and after. This stage also laid the groundwork every later stage reuses.
 
 ## Stage 4: Match details
 
-- [ ] `GET /live/v1/matches/{id}`: goals, cards, substitutions
-- [ ] Line-ups and statistics, if the request budget allows (a new line in
-      the budget first)
-- [ ] Match pop-up or page view
-- [ ] Checks and release as in stage 1
+- [x] `GET /live/v1/matches/{id}`: all events (goals with assists, cards,
+      substitutions, VAR), venue, referee, half-time score; only for match
+      ids we have listed
+- [x] Line-ups (formation, coach, pitch places, what each player did) and
+      team statistics; budget line added (about 1,200 a day at its ceiling)
+- [x] Screen: tapping a match opens its details in place of the list, with
+      Summary / Line-ups / Statistics at the top; the address holds the match
+      (`live?match=...`), Back (and Escape) returns to the list where it was
+      left
+- [x] Checked at 320, 390, 768, 1024 and 1440 px, in English, French and
+      Armenian, for a finished, a live and a not-started match
+- [ ] **Owner:** try it on a real iPhone and Android phone
+- [ ] Release with the rest of Live (the owner keeps everything on dev until
+      all of Live is done)
 
 ## Stage 5: remove the widgets, new key
 
@@ -361,3 +375,4 @@ and after. This stage also laid the groundwork every later stage reuses.
 - 2026-11-25: the sticky bar is gone again. Tabs go into the site header
   when scrolled, day switcher and filters stay fixed, Back as before, no
   outline (owner).
+- 2026-11-26: stage 4, match details, built on dev (API and website).

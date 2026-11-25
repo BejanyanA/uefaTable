@@ -1,0 +1,1080 @@
+[
+ {
+  "fixture": {
+   "id": 1635682,
+   "referee": "Marco Guida",
+   "timezone": "UTC",
+   "date": "2026-11-25T20:00:00+00:00",
+   "timestamp": 1795636800,
+   "periods": {
+    "first": null,
+    "second": null
+   },
+   "venue": {
+    "id": 22783,
+    "name": "Stade Pierre-Mauroy",
+    "city": "Lille"
+   },
+   "status": {
+    "long": "Match Finished",
+    "short": "FT",
+    "elapsed": 90,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 2,
+   "name": "UEFA Champions League",
+   "country": "World",
+   "logo": "https://media.api-sports.io/football/leagues/2.png",
+   "flag": null,
+   "season": 2026,
+   "round": "League Stage - 5",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 79,
+    "name": "Lille",
+    "logo": "https://media.api-sports.io/football/teams/79.png",
+    "winner": true
+   },
+   "away": {
+    "id": 157,
+    "name": "Bayern München",
+    "logo": "https://media.api-sports.io/football/teams/157.png",
+    "winner": false
+   }
+  },
+  "goals": {
+   "home": 2,
+   "away": 1
+  },
+  "score": {
+   "halftime": {
+    "home": 0,
+    "away": 1
+   },
+   "fulltime": {
+    "home": 2,
+    "away": 1
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  },
+  "events": [
+   {
+    "time": {
+     "elapsed": 15,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 1149,
+     "name": "Dayot Upamecano"
+    },
+    "assist": {
+     "id": 325975,
+     "name": "Tom Bischof"
+    },
+    "type": "Goal",
+    "detail": "Normal Goal",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 48,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 502,
+     "name": "Joshua Kimmich"
+    },
+    "assist": {
+     "id": null,
+     "name": null
+    },
+    "type": "Var",
+    "detail": "Goal cancelled",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 53,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 1157,
+     "name": "Konrad Laimer"
+    },
+    "assist": {
+     "id": null,
+     "name": null
+    },
+    "type": "Card",
+    "detail": "Yellow Card",
+    "comments": "Foul"
+   },
+   {
+    "time": {
+     "elapsed": 59,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": null,
+     "name": "Davide Ancelotti"
+    },
+    "assist": {
+     "id": null,
+     "name": null
+    },
+    "type": "Card",
+    "detail": "Yellow Card",
+    "comments": "Dissent"
+   },
+   {
+    "time": {
+     "elapsed": 62,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 72155,
+     "name": "Ayase Ueda"
+    },
+    "assist": {
+     "id": 312964,
+     "name": "Nathan Ngoy"
+    },
+    "type": "Goal",
+    "detail": "Normal Goal",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 65,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 328033,
+     "name": "Aleksandar Pavlović"
+    },
+    "assist": {
+     "id": null,
+     "name": null
+    },
+    "type": "Goal",
+    "detail": "Own Goal",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 76,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 325975,
+     "name": "Tom Bischof"
+    },
+    "assist": {
+     "id": 181812,
+     "name": "Jamal Musiala"
+    },
+    "type": "subst",
+    "detail": "Substitution 1",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 76,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 125171,
+     "name": "Josip Stanišić"
+    },
+    "assist": {
+     "id": 2489,
+     "name": "Luis Díaz"
+    },
+    "type": "subst",
+    "detail": "Substitution 2",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 76,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 32893,
+     "name": "Hiroki Ito"
+    },
+    "assist": {
+     "id": 478668,
+     "name": "Tim Binder"
+    },
+    "type": "subst",
+    "detail": "Substitution 3",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 77,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 386287,
+     "name": "Ethan Mbappe"
+    },
+    "assist": {
+     "id": 487381,
+     "name": "Soriba Diaoune"
+    },
+    "type": "subst",
+    "detail": "Substitution 1",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 77,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 72155,
+     "name": "Ayase Ueda"
+    },
+    "assist": {
+     "id": 360032,
+     "name": "Basar Onal"
+    },
+    "type": "subst",
+    "detail": "Substitution 2",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 81,
+     "extra": null
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 494131,
+     "name": "Lennart Karl"
+    },
+    "assist": {
+     "id": null,
+     "name": "Noah Codjo-Evora"
+    },
+    "type": "subst",
+    "detail": "Substitution 4",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 87,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 67889,
+     "name": "Hákon Arnar Haraldsson"
+    },
+    "assist": {
+     "id": 2295,
+     "name": "Olivier Giroud"
+    },
+    "type": "subst",
+    "detail": "Substitution 3",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 87,
+     "extra": null
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 2204,
+     "name": "Benjamin André"
+    },
+    "assist": {
+     "id": 486136,
+     "name": "Isaac Cossier"
+    },
+    "type": "subst",
+    "detail": "Substitution 4",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 90,
+     "extra": 2
+    },
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "player": {
+     "id": 2897,
+     "name": "Kim Min-Jae"
+    },
+    "assist": {
+     "id": 972,
+     "name": "Jonathan Tah"
+    },
+    "type": "subst",
+    "detail": "Substitution 5",
+    "comments": null
+   },
+   {
+    "time": {
+     "elapsed": 90,
+     "extra": 2
+    },
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "player": {
+     "id": 37151,
+     "name": "Calvin Verdonk"
+    },
+    "assist": {
+     "id": 20600,
+     "name": "Romain Perraud"
+    },
+    "type": "subst",
+    "detail": "Substitution 5",
+    "comments": null
+   }
+  ],
+  "lineups": [
+   {
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png",
+     "colors": null
+    },
+    "formation": "4-3-3",
+    "coach": {
+     "id": 0,
+     "name": "Davide Ancelotti",
+     "photo": null
+    },
+    "startXI": [
+     {
+      "player": {
+       "id": 1337,
+       "name": "B. Özer",
+       "number": 1,
+       "pos": "G",
+       "grid": "1:1"
+      }
+     },
+     {
+      "player": {
+       "id": 490745,
+       "name": "M. Goffi",
+       "number": 38,
+       "pos": "D",
+       "grid": "2:4"
+      }
+     },
+     {
+      "player": {
+       "id": 312964,
+       "name": "N. Ngoy",
+       "number": 3,
+       "pos": "D",
+       "grid": "2:3"
+      }
+     },
+     {
+      "player": {
+       "id": 142691,
+       "name": "Alexsandro Ribeiro",
+       "number": 4,
+       "pos": "D",
+       "grid": "2:2"
+      }
+     },
+     {
+      "player": {
+       "id": 37151,
+       "name": "C. Verdonk",
+       "number": 24,
+       "pos": "D",
+       "grid": "2:1"
+      }
+     },
+     {
+      "player": {
+       "id": 375598,
+       "name": "N. Mukau",
+       "number": 17,
+       "pos": "M",
+       "grid": "3:3"
+      }
+     },
+     {
+      "player": {
+       "id": 409,
+       "name": "N. Bentaleb",
+       "number": 6,
+       "pos": "M",
+       "grid": "3:2"
+      }
+     },
+     {
+      "player": {
+       "id": 2204,
+       "name": "B. André",
+       "number": 21,
+       "pos": "M",
+       "grid": "3:1"
+      }
+     },
+     {
+      "player": {
+       "id": 386287,
+       "name": "E. Mbappé",
+       "number": 8,
+       "pos": "F",
+       "grid": "4:3"
+      }
+     },
+     {
+      "player": {
+       "id": 72155,
+       "name": "A. Ueda",
+       "number": 18,
+       "pos": "F",
+       "grid": "4:2"
+      }
+     },
+     {
+      "player": {
+       "id": 67889,
+       "name": "H. Haraldsson",
+       "number": 10,
+       "pos": "F",
+       "grid": "4:1"
+      }
+     }
+    ],
+    "substitutes": [
+     {
+      "player": {
+       "id": 20732,
+       "name": "G. Perrin",
+       "number": 28,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 20600,
+       "name": "R. Perraud",
+       "number": 15,
+       "pos": "D",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": null,
+       "name": "Thomas Sajous",
+       "number": 50,
+       "pos": "G",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 394211,
+       "name": "L. Srdanovic",
+       "number": 2,
+       "pos": "D",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 99576,
+       "name": "O. Sahraoui",
+       "number": 11,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 129695,
+       "name": "D. Bakwa",
+       "number": 7,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 486136,
+       "name": "I. Cossier",
+       "number": 26,
+       "pos": "D",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 487381,
+       "name": "S. Diaoune",
+       "number": 35,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 70852,
+       "name": "O. Gill",
+       "number": 12,
+       "pos": "G",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 2295,
+       "name": "O. Giroud",
+       "number": 9,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 115587,
+       "name": "M. Kjærgaard",
+       "number": 14,
+       "pos": "M",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 360032,
+       "name": "B. Önal",
+       "number": 19,
+       "pos": "F",
+       "grid": null
+      }
+     }
+    ]
+   },
+   {
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png",
+     "colors": null
+    },
+    "formation": "4-2-3-1",
+    "coach": {
+     "id": 12590,
+     "name": "V. Kompany",
+     "photo": "https://media.api-sports.io/football/coachs/12590.png"
+    },
+    "startXI": [
+     {
+      "player": {
+       "id": 203376,
+       "name": "J. Urbig",
+       "number": 40,
+       "pos": "G",
+       "grid": "1:1"
+      }
+     },
+     {
+      "player": {
+       "id": 125171,
+       "name": "J. Stanišić",
+       "number": 44,
+       "pos": "D",
+       "grid": "2:4"
+      }
+     },
+     {
+      "player": {
+       "id": 1149,
+       "name": "D. Upamecano",
+       "number": 2,
+       "pos": "D",
+       "grid": "2:3"
+      }
+     },
+     {
+      "player": {
+       "id": 2897,
+       "name": "Kim Min-Jae",
+       "number": 3,
+       "pos": "D",
+       "grid": "2:2"
+      }
+     },
+     {
+      "player": {
+       "id": 32893,
+       "name": "H. Ito",
+       "number": 21,
+       "pos": "D",
+       "grid": "2:1"
+      }
+     },
+     {
+      "player": {
+       "id": 502,
+       "name": "J. Kimmich",
+       "number": 6,
+       "pos": "M",
+       "grid": "3:2"
+      }
+     },
+     {
+      "player": {
+       "id": 325975,
+       "name": "T. Bischof",
+       "number": 8,
+       "pos": "M",
+       "grid": "3:1"
+      }
+     },
+     {
+      "player": {
+       "id": 494131,
+       "name": "L. Karl",
+       "number": 42,
+       "pos": "M",
+       "grid": "4:3"
+      }
+     },
+     {
+      "player": {
+       "id": 328033,
+       "name": "A. Pavlović",
+       "number": 45,
+       "pos": "M",
+       "grid": "4:2"
+      }
+     },
+     {
+      "player": {
+       "id": 280074,
+       "name": "N. Brown",
+       "number": 11,
+       "pos": "M",
+       "grid": "4:1"
+      }
+     },
+     {
+      "player": {
+       "id": 1157,
+       "name": "K. Laimer",
+       "number": 27,
+       "pos": "F",
+       "grid": "5:1"
+      }
+     }
+    ],
+    "substitutes": [
+     {
+      "player": {
+       "id": 498,
+       "name": "S. Ulreich",
+       "number": 26,
+       "pos": "G",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 630895,
+       "name": "Bara Ndiaye",
+       "number": 39,
+       "pos": "M",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 670466,
+       "name": "D. Podar-Stiube",
+       "number": 38,
+       "pos": "G",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 181812,
+       "name": "J. Musiala",
+       "number": 10,
+       "pos": "M",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 2489,
+       "name": "L. Díaz",
+       "number": 14,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": null,
+       "name": "Noah Codjo-Evora",
+       "number": 36,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 2195,
+       "name": "S. Boey",
+       "number": 23,
+       "pos": "D",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 478668,
+       "name": "T. Binder",
+       "number": 46,
+       "pos": "F",
+       "grid": null
+      }
+     },
+     {
+      "player": {
+       "id": 972,
+       "name": "J. Tah",
+       "number": 4,
+       "pos": "D",
+       "grid": null
+      }
+     }
+    ]
+   }
+  ],
+  "statistics": [
+   {
+    "team": {
+     "id": 79,
+     "name": "Lille",
+     "logo": "https://media.api-sports.io/football/teams/79.png"
+    },
+    "statistics": [
+     {
+      "type": "Passes accurate",
+      "value": 329
+     },
+     {
+      "type": "Shots insidebox",
+      "value": 12
+     },
+     {
+      "type": "Shots outsidebox",
+      "value": 3
+     },
+     {
+      "type": "Blocked Shots",
+      "value": 6
+     },
+     {
+      "type": "Free Kicks",
+      "value": 10
+     },
+     {
+      "type": "Shots on Goal",
+      "value": 3
+     },
+     {
+      "type": "Goalkeeper Saves",
+      "value": 7
+     },
+     {
+      "type": "Shots off Goal",
+      "value": 6
+     },
+     {
+      "type": "Total passes",
+      "value": 406
+     },
+     {
+      "type": "Total Shots",
+      "value": 15
+     },
+     {
+      "type": "Corner Kicks",
+      "value": 3
+     },
+     {
+      "type": "Offsides",
+      "value": 0
+     },
+     {
+      "type": "Yellow Cards",
+      "value": 0
+     },
+     {
+      "type": "Fouls",
+      "value": 2
+     },
+     {
+      "type": "Red Cards",
+      "value": 0
+     },
+     {
+      "type": "Ball Possession",
+      "value": "35%"
+     },
+     {
+      "type": "expected_goals",
+      "value": "2.15"
+     }
+    ]
+   },
+   {
+    "team": {
+     "id": 157,
+     "name": "Bayern München",
+     "logo": "https://media.api-sports.io/football/teams/157.png"
+    },
+    "statistics": [
+     {
+      "type": "Passes accurate",
+      "value": 681
+     },
+     {
+      "type": "Shots insidebox",
+      "value": 4
+     },
+     {
+      "type": "Shots outsidebox",
+      "value": 8
+     },
+     {
+      "type": "Blocked Shots",
+      "value": 3
+     },
+     {
+      "type": "Free Kicks",
+      "value": 2
+     },
+     {
+      "type": "Shots on Goal",
+      "value": 7
+     },
+     {
+      "type": "Goalkeeper Saves",
+      "value": 2
+     },
+     {
+      "type": "Shots off Goal",
+      "value": 2
+     },
+     {
+      "type": "Total passes",
+      "value": 754
+     },
+     {
+      "type": "Total Shots",
+      "value": 12
+     },
+     {
+      "type": "Corner Kicks",
+      "value": 4
+     },
+     {
+      "type": "Offsides",
+      "value": 4
+     },
+     {
+      "type": "Yellow Cards",
+      "value": 1
+     },
+     {
+      "type": "Fouls",
+      "value": 11
+     },
+     {
+      "type": "Red Cards",
+      "value": 0
+     },
+     {
+      "type": "Ball Possession",
+      "value": "65%"
+     },
+     {
+      "type": "expected_goals",
+      "value": "1.19"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "fixture": {
+   "id": 1636231,
+   "referee": "Morten Krogh",
+   "timezone": "UTC",
+   "date": "2026-11-26T17:45:00+00:00",
+   "timestamp": 1795715100,
+   "periods": {
+    "first": null,
+    "second": null
+   },
+   "venue": {
+    "id": 20423,
+    "name": "Batumi Arena",
+    "city": "Batumi"
+   },
+   "status": {
+    "long": "Not Started",
+    "short": "NS",
+    "elapsed": null,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 3,
+   "name": "UEFA Europa League",
+   "country": "World",
+   "logo": "https://media.api-sports.io/football/leagues/3.png",
+   "flag": null,
+   "season": 2026,
+   "round": "League Stage - 5",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 549,
+    "name": "Beşiktaş",
+    "logo": "https://media.api-sports.io/football/teams/549.png",
+    "winner": null
+   },
+   "away": {
+    "id": 563,
+    "name": "Hapoel Beer Sheva",
+    "logo": "https://media.api-sports.io/football/teams/563.png",
+    "winner": null
+   }
+  },
+  "goals": {
+   "home": null,
+   "away": null
+  },
+  "score": {
+   "halftime": {
+    "home": null,
+    "away": null
+   },
+   "fulltime": {
+    "home": null,
+    "away": null
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  },
+  "events": [],
+  "lineups": [],
+  "statistics": []
+ }
+]

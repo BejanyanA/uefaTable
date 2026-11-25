@@ -5,7 +5,7 @@
 // allowance: { matches, competitions, quota }.
 
 import { ProviderError, request } from "./client.js";
-import { fixtureRef, mapFixtures } from "./map.js";
+import { fixtureRef, mapFixtures, mapMatchDetails } from "./map.js";
 
 export { ProviderError };
 
@@ -35,3 +35,12 @@ export async function getMatchesByIds(env, { ids }) {
 }
 
 export const MAX_IDS_PER_CALL = IDS_PER_CALL;
+
+// One match with everything known about it: all events, line-ups, team
+// statistics, venue and referee. `null` when the provider has no such match.
+export async function getMatchDetails(env, { id }) {
+  const ref = fixtureRef(id);
+  if (!ref) return { found: null, quota: null };
+  const { items, quota } = await request(env, "/fixtures", { id: ref });
+  return { found: items.length > 0 ? mapMatchDetails(items[0]) : null, quota };
+}

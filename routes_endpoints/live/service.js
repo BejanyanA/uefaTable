@@ -12,6 +12,7 @@ import {
 } from "./arrange.js";
 import { FEATURED } from "./competitions.js";
 import { addDays, daysBetween, localDateOf, localDayWindow, utcDateOf, utcDatesOf } from "./day.js";
+import { detailsAnswer, detailsFreshFor, detailsRefreshSeconds } from "./details.js";
 import { isInPlay, isOver } from "./model.js";
 import { getProvider } from "./providers/index.js";
 
@@ -55,6 +56,7 @@ const LIVE_WHEN_STOPPED_MS = 60 * SECOND;
 const KEY_LIVE = "live";
 const KEY_QUOTA = "quota";
 const dateKey = (utcDate) => `date:${utcDate}`;
+const matchKey = (id) => `match:${id}`;
 
 export class LiveError extends Error {
   constructor(code, status) {
@@ -361,6 +363,58 @@ export async function getLive(env, ctx, { now }) {
       fetchedAt: fresh.fetchedAt,
       stale: fresh.stale,
       refreshAfterSeconds: matches.length > 0 ? LIVE_REFRESH_SECONDS : 60,
+    }),
+  };
+}
+
+// One match with all its events, line-ups and statistics. Fetched only when
+// someone opens that match, and stored for everyone (times in details.js).
+export async function getMatch(env, ctx, { id, now }) {
+  const key = matchKey(id);
+  // Only matches we have listed: an id we never showed costs no call.
+  if (!(await cache.read(env, key)) && !(await cache.listsMatch(env, id))) throw new LiveError("not_found", 404);
+
+  const quota = await readQuota(env, now);
+  const share = usedShare(quota);
+  const slow = share >= SLOW_AT ? 2 : 1;
+
+  const copy = await stored(env, ctx, {
+    key,
+    freshFor: (have) => detailsFreshFor(have?.found?.match || null, now) * (have?.found ? slow : 1),
+    wait: true,
+    now,
+    mayRefresh: share < STOP_AT,
+    fetcher: async () => {
+      const { found, quota: left } = await getProvider(env).getMatchDetails(env, { id });
+      await recordQuota(env, left, Date.now());
+      return { found };
+    },
+  });
+  const found = copy.value.found;
+  if (!found) throw new LiveError("not_found", 404);
+
+  // While it may be in play, the live list is newer than the stored details:
+  // score, minute and events every 15 seconds.
+  const parts = [copy];
+  let fresher = null;
+  if (mayBeInPlay(found.match, now)) {
+    try {
+      const live = await loadLive(env, ctx, now, quota);
+      fresher = live.value.matches.find((m) => m.id === id) || live.value.ended.find((e) => e.match.id === id)?.match || null;
+      if (fresher) parts.push(live);
+    } catch {
+      // The stored details are all there is.
+    }
+  }
+
+  const answer = detailsAnswer(found, fresher);
+  const oldParts = parts.filter((p) => p.stale);
+  return {
+    data: answer,
+    meta: meta({
+      fetchedAt: Math.min(...(oldParts.length > 0 ? oldParts : parts).map((p) => p.fetchedAt)),
+      stale: oldParts.length > 0,
+      refreshAfterSeconds: detailsRefreshSeconds(answer.match, now, LIVE_REFRESH_SECONDS),
     }),
   };
 }

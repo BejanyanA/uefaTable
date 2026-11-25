@@ -38,9 +38,17 @@ The All tab shows every match of the day.
 | Day view, other days | every match of one calendar date | finished days 24 h, coming days 60 min | about 180 (a week each way) |
 | Fixtures and results of a league | one league, whole season | 60 min | 552 (23 leagues) |
 | Standings | one league | 30 min | 576 (12 leagues) |
-| **Total** | | | **about 4,000, a little over half of the daily limit** |
+| Match details (events, line-ups, statistics) | one match, only when someone opens it | in play 2 min (score and events come from the live list meanwhile); 90 min before kick-off 5 min; further ahead 60 min; over 24 h | 1,200 (20 different matches followed through 2 hours each); a finished or future match costs about one call |
+| **Total** | | | **about 5,200, a little over two thirds of the daily limit** |
 
-Per minute this is at most about 6 calls against a limit of 300.
+Per minute this is at most about 16 calls against a limit of 300.
+
+Match details are the per-match kind of call, so three things hold them in:
+only a match id that appeared in one of our lists can be opened (anything
+else is refused without a call), one stored copy serves every visitor, and
+while a match is on only its line-ups and statistics need the provider (every
+2 minutes); score, minute and events come from the live list. The guard below
+doubles the 2 minutes past 70% and stops new calls past 90%.
 
 If football were in play around the clock, live scores alone would reach 5,760
 a day and the total about 7,350. That is why the guard below exists.

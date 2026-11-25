@@ -13,6 +13,7 @@ import {
 } from "../format.js";
 import { activeTimeZone, TIMEZONE_EVENT } from "../settings.js";
 import { createDayStore } from "../store.js";
+import { el, logo } from "./dom.js";
 
 const SKELETON_ROWS = 9;
 // Competitions the visitor closed, remembered on this device.
@@ -25,39 +26,19 @@ const t = (key, vars) => {
   return vars ? text.replace(/\{(\w+)\}/g, (_, name) => (name in vars ? vars[name] : "")) : text;
 };
 
-function el(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined && text !== null) node.textContent = text;
-  return node;
-}
-
-function logo(url, size, className) {
-  const img = document.createElement("img");
-  img.className = className;
-  img.width = size;
-  img.height = size;
-  img.alt = "";
-  img.loading = "lazy";
-  img.decoding = "async";
-  if (url) img.src = url;
-  // A missing logo keeps its box, so the row does not shift.
-  img.addEventListener("error", () => { img.removeAttribute("src"); img.classList.add("is-missing"); }, { once: true });
-  if (!url) img.classList.add("is-missing");
-  return img;
-}
-
 let view = null;
 
 // Show the day view inside `container`, for `date` ("2026-11-25") or today.
+// `onOpenMatch(id, date | null)` is called when the visitor opens a match.
 // `onPickDate(date | null)` is called when the visitor chooses another day;
 // the caller puts it in the address and calls showDay again.
-export function showDay(container, { date = null, onPickDate }) {
+export function showDay(container, { date = null, onPickDate, onOpenMatch }) {
   if (!view || view.container !== container || !container.contains(view.root)) {
     hideDay();
     view = createView(container, onPickDate);
   }
   view.onPickDate = onPickDate;
+  view.onOpenMatch = onOpenMatch;
   view.store.show(date);
 }
 
@@ -495,6 +476,18 @@ function drawRow(self, match) {
   scores.append(parts.homeScore, sep, parts.awayScore);
 
   node.append(when, teams, scores);
+  // The whole row opens the match. A row is a list item, not a link, so
+  // its columns keep their layout; keyboard users reach it with Tab.
+  node.tabIndex = 0;
+  node.setAttribute("role", "link");
+  const open = () => {
+    const data = self.store.state.data;
+    self.onOpenMatch?.(match.id, data && data.date !== data.today ? data.date : null);
+  };
+  node.addEventListener("click", open);
+  node.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+  });
   const row = { node, parts, last: {} };
   updateRow(row, match, false, null, self.tz);
   return row;
