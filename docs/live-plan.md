@@ -82,7 +82,8 @@ live, so nothing is missing for visitors in between.
 - **Days:** all fifteen (a week each way) in a strip that scrolls sideways;
   only today is named "Today", the others show their weekday. The selected
   day has light text and an underline, no outline; the others are a little
-  grey. (2026-11-26)
+  grey. While another day
+  is selected, "Today" is light green. (2026-11-26)
 - **Live has its own scroll position:** it always opens at its top, and the
   page you came from comes back where you left it. (2026-11-26)
 - **"Updated ... ago" shows only when the API says the data is old**, not
@@ -286,6 +287,7 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: "Today" in light green while another day is selected (owner).
 - 2026-11-26: football pitch picture for empty days; the header's language
   menu opens over the Back button (owner).
 - 2026-11-26: Live pressed by default (owner).
