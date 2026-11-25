@@ -116,9 +116,10 @@
   height: 2.75rem;
   padding: 0 0.625rem;
   border-radius: 999px;
-  /* Not pressed: the same outline and fill as the Back button next to it. */
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(0, 0, 0, 0.25);
+  /* Not pressed: the same grey fill as the Settings button at the other end
+     of the row, no outline (owner). Phones use the Back arrow's glass. */
+  border: 1px solid transparent;
+  background: rgba(118, 118, 128, 0.24);
   color: #fff;
   font-size: 0.8125rem;
   font-weight: 700;
@@ -582,7 +583,7 @@
   }
 
   .lv .lv-filter[aria-pressed="false"]:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(118, 118, 128, 0.32);
   }
 }
 

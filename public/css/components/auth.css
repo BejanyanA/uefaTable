@@ -1,7 +1,7 @@
 /* Buttons */
 /* Login and Sign Up look like the Live / Standings / Matches tab bar: one
-   dark track with a fine light outline, the buttons inside it; Sign Up is
-   blue like the selected tab. */
+   dark track with a fine light outline, the buttons inside it; Sign Up has
+   blue text (owner). */
 .auth-buttons {
    display: flex;
    gap: 2px;
@@ -31,18 +31,16 @@
 }
 
 .auth-buttons #registerBtn {
-   background: linear-gradient(135deg, #2d7cff, #1b56d6);
-   color: #fff;
+   color: #0a84ff;
 }
 
 @media (hover: hover) {
-   .auth-buttons #loginBtn:hover {
+   .auth-buttons button:hover {
       background: rgba(255, 255, 255, 0.08);
-      color: #fff;
    }
 
-   .auth-buttons #registerBtn:hover {
-      filter: brightness(1.1);
+   .auth-buttons #loginBtn:hover {
+      color: #fff;
    }
 }
 
