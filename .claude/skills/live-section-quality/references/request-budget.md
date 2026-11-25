@@ -80,3 +80,25 @@ The current key has been in the site's public code, so anyone can copy it and
 use up the limit. Once no page needs it in the browser, the owner should
 create a new key in the API-Sports dashboard and store it only as a Worker
 secret (dev and production). Remind them; only they can do it.
+
+## Notifications (goals, kick-off, full-time)
+
+API-Sports does not send anything to us: no webhooks or push were found, we
+always ask. (Its documentation site blocks automated reading, so this rests on
+third-party descriptions of the API and on how the API behaves; re-check in a
+browser if it matters.)
+
+Checked on 2026-11-25 with a real call: the one live-scores call already
+carries each match's events (goals, cards, substitutions, with minute, player
+and team). So alerts need no extra requests: the Worker compares each new live
+answer with the previous one and treats the difference as the event.
+
+- **While the site is open:** signed-in users already have a notification
+  stream (`routes_endpoints/NotificationHub.js`, the bell in
+  `public/js/modules/NotificationManager.js`). Match alerts can travel on it.
+- **While the site is closed (phone or browser push):** not built. It needs a
+  service worker, the visitor's permission, stored subscriptions, and a
+  scheduled job in the Worker that asks for live scores even when nobody is on
+  the site. That job's calls are already inside the live-scores ceiling above.
+- Alerts only make sense for things a user chose to follow (a team, a match, a
+  league). Never notify everyone about everything.
