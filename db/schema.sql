@@ -215,3 +215,18 @@ CREATE INDEX idx_user_teams_league_user ON user_teams(league_instance_id, user_i
 CREATE INDEX idx_user_teams_team ON user_teams(team_id);
 
 CREATE UNIQUE INDEX ux_final_single ON league_knockouts(league_id, round, match_order) WHERE round = 'final';
+
+-- Added by db/migrations/001_add_missing_indexes.sql
+CREATE INDEX idx_league_instances_league_id ON league_instances(league_id);
+
+CREATE INDEX idx_rk_team1_user ON round_knockouts(team1_user_id);
+
+CREATE INDEX idx_rk_team2_user ON round_knockouts(team2_user_id);
+
+CREATE INDEX idx_users_username_lower ON users(LOWER(username));
+
+CREATE INDEX idx_users_email_lower ON users(LOWER(email));
+
+CREATE INDEX idx_messages_conversation_created ON messages(conversation_id, created_at, id);
+
+CREATE INDEX idx_messages_conversation_unread ON messages(conversation_id, is_read, sender_id);

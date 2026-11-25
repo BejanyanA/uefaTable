@@ -36,7 +36,7 @@ How it fits together:
 
 - **Site:** Cloudflare Pages builds every branch. `main` goes to production, `dev` goes to the dev address. The site picks its API from the address it is opened on (`public/js/services/config.js`), so the same code works in both places. Analytics only load on production.
 - **API:** the dev Worker has its own database, its own chat/notification storage and its own login secret. A login from one environment does not work in the other.
-- **Database structure:** `db/schema.sql` holds the tables and indexes (no data). Update it when the structure changes.
+- **Database structure:** `db/schema.sql` holds the tables and indexes (no data). Each change also goes in `db/migrations/` as a numbered file that says where it has been applied; run it on dev first, then on production.
 
 Day-to-day:
 
