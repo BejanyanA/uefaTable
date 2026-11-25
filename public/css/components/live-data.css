@@ -990,7 +990,10 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     height: 44px;
     padding: 4px 8px;
     box-sizing: border-box;
-    background: #000;
+    /* Frosted like the site header above it. */
+    background: rgba(0, 0, 0, 0.329);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     grid-template-columns: 1fr minmax(0, auto) 1fr;
     gap: 6px;
   }

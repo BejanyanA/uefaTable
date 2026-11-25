@@ -93,6 +93,13 @@ Shapes and sizes:
   saturate(180%)`) over a light dimming of the page, a grabber at the top,
   and they close with a swipe down as well as a button. Use a plain word on
   that button ("Close"), short enough for every language.
+- **Bars that stay at the top are frosted like the site header**
+  (`rgba(0, 0, 0, 0.329)` with `blur(6px)`), never solid black. The header
+  draws its own blur on `header::before`, so frosted things inside it (the
+  phone tab bar) can blur the page too; keep it that way.
+- **Sticky bars must not sit inside a container-query element.** Safari can
+  stop them from sticking. On Live the top row and the list are each their
+  own `lv` container instead of the whole view.
 - **Menus and popovers go on the page, not inside the header.** A blur
   inside an element that already has a blur (the site header) only sees that
   element, so the menu looks flat. Append floating panels to `document.body`

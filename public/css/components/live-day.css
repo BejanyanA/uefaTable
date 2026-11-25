@@ -25,8 +25,6 @@
   /* Corner radius of a match block: the site's radius. */
   --lv-row-radius: var(--lv-radius);
 
-  container-type: inline-size;
-  container-name: lv;
   color: var(--lv-text);
   font-size: 1rem;
   line-height: 1.25;
@@ -77,6 +75,16 @@
 
 /* One row that stays in view while the list scrolls: Live and All first,
    then the days. */
+/* The top row and the list each measure their own width for the
+   "@container lv" rules. The whole view is not one container on purpose:
+   Safari can stop a sticky element from sticking when it sits inside an
+   element that is a container. */
+.lv-bar,
+.lv-list {
+  container-type: inline-size;
+  container-name: lv;
+}
+
 .lv-bar {
   position: sticky;
   /* Below whatever is already fixed above it (the site header and, on phones,
@@ -87,7 +95,10 @@
   align-items: center;
   gap: 0.5rem;
   height: var(--lv-bar-h);
-  background: var(--lv-page);
+  /* Frosted like the site header. */
+  background: rgba(0, 0, 0, 0.329);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .lv-filters {
@@ -746,11 +757,13 @@
   .lv .lv-filter {
     position: relative;
     min-width: 0;
-    height: 2.25rem;
+    height: 2rem;
     padding: 0 0.875rem;
     border-width: 1px;
     font-size: 0.875rem;
     font-weight: 600;
+    /* The word sits in the exact middle, whatever the font's own spacing. */
+    line-height: 1;
   }
 
   /* Pressed: white with iOS red (systemRed on a light surface). */
@@ -762,7 +775,7 @@
   .lv .lv-filter::before {
     content: "";
     position: absolute;
-    inset: -0.25rem -0.25rem;
+    inset: -0.375rem -0.25rem;
   }
 
   .lv-days {

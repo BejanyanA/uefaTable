@@ -11,14 +11,27 @@ header {
   /* flex-wrap: nowrap; */
   gap: 10px;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.329);
-  /* Frosted: what scrolls underneath is blurred (phones already had this). */
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  /* The frosted background is drawn by header::before (below), not by the
+     header itself: an element with its own blur becomes the only thing its
+     children's blur can see, which would make every frosted bar or menu
+     inside the header look flat black. */
+  background: transparent;
   box-sizing: border-box;
   overflow: visible;
   height: 60px;
   white-space: nowrap;
+}
+
+/* Frosted: what scrolls underneath is blurred. */
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.329);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
 }
 
 .header-username h2 {
@@ -45,7 +58,6 @@ header {
     justify-content: space-between;
     gap: 10px;
     align-items: center;
-    backdrop-filter: blur(6px);
     height: 50px;
     overflow: visible;
     white-space: nowrap;

@@ -325,6 +325,9 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: tab bar and day row frosted like the header; day row moved
+  out of the container element so it sticks on iPhone; smaller Live button
+  on phones (owner's phone test).
 - 2026-11-26: menus drawn on the page (real blur, never cut); time zone
   panel under Settings on desktop; words on all phone tabs; bigger desktop
   list (owner).
