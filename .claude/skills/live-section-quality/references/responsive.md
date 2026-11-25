@@ -110,6 +110,11 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   the screen opens, unless the day has nothing in play. While it is pressed,
   today's button in the day row reads "Live" without a date; pressing it on
   another day goes to today, and picking a day releases it.
+- **Phone menu:** a round glass menu button in the tab bar's right-hand
+  column (so it never moves), opening an iOS menu with Favorites (later) and
+  Time zone; the time zone sheet is an iOS sheet with search. The chosen zone
+  is in `public/js/live/settings.js` and every Live screen follows it
+  (`live:timezone-changed` event); default is the device's zone.
 - **Matches do not vanish at midnight.** A match that kicked off before the
   viewer's midnight and is still on belongs to today as well (the API adds
   it, `stillRunningFromBefore` in `arrange.js`).

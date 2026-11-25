@@ -11,6 +11,7 @@ import {
   dateParts, daysInRange, isInPlay, kickoffTime, matchStatus, redCards,
   scoreText, updatedAgo,
 } from "../format.js";
+import { activeTimeZone, TIMEZONE_EVENT } from "../settings.js";
 import { createDayStore } from "../store.js";
 
 const SKELETON_ROWS = 9;
@@ -98,16 +99,30 @@ function createView(container, onPickDate) {
     destroy() {},
   };
 
-  let tz = "UTC";
-  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch { /* keep UTC */ }
-
   let storage = null;
   try { storage = window.localStorage; } catch { /* private mode: no saved copy */ }
 
-  self.store = createDayStore({
-    api, tz, storage,
-    onChange: (state, change) => draw(self, state, change, { bar, note, filters, list, announcer }),
-  });
+  // The day and the kick-off times follow the visitor's time zone: the
+  // device's own, or the one chosen in the Live menu.
+  const makeStore = () => {
+    self.tz = activeTimeZone();
+    return createDayStore({
+      api, tz: self.tz, storage,
+      onChange: (state, change) => draw(self, state, change, { bar, note, filters, list, announcer }),
+    });
+  };
+  self.store = makeStore();
+
+  const onTimeZone = () => {
+    if (activeTimeZone() === self.tz) return;
+    const date = self.store.state.requestedDate;
+    self.store.stop();
+    self.drawnKey = "";
+    bar.dataset.key = "";
+    self.store = makeStore();
+    self.store.show(date);
+  };
+  document.addEventListener(TIMEZONE_EVENT, onTimeZone);
 
   const onVisibility = () => self.store.setVisible(document.visibilityState === "visible");
   const onLanguage = () => { self.drawnKey = ""; draw(self, self.store.state, {}, { bar, note, filters, list, announcer }); };
@@ -120,6 +135,7 @@ function createView(container, onPickDate) {
     clearInterval(clock);
     document.removeEventListener("visibilitychange", onVisibility);
     document.removeEventListener("app:language-changed", onLanguage);
+    document.removeEventListener(TIMEZONE_EVENT, onTimeZone);
     root.remove();
   };
   return self;
@@ -181,7 +197,7 @@ function draw(self, state, change, parts) {
   for (const group of groups) {
     for (const match of group.matches) {
       const row = self.rows.get(match.id);
-      if (row) updateRow(row, match, change.changedScores?.has(match.id), announcer);
+      if (row) updateRow(row, match, change.changedScores?.has(match.id), announcer, self.tz);
     }
   }
   updateCounts(self, state.data);
@@ -405,7 +421,7 @@ function drawGroup(self, group) {
   matches.id = `lv-group-${key}`;
   button.setAttribute("aria-controls", matches.id);
   for (const match of group.matches) {
-    const row = drawRow(match);
+    const row = drawRow(self, match);
     self.rows.set(match.id, row);
     matches.append(row.node);
   }
@@ -424,7 +440,7 @@ function drawSide(parts, which) {
   return line;
 }
 
-function drawRow(match) {
+function drawRow(self, match) {
   const node = el("li", "lv-match");
   const parts = {};
   const when = el("div", "lv-when");
@@ -443,12 +459,12 @@ function drawRow(match) {
 
   node.append(when, teams, scores);
   const row = { node, parts, last: {} };
-  updateRow(row, match, false, null);
+  updateRow(row, match, false, null, self.tz);
   return row;
 }
 
 // Write a match into its row, touching only what changed.
-function updateRow(row, match, scoreChanged, announcer) {
+function updateRow(row, match, scoreChanged, announcer, timeZone) {
   const { node, parts, last } = row;
   const set = (name, target, value) => {
     if (last[name] === value) return;
@@ -457,7 +473,7 @@ function updateRow(row, match, scoreChanged, announcer) {
   };
 
   const status = matchStatus(match);
-  const whenText = status.kickoff ? kickoffTime(match.kickoff, currentLang) : (status.text || t(status.key));
+  const whenText = status.kickoff ? kickoffTime(match.kickoff, currentLang, timeZone) : (status.text || t(status.key));
   if (last.when !== whenText) {
     last.when = whenText;
     if (status.added) {

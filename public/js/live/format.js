@@ -63,9 +63,11 @@ export function dateParts(date, lang) {
 }
 
 // Kick-off in the viewer's own time zone ("21:00").
-export function kickoffTime(iso, lang) {
+export function kickoffTime(iso, lang, timeZone) {
   // Always the 24-hour clock: all three languages use it for match times.
-  return new Intl.DateTimeFormat(localeFor(lang), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(iso));
+  const options = { hour: "2-digit", minute: "2-digit", hourCycle: "h23" };
+  if (timeZone) options.timeZone = timeZone;
+  return new Intl.DateTimeFormat(localeFor(lang), options).format(new Date(iso));
 }
 
 export function isInPlay(match) {

@@ -134,3 +134,9 @@ test("a failed first load shows an error and retries; a failed refresh keeps the
   assert.equal(store.state.meta.stale, true, "and is marked as old");
   store.stop();
 });
+
+test("kick-off times follow the chosen time zone", () => {
+  assert.equal(kickoffTime("2026-11-25T18:05:00Z", "en", "Europe/Paris"), "19:05");
+  assert.equal(kickoffTime("2026-11-25T18:05:00Z", "en", "Asia/Yerevan"), "22:05");
+  assert.equal(kickoffTime("2026-11-25T18:05:00Z", "fr", "America/New_York"), "13:05");
+});

@@ -102,6 +102,13 @@ live, so nothing is missing for visitors in between.
   choice is remembered on the device. (2026-11-26)
 - **Desktop: each match on one line**, `Home [crest]  2 - 0  [crest] Away`,
   score in the middle; narrow lists keep two lines. (2026-11-26)
+- **Phones: a menu button at the right end of the tab bar** (its own column,
+  so the tabs never move it), with Favorites (marked "Soon", to be built
+  later) and Time zone. The time zone is the phone's own by default
+  ("Automatic"); a chosen one is remembered on the device, and days and
+  kick-off times follow it. Phone tabs get tighter on narrow screens: the
+  selected tab keeps icon and word, the others show only the word (up to
+  432px) or only the icon (up to 368px). (2026-11-26)
 - **One corner radius for the whole site: 12px, like the tab bar** (skill
   `corner-radius`); match blocks use it. The Live pill on phones has 14px
   text and is 36px tall; the selected Live tab's icon is red. (2026-11-26)
@@ -245,6 +252,14 @@ and after. This stage also laid the groundwork every later stage reuses.
       has been public in the site's code)
 - [ ] New key stored only as a secret on the dev and production APIs
 
+## Favorites (owner asked, to be built later)
+
+- [ ] Favorites entry in the phone menu is there, marked "Soon"
+- [ ] Decide with the owner what a favorite is (team, competition, match)
+      and where favorites show (top of the day view, own list)
+- [ ] Stored on the server for signed-in users (`live-architecture`), on the
+      device otherwise
+
 ## Stage 6: follows and in-site alerts (optional)
 
 - [ ] Follow a team, a match or a competition; stored on the server
@@ -289,6 +304,7 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: phone menu with Favorites (later) and Time zone (owner).
 - 2026-11-26: added time as 90'+9, the +9 smaller and red (owner).
 - 2026-11-26: matches still running from before midnight stay in today; the
   Today button reads "Live" while the Live button is pressed (owner).

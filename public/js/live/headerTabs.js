@@ -9,6 +9,8 @@
 // words, which one is active, and a tap here is a tap on the original. The
 // Back arrow does the same for the page's Back button.
 
+import { langMap, currentLang } from "../modules/LanguageManager.js";
+
 // Small line icons, drawn beside the words.
 const ICONS = {
   // broadcast: a dot with two waves
@@ -19,6 +21,8 @@ const ICONS = {
   matches: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   // arrow to the left
   back: '<path d="M15 5l-7 7 7 7"/>',
+  // three lines
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
 };
 
 function icon(name) {
@@ -26,7 +30,7 @@ function icon(name) {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("fill", "none");
   svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", name === "back" ? "2.4" : "1.8");
+  svg.setAttribute("stroke-width", name === "back" || name === "menu" ? "2.2" : "1.8");
   svg.setAttribute("stroke-linecap", "round");
   svg.setAttribute("stroke-linejoin", "round");
   svg.setAttribute("aria-hidden", "true");
@@ -61,6 +65,20 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
   const inner = document.createElement("div");
   inner.className = "liveHeaderTabs-inner";
   nav.append(inner);
+
+  // The Live menu (favorites, time zone), at the right end of the phone bar.
+  // It has a column of its own, so the tabs changing width never move it.
+  const menuButton = document.createElement("button");
+  menuButton.type = "button";
+  menuButton.className = "liveHeaderMenu";
+  menuButton.setAttribute("aria-haspopup", "menu");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.append(icon("menu"));
+  menuButton.addEventListener("click", async () => {
+    const { toggleLiveMenu } = await import("./views/liveMenu.js");
+    toggleLiveMenu(menuButton);
+  });
+  nav.append(menuButton);
   anchor.after(nav);
 
   const copies = new Map(); // original button -> its copy
@@ -93,6 +111,9 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
       if (active) copy.setAttribute("aria-current", "page");
       else copy.removeAttribute("aria-current");
     }
+    const menuLabel = (langMap[currentLang] && langMap[currentLang].live_menu) || langMap.en.live_menu || "Menu";
+    menuButton.setAttribute("aria-label", menuLabel);
+    menuButton.title = menuLabel;
     if (backCopy) {
       // The page's button reads "< Back"; the arrow here needs only the word.
       const text = back.textContent.replace(/^[\s<‹←]+/, "").trim();
