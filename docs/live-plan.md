@@ -217,9 +217,11 @@ and after. This stage also laid the groundwork every later stage reuses.
       touched, so no change is expected)
 
 **Known gaps in this stage**
-- Opening Standings directly by its address (`/en/live-standings`) showed an
-  empty table during testing, on production too, while switching to it from
-  another tab works. It is the old widget; stage 2 replaces it.
+- The Standings and Matches tabs (still the API-Sports widget) sometimes
+  show an empty table when opened several times within a minute. Seen on
+  production and on the unchanged `main` code as well, so it is not caused
+  by this stage: the provider refuses the widget's calls for a while. Stage 2
+  replaces the widget with our cached API, which avoids this.
 - Tapping a match does nothing yet. The widget opened a match pop-up from
   this tab; that returns with stage 4. The Matches tab still has it.
 - The Armenian texts need your eye.
