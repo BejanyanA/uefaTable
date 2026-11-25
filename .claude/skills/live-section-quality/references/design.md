@@ -87,8 +87,10 @@ settle them):
 ## 4. Match list (All and Matches tabs)
 
 - Group by competition (or by round on the Matches tab), with a small header:
-  logo, competition name, and the round or date. Headers stick to the top
-  while their group scrolls (`position: sticky`).
+  logo, competition name, country. The whole header is a button that closes
+  and opens the competition (a chevron at its end); a closed one shows
+  "live/total" (live in red when above 0). Closed competitions are
+  remembered on the device.
 - Order inside "today": live first, then upcoming by kick-off, then finished.
 - The day switcher sits above the list: the selected day, the days around it,
   previous and next arrows, Today always one tap away. Its full rules are in
@@ -134,8 +136,9 @@ settle them):
 
 ## 7. Live indicators and score changes
 
-- A live match shows a small red dot and the minute ("67'"). The dot may pulse
-  slowly; with reduced motion it is steady.
+- A live match shows its minute in strong white text and a red bar at the
+  left edge of its block, with a faint red glow behind it (the owner's
+  choice, 2026-11-26). Nothing blinks.
 - When a score changes, highlight that score cell for about two seconds
   (a soft background fade), then return to normal. No sound, no popup, no
   shifting of rows.
@@ -164,8 +167,8 @@ settle them):
 
 - Short and functional: 150-250 ms for state changes, about 2 s for the score
   highlight. Ease out. Animate only `opacity` and `transform`.
-- Nothing loops forever except the slow live dot.
-- Under `prefers-reduced-motion: reduce`, drop the pulse and the fades; change
+- Nothing loops forever.
+- Under `prefers-reduced-motion: reduce`, drop the fades and turns; change
   state instantly.
 
 ## 10. What to avoid

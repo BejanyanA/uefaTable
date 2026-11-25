@@ -14,6 +14,9 @@ import {
 import { createDayStore } from "../store.js";
 
 const SKELETON_ROWS = 9;
+// Competitions the visitor closed, remembered on this device.
+const COLLAPSED_KEY = "live_collapsed_v1";
+const MAX_COLLAPSED = 200;
 const FLASH_MS = 2200;
 
 const t = (key, vars) => {
@@ -84,6 +87,8 @@ function createView(container, onPickDate) {
     // narrows it to the matches in play and a second tap widens it again.
     filter: "all",
     rows: new Map(),     // match id -> { node, parts }
+    groups: new Map(),   // competition key -> { section, button, live, total, sr }
+    collapsed: readCollapsed(),
     drawnKey: "",        // what the list currently shows, to know when to rebuild
     store: null,
     destroy() {},
@@ -148,11 +153,13 @@ function draw(self, state, change, parts) {
   if (key !== self.drawnKey) {
     self.drawnKey = key;
     self.rows.clear();
+    self.groups.clear();
     if (groups.length === 0) {
       list.replaceChildren(message(t(self.filter === "live" ? "live_no_live_matches" : "live_no_matches")));
     } else {
       list.replaceChildren(...groups.map((group) => drawGroup(self, group)));
     }
+    updateCounts(self, state.data);
     return;
   }
 
@@ -161,6 +168,56 @@ function draw(self, state, change, parts) {
       const row = self.rows.get(match.id);
       if (row) updateRow(row, match, change.changedScores?.has(match.id), announcer);
     }
+  }
+  updateCounts(self, state.data);
+}
+
+// ---------------------------------------------------------------- open / closed competitions
+
+function readCollapsed() {
+  try {
+    const list = JSON.parse(localStorage.getItem(COLLAPSED_KEY) || "[]");
+    return new Set(Array.isArray(list) ? list.filter((k) => typeof k === "string") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveCollapsed(set) {
+  try {
+    localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...set].slice(-MAX_COLLAPSED)));
+  } catch {
+    // Storage blocked: the choice lasts until the page is reloaded.
+  }
+}
+
+function setCollapsed(self, key, collapsed) {
+  const group = self.groups.get(key);
+  if (collapsed) self.collapsed.add(key);
+  else self.collapsed.delete(key);
+  saveCollapsed(self.collapsed);
+  if (!group) return;
+  group.section.classList.toggle("is-collapsed", collapsed);
+  group.button.setAttribute("aria-expanded", String(!collapsed));
+}
+
+// "live / total" of every competition on screen, from the whole day (not only
+// the matches the Live toggle leaves on screen).
+function updateCounts(self, data) {
+  if (!data || self.groups.size === 0) return;
+  for (const group of data.groups) {
+    const shown = self.groups.get(group.competition.key);
+    if (!shown) continue;
+    const live = group.matches.filter(isInPlay).length;
+    const total = group.matches.length;
+    const text = `${live}/${total}`;
+    if (shown.text === text && shown.lang === currentLang) continue;
+    shown.text = text;
+    shown.lang = currentLang;
+    shown.live.textContent = String(live);
+    shown.live.classList.toggle("has-live", live > 0);
+    shown.total.textContent = `/${total}`;
+    shown.sr.textContent = t("live_count_title", { live, total });
   }
 }
 
@@ -269,23 +326,56 @@ function drawNote(state, note) {
 }
 
 function drawGroup(self, group) {
-  const section = el("section", "lv-group");
-  const head = el("h3", "lv-group-head");
   const { competition } = group;
-  head.append(logo(competition.logo, 20, "lv-group-logo"));
+  const key = competition.key;
+  const collapsed = self.collapsed.has(key);
+  const section = el("section", "lv-group");
+  if (collapsed) section.classList.add("is-collapsed");
+
+  // The heading is one button: tap it to open or close the competition.
+  const head = el("h3", "lv-group-head");
+  const button = el("button", "lv-group-toggle");
+  button.type = "button";
+  button.setAttribute("aria-expanded", String(!collapsed));
+
   const names = el("span", "lv-group-names");
   names.append(el("span", "lv-group-name", competition.name));
   const place = competition.country ? competition.country.name : (competition.featured ? "" : t("live_international"));
   if (place) names.append(el("span", "lv-group-country", place));
-  head.append(names);
+
+  // live / total, shown while closed. Screen readers get it in words.
+  const count = el("span", "lv-group-count");
+  count.setAttribute("aria-hidden", "true");
+  const live = el("span", "lv-group-count-live");
+  const total = el("span", "lv-group-count-total");
+  count.append(live, total);
+  const sr = el("span", "lv-sr");
+
+  const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  chevron.setAttribute("class", "lv-group-chevron");
+  chevron.setAttribute("viewBox", "0 0 24 24");
+  chevron.setAttribute("fill", "none");
+  chevron.setAttribute("stroke", "currentColor");
+  chevron.setAttribute("stroke-width", "2.4");
+  chevron.setAttribute("stroke-linecap", "round");
+  chevron.setAttribute("stroke-linejoin", "round");
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.innerHTML = '<path d="M6 9l6 6 6-6"/>';
+
+  button.append(logo(competition.logo, 20, "lv-group-logo"), names, count, sr, chevron);
+  button.addEventListener("click", () => setCollapsed(self, key, !self.collapsed.has(key)));
+  head.append(button);
 
   const matches = el("ul", "lv-matches");
+  matches.id = `lv-group-${key}`;
+  button.setAttribute("aria-controls", matches.id);
   for (const match of group.matches) {
     const row = drawRow(match);
     self.rows.set(match.id, row);
     matches.append(row.node);
   }
   section.append(head, matches);
+  self.groups.set(key, { section, button, live, total, sr, text: "", lang: "" });
   return section;
 }
 

@@ -366,21 +366,30 @@
   overflow-wrap: anywhere;
 }
 
+/* A live match: its minute in strong text and a red bar at its left edge,
+   with a faint red glow behind it. No blinking. */
 .lv-match.is-live .lv-when {
-  color: var(--lv-live);
+  color: var(--lv-text);
   font-weight: 700;
 }
 
-.lv-match.is-live .lv-when::before {
+.lv .lv-match.is-live {
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(255, 69, 58, 0.12), rgba(255, 69, 58, 0) 45%),
+    var(--lv-row-bg);
+}
+
+.lv-match.is-live::before {
   content: "";
-  display: inline-block;
-  width: 0.4375rem;
-  height: 0.4375rem;
-  margin-right: 0.3125rem;
-  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 40%;
+  transform: translateY(-50%);
+  border-radius: 0 2px 2px 0;
   background: var(--lv-live);
-  vertical-align: 0.0625rem;
-  animation: lv-pulse 1.6s ease-in-out infinite;
 }
 
 .lv-teams {
@@ -447,10 +456,6 @@
   to { background: var(--lv-row-bg); }
 }
 
-@keyframes lv-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
 
 /* ---------------------------------------------------------------- loading, empty, failure */
 
@@ -519,6 +524,10 @@
     background: var(--lv-surface);
   }
 
+  .lv .lv-group-toggle:hover {
+    background: var(--lv-surface);
+  }
+
   .lv .lv-filter[aria-pressed="false"]:hover {
     background: var(--lv-surface);
   }
@@ -548,10 +557,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lv-match.is-live .lv-when::before,
   .lv-skel-row,
   .lv-match.is-flash {
     animation: none;
+  }
+
+  .lv-group-chevron {
+    transition: none;
   }
 
   .lv-list {
@@ -572,8 +584,68 @@
 
 .lv .lv-group-head {
   min-height: 0;
-  padding: 0.25rem 0.25rem 0.5rem;
+  margin: 0;
+  padding: 0 0 0.25rem;
   border-bottom: 0;
+}
+
+/* The whole heading is the button that opens and closes the competition. */
+.lv .lv-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border-radius: var(--lv-radius);
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.lv-group-toggle .lv-group-names {
+  flex: 1 1 auto;
+}
+
+/* live / total, shown while the competition is closed. */
+.lv-group-count {
+  display: none;
+  flex: none;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--lv-radius);
+  background: var(--lv-row-bg);
+  color: var(--lv-text-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.lv-group.is-collapsed .lv-group-count {
+  display: inline-block;
+}
+
+.lv-group-count-live.has-live {
+  color: var(--lv-live);
+}
+
+.lv-group-chevron {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--lv-text-2);
+  transition: transform 0.2s ease-out;
+}
+
+.lv-group.is-collapsed .lv-group-chevron {
+  transform: rotate(-90deg);
+}
+
+.lv-group.is-collapsed {
+  margin-bottom: 0.25rem;
+}
+
+.lv-group.is-collapsed .lv-matches {
+  display: none;
 }
 
 .lv .lv-matches {
