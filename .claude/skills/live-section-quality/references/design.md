@@ -161,8 +161,10 @@ settle them):
   an empty area.
 - **Switching league:** keep the old content dimmed until the new one is
   ready, or swap to skeletons at once. Do not flash an empty state in between.
-- **Empty:** one short sentence in the current language and, if known, the
-  next match day. A friendly line beats an icon wall.
+- **Empty:** a small football pitch picture with the ball on the centre spot
+  (drawn in code in `dayView.js`, about 1 KB, no image download; the owner
+  asked for it on 2026-11-26) and one short sentence in the current
+  language.
 - **Old data:** content as normal plus the "Updated ... ago" line in a
   noticeable (not alarming) colour.
 - **Failed with nothing to show:** a short explanation and a Retry button.

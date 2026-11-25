@@ -508,6 +508,24 @@
   color: inherit;
 }
 
+/* The football pitch picture of an empty day. */
+.lv-empty-art {
+  width: min(11rem, 60%);
+  margin: 0 auto 1rem;
+}
+
+.lv-empty-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+}
+
+.lv-empty-art + p {
+  color: var(--lv-text);
+  font-weight: 600;
+}
+
 .lv-message p:last-child {
   margin-bottom: 0;
 }

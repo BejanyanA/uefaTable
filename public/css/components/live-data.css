@@ -58,7 +58,9 @@ body.live-open::before {
   position: fixed;
   white-space: nowrap;
   min-width: 60px;
-  z-index: 10000;
+  /* Under the site header (1000), so the header's language and profile
+     menus open over it. */
+  z-index: 999;
 }
 
 .liveWidgetCard {

@@ -170,7 +170,7 @@ function draw(self, state, change, parts) {
     self.rows.clear();
     self.groups.clear();
     if (groups.length === 0) {
-      list.replaceChildren(message(t(self.filter === "live" ? "live_no_live_matches" : "live_no_matches")));
+      list.replaceChildren(message(t(self.filter === "live" ? "live_no_live_matches" : "live_no_matches"), null, null, { art: true }));
     } else {
       list.replaceChildren(...groups.map((group) => drawGroup(self, group)));
     }
@@ -493,8 +493,48 @@ function skeleton() {
   return box;
 }
 
-function message(text, actionLabel, onAction) {
+// A small football pitch with the ball on the centre spot, drawn in code (no
+// image to download, about 1 KB). Shown when a day or the Live filter has
+// nothing to list.
+const EMPTY_ART = `<svg viewBox="0 0 200 128" role="presentation" aria-hidden="true">
+  <defs>
+    <clipPath id="lv-pitch"><rect x="8" y="8" width="184" height="112" rx="12"/></clipPath>
+    <radialGradient id="lv-light" cx="50%" cy="40%" r="70%">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#lv-pitch)">
+    <rect x="8" y="8" width="184" height="112" fill="#1f7f3d"/>
+    <g fill="#26914a">
+      <rect x="8" y="8" width="23" height="112"/><rect x="54" y="8" width="23" height="112"/>
+      <rect x="100" y="8" width="23" height="112"/><rect x="146" y="8" width="23" height="112"/>
+    </g>
+    <rect x="8" y="8" width="184" height="112" fill="url(#lv-light)"/>
+  </g>
+  <g fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.6">
+    <rect x="18" y="18" width="164" height="92" rx="2"/>
+    <path d="M100 18v92"/>
+    <circle cx="100" cy="64" r="17"/>
+    <rect x="18" y="40" width="26" height="48"/><rect x="18" y="53" width="9" height="22"/>
+    <rect x="156" y="40" width="26" height="48"/><rect x="173" y="53" width="9" height="22"/>
+  </g>
+  <ellipse cx="103" cy="78" rx="11" ry="3.2" fill="#000" opacity=".25"/>
+  <g>
+    <circle cx="100" cy="64" r="11" fill="#fff"/>
+    <path d="M100 58.6l4.6 3.3-1.8 5.4h-5.6l-1.8-5.4z" fill="#1c1c1e"/>
+    <path d="M90.4 61.3l3.1.9.7 4.3-2.6 2.6-2-1.2a11 11 0 0 1 .8-6.6zM109.6 61.3a11 11 0 0 1 .8 6.6l-2 1.2-2.6-2.6.7-4.3zM96.3 74.4l1.5-3.3h4.4l1.5 3.3a11 11 0 0 1-7.4 0zM97.2 53.4l2.8 1.6 2.8-1.6a11 11 0 0 0-5.6 0z" fill="#1c1c1e"/>
+    <circle cx="100" cy="64" r="11" fill="none" stroke="#1c1c1e" stroke-opacity=".35"/>
+  </g>
+</svg>`;
+
+function message(text, actionLabel, onAction, { art = false } = {}) {
   const box = el("div", "lv-message");
+  if (art) {
+    const picture = el("div", "lv-empty-art");
+    picture.innerHTML = EMPTY_ART; // fixed drawing above, no outside data
+    box.append(picture);
+  }
   box.append(el("p", null, text));
   if (actionLabel) {
     const button = el("button", "lv-button", actionLabel);

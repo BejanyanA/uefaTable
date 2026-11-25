@@ -286,6 +286,8 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: football pitch picture for empty days; the header's language
+  menu opens over the Back button (owner).
 - 2026-11-26: Live pressed by default (owner).
 - 2026-11-26: one-line match rows on desktop (owner).
 - 2026-11-26: red side bar for live matches; leagues open and close with a
