@@ -202,6 +202,12 @@
   color: var(--lv-text);
 }
 
+/* Today, while another day is selected: its name in light green (iOS
+   systemGreen), so the way back is easy to find. */
+.lv .lv-day.is-today:not([aria-current="date"]) .lv-day-name {
+  color: #30d158;
+}
+
 /* The selected day is underlined. */
 .lv .lv-day[aria-current="date"]::after {
   content: "";
