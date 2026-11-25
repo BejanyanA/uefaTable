@@ -15,6 +15,8 @@
   --lv-page: rgb(1, 10, 20);
   --lv-radius: 0.75rem;
   --lv-bar-h: 3.5rem;
+  /* Background of a match row (phones give each match its own block). */
+  --lv-row-bg: transparent;
 
   container-type: inline-size;
   container-name: lv;
@@ -435,7 +437,7 @@
 
 @keyframes lv-flash {
   from { background: rgba(77, 163, 255, 0.28); }
-  to { background: transparent; }
+  to { background: var(--lv-row-bg); }
 }
 
 @keyframes lv-pulse {
@@ -547,5 +549,83 @@
 
   .lv-list {
     transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- phones */
+
+/* Phones (768px and less), in the iOS way: the competition name is a small
+   heading, and each match is a block of its own in iOS's dark "grouped" cell
+   colour. The Live toggle is a compact pill and the row is tighter. */
+@media (max-width: 768px) {
+  .lv {
+    --lv-row-bg: #1c1c1e;
+  }
+
+  .lv-bar {
+    gap: 0.25rem;
+  }
+
+  .lv .lv-filter {
+    position: relative;
+    min-width: 0;
+    height: 1.875rem;
+    padding: 0 0.75rem;
+    border-width: 1px;
+    font-size: 0.75rem;
+  }
+
+  /* The pill is small, the place a finger can tap is not. */
+  .lv .lv-filter::before {
+    content: "";
+    position: absolute;
+    inset: -0.4375rem -0.25rem;
+  }
+
+  .lv-days {
+    padding-inline: 0.25rem;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
+  }
+
+  .lv-group {
+    margin-bottom: 1rem;
+    background: none;
+    border-radius: 0;
+  }
+
+  .lv .lv-group-head {
+    min-height: 0;
+    padding: 0.25rem 0.25rem 0.5rem;
+    border-bottom: 0;
+  }
+
+  .lv .lv-matches {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .lv .lv-match,
+  .lv .lv-match:last-child {
+    border-bottom: 0;
+    border-radius: 0.75rem;
+    background: var(--lv-row-bg);
+  }
+
+  .lv-skeleton {
+    background: none;
+  }
+
+  .lv-skel-head {
+    height: 1.75rem;
+    border-bottom: 0;
+  }
+
+  .lv-skel-row,
+  .lv-skel-row:last-child {
+    margin-bottom: 0.375rem;
+    border-bottom: 0;
+    border-radius: 0.75rem;
+    background-color: var(--lv-row-bg);
   }
 }

@@ -113,6 +113,13 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   selected day has light text and an underline (no outline); the others are
   a little grey. On desktop there are previous and next arrows and a
   calendar button as well; on phones the strip is scrolled with a finger.
+- **Phones (768 px and less):** each match is a block of its own in iOS's
+  dark grouped cell colour (`--lv-row-bg`, #1c1c1e) under a small
+  competition heading; the Live toggle is a compact pill (30 px tall, with a
+  larger invisible tap area).
+- **The width never jumps when a scrollbar appears.** While Live is open the
+  body keeps room for its scrollbar (`body.live-open { scrollbar-gutter:
+  stable }`), because toggling Live can turn a long page into a short one.
 - **Live keeps its own scroll position.** The whole site scrolls on the body,
   so `liveData.js` opens Live at its top and puts the page you came from back
   where it was (`enterLiveScroll` / `leaveLiveScroll`). Check it: scroll the

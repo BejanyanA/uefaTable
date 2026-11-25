@@ -273,12 +273,12 @@ export async function getDay(env, ctx, { date, tz, now }) {
 
   let matches = days.flatMap((d) => matchesInWindow(d.value.matches, window));
   const competitions = Object.assign({}, ...days.map((d) => d.value.competitions));
-  // How old the answer is: the oldest copy that could still change. A date
-  // whose matches are all over is as good as new however long ago it was
-  // fetched, so it does not make the answer look old.
+  // How old the answer is. If a part of it is older than it should be, that
+  // part's age is what matters (it is what a client shows). Otherwise the
+  // oldest copy that could still change: a date whose matches are all over is
+  // as good as new however long ago it was fetched.
+  const parts = [...days];
   const changing = days.filter((d) => !(d.value.matches.length > 0 && d.value.matches.every(isOver)));
-  const fetchedAt = Math.min(...(changing.length > 0 ? changing : days).map((d) => d.fetchedAt));
-  let stale = days.some((d) => d.stale);
 
   // While something is on, lay the live list over the day: the stored day may
   // be minutes old, the live list seconds.
@@ -301,15 +301,20 @@ export async function getDay(env, ctx, { date, tz, now }) {
           matches = overlay(matches, new Map(settled.map((m) => [m.id, m])));
         }
       }
-      stale = stale || fresh.stale;
+      parts.push(fresh);
       live = {
         count: matches.filter(isInPlay).length,
         refreshAfterSeconds: LIVE_REFRESH_SECONDS,
       };
     } catch {
-      stale = true;
+      // No live list at all: the scores shown are only as new as the day.
+      parts.push({ fetchedAt: Math.min(...days.map((d) => d.fetchedAt)), stale: true });
     }
   }
+
+  const oldParts = parts.filter((p) => p.stale);
+  const stale = oldParts.length > 0;
+  const fetchedAt = Math.min(...(stale ? oldParts : changing.length > 0 ? changing : days).map((p) => p.fetchedAt));
 
   return {
     data: {

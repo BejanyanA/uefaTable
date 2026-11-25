@@ -149,6 +149,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
    const livePage = document.getElementById("liveDataPage");
    if (livePage) livePage.dataset.liveTab = tab;
    enterLiveScroll();
+   document.body.classList.add("live-open");
    enableHeaderTabs();
 
    if (tab === "allGames") {
@@ -181,6 +182,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
 export function closeLiveData() {
    setLiveDataVisible(false);
    disableHeaderTabs();
+   document.body.classList.remove("live-open");
    leaveLiveScroll();
    hideDayView();
    resetLiveWidgets(); // so next open -> widget recreated -> request sent again

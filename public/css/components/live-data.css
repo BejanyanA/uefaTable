@@ -1,3 +1,10 @@
+/* While Live is open the page always keeps room for its scrollbar, so the
+   content does not change width when the list gets long enough to need one
+   (for example when the Live toggle is released). Set by liveData.js. */
+body.live-open {
+  scrollbar-gutter: stable;
+}
+
 .liveDataPage {
   /* Height of the site's fixed header (css/layout/header.css): 60px, and 50px
      on phones (see the 480px rule at the end of this file). Sticky parts of a

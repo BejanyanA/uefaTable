@@ -261,7 +261,8 @@ function drawNote(state, note) {
   // The API knows how long each kind of data stays fresh (matches not yet
   // started much longer than scores in play) and says when what it sent is
   // older than it should be. Only then is the age worth showing.
-  const old = Boolean(state.meta.stale);
+  // "Updated just now" would say nothing useful, so under a minute stays quiet.
+  const old = Boolean(state.meta.stale) && (ago.n || 0) >= 1;
   note.className = old ? "lv-note is-old" : "lv-note";
   // Only say something when it matters: data that is old, or a failed refresh.
   note.textContent = old || state.error ? t(ago.key, { n: ago.n }) : "";
