@@ -7,6 +7,10 @@
 // store obeys it. While the screen is hidden nothing is requested.
 
 const RETRY_SECONDS = [5, 15, 30, 60];
+// An answer marked as old means the server is fetching a newer one right
+// now: ask again shortly, a couple of times, instead of waiting a full round.
+const STALE_RECHECK_SECONDS = 4;
+const STALE_RECHECKS = 2;
 const SAVED_KEY = "live_day_v1";
 const SAVED_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
@@ -30,6 +34,7 @@ export function createDayStore({ api, tz, onChange, timers = globalThis, storage
   let visible = true;
   let stopped = false;
   let failures = 0;
+  let staleChecks = 0;
   let requestId = 0;
 
   const emit = (change = {}) => onChange(state, change);
@@ -70,7 +75,13 @@ export function createDayStore({ api, tz, onChange, timers = globalThis, storage
   function schedule() {
     clearTimers();
     if (stopped || !visible || state.status !== "ready") return;
-    const daySeconds = state.meta?.refreshAfterSeconds;
+    let daySeconds = state.meta?.refreshAfterSeconds;
+    if (state.meta?.stale && staleChecks < STALE_RECHECKS) {
+      staleChecks++;
+      daySeconds = STALE_RECHECK_SECONDS;
+    } else if (!state.meta?.stale) {
+      staleChecks = 0;
+    }
     if (Number.isFinite(daySeconds) && daySeconds > 0) {
       dayTimer = timers.setTimeout(() => loadDay({ quiet: true }), daySeconds * 1000);
     }
