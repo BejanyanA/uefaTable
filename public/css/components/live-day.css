@@ -112,17 +112,18 @@
 .lv .lv-filter {
   display: grid;
   place-items: center;
-  min-width: 2.75rem;
-  height: 2.75rem;
-  padding: 0 0.625rem;
+  /* The Settings button's size (owner). */
+  min-width: 0;
+  height: 40px;
+  padding: 0 14px;
   border-radius: 12px;
   /* Not pressed: the same grey fill as the Settings button at the other end
      of the row, no outline (owner). Phones use the Back arrow's glass. */
   border: 1px solid transparent;
   background: rgba(118, 118, 128, 0.24);
   color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -941,9 +942,4 @@
     font-size: 0.75rem;
   }
 
-  .lv .lv-filter {
-    height: 3rem;
-    min-width: 3rem;
-    font-size: 0.875rem;
-  }
 }
