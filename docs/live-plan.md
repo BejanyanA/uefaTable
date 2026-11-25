@@ -74,9 +74,11 @@ live, so nothing is missing for visitors in between.
 - **One row sits against the header (on phones against the tab bar) from the
   moment Live opens and stays there:** the Live toggle first, then the days.
   On desktop the Back button is on the same line, at its left. (2026-11-26)
-- **Only a Live toggle, no All.** All matches of the day are shown by default;
-  pressing Live shows only those in play (the button turns white with red
-  text); pressing it again shows all. (2026-11-26)
+- **Only a Live toggle, no All.** Live is pressed when the screen opens, so
+  only the matches in play show (white button, red text); a day with nothing
+  in play opens with all its matches. Tapping the button switches between
+  live and all, and that choice is kept while moving between days.
+  (2026-11-26)
 - **Days:** all fifteen (a week each way) in a strip that scrolls sideways;
   only today is named "Today", the others show their weekday. The selected
   day has light text and an underline, no outline; the others are a little
@@ -284,6 +286,7 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: Live pressed by default (owner).
 - 2026-11-26: one-line match rows on desktop (owner).
 - 2026-11-26: red side bar for live matches; leagues open and close with a
   live/total count (owner).

@@ -105,8 +105,9 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
 - **One row sits right under them from the moment Live opens** and stays
   there while scrolling: the Live toggle first, then the days. On wide
   screens the Back button is on the same line, at its left.
-- **The Live toggle** is one round button: released, every match of the day
-  is shown; pressed (white, red text), only the matches in play.
+- **The Live toggle** is one round button: pressed (white, red text), only
+  the matches in play; released, every match of the day. It is pressed when
+  the screen opens, unless the day has nothing in play.
 - **The days are all fifteen** (a week each way) in a strip that scrolls
   sideways on its own, with the selected day brought to the middle. Only
   today is named ("Today"); every other day shows its weekday and date. The

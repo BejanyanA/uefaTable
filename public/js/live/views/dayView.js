@@ -83,9 +83,13 @@ function createView(container, onPickDate) {
 
   const self = {
     container, root, onPickDate,
-    // "all" | "live". Every match of the day is shown; the Live button
-    // narrows it to the matches in play and a second tap widens it again.
-    filter: "all",
+    // "live" | "all". Live is pressed when the screen opens (the owner's
+    // choice), so the matches in play come first. A day with nothing in play
+    // opens with all its matches instead of an empty screen. Once the visitor
+    // taps the button, their choice is kept.
+    filter: "live",
+    filterChosen: false,
+    filterDay: null,
     rows: new Map(),     // match id -> { node, parts }
     groups: new Map(),   // competition key -> { section, button, live, total, sr }
     collapsed: readCollapsed(),
@@ -127,6 +131,17 @@ function draw(self, state, change, parts) {
   const { bar, note, filters, list, announcer } = parts;
   self.root.dataset.status = state.status;
   self.root.classList.toggle("is-switching", Boolean(state.switching));
+
+  if (state.status === "ready" && !self.filterChosen) {
+    const inPlay = state.data.live?.count || 0;
+    if (self.filterDay !== state.data.date) {
+      self.filterDay = state.data.date;
+      self.filter = inPlay > 0 ? "live" : "all";
+    } else if (self.filter === "live" && inPlay === 0) {
+      // The last match in play just ended: show the whole day.
+      self.filter = "all";
+    }
+  }
 
   drawDayBar(self, state, bar);
   drawFilters(self, state, filters, parts);
@@ -307,6 +322,7 @@ function drawFilters(self, state, filters, parts) {
   live.setAttribute("aria-pressed", String(self.filter === "live"));
   live.addEventListener("click", () => {
     self.filter = self.filter === "live" ? "all" : "live";
+    self.filterChosen = true;
     draw(self, self.store.state, {}, parts);
   });
   filters.replaceChildren(live);
