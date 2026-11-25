@@ -62,18 +62,22 @@ live, so nothing is missing for visitors in between.
   competitions from our menus on top in the usual order, then all the others
   grouped by country. (2026-11-25)
 - **The three tabs are always at the top of the screen while Live is open,**
-  and are not shown separately in the page: inside the site header on
-  desktop (between the home icon and the login buttons or user name), and in
-  a bar of their own right under the header, as wide as the screen, on
-  phones. (2026-11-25)
+  and are not shown separately in the page. Wide screens: inside the site
+  header, centred over the content below, with the Back button floating at
+  the left and staying there while scrolling. Narrow screens (768 px and
+  less): a bar right under the header that starts with a Back arrow (no
+  word); the tabs are only as wide as their words; no line under the bar.
+  (2026-11-25)
+- **The site header is frosted (blurred) on every screen size,** on all
+  pages. (2026-11-25)
+- **The day view's list is 54rem wide at most** (was 46rem). (2026-11-25)
 - **One row stays in view under them: Live and All first, then the days.**
   Live and All are round buttons with no count. The days are all fifteen (a
   week each way) in a strip that scrolls sideways; only today is named
   "Today", the others show their weekday; the selected day has a full outline.
   Live is the filter selected when the screen opens; a day with nothing in
   play opens on All. (2026-11-25)
-- **Back button as before** (floating, top left); it steps aside while the
-  page is scrolled. **The Live block has no outline.** (2026-11-25)
+- **The Live block has no outline.** (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
 - The viewer's day is worked out on the server from their date and time zone;
@@ -254,6 +258,9 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-25: fixed a second scrollbar on the page (a hidden helper element
+  of the day view was placed against the whole page). Back stays on desktop,
+  Back arrow in the bar on phones, frosted header, wider list (owner).
 - 2026-11-25: the sticky bar is gone again. Tabs go into the site header
   when scrolled, day switcher and filters stay fixed, Back as before, no
   outline (owner).

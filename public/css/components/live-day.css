@@ -22,9 +22,12 @@
   font-size: 1rem;
   line-height: 1.25;
   text-align: left;
-  max-width: 46rem;
+  max-width: 54rem;
   margin: 0 auto;
   min-width: 0;
+  /* Holds its own hidden helper (.lv-sr). Without this that element is placed
+     against the whole page and gives the page a second scrollbar. */
+  position: relative;
 }
 
 .lv *,
@@ -52,6 +55,8 @@
 
 .lv-sr {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 1px;
   height: 1px;
   overflow: hidden;

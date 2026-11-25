@@ -94,11 +94,14 @@ width", not a list of devices.
 The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
 
 - **The three tabs (Live, Standings, Matches) are always at the top** while
-  Live is open, drawn by `public/js/live/headerTabs.js`: inside the site
-  header on desktop, between the home icon and the login buttons or user
-  name; on phones (480 px and less) in a bar of their own right under the
-  header, as wide as the screen. The original tab buttons stay in the page,
-  hidden, as the source of the words and the switching.
+  Live is open, drawn by `public/js/live/headerTabs.js`. Wide screens: inside
+  the site header, centred over the content below (not over the header: a
+  scrollbar shifts the content), with the Back button floating at the left
+  and never hidden. Narrow screens (768 px and less): a bar of their own
+  right under the header, starting with a Back arrow without a word; each tab
+  is only as wide as its word; no line under the bar. The original tab and
+  Back buttons stay in the page, hidden, as the source of the words and the
+  actions.
 - **One row stays in view under them** in the day view: first the Live and
   All buttons (round, no count), then the days.
 - **The days are all fifteen** (a week each way) in a strip that scrolls
@@ -113,8 +116,13 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   `top: var(--lv-sticky-top)` (set on `.liveDataPage` in `live-data.css`: the
   header height, plus the tab bar's on phones), never `top: 0`, or it slides
   under the header. Check by scrolling, not only by looking at the top.
-- The floating Back button fades out while the page is scrolled, because it
-  would sit on that row.
+- On wide screens the day view keeps clear of the floating Back button
+  (its width leaves room at the sides), so the two never overlap.
+- **Never position anything against the whole page from inside a Live view.**
+  The body is what scrolls on this site, and an absolutely positioned element
+  without a positioned parent inside the view is placed against the page
+  instead: it gave the page a second scrollbar once. `.lv` is
+  `position: relative` for that reason.
 - A phone on its side is the exception: with so little height the row scrolls
   away with the page.
 

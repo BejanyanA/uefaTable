@@ -12,6 +12,9 @@ header {
   gap: 10px;
   z-index: 1000;
   background: rgba(0, 0, 0, 0.329);
+  /* Frosted: what scrolls underneath is blurred (phones already had this). */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   box-sizing: border-box;
   overflow: visible;
   height: 60px;

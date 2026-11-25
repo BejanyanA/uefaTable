@@ -45,14 +45,6 @@
   white-space: nowrap;
   min-width: 60px;
   z-index: 10000;
-  transition: opacity 0.15s ease-out;
-}
-
-/* Once the page is scrolled the Back button steps aside: the day bar stays
-   in that spot, and the header's home icon and tabs do its job. */
-.liveDataPage.is-scrolled .liveBackBtn {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .liveWidgetCard {
@@ -810,25 +802,35 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
 
 /* ---------------------------------------------------------------------------
    The Live tabs at the top of the screen (public/js/live/headerTabs.js).
-   Desktop: inside the site header, between the home icon and the login
-   buttons or the user name. Phones: a bar of their own right under the
-   header, as wide as the screen. Always there while Live is open. */
+   Always there while Live is open.
+
+   Wide screens: inside the site header, centred over the content below
+   (--live-center is measured by the script), with the Back button floating
+   at the left as it always did.
+   Narrow screens (768px and less): a bar of their own right under the
+   header, as wide as the screen, starting with a Back arrow. */
 .liveHeaderTabs {
-  container-type: inline-size;
-  flex: 1 1 0;
-  min-width: 0;
   display: none;
-  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  top: 50%;
+  left: var(--live-center, 50%);
+  transform: translate(-50%, -50%);
 }
 
 .liveHeaderTabs.is-shown {
   display: flex;
 }
 
+/* The Back arrow belongs to the narrow bar only. */
+.liveHeaderBack {
+  display: none;
+}
+
 .liveHeaderTabs-inner {
   display: flex;
   gap: 2px;
-  max-width: 100%;
   padding: 2px;
   border-radius: 12px;
   background: #121212;
@@ -840,8 +842,8 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-width: 0;
   height: 36px;
+  /* A little room before and after the word, no more. */
   padding: 0 12px;
   border: 0;
   border-radius: 10px;
@@ -859,18 +861,13 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   height: 18px;
 }
 
-.liveHeaderTab span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .liveHeaderTab.active {
   background: linear-gradient(135deg, #2d7cff, #1b56d6);
   color: #fff;
 }
 
-.liveHeaderTab:focus-visible {
+.liveHeaderTab:focus-visible,
+.liveHeaderBack:focus-visible {
   outline: 2px solid #4da3ff;
   outline-offset: 1px;
 }
@@ -882,13 +879,28 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 }
 
-/* Little room in the header (small tablets): icons only. The words stay for
-   screen readers. */
-@container (max-width: 17rem) {
+/* Wide screens: the day view starts right under the header, and keeps clear
+   of the floating Back button at its left. */
+@media (min-width: 769px) {
+  .liveDataPage[data-live-tab="allGames"] {
+    padding-top: calc(var(--live-top) + 12px);
+  }
+
+  .liveDataPage[data-live-tab="allGames"] .liveWidgetCard {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .liveDataPage[data-live-tab="allGames"] .lv {
+    max-width: min(54rem, calc(100% - 220px));
+  }
+}
+
+/* Not much room in the header: icons only. The words stay for screen readers. */
+@media (min-width: 769px) and (max-width: 1100px) {
   .liveHeaderTab {
-    flex: 1 1 0;
-    padding: 0;
     width: 40px;
+    padding: 0;
   }
 
   .liveHeaderTab span {
@@ -900,21 +912,12 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 }
 
-/* A narrow bar (the smallest phones): words only, so long ones are not cut. */
-@container (min-width: 17.01rem) and (max-width: 21rem) {
-  .liveHeaderTab svg {
-    display: none;
-  }
-}
-
-/* Phones: the header is 50px tall, and the tabs leave it for a bar of their
-   own right under it, across the whole screen. */
-@media (max-width: 480px) {
+/* Narrow screens: the tabs leave the header for a bar right under it. */
+@media (max-width: 768px) {
   .liveDataPage {
-    --live-top: 50px;
     --live-tabs-h: 44px;
-    /* Room for the tab bar and the floating Back button under it. */
-    padding-top: calc(var(--live-top) + var(--live-tabs-h) + 48px);
+    /* The content starts right under the bar. */
+    padding-top: calc(var(--live-top) + var(--live-tabs-h) + 8px);
   }
 
   .liveWidgetCard {
@@ -922,39 +925,81 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     padding-top: 0;
   }
 
+  /* Its place is taken by the arrow in the bar. */
   .liveBackBtn {
-    top: calc(50px + 44px + 6px);
-    margin: 0;
-    left: 10px;
+    display: none;
+  }
+
+  .liveHeader {
+    margin-top: 0;
   }
 
   .liveHeaderTabs {
-    position: absolute;
+    container-type: inline-size;
     top: 100%;
     left: 0;
     right: 0;
+    transform: none;
     height: 44px;
-    padding: 3px 8px;
+    padding: 4px 8px;
     box-sizing: border-box;
     background: rgb(1, 10, 20);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .liveHeaderBack {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .liveHeaderBack svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* The tabs take only the room their words need, in the middle of what is
+     left beside the arrow. */
   .liveHeaderTabs-inner {
-    width: 100%;
-    box-sizing: border-box;
+    margin-inline: auto;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .liveHeaderTab {
-    flex: 1 1 0;
-    height: 34px;
-    padding: 0 4px;
-    font-size: 12.5px;
+    height: 32px;
+    min-width: 0;
+  }
+
+  .liveHeaderTab span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .liveBackBtn {
-    transition: none;
+/* The smallest phones: words only and tighter, so long words are not cut. */
+@container (max-width: 23rem) {
+  .liveHeaderTab {
+    padding: 0 8px;
+    font-size: 12.5px;
+  }
+
+  .liveHeaderTab svg {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .liveDataPage {
+    --live-top: 50px;
   }
 }

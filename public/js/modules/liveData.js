@@ -92,7 +92,12 @@ async function enableHeaderTabs() {
       const tabs = page && page.querySelector(".liveTabs");
       if (!tabs) return;
       const { mountHeaderTabs } = await import("../live/headerTabs.js");
-      headerTabs = mountHeaderTabs({ page, tabs });
+      headerTabs = mountHeaderTabs({
+         page,
+         tabs,
+         back: document.getElementById("btnBackFromLive"),
+         content: document.getElementById("leaguesWidgetContainer"),
+      });
    }
    // Live may have been closed again while the module was loading.
    if (headerTabs) headerTabs.setEnabled(liveIsOpen);
@@ -105,6 +110,9 @@ function disableHeaderTabs() {
 
 export async function openLiveData(tab = "allGames", { date = null } = {}) {
    setLiveDataVisible(true);
+   // The styles lay the page out a little differently for our own day view.
+   const livePage = document.getElementById("liveDataPage");
+   if (livePage) livePage.dataset.liveTab = tab;
    enableHeaderTabs();
 
    if (tab === "allGames") {
