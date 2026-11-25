@@ -11,8 +11,11 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Yandex.Metrika counter -->
+  <!-- Yandex.Metrika counter. Production only: the dev site
+       (dev.uefatable.pages.dev), branch previews and localhost must not
+       send visits to the production counter. -->
   <script type="text/javascript">
+    if (/^(www\.)?uefaresults\.com$/.test(location.hostname)) {
     (function (m, e, t, r, i, k, a) {
       m[i] = m[i] || function () {
         (m[i].a = m[i].a || []).push(arguments);
@@ -37,6 +40,7 @@
       accurateTrackBounce: true,
       trackLinks: true
     });
+    }
   </script>
   <!-- /Yandex.Metrika counter -->
 

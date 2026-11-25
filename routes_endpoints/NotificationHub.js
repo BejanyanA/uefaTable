@@ -1,10 +1,13 @@
 // routes/get_friends.js
-import { handleCorsHeaders } from '../utils/helper.js';
+import { handleCorsHeaders, configureAllowedOrigins } from '../utils/helper.js';
 
 export class NotificationHub {
   constructor(state, env) {
     this.state = state;
     this.env = env;
+    // This object can run apart from the main Worker, so it sets up the
+    // per-environment allowed origins itself (see utils/helper.js).
+    configureAllowedOrigins(env);
     this.clients = new Map(); // userId -> Set(controller)
     this.encoder = new TextEncoder();
   }

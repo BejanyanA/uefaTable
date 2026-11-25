@@ -9,7 +9,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preloads": "node tools/update-preloads.mjs",
-    "preloads:check": "node tools/update-preloads.mjs --check"
+    "preloads:check": "node tools/update-preloads.mjs --check",
+    "dev:site": "node tools/dev-site.mjs",
+    "dev:api": "npx wrangler@4.168.0 dev --config wrangler.dev.toml",
+    "dev:db:init": "npx wrangler@4.168.0 d1 execute core-db-dev --local --config wrangler.dev.toml --file db/schema.sql",
+    "deploy:api:dev": "npx wrangler@4.168.0 deploy --config wrangler.dev.toml",
+    "logs:api:dev": "npx wrangler@4.168.0 tail --config wrangler.dev.toml"
   },
   "keywords": [],
   "author": "",

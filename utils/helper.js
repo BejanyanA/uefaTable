@@ -5,12 +5,30 @@ const ALLOWED_ORIGINS = new Set([
   "https://www.uefaresults.com",
 ]);
 
+// Extra origins for non-production deployments, set from the environment by
+// configureAllowedOrigins(). Empty in production, so production only accepts
+// the two origins above (plus localhost).
+let extraOrigins = new Set();
+let extraOriginSuffix = "";
+
+// Call once per request with the Worker's `env`.
+//   EXTRA_ALLOWED_ORIGINS        comma-separated full origins
+//   EXTRA_ALLOWED_ORIGIN_SUFFIX  host suffix, e.g. ".uefatable.pages.dev",
+//                                to accept every preview of the site
+// Both are defined only in wrangler.dev.toml.
+export function configureAllowedOrigins(env) {
+  const list = (env?.EXTRA_ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
+  extraOrigins = new Set(list);
+  extraOriginSuffix = (env?.EXTRA_ALLOWED_ORIGIN_SUFFIX || "").trim();
+}
+
 export function isAllowedOrigin(origin) {
   if (!origin) return false;
-  if (ALLOWED_ORIGINS.has(origin)) return true;
+  if (ALLOWED_ORIGINS.has(origin) || extraOrigins.has(origin)) return true;
   try {
-    const { hostname } = new URL(origin);
-    return hostname === "localhost" || hostname === "127.0.0.1";
+    const { hostname, protocol } = new URL(origin);
+    if (hostname === "localhost" || hostname === "127.0.0.1") return true;
+    return Boolean(extraOriginSuffix) && protocol === "https:" && hostname.endsWith(extraOriginSuffix);
   } catch {
     return false;
   }

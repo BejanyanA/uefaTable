@@ -1,0 +1,54 @@
+# DEV copy of the API Worker.
+#
+# A separate file on purpose: an [env.dev] block inside wrangler.toml would
+# inherit production's route (api.uefaresults.com). This file shares nothing
+# with production: its own Worker name, its own database, its own Durable
+# Object storage, its own JWT secret, and no custom domain.
+#
+#   Deploy dev:   npm run deploy:api:dev
+#   Run locally:  npm run dev:api
+#   Production is still deployed from wrangler.toml and is not affected.
+
+name = "uefa-app-dev"
+main = "worker.js"
+compatibility_date = "2025-07-11"
+
+# Served at https://uefa-app-dev.<account>.workers.dev - no routes, no custom domain.
+workers_dev = true
+
+[observability.logs]
+enabled = true
+
+# Browser origins the dev API accepts, on top of localhost.
+[vars]
+EXTRA_ALLOWED_ORIGINS = "https://dev.uefatable.pages.dev"
+EXTRA_ALLOWED_ORIGIN_SUFFIX = ".uefatable.pages.dev"
+
+[[d1_databases]]
+binding = "core_data"
+database_name = "core-db-dev"
+database_id = "5a8b79c7-e6f2-4a38-865f-538bf79c6f9f"
+
+[[durable_objects.bindings]]
+name = "NOTIF_HUB"
+class_name = "NotificationHub"
+
+[[durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
+
+[[durable_objects.bindings]]
+name = "PRESENCE_ROOM"
+class_name = "PresenceRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["NotificationHub"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ChatRoom"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["PresenceRoom"]

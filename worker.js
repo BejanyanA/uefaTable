@@ -1,4 +1,4 @@
-import { handleCorsHeaders, jsonResponse, isAllowedOrigin } from './utils/helper.js';
+import { handleCorsHeaders, jsonResponse, isAllowedOrigin, configureAllowedOrigins } from './utils/helper.js';
 import { verifyToken } from './utils/jwt.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
@@ -133,6 +133,9 @@ export async function onRequest(context) {
 
   const origin = request.headers.get("Origin");
 
+  // Dev deployments accept extra origins (see wrangler.dev.toml); production does not.
+  configureAllowedOrigins(env);
+
   // Handle CORS preflight
   if (method === "OPTIONS") {
     return new Response(null, {
@@ -191,6 +194,9 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
+
+    // Dev deployments accept extra origins (see wrangler.dev.toml); production does not.
+    configureAllowedOrigins(env);
 
     // === SSE subscribe (forward to Durable Object) ===
     if (url.pathname === "/notifications/stream" && request.method === "GET") {
