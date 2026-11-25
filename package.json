@@ -14,7 +14,8 @@
     "dev:api": "npx wrangler@4.168.0 dev --config wrangler.dev.toml",
     "dev:db:init": "npx wrangler@4.168.0 d1 execute core-db-dev --local --config wrangler.dev.toml --file db/schema.sql",
     "deploy:api:dev": "npx wrangler@4.168.0 deploy --config wrangler.dev.toml",
-    "logs:api:dev": "npx wrangler@4.168.0 tail --config wrangler.dev.toml"
+    "logs:api:dev": "npx wrangler@4.168.0 tail --config wrangler.dev.toml",
+    "check": "node --no-warnings tools/check.mjs"
   },
   "keywords": [],
   "author": "",

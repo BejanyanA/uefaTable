@@ -48,6 +48,7 @@ Commands:
 
 | Command | What it does |
 | --- | --- |
+| `npm run check` | Check that nothing is broken: code checks plus the dev site and dev API. Add `-- https://uefaresults.com` to check production, `-- --local` for code only |
 | `npm run deploy:api:dev` | Deploy the API to the dev Worker |
 | `npm run logs:api:dev` | Follow the dev Worker's logs |
 | `npm run dev:site` | Run the site on this machine (http://localhost:8788), talking to the dev API |
