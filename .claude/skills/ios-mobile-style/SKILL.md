@@ -89,6 +89,14 @@ Shapes and sizes:
   not a coloured gradient. (The Live tabs still use the site's blue: changing
   them is a decision for the owner.)
 
+- **Sheets:** frosted glass (`rgba(28, 28, 30, 0.72)` with `blur(30px)
+  saturate(180%)`) over a light dimming of the page, a grabber at the top,
+  and they close with a swipe down as well as a button. Use a plain word on
+  that button ("Close"), short enough for every language.
+- **Inputs:** `style.css` gives every input a box, border and shadow with
+  `!important`; an iOS search field must override all three, or it shows two
+  backgrounds.
+
 Motion: short and quiet (about 0.2-0.3s, ease-out). Respect
 `prefers-reduced-motion`.
 

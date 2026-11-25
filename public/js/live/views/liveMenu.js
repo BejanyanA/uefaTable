@@ -18,6 +18,11 @@ const ICONS = {
   search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
 };
 
+const SHEET_ANIMATION_MS = 300;
+// A swipe down closes the sheet when it goes this far, or this fast.
+const CLOSE_DISTANCE_PX = 110;
+const CLOSE_SPEED_PX_PER_MS = 0.5;
+
 function icon(name, className) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
@@ -108,7 +113,7 @@ function openTimeZoneSheet(returnFocusTo) {
   const grabber = el("div", "lv-sheet-grabber");
   const head = el("div", "lv-sheet-head");
   const title = el("h2", "lv-sheet-title", t("live_time_zone"));
-  const done = el("button", "lv-sheet-done", t("live_done"));
+  const done = el("button", "lv-sheet-done", t("live_close"));
   done.type = "button";
   head.append(el("span", "lv-sheet-spacer"), title, done);
 
@@ -178,11 +183,63 @@ function openTimeZoneSheet(returnFocusTo) {
   backdrop.addEventListener("click", close);
   done.addEventListener("click", close);
 
-  function close() {
+  // Swipe down to close, as on iOS: from the top part anywhere, or from the
+  // list when it is already scrolled to its top.
+  let startY = 0;
+  let startTime = 0;
+  let distance = 0;
+  let mayDrag = false;
+  let dragging = false;
+
+  sheet.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1 || e.target.closest("input")) { mayDrag = false; return; }
+    startY = e.touches[0].clientY;
+    startTime = performance.now();
+    distance = 0;
+    dragging = false;
+    mayDrag = !list.contains(e.target) || list.scrollTop <= 0;
+  }, { passive: true });
+
+  sheet.addEventListener("touchmove", (e) => {
+    if (!mayDrag) return;
+    distance = e.touches[0].clientY - startY;
+    if (!dragging && distance < 0) { mayDrag = false; return; } // scrolling the list up
+    if (distance > 0) {
+      dragging = true;
+      e.preventDefault();
+      sheet.classList.add("is-dragging");
+      sheet.style.transform = `translateY(${distance}px)`;
+      backdrop.style.opacity = String(Math.max(0, 1 - distance / 400));
+    }
+  }, { passive: false });
+
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    mayDrag = false;
+    sheet.classList.remove("is-dragging");
+    const speed = distance / Math.max(1, performance.now() - startTime);
+    sheet.style.transform = "";
+    backdrop.style.opacity = "";
+    if (distance > CLOSE_DISTANCE_PX || speed > CLOSE_SPEED_PX_PER_MS) close({ from: distance });
+  };
+  sheet.addEventListener("touchend", endDrag);
+  sheet.addEventListener("touchcancel", endDrag);
+
+  let closed = false;
+  function close({ from = 0 } = {}) {
+    if (closed) return;
+    closed = true;
     document.removeEventListener("keydown", onKey);
     document.body.classList.remove("lv-sheet-open");
-    backdrop.remove();
-    sheet.remove();
+    // Slide away from where the finger left it, then remove.
+    if (from > 0) sheet.style.transform = `translateY(${from}px)`;
+    requestAnimationFrame(() => {
+      sheet.style.transform = "";
+      sheet.classList.remove("is-open");
+      backdrop.classList.remove("is-open");
+    });
+    setTimeout(() => { backdrop.remove(); sheet.remove(); }, SHEET_ANIMATION_MS);
     returnFocusTo?.focus();
   }
 }

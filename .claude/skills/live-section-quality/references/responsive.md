@@ -112,7 +112,10 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   another day goes to today, and picking a day releases it.
 - **Phone menu:** a round glass menu button in the tab bar's right-hand
   column (so it never moves), opening an iOS menu with Favorites (later) and
-  Time zone; the time zone sheet is an iOS sheet with search. The chosen zone
+  Time zone; the time zone sheet is a frosted iOS sheet with search that
+  closes with a swipe down or its "Close" button. On desktop the same menu
+  opens from a "Settings" button at the right end of the day row, and the
+  time zone list is a centred panel. The chosen zone
   is in `public/js/live/settings.js` and every Live screen follows it
   (`live:timezone-changed` event); default is the device's zone.
 - **Matches do not vanish at midnight.** A match that kicked off before the

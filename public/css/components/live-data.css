@@ -1215,7 +1215,7 @@ body.lv-sheet-open {
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.25);
   opacity: 0;
   transition: opacity 0.25s ease-out;
 }
@@ -1234,7 +1234,11 @@ body.lv-sheet-open {
   display: flex;
   flex-direction: column;
   border-radius: 12px 12px 0 0;
-  background: #1c1c1e;
+  /* Frosted, as iOS sheets are: the page behind shows through, blurred. */
+  background: rgba(28, 28, 30, 0.72);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.12);
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   transform: translateY(100%);
@@ -1243,6 +1247,11 @@ body.lv-sheet-open {
 
 .lv-sheet.is-open {
   transform: none;
+}
+
+/* Following the finger: no easing. */
+.lv-sheet.is-dragging {
+  transition: none;
 }
 
 .lv-sheet-grabber {
@@ -1304,12 +1313,28 @@ body.lv-sheet-open {
 .lv-sheet-search input {
   flex: 1 1 auto;
   min-width: 0;
+  height: 100%;
+  padding: 0;
   border: 0;
   outline: 0;
-  background: none;
+  /* Only the field around it has a background: the browser's own search box
+     look is switched off. */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
   color: #fff;
   font: inherit;
   font-size: 1.0625rem;
+}
+
+/* style.css gives every input a faint box, a border and a shadow with
+   !important; here the search field's surroundings already are the box. */
+.lv-sheet .lv-sheet-search input {
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .lv-sheet-search input::placeholder {
@@ -1370,6 +1395,84 @@ body.lv-sheet-open {
   width: 20px;
   height: 20px;
   color: #0a84ff;
+}
+
+/* Desktop: the same list as a centred panel instead of a sheet from the
+   bottom; no grabber. */
+@media (min-width: 769px) {
+  .lv-sheet {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(420px, calc(100vw - 48px));
+    height: min(640px, calc(100vh - 120px));
+    border-radius: 12px;
+    opacity: 0;
+    transform: translate(-50%, -46%);
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  }
+
+  .lv-sheet.is-open {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  .lv-sheet-grabber {
+    display: none;
+  }
+
+  .lv-sheet-head {
+    padding-top: 8px;
+  }
+}
+
+/* Desktop: the Settings button at the right end of the day row
+   (dayView.js), opening the same menu under it. */
+.lv-settings {
+  position: relative;
+  flex: none;
+  margin-left: 0.25rem;
+}
+
+.lv-settings .lv-menu {
+  right: 0;
+}
+
+.lv .lv-settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: rgba(118, 118, 128, 0.24);
+  color: var(--lv-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lv .lv-settings-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.lv .lv-settings-button[aria-expanded="true"] {
+  background: rgba(118, 118, 128, 0.36);
+}
+
+@media (hover: hover) {
+  .lv .lv-settings-button:hover {
+    background: rgba(118, 118, 128, 0.32);
+  }
+}
+
+/* Phones have the menu in the tab bar instead. */
+@media (max-width: 768px) {
+  .lv-settings {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

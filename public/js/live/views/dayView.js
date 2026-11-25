@@ -329,7 +329,22 @@ function drawDayBar(self, state, bar) {
   // Desktop browsers open the picker only from its own small icon; ask for it.
   jump.addEventListener("click", () => { try { input.showPicker(); } catch { /* not supported: the input still works */ } });
 
-  bar.replaceChildren(prev, strip, next, jump);
+  // Settings (favorites, time zone) at the right end of the row. Shown on
+  // wide screens; phones have the same menu in the tab bar.
+  const settingsBox = el("span", "lv-settings");
+  const settings = el("button", "lv-settings-button");
+  settings.type = "button";
+  settings.setAttribute("aria-haspopup", "menu");
+  settings.setAttribute("aria-expanded", "false");
+  settings.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
+  settings.append(el("span", null, t("live_settings")));
+  settings.addEventListener("click", async () => {
+    const { toggleLiveMenu } = await import("./liveMenu.js");
+    toggleLiveMenu(settings);
+  });
+  settingsBox.append(settings);
+
+  bar.replaceChildren(prev, strip, next, jump, settingsBox);
 
   // Bring the selected day to the middle of the strip (the strip only, never
   // the page). Done after layout, when the sizes are known.
