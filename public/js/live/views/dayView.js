@@ -249,7 +249,8 @@ function drawFilters(self, state, filters, parts) {
   };
   const badge = el("span", "lv-filter-count", String(count));
   if (count > 0) badge.classList.add("is-live");
-  filters.replaceChildren(make("all", t("live_filter_all")), make("live", t("live_filter_live"), badge));
+  // The owner asked for Live first, then All.
+  filters.replaceChildren(make("live", t("live_filter_live"), badge), make("all", t("live_filter_all")));
 }
 
 function drawNote(state, note) {

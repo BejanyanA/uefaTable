@@ -61,6 +61,11 @@ live, so nothing is missing for visitors in between.
 - **The day view lists every competition of the day, ours first:** the
   competitions from our menus on top in the usual order, then all the others
   grouped by country. (2026-11-25)
+- **Back and the three tabs are one slim bar that stays under the site header**
+  while the page scrolls, on all three Live tabs; the day switcher stays
+  right under it. (2026-11-25)
+- **In the day view the "Live" filter comes before "All".** "All" is still the
+  one selected when the screen opens. (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
 - The viewer's day is worked out on the server from their date and time zone;
@@ -120,7 +125,9 @@ and after. This stage also laid the groundwork every later stage reuses.
       calendar button to jump further; the day is in the address
 - [x] Refresh only while a match is in play and the screen is visible; score
       changes update in place with a short highlight
-- [x] "All" and "Live" filter with the number of matches in play
+- [x] "Live" and "All" filter with the number of matches in play
+- [x] Back and the tabs in one bar that sticks under the site header; the day
+      switcher sticks below it (it used to slide under the header)
 - [x] Styles in their own file, colours and sizes named once
 - [x] All states: loading, data, no matches that day, old data, failure with
       Retry
@@ -234,3 +241,4 @@ and after. This stage also laid the groundwork every later stage reuses.
   to the decisions and the checks.
 - 2026-11-25: the day view lists every competition, ours first (owner).
 - 2026-11-25: stage 1 built on dev (API and website). Not on production.
+- 2026-11-25: sticky bar with Back and the tabs; Live filter before All (owner).

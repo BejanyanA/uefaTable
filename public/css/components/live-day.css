@@ -14,7 +14,7 @@
   --lv-accent: #4da3ff;
   --lv-page: rgb(1, 10, 20);
   --lv-radius: 0.75rem;
-  --lv-bar-h: 3.5rem;
+  --lv-bar-h: 3.25rem;
 
   container-type: inline-size;
   container-name: lv;
@@ -63,8 +63,10 @@
 
 .lv-daybar {
   position: sticky;
-  top: 0;
-  z-index: 3;
+  /* Below whatever is already stuck above it (the site header and the tab
+     bar set --lv-sticky-top); at the very top when used on its own. */
+  top: var(--lv-sticky-top, 0px);
+  z-index: 20;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
@@ -170,7 +172,12 @@
 
 @container lv (max-width: 23rem) {
   .lv-day[data-distance="2"] { display: none; }
-  .lv-day-step, .lv-day-jump { width: 2.5rem; }
+  /* The smallest phones: slimmer arrows and slightly smaller words, so three
+     days fit even with long names ("Aujourd'hui"). */
+  .lv-day-step, .lv-day-jump { width: 2.25rem; }
+  .lv .lv-day { padding-inline: 0.125rem; }
+  .lv-day-name { font-size: 0.75rem; }
+  .lv-day-date { font-size: 0.6875rem; }
 }
 
 /* ---------------------------------------------------------------- filters and note */

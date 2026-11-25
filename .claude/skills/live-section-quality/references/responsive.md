@@ -113,6 +113,12 @@ and later days. This control is used constantly, so it gets the most care.
 - With the keyboard: left and right arrows move a day when the strip has
   focus.
 - The strip stays reachable while scrolling (sticky), but thin.
+- **What is stuck above it.** The site header is fixed (60px, 50px on
+  phones), and the bar with Back and the three tabs sticks right under it on
+  all Live tabs. Anything sticky inside a Live tab must stop below both: use
+  `top: var(--lv-sticky-top)` (set on `.liveDataPage` in `live-data.css`),
+  never `top: 0`, or it slides under the header. Check by scrolling, not only
+  by looking at the top of the page.
 
 ## 5. Long lists on small phones
 
