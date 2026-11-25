@@ -380,7 +380,7 @@ function drawGroup(self, group) {
 }
 
 function drawSide(parts, which) {
-  const line = el("div", "lv-team");
+  const line = el("div", `lv-team lv-team--${which}`);
   const crest = logo(null, 20, "lv-team-logo");
   const name = el("span", "lv-team-name");
   const cards = el("span", "lv-team-cards");
@@ -401,7 +401,10 @@ function drawRow(match) {
   const scores = el("div", "lv-scores");
   parts.homeScore = el("span", "lv-score");
   parts.awayScore = el("span", "lv-score");
-  scores.append(parts.homeScore, parts.awayScore);
+  // "2 - 0" on one line on wide screens; hidden where the scores stack.
+  const sep = el("span", "lv-score-sep", "-");
+  sep.setAttribute("aria-hidden", "true");
+  scores.append(parts.homeScore, sep, parts.awayScore);
 
   node.append(when, teams, scores);
   const row = { node, parts, last: {} };

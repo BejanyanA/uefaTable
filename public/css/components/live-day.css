@@ -441,6 +441,10 @@
   min-width: 1.5rem;
 }
 
+.lv-score-sep {
+  display: none;
+}
+
 .lv-score {
   min-height: 1.25rem;
   font-size: 1.0625rem;
@@ -732,5 +736,94 @@
     padding-inline: 0.25rem;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
     mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
+  }
+}
+
+/* ---------------------------------------------------------------- wide screens */
+
+/* Wide lists (640px and more, so desktop and wide tablets): each match on
+   one line, the score in the middle of its block. Measured on the list, not
+   the window: a narrow list in a wide window keeps the two-line rows.
+     [time]  Home name [crest]   2 - 0   [crest] Away name  [empty]
+   The empty last column is as wide as the time column, so the score sits in
+   the exact middle. Phones keep the two-line rows above. */
+@container lv (min-width: 40rem) {
+  .lv .lv-match {
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto minmax(0, 1fr) 4.5rem;
+    column-gap: 1rem;
+    min-height: 3.5rem;
+    padding-inline: 1rem;
+  }
+
+  /* The two team lines and the score box place their parts straight into
+     the row's columns. */
+  .lv-teams {
+    display: contents;
+  }
+
+  /* All on the first (only) line; otherwise the score, placed after the away
+     team in the page, would start a second line. */
+  .lv-when,
+  .lv-team,
+  .lv-scores {
+    grid-row: 1;
+  }
+
+  .lv-when {
+    grid-column: 1;
+  }
+
+  .lv-team {
+    gap: 0.75rem;
+  }
+
+  /* Home: name then crest, against the score. */
+  .lv-team--home {
+    grid-column: 2;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+  }
+
+  .lv-team--away {
+    grid-column: 4;
+  }
+
+  .lv-team-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .lv-team-name {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .lv-scores {
+    grid-column: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 4.5rem;
+    justify-content: center;
+  }
+
+  .lv-score {
+    min-height: 0;
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+  }
+
+  .lv-score-sep {
+    display: inline;
+    color: var(--lv-text-2);
+    font-size: 1.125rem;
+  }
+
+  /* Before kick-off there is no score: no lonely dash either. */
+  .lv-match[data-phase="scheduled"] .lv-score-sep,
+  .lv-match[data-phase="postponed"] .lv-score-sep,
+  .lv-match[data-phase="cancelled"] .lv-score-sep,
+  .lv-match[data-phase="unknown"] .lv-score-sep {
+    visibility: hidden;
   }
 }

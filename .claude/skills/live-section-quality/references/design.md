@@ -69,9 +69,14 @@ settle them):
                  [logo] Away team name ............  1
 ```
 
-- Two lines, one team per line, scores right-aligned in a column. This layout
-  survives long names and narrow phones far better than
-  "Home 2 - 1 Away" on one line.
+- **Narrow lists (phones, small windows):** two lines, one team per line,
+  scores right-aligned in a column. This survives long names on narrow
+  screens.
+- **Wide lists (640px of list width and more, desktop):** one line, as the
+  owner asked on 2026-11-26: `Home name [crest]  2 - 0  [crest] Away name`,
+  the score in the exact middle of the block, the home name right-aligned
+  against its crest. The switch is a container query on the list, not on the
+  window.
 - Left column, fixed width: kick-off time before the match, the live minute
   during it (with the live mark), "HT", "FT", "AET", "Pen" after.
 - Team names on one line, cut with an ellipsis. The winner's name and score
