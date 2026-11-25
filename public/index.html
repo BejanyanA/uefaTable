@@ -876,9 +876,11 @@
       }
     });
 
+    // Only the Standings and Matches tabs still use the API-Sports widget;
+    // the Live tab (the day view) is drawn by the site itself.
     function isLiveRoute() {
       const routeSlug = location.pathname.split("/").filter(Boolean).pop() || "";
-      return routeSlug === "live" || routeSlug === "live-standings" || routeSlug === "live-matches"
+      return routeSlug === "live-standings" || routeSlug === "live-matches"
         || location.pathname.includes("liveData");
     }
 

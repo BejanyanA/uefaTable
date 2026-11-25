@@ -195,19 +195,31 @@ and after. This stage also laid the groundwork every later stage reuses.
 **Checks**
 - [x] Sizes checked in the browser: 320, 360, 375, 390 px, a phone in
       landscape (740 by 360) and 1440 px; no sideways page scroll
-- [ ] Sizes not yet checked: 430, 600, 768, 1024, 1280, 1920 px and 200% zoom
+- [x] Sizes 430, 600, 768, 800, 1024, 1280, 1920 px and 200% zoom (as
+      640 by 450): no sideways scroll, no cut tab or day words; at 768 and
+      1024 px 5 and 2 very long club names end in "..." (2026-11-26)
 - [x] English, French and Armenian looked at
 - [x] No provider words outside the provider folder (`npm run check`)
 - [x] `npm run check` passes; Standings and Matches tabs still work; leaving
       Live stops all refreshing; home banners still there
 - [x] One request for the day (15 KB), then small score requests (about 2 KB
       compressed) every 15 s; rows are updated in place
-- [ ] Keyboard and screen reader pass
-- [ ] Comparison with the widget version in numbers
+- [x] Keyboard and screen reader basics: visible focus on every control,
+      the day strip is one Tab stop with arrow keys and Home, the Live
+      button says pressed or not, leagues say open or closed, goals are
+      announced politely, the tab bar is named (2026-11-26)
+- [x] Comparison with the widget version (390 px, browser cache warm, 20 s
+      after opening): matches on screen after 0.79 s (widget 0.93 s); the
+      browser no longer calls API-Sports with the key (widget: 2 calls in
+      20 s per visitor; new: 2 calls to our own API, shared cache); the
+      widget script is no longer downloaded on this tab (2026-11-26)
 - [ ] Custom-league tables looked at while signed in (no shared styles were
       touched, so no change is expected)
 
 **Known gaps in this stage**
+- Opening Standings directly by its address (`/en/live-standings`) showed an
+  empty table during testing, on production too, while switching to it from
+  another tab works. It is the old widget; stage 2 replaces it.
 - Tapping a match does nothing yet. The widget opened a match pop-up from
   this tab; that returns with stage 4. The Matches tab still has it.
 - The Armenian texts need your eye.
