@@ -161,9 +161,9 @@ settle them):
   an empty area.
 - **Switching league:** keep the old content dimmed until the new one is
   ready, or swap to skeletons at once. Do not flash an empty state in between.
-- **Empty:** a small football pitch picture with the ball on the centre spot
-  (drawn in code in `dayView.js`, about 1 KB, no image download; the owner
-  asked for it on 2026-11-26) and one short sentence in the current
+- **Empty:** a small picture of an empty football pitch, no ball (drawn in
+  code in `dayView.js`, under 1 KB, no image download; the owner asked for
+  it on 2026-11-26) and one short sentence in the current
   language.
 - **Old data:** content as normal plus the "Updated ... ago" line in a
   noticeable (not alarming) colour.
