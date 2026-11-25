@@ -64,8 +64,13 @@ live, so nothing is missing for visitors in between.
 - **Back and the three tabs are one slim bar that stays under the site header**
   while the page scrolls, on all three Live tabs; the day switcher stays
   right under it. (2026-11-25)
-- **In the day view the "Live" filter comes before "All".** "All" is still the
-  one selected when the screen opens. (2026-11-25)
+- **In the day view the "Live" filter comes before "All", and Live is the one
+  selected when the screen opens.** A day with nothing in play opens on All
+  instead of an empty screen; once the visitor picks a filter, their choice is
+  kept. (2026-11-25)
+- **The day switcher keeps the look it had in the first version** (sizes of
+  names, dates and arrows); only phones about 320 px wide get a tighter one.
+  (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
 - The viewer's day is worked out on the server from their date and time zone;
@@ -242,3 +247,5 @@ and after. This stage also laid the groundwork every later stage reuses.
 - 2026-11-25: the day view lists every competition, ours first (owner).
 - 2026-11-25: stage 1 built on dev (API and website). Not on production.
 - 2026-11-25: sticky bar with Back and the tabs; Live filter before All (owner).
+- 2026-11-25: Live is the default filter; the day switcher back to its
+  first look (owner).

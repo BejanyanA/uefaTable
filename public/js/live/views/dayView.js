@@ -78,7 +78,12 @@ function createView(container, onPickDate) {
 
   const self = {
     container, root, onPickDate,
-    filter: "all",       // "all" | "live"
+    // "live" | "all". Live is the default (the owner's choice); a day with
+    // nothing in play opens on All instead of an empty screen. Once the
+    // visitor picks one themselves, their choice is kept.
+    filter: "live",
+    filterChosen: false,
+    filterDay: null,
     rows: new Map(),     // match id -> { node, parts }
     drawnKey: "",        // what the list currently shows, to know when to rebuild
     store: null,
@@ -118,6 +123,16 @@ function draw(self, state, change, parts) {
   const { bar, note, filters, list, announcer } = parts;
   self.root.dataset.status = state.status;
   self.root.classList.toggle("is-switching", Boolean(state.switching));
+
+  if (state.status === "ready" && !self.filterChosen) {
+    const inPlay = state.data.live?.count || 0;
+    if (self.filterDay !== state.data.date) {
+      self.filterDay = state.data.date;
+      self.filter = inPlay > 0 ? "live" : "all";
+    } else if (self.filter === "live" && inPlay === 0) {
+      self.filter = "all";
+    }
+  }
 
   drawDayBar(self, state, bar);
   drawFilters(self, state, filters, parts);
@@ -243,6 +258,7 @@ function drawFilters(self, state, filters, parts) {
     button.addEventListener("click", () => {
       if (self.filter === name) return;
       self.filter = name;
+      self.filterChosen = true;
       draw(self, self.store.state, {}, parts);
     });
     return button;

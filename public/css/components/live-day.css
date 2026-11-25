@@ -14,7 +14,7 @@
   --lv-accent: #4da3ff;
   --lv-page: rgb(1, 10, 20);
   --lv-radius: 0.75rem;
-  --lv-bar-h: 3.25rem;
+  --lv-bar-h: 3.5rem;
 
   container-type: inline-size;
   container-name: lv;
@@ -172,8 +172,12 @@
 
 @container lv (max-width: 23rem) {
   .lv-day[data-distance="2"] { display: none; }
-  /* The smallest phones: slimmer arrows and slightly smaller words, so three
-     days fit even with long names ("Aujourd'hui"). */
+  .lv-day-step, .lv-day-jump { width: 2.5rem; }
+}
+
+/* Only the very smallest phones (about 320 px wide): slimmer arrows and
+   slightly smaller words, so three days fit even with long names. */
+@container lv (max-width: 19rem) {
   .lv-day-step, .lv-day-jump { width: 2.25rem; }
   .lv .lv-day { padding-inline: 0.125rem; }
   .lv-day-name { font-size: 0.75rem; }
