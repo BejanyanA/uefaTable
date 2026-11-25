@@ -31,7 +31,7 @@
   font-size: 1rem;
   line-height: 1.25;
   text-align: left;
-  max-width: 54rem;
+  max-width: 68rem;
   margin: 0 auto;
   min-width: 0;
   /* Holds its own hidden helper (.lv-sr). Without this that element is placed
@@ -782,10 +782,27 @@
    the exact middle. Phones keep the two-line rows above. */
 @container lv (min-width: 40rem) {
   .lv .lv-match {
-    grid-template-columns: 4.5rem minmax(0, 1fr) auto minmax(0, 1fr) 4.5rem;
-    column-gap: 1rem;
-    min-height: 3.5rem;
-    padding-inline: 1rem;
+    grid-template-columns: 5rem minmax(0, 1fr) auto minmax(0, 1fr) 5rem;
+    column-gap: 1.25rem;
+    min-height: 4.25rem;
+    padding-inline: 1.25rem;
+  }
+
+  .lv-when {
+    font-size: 0.9375rem;
+  }
+
+  .lv .lv-group-toggle {
+    font-size: 1rem;
+  }
+
+  .lv-group-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lv-group-country {
+    font-size: 0.8125rem;
   }
 
   /* The two team lines and the score box place their parts straight into
@@ -822,12 +839,12 @@
   }
 
   .lv-team-logo {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
 
   .lv-team-name {
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 600;
   }
 
@@ -842,14 +859,38 @@
 
   .lv-score {
     min-height: 0;
-    font-size: 1.25rem;
-    line-height: 1.5rem;
+    font-size: 1.5rem;
+    line-height: 1.75rem;
   }
 
   .lv-score-sep {
     display: inline;
     color: var(--lv-text-2);
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+  }
+
+  /* The day row grows with the list. */
+  .lv {
+    --lv-bar-h: 4rem;
+  }
+
+  .lv .lv-day {
+    min-width: 3.25rem;
+    height: 3.125rem;
+  }
+
+  .lv-day-name {
+    font-size: 0.875rem;
+  }
+
+  .lv-day-date {
+    font-size: 0.75rem;
+  }
+
+  .lv .lv-filter {
+    height: 3rem;
+    min-width: 3rem;
+    font-size: 0.875rem;
   }
 
   /* Before kick-off there is no score: no lonely dash either. */

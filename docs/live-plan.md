@@ -108,11 +108,14 @@ live, so nothing is missing for visitors in between.
   ("Automatic"); a chosen one is remembered on the device, and days and
   kick-off times follow it. Phone tabs get tighter on narrow screens: the
   selected tab keeps icon and word, the others show only the word (up to
-  432px) or only the icon (up to 368px). The time zone sheet is frosted
+  432px); below 368px every tab shows its word without an icon. The time zone sheet is frosted
   glass and closes with a swipe down or "Close". (2026-11-26)
 - **Desktop: a "Settings" button at the right end of the day row** opens the
-  same menu under it; the time zone list opens as a centred panel.
+  same menu under it; the time zone list opens as a panel under Settings.
+  The desktop list is larger: up to 68rem wide, 18px names, 24px scores.
   (2026-11-26)
+- **Phone tabs keep their words at every width** (Armenian included); below
+  368px the icons give way and the text shrinks slightly. (2026-11-26)
 - **One corner radius for the whole site: 12px, like the tab bar** (skill
   `corner-radius`); match blocks use it. The Live pill on phones has 14px
   text and is 36px tall; the selected Live tab's icon is red. (2026-11-26)
@@ -308,6 +311,9 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: menus drawn on the page (real blur, never cut); time zone
+  panel under Settings on desktop; words on all phone tabs; bigger desktop
+  list (owner).
 - 2026-11-26: frosted time zone sheet with swipe-down, Close label;
   Settings menu on desktop (owner).
 - 2026-11-26: phone menu with Favorites (later) and Time zone (owner).

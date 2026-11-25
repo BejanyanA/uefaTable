@@ -115,7 +115,8 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   Time zone; the time zone sheet is a frosted iOS sheet with search that
   closes with a swipe down or its "Close" button. On desktop the same menu
   opens from a "Settings" button at the right end of the day row, and the
-  time zone list is a centred panel. The chosen zone
+  time zone list opens as a panel under it. Menus and panels are drawn on
+  the page (`document.body`), never inside the header. The chosen zone
   is in `public/js/live/settings.js` and every Live screen follows it
   (`live:timezone-changed` event); default is the device's zone.
 - **Matches do not vanish at midnight.** A match that kicked off before the

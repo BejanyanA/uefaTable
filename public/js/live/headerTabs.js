@@ -81,6 +81,12 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
   nav.append(menuButton);
   anchor.after(nav);
 
+  // Load the menu's code while the visitor looks at the scores, so the first
+  // tap on the menu (or on Settings) opens it at once.
+  const preloadMenu = () => import("./views/liveMenu.js").catch(() => {});
+  if ("requestIdleCallback" in window) requestIdleCallback(preloadMenu, { timeout: 4000 });
+  else setTimeout(preloadMenu, 2000);
+
   const copies = new Map(); // original button -> its copy
   for (const real of tabs.querySelectorAll(".liveTabBtn")) {
     const copy = document.createElement("button");

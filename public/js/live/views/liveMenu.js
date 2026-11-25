@@ -19,6 +19,20 @@ const ICONS = {
 };
 
 const SHEET_ANIMATION_MS = 300;
+const GAP_PX = 6;
+// Wide screens: the time zone list opens under its button instead of as a
+// sheet from the bottom.
+const wideScreen = () => window.matchMedia("(min-width: 769px)").matches;
+
+// Place a floating panel under `anchor`, right edges aligned. Panels are
+// drawn on the page itself, not inside the header: a blur inside the
+// header's own blur would only see the header.
+function placeUnder(panel, anchor) {
+  const rect = anchor.getBoundingClientRect();
+  panel.style.top = `${Math.round(rect.bottom + GAP_PX)}px`;
+  panel.style.right = `${Math.max(8, Math.round(window.innerWidth - rect.right))}px`;
+  return rect;
+}
 // A swipe down closes the sheet when it goes this far, or this fast.
 const CLOSE_DISTANCE_PX = 110;
 const CLOSE_SPEED_PX_PER_MS = 0.5;
@@ -80,32 +94,40 @@ export function toggleLiveMenu(button) {
   );
 
   // Under the button, aligned to its right edge.
-  const bar = button.parentElement;
-  bar.append(menu);
+  document.body.append(menu);
+  placeUnder(menu, button);
   button.setAttribute("aria-expanded", "true");
   requestAnimationFrame(() => menu.classList.add("is-open"));
 
   const onOutside = (e) => { if (!menu.contains(e.target) && e.target !== button && !button.contains(e.target)) closeMenu(); };
   const onKey = (e) => { if (e.key === "Escape") { closeMenu(); button.focus(); } };
+  // The menu does not follow the page: scrolling or resizing closes it.
+  const onMove = () => closeMenu();
   setTimeout(() => document.addEventListener("click", onOutside), 0);
   document.addEventListener("keydown", onKey);
+  window.addEventListener("scroll", onMove, { capture: true, passive: true });
+  window.addEventListener("resize", onMove, { passive: true });
   menu.querySelector(".lv-menu-item:not([aria-disabled])")?.focus();
 
   openMenu = {
     close() {
       document.removeEventListener("click", onOutside);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onMove, { capture: true });
+      window.removeEventListener("resize", onMove);
       button.setAttribute("aria-expanded", "false");
       menu.remove();
     },
   };
 }
 
-// A full-height iOS sheet: search field and every time zone, "Automatic"
-// (the phone's own zone) first.
+// Search field and every time zone, "Automatic" (the device's own zone)
+// first. Phones: a full-height iOS sheet from the bottom. Wide screens: a
+// panel under the Settings button.
 function openTimeZoneSheet(returnFocusTo) {
-  const backdrop = el("div", "lv-sheet-backdrop");
-  const sheet = el("div", "lv-sheet");
+  const popover = wideScreen() && returnFocusTo;
+  const backdrop = el("div", popover ? "lv-sheet-backdrop is-clear" : "lv-sheet-backdrop");
+  const sheet = el("div", popover ? "lv-sheet lv-sheet--popover" : "lv-sheet");
   sheet.setAttribute("role", "dialog");
   sheet.setAttribute("aria-modal", "true");
   sheet.setAttribute("aria-label", t("live_time_zone"));
@@ -170,6 +192,10 @@ function openTimeZoneSheet(returnFocusTo) {
 
   sheet.append(grabber, head, searchBox, list);
   document.body.append(backdrop, sheet);
+  if (popover) {
+    const rect = placeUnder(sheet, returnFocusTo);
+    sheet.style.height = `${Math.max(240, Math.min(560, window.innerHeight - rect.bottom - GAP_PX - 16))}px`;
+  }
   document.body.classList.add("lv-sheet-open");
   requestAnimationFrame(() => { backdrop.classList.add("is-open"); sheet.classList.add("is-open"); });
 

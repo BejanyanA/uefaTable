@@ -927,7 +927,7 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 
   .liveDataPage[data-live-tab="allGames"] .lv {
-    max-width: min(54rem, calc(100% - 220px));
+    max-width: min(68rem, calc(100% - 220px));
   }
 }
 
@@ -1103,23 +1103,29 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 }
 
-/* Small phones (368px or less): the others show only their icon instead.
-   Their names stay for screen readers. */
+/* Small phones (368px or less): every tab keeps its word (also in Armenian,
+   whose words are long); the icons give way, and the text shrinks a little
+   with the bar when it must. */
 @container (max-width: 23rem) {
-  .liveHeaderTab:not(.active) {
-    padding: 0 10px;
+  .liveHeaderTabs {
+    gap: 4px;
+    padding-inline: 6px;
   }
 
+  .liveHeaderBack,
+  .liveHeaderMenu {
+    width: 32px;
+    height: 32px;
+  }
+
+  .liveHeaderTab {
+    padding: 0 6px;
+    font-size: min(12.5px, 3.75cqi);
+  }
+
+  .liveHeaderTab svg,
   .liveHeaderTab:not(.active) svg {
-    display: block;
-  }
-
-  .liveHeaderTab:not(.active) span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+    display: none;
   }
 }
 
@@ -1133,11 +1139,13 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
    The Live menu and the time zone sheet on phones (public/js/live/views/
    liveMenu.js), drawn the iOS way (ios-mobile-style, corner-radius). */
 .lv-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 8px;
-  z-index: 20;
+  /* Drawn on the page under its button (liveMenu.js sets top and right), so
+     its own blur sees the page; as wide as its words need. */
+  position: fixed;
+  z-index: 1050;
+  width: max-content;
   min-width: 15rem;
+  max-width: calc(100vw - 16px);
   padding: 0;
   overflow: hidden;
   border-radius: 12px;
@@ -1197,11 +1205,17 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   height: 20px;
 }
 
+.lv-menu-item {
+  white-space: nowrap;
+}
+
 .lv-menu-label {
   flex: 1 1 auto;
 }
 
 .lv-menu-value {
+  margin-left: auto;
+  padding-left: 16px;
   color: rgba(235, 235, 245, 0.6);
   font-size: 0.9375rem;
 }
@@ -1222,6 +1236,12 @@ body.lv-sheet-open {
 
 .lv-sheet-backdrop.is-open {
   opacity: 1;
+}
+
+/* Behind a panel under its button nothing is dimmed; the layer only catches
+   a click outside to close it. */
+.lv-sheet-backdrop.is-clear {
+  background: transparent;
 }
 
 .lv-sheet {
@@ -1397,34 +1417,31 @@ body.lv-sheet-open {
   color: #0a84ff;
 }
 
-/* Desktop: the same list as a centred panel instead of a sheet from the
-   bottom; no grabber. */
-@media (min-width: 769px) {
-  .lv-sheet {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    width: min(420px, calc(100vw - 48px));
-    height: min(640px, calc(100vh - 120px));
-    border-radius: 12px;
-    opacity: 0;
-    transform: translate(-50%, -46%);
-    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-  }
+/* Wide screens: the same list as a panel under the Settings button
+   (liveMenu.js sets top, right and height); no grabber. */
+.lv-sheet.lv-sheet--popover {
+  left: auto;
+  bottom: auto;
+  width: min(380px, calc(100vw - 32px));
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 0 0 0.5px rgba(255, 255, 255, 0.12);
+  opacity: 0;
+  transform: scale(0.97);
+  transform-origin: top right;
+  transition: transform 0.18s ease-out, opacity 0.18s ease-out;
+}
 
-  .lv-sheet.is-open {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+.lv-sheet.lv-sheet--popover.is-open {
+  opacity: 1;
+  transform: none;
+}
 
-  .lv-sheet-grabber {
-    display: none;
-  }
+.lv-sheet--popover .lv-sheet-grabber {
+  display: none;
+}
 
-  .lv-sheet-head {
-    padding-top: 8px;
-  }
+.lv-sheet--popover .lv-sheet-head {
+  padding-top: 6px;
 }
 
 /* Desktop: the Settings button at the right end of the day row
@@ -1435,20 +1452,16 @@ body.lv-sheet-open {
   margin-left: 0.25rem;
 }
 
-.lv-settings .lv-menu {
-  right: 0;
-}
-
 .lv .lv-settings-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 36px;
-  padding: 0 12px;
+  height: 40px;
+  padding: 0 14px;
   border-radius: 12px;
   background: rgba(118, 118, 128, 0.24);
   color: var(--lv-text);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   white-space: nowrap;
 }

@@ -93,6 +93,13 @@ Shapes and sizes:
   saturate(180%)`) over a light dimming of the page, a grabber at the top,
   and they close with a swipe down as well as a button. Use a plain word on
   that button ("Close"), short enough for every language.
+- **Menus and popovers go on the page, not inside the header.** A blur
+  inside an element that already has a blur (the site header) only sees that
+  element, so the menu looks flat. Append floating panels to `document.body`
+  and place them with `position: fixed` under their button.
+- **Tabs keep their words.** On the narrowest phones let icons go and the
+  text shrink a little; do not hide the words (the owner asked for this,
+  Armenian words being long).
 - **Inputs:** `style.css` gives every input a box, border and shadow with
   `!important`; an iOS search field must override all three, or it shows two
   backgrounds.
