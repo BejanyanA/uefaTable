@@ -63,15 +63,15 @@
 
 .lv-daybar {
   position: sticky;
-  /* Below whatever is already stuck above it (the site header and the tab
-     bar set --lv-sticky-top); at the very top when used on its own. */
+  /* Below whatever is already stuck above it (the site header sets
+     --lv-sticky-top); at the very top when used on its own. */
   top: var(--lv-sticky-top, 0px);
   z-index: 20;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.25rem;
-  min-height: var(--lv-bar-h);
+  height: var(--lv-bar-h);
   padding: 0.25rem 0;
   background: var(--lv-page);
 }
@@ -187,10 +187,19 @@
 /* ---------------------------------------------------------------- filters and note */
 
 .lv-filters {
+  /* Stays in view too, right under the day bar. */
+  position: sticky;
+  top: calc(var(--lv-sticky-top, 0px) + var(--lv-bar-h));
+  z-index: 19;
   display: flex;
   gap: 0.5rem;
   min-height: 2.75rem;
   padding: 0.25rem 0 0.5rem;
+  background: var(--lv-page);
+}
+
+.lv-filters:empty {
+  position: static;
 }
 
 .lv .lv-filter {
@@ -493,7 +502,8 @@
 
 /* A phone on its side has very little height: let the day bar scroll away. */
 @media (max-height: 30rem) {
-  .lv-daybar {
+  .lv-daybar,
+  .lv-filters {
     position: static;
   }
 }

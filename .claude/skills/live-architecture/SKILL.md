@@ -185,7 +185,8 @@ public/js/live/
   api.js       The only file that knows Live addresses. Returns our model
   store.js     State, refresh timer, comparing old and new. No DOM
   format.js    Small pure helpers: local time, phase -> text key, score text
-  views/       DOM only: matchRow.js, standingsTable.js, picker.js ...
+  views/       DOM only: dayView.js, later standingsTable.js, picker.js ...
+  headerTabs.js  DOM only: the tabs mirrored in the site header when scrolled
 ```
 
 - `views` read from `store`; `store` calls `api`; nothing calls upward.

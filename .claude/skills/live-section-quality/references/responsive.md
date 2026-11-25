@@ -113,12 +113,18 @@ and later days. This control is used constantly, so it gets the most care.
 - With the keyboard: left and right arrows move a day when the strip has
   focus.
 - The strip stays reachable while scrolling (sticky), but thin.
-- **What is stuck above it.** The site header is fixed (60px, 50px on
-  phones), and the bar with Back and the three tabs sticks right under it on
-  all Live tabs. Anything sticky inside a Live tab must stop below both: use
+- **What stays in view when scrolled** (the owner's design, 2026-11-25):
+  the site header is fixed (60px, 50px on phones); the three Live tabs are
+  mirrored inside it once the real ones scroll out of sight
+  (`public/js/live/headerTabs.js`); the day switcher sticks right under the
+  header and the Live / All filter right under that. The floating Back button
+  fades out while scrolled, because it would sit on the day switcher.
+- Anything sticky inside a Live tab stops below the header: use
   `top: var(--lv-sticky-top)` (set on `.liveDataPage` in `live-data.css`),
   never `top: 0`, or it slides under the header. Check by scrolling, not only
   by looking at the top of the page.
+- A phone on its side is the exception: with so little height the day
+  switcher and the filter scroll away with the page.
 
 ## 5. Long lists on small phones
 

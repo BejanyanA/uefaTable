@@ -61,9 +61,14 @@ live, so nothing is missing for visitors in between.
 - **The day view lists every competition of the day, ours first:** the
   competitions from our menus on top in the usual order, then all the others
   grouped by country. (2026-11-25)
-- **Back and the three tabs are one slim bar that stays under the site header**
-  while the page scrolls, on all three Live tabs; the day switcher stays
-  right under it. (2026-11-25)
+- **When the page is scrolled, the three tabs appear inside the site header,**
+  between the home icon and the login buttons or the user name: icons on
+  phones, icons with words where there is room. Unscrolled, the tabs and the
+  Back button look as they always did. (2026-11-25)
+- **When scrolled, the day switcher and the Live / All filter stay fixed**
+  under the header. The floating Back button steps aside while scrolled.
+  (2026-11-25)
+- **The Live block has no outline.** (2026-11-25)
 - **In the day view the "Live" filter comes before "All", and Live is the one
   selected when the screen opens.** A day with nothing in play opens on All
   instead of an empty screen; once the visitor picks a filter, their choice is
@@ -131,8 +136,8 @@ and after. This stage also laid the groundwork every later stage reuses.
 - [x] Refresh only while a match is in play and the screen is visible; score
       changes update in place with a short highlight
 - [x] "Live" and "All" filter with the number of matches in play
-- [x] Back and the tabs in one bar that sticks under the site header; the day
-      switcher sticks below it (it used to slide under the header)
+- [x] Scrolled: tabs mirrored in the site header, day switcher and Live / All
+      fixed under it, Back button hidden; no outline around the block
 - [x] Styles in their own file, colours and sizes named once
 - [x] All states: loading, data, no matches that day, old data, failure with
       Retry
@@ -249,3 +254,6 @@ and after. This stage also laid the groundwork every later stage reuses.
 - 2026-11-25: sticky bar with Back and the tabs; Live filter before All (owner).
 - 2026-11-25: Live is the default filter; the day switcher back to its
   first look (owner).
+- 2026-11-25: the sticky bar is gone again. Tabs go into the site header
+  when scrolled, day switcher and filters stay fixed, Back as before, no
+  outline (owner).

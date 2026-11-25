@@ -1,16 +1,20 @@
 .liveDataPage {
   /* Height of the site's fixed header (css/layout/header.css): 60px, and 50px
-     on phones (see the 480px rule at the end of this file). */
+     on phones (see the 480px rule at the end of this file). Sticky parts of a
+     Live tab stop right below it. */
   --live-top: 60px;
-  /* Height of the bar with Back and the tabs, which sticks under the header. */
-  --live-bar-h: 3.25rem;
-  /* Where the next sticky thing (the day switcher) has to stop. */
-  --lv-sticky-top: calc(var(--live-top) + var(--live-bar-h));
+  --lv-sticky-top: var(--live-top);
 
   margin-inline: 0;
-  padding-top: calc(var(--live-top) + 12px);
+  padding-top: 130px;
   margin-bottom: 30px;
   width: 100%;
+}
+
+.liveHeader {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .liveTitle {
@@ -21,40 +25,38 @@
   text-align: center;
 }
 
-/* Back and the three tabs: one bar that stays under the site header. */
-.liveBar {
-  position: sticky;
-  top: var(--live-top);
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: var(--live-bar-h);
-  margin-bottom: 8px;
-  /* Solid, so the list does not show through while it scrolls underneath. */
-  background: rgb(1, 10, 20);
+.liveBackBtn {
+  border: 1px solid rgba(255, 255, 255, .25);
+  background: rgba(0, 0, 0, .25);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin: 10px;
+  top: 85px;
+  left: 15px;
+  z-index: 1;
+  text-align: center;
+  box-sizing: content-box;
+  position: fixed;
+  white-space: nowrap;
+  min-width: 60px;
+  z-index: 10000;
+  transition: opacity 0.15s ease-out;
 }
 
-.liveBackBtn {
-  flex: none;
-  height: 44px;
-  min-width: 44px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, .25);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, .05);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  box-sizing: border-box;
+/* Once the page is scrolled the Back button steps aside: the day bar stays
+   in that spot, and the header's home icon and tabs do its job. */
+.liveDataPage.is-scrolled .liveBackBtn {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .liveWidgetCard {
-  margin: 0 20px 10px;
-  border: 1px solid rgba(255, 255, 255, .15);
-  background: rgba(0, 0, 0, .20);
+  margin: 20px 20px 10px;
+  /* No outline and no fill: the owner asked for the block's frame to go. */
+  border: 0;
+  background: none;
   border-radius: 16px;
   padding: 5px;
 }
@@ -105,10 +107,10 @@ date-picker button.next-day {
 
 /* Live Data Tabs */
 .liveTabs {
-  flex: 1;
-  min-width: 0;
   display: flex;
-  padding: 2px;
+  /* gap: 10px; */
+  margin-bottom: 16px;
+  padding: 6px;
   background: #121212;
   border-radius: 14px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -116,12 +118,7 @@ date-picker button.next-day {
 
 .liveTabBtn {
   flex: 1;
-  min-width: 0;
-  min-height: 44px;
-  padding: 0 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 10px 14px;
   border: none;
   border-radius: 12px;
   background: transparent;
@@ -504,11 +501,17 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
 @media (max-width: 600px) {
   .liveTabBtn {
     font-size: 13px;
-    padding: 0 6px;
+    padding: 9px 10px;
   }
 
   .liveTitle {
     font-size: 24px;
+  }
+
+  .liveHeader {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
   }
 
 }
@@ -570,10 +573,14 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
 
   .liveWidgetCard {
     margin: 0px 10px 10px;
-    border: 1px solid rgba(255, 255, 255, .15);
-    background: rgba(0, 0, 0, .20);
-    border-radius: 16px;
     padding: 5px;
+  }
+
+  .liveBackBtn {
+    left: 3px;
+    top: 65px;
+    min-width: 40px;
+    backdrop-filter: blur(6px)
   }
 
   .liveTitle {
@@ -687,6 +694,10 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
 
 /* ✅ Extra small phones */
 @media (max-width: 420px) {
+  .liveDataPage {
+    padding-top: 100px;
+  }
+
   .standingsLeagueBtn {
     padding: 8px 10px;
     font-size: 12px;
@@ -701,11 +712,15 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 
   .liveWidgetCard {
-    margin: 0 8px 10px;
-    border: 1px solid rgba(255, 255, 255, .15);
-    background: rgba(0, 0, 0, .20);
-    border-radius: 16px;
+    margin: 20px 8px 10px;
     padding: 5px;
+  }
+
+  .liveBackBtn {
+    left: 3px;
+    top: 65px;
+    min-width: 40px;
+    backdrop-filter: blur(6px)
   }
 
   .liveTitle {
@@ -786,38 +801,123 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 }
 
-/* Phones: the site header is 50px tall here. The Back button shows only its
-   arrow, to leave the room to the tabs. Its text stays for screen readers. */
 @media (max-width: 480px) {
   .liveDataPage {
     --live-top: 50px;
   }
+}
 
-  .liveBar {
-    gap: 6px;
-  }
+/* ---------------------------------------------------------------------------
+   The Live tabs inside the site header (public/js/live/headerTabs.js).
+   When the page is scrolled and the tabs above are out of sight, a compact
+   copy appears in the header, between the home icon and the login buttons
+   or the user name. */
+.liveHeaderTabs {
+  container-type: inline-size;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease-out, visibility 0s linear 0.15s;
+}
 
-  /* Each tab takes the room its word needs; long words are not cut. */
-  .liveTabBtn {
-    flex: 1 1 auto;
-    padding: 0 4px;
-  }
+.liveHeaderTabs.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.15s ease-out;
+}
 
-  .liveBackBtn {
-    width: 44px;
-    padding: 0;
-    font-size: 0;
-  }
+.liveHeaderTabs-inner {
+  display: flex;
+  gap: 2px;
+  max-width: 100%;
+  padding: 2px;
+  border-radius: 12px;
+  background: #121212;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
 
-  .liveBackBtn::before {
-    content: "\2039";
-    font-size: 26px;
-    line-height: 1;
+.liveHeaderTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #bdbdbd;
+  font: 600 13px/1 Arial, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.liveHeaderTab svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.liveHeaderTab.active {
+  background: linear-gradient(135deg, #2d7cff, #1b56d6);
+  color: #fff;
+}
+
+.liveHeaderTab:focus-visible {
+  outline: 2px solid #4da3ff;
+  outline-offset: 1px;
+}
+
+@media (hover: hover) {
+  .liveHeaderTab:not(.active):hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
   }
 }
 
-@media (max-width: 360px) {
-  .liveTabBtn {
-    font-size: 12px;
+/* Little room (phones): icons only. The words stay for screen readers. */
+@container (max-width: 17rem) {
+  .liveHeaderTab {
+    flex: 1 1 0;
+    padding: 0;
+    width: 40px;
+  }
+
+  .liveHeaderTab span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+/* On phones the login buttons give up a little width while the tabs are in
+   the header, so three icons fit between them and the home icon. */
+@media (max-width: 480px) {
+  header.has-live-tabs .language-auth-group {
+    gap: 8px;
+  }
+
+  header.has-live-tabs .auth-buttons {
+    gap: 6px;
+  }
+
+  header.has-live-tabs .auth-buttons button {
+    min-width: 0;
+    padding-inline: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveHeaderTabs,
+  .liveHeaderTabs.is-shown,
+  .liveBackBtn {
+    transition: none;
   }
 }

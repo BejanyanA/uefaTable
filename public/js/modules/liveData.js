@@ -80,8 +80,32 @@ function hideDayView() {
    if (dayViewModule) dayViewModule.hideDay();
 }
 
+// The tabs mirrored in the site header once the page is scrolled
+// (public/js/live/headerTabs.js). Loaded with Live, not with the home page.
+let headerTabs = null;
+let liveIsOpen = false;
+
+async function enableHeaderTabs() {
+   liveIsOpen = true;
+   if (!headerTabs) {
+      const page = document.getElementById("liveDataPage");
+      const tabs = page && page.querySelector(".liveTabs");
+      if (!tabs) return;
+      const { mountHeaderTabs } = await import("../live/headerTabs.js");
+      headerTabs = mountHeaderTabs({ page, tabs });
+   }
+   // Live may have been closed again while the module was loading.
+   if (headerTabs) headerTabs.setEnabled(liveIsOpen);
+}
+
+function disableHeaderTabs() {
+   liveIsOpen = false;
+   if (headerTabs) headerTabs.setEnabled(false);
+}
+
 export async function openLiveData(tab = "allGames", { date = null } = {}) {
    setLiveDataVisible(true);
+   enableHeaderTabs();
 
    if (tab === "allGames") {
       initLiveTabsOnce();
@@ -112,6 +136,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
 
 export function closeLiveData() {
    setLiveDataVisible(false);
+   disableHeaderTabs();
    hideDayView();
    resetLiveWidgets(); // so next open -> widget recreated -> request sent again
 }
