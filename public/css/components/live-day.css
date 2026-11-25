@@ -107,15 +107,15 @@
   gap: 0.375rem;
 }
 
-/* The Live toggle: a full circle (a longer word stretches it a little).
-   Pressed, it is white with red text. */
+/* The Live toggle: rounded like the Settings button (owner); a capsule on
+   phones. Pressed, it is white with red text. */
 .lv .lv-filter {
   display: grid;
   place-items: center;
   min-width: 2.75rem;
   height: 2.75rem;
   padding: 0 0.625rem;
-  border-radius: 999px;
+  border-radius: 12px;
   /* Not pressed: the same grey fill as the Settings button at the other end
      of the row, no outline (owner). Phones use the Back arrow's glass. */
   border: 1px solid transparent;
@@ -763,6 +763,8 @@
     height: 2rem;
     padding: 0 0.875rem;
     border-width: 1px;
+    /* A capsule, like the round Back arrow beside it (owner-approved). */
+    border-radius: 999px;
     font-size: 0.875rem;
     font-weight: 600;
     /* The word sits in the exact middle, whatever the font's own spacing. */
