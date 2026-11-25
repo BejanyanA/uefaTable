@@ -109,8 +109,10 @@ explain it away.
 
 Then, in a browser, for every screen the change could reach:
 
-1. **Widths:** 360, 390, 430, 768, 1100 and 1400 px. If you edited a
-   breakpoint, both sides of it. Check the element you changed is the visible
+1. **Widths:** 320, 360, 390, 430, 768, 1100 and 1400 px, and a phone in
+   landscape. The owner requires every screen to fit any device and any
+   phone: no sideways page scroll, nothing overlapping or cut off. If you
+   edited a breakpoint, both sides of it. Check the element you changed is the visible
    one at that width (the desktop and phone versions of a table are separate
    elements; measuring the hidden one gives zeros).
 2. **Languages:** English, French (`/fr/...`) and Armenian (`/am/...`).

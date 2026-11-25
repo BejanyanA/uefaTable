@@ -16,9 +16,9 @@ each needs your yes.
 | Stage | What | State |
 | --- | --- | --- |
 | 0 | Preparation | Done |
-| 1 | Standings tab | **Next** |
-| 2 | Matches tab (fixtures and results per league) | Not started |
-| 3 | All tab (today's matches, live scores) | Not started |
+| 1 | Day view: the opening screen (current day, switch days, live and finished matches) | **Next** |
+| 2 | Standings tab | Not started |
+| 3 | Matches tab (fixtures and results per league) | Not started |
 | 4 | Match details (goals, cards, line-ups) | Not started |
 | 5 | Remove the widgets, new key | Not started |
 | 6 | Follows and in-site alerts | Not started, optional |
@@ -54,6 +54,14 @@ live, so nothing is missing for visitors in between.
 - Three languages for every text: English, French, Armenian.
 - No bundler, no framework, no new libraries.
 - No server-rendered, indexable standings or fixtures pages.
+- **Opening Live shows the current day** (the viewer's own day), with a
+  switch to the days before and after. The selected day lists its matches in
+  play and its finished ones; matches of that day not started yet are listed
+  too, with their kick-off time. (2026-11-25)
+- **Every screen fits any device and any phone**, from 320 px wide to a wide
+  desktop, portrait and landscape. (2026-11-25)
+- The viewer's day is worked out on the server from their date and time zone;
+  data is fetched once per calendar date for everyone.
 - The server sends ready-to-show data; clients only draw.
 - Only `routes_endpoints/live/providers/` knows the provider.
 
@@ -64,70 +72,85 @@ live, so nothing is missing for visitors in between.
       blocks automated readers).
 - [ ] **Owner:** which technology for the mobile app (Flutter, native, other)?
       Not needed to start; it only matters at stage 8.
+- [ ] **Owner:** should the day view list every competition in the world (as
+      the widget does today, ours shown first) or only the competitions in our
+      menus?
 - [ ] Where the cached answers live (Cloudflare Cache, KV or D1). Decided at
       the start of stage 1 after reading Cloudflare's current limits.
-- [ ] How "today" is chosen for a visitor's time zone in the All tab. Decided
-      at stage 3.
+- [x] How "today" is chosen for a visitor's time zone: on the server, from
+      the viewer's date and time zone (see "Decisions").
 
-## Stage 1: Standings tab (next)
+## Stage 1: day view, the opening screen (next)
 
-The smallest piece, and it sets up everything the other stages reuse.
+Opening Live shows the current day; the visitor can move to the days before
+and after. This stage also lays the groundwork every later stage reuses.
 
 **API (dev)**
 - [ ] Provider key stored as a secret on the dev API
 - [ ] Our competition list: our keys, names, order, provider references
-- [ ] Provider folder: fetch standings, turn them into our shape
+- [ ] Provider folder: fetch the matches of a date and the matches in play,
+      turn them into our shape (states, scores, goals and cards)
 - [ ] Saved sample answers and tests for that mapping (`npm test`)
-- [ ] Cache with "serve the old copy while refreshing"
+- [ ] Cache per calendar date with "serve the old copy while refreshing"
+- [ ] The viewer's day cut out on the server from date and time zone
+- [ ] Day range limited (a week back, a week ahead)
 - [ ] Daily request counter and the budget guard
 - [ ] `GET /live/v1/competitions`
-- [ ] `GET /live/v1/competitions/{key}/standings`
-- [ ] Unknown competitions and seasons are refused
+- [ ] `GET /live/v1/matches?date=&tz=` and `GET /live/v1/matches/live`
+- [ ] Bad dates and time zones are refused
 - [ ] `docs/live-api.md` updated with real example answers
 - [ ] Deployed to the dev API
 
 **Website (dev)**
 - [ ] New folder `public/js/live/`: `api.js`, `store.js`, `format.js`
-- [ ] Standings table and league picker views
+- [ ] Match row and competition group views
+- [ ] Day switcher: Today named, previous and next, days around it, a way to
+      jump further; the day is in the address
+- [ ] Refresh only while a match is in play and the screen is visible; score
+      changes update in place with a short highlight
 - [ ] Styles in their own file, colours and sizes named once
-- [ ] All states: loading, data, empty, old data, failure with Retry
-- [ ] Texts in three languages (`live_` keys)
-- [ ] Group tables (Champions League, World Cup, EURO) as well as leagues
-- [ ] The Standings tab uses the new code; its widget code is deleted
+- [ ] All states: loading, data, no matches that day, old data, failure with
+      Retry
+- [ ] Texts in three languages (`live_` keys), day names included
+- [ ] The first Live tab uses the new code; its widget code is deleted
 - [ ] `npm run preloads` after the module changes
 
 **Checks**
-- [ ] `live-section-quality` checklist, including 360 to 1400 px and three
-      languages
+- [ ] Every device: 320 to 1920 px, a phone in landscape, 200% zoom, no
+      sideways page scroll (`live-section-quality`, section 5)
+- [ ] The rest of the `live-section-quality` checklist, three languages
 - [ ] `live-architecture` checklist, including "no provider words outside its
       folder"
 - [ ] `no-regressions` checks: `npm run check`, custom-league tables still
       right, the other two Live tabs still work
-- [ ] Requests, size and time to data compared with the widget version
+- [ ] Requests, size and time to data compared with the widget version; the
+      day's request count looked at
 
 **Release**
-- [ ] **Owner:** try the Standings tab on the dev site
+- [ ] **Owner:** try the day view on the dev site, on a real iPhone and a real
+      Android phone
 - [ ] **Owner says yes:** provider key as a secret on the production API
 - [ ] **Owner says yes:** deploy the production API
 - [ ] **Owner says yes:** merge to `main` (production site)
 - [ ] `npm run check -- https://uefaresults.com` and a look at the real page
 
-## Stage 2: Matches tab
+## Stage 2: Standings tab
+
+- [ ] `GET /live/v1/competitions/{key}/standings`, shape as in
+      `docs/live-api.md`
+- [ ] Standings table and league picker views
+- [ ] Group tables (Champions League, World Cup, EURO) as well as leagues
+- [ ] Widget code for this tab deleted
+- [ ] Checks and release as in stage 1, plus the custom-league tables, which
+      share table styles
+
+## Stage 3: Matches tab
 
 - [ ] `GET /live/v1/competitions/{key}/matches`, grouped by round
-- [ ] Match row and round list views, reused later by the All tab
+- [ ] Round list view, reusing the match row from stage 1
 - [ ] League menu with the 23 competitions in the current order
 - [ ] Widget code for this tab deleted
 - [ ] Checks and release as in stage 1
-
-## Stage 3: All tab (live scores)
-
-- [ ] `GET /live/v1/matches/live` and `GET /live/v1/matches?date=`
-- [ ] Refresh only while a match is in play and the screen is visible
-- [ ] Score changes update in place, with a short highlight
-- [ ] Day navigation
-- [ ] Widget code for this tab deleted
-- [ ] Checks and release as in stage 1, plus a look at the day's request count
 
 ## Stage 4: Match details
 
@@ -180,3 +203,6 @@ The smallest piece, and it sets up everything the other stages reuse.
 ## Change log
 
 - 2026-11-25: plan created. Stage 0 done.
+- 2026-11-25: the day view becomes stage 1 and the opening screen (owner).
+  Standings moves to stage 2, the Matches tab to stage 3. "Every device" added
+  to the decisions and the checks.

@@ -52,6 +52,10 @@ score with penalties reads), stop and move it into the API response.
 - **Send data ready to show.** Lists arrive already filtered, grouped and in
   display order. Clients may re-sort for a user's choice; they never need to
   know the default rules.
+- **Work out the viewer's day on the server.** The opening screen is "the
+  matches of my current day". The client sends its date and time zone; the
+  server decides which matches fall inside that day. Every client then shows
+  the same list, and none of them carries date arithmetic.
 - **Send meaning, not raw codes.** One `phase` value per match from our own
   short list, plus period and minute. Clients map a phase to a word in their
   language. They never see or interpret provider codes.

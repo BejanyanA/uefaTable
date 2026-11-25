@@ -34,15 +34,31 @@ The All tab shows every match of the day.
 | Data | One call covers | Fresh for | Ceiling per day |
 | --- | --- | --- | --- |
 | Live scores | every match in play, all leagues | 15 s, only while a match is in play | 2,400 (10 hours of football) |
-| Today's matches | every match of one date | 10 min while nothing is live | 144 |
+| Day view, the current day | every match of one calendar date | 10 min | 288 (two dates, see below) |
+| Day view, other days | every match of one calendar date | finished days 24 h, coming days 60 min | about 180 (a week each way) |
 | Fixtures and results of a league | one league, whole season | 60 min | 552 (23 leagues) |
 | Standings | one league | 30 min | 576 (12 leagues) |
-| **Total** | | | **about 3,700, half of the daily limit** |
+| **Total** | | | **about 4,000, a little over half of the daily limit** |
 
 Per minute this is at most about 6 calls against a limit of 300.
 
 If football were in play around the clock, live scores alone would reach 5,760
-a day and the total 7,030. That is why the guard below exists.
+a day and the total about 7,350. That is why the guard below exists.
+
+### The day view and time zones
+
+Opening Live shows the viewer's own current day, and they can move to other
+days. A viewer's day does not line up with the provider's calendar date, and
+viewers are in many time zones. If we asked the provider once per time zone,
+calls would grow with the audience. So:
+
+- the Worker fetches and caches by **UTC date**, the same copy for everyone;
+- a viewer's day overlaps at most two UTC dates; the Worker cuts the viewer's
+  day out of those two cached copies. That is why the current day costs two
+  dates;
+- the cutting happens on the server (it is a rule a mobile app needs too);
+- the day switcher is limited to a fixed range (start with seven days back
+  and seven ahead), so nobody can make us fetch years of dates.
 
 ## The guard
 

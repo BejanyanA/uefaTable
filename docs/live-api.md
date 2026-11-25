@@ -4,9 +4,10 @@ The contract between our API and every client that shows live football data:
 the website now, mobile apps later. A client should be buildable from this
 document alone.
 
-**Status: draft. Nothing here is built yet.** The Standings endpoint is the
-first to be built; its shape below is the one to implement. The Matches
-endpoints are a sketch and are settled when each is built. Once an endpoint is
+**Status: draft. Nothing here is built yet.** The day view (matches of
+one day) is built first and its exact shape is settled then, starting from the
+Match sketch below. The Standings shape below is the one to implement when its
+turn comes. Once an endpoint is
 live, its section is the truth and changes only by adding.
 
 ## Rules for every endpoint
@@ -153,8 +154,6 @@ The menus, in the order clients should show them.
 
 ### `GET /live/v1/competitions/{key}/standings`
 
-First endpoint to be built.
-
 Query: `season` (optional). Without it, the current season. A season is named
 by the year it starts in (`2026` for 2026/27).
 
@@ -202,10 +201,17 @@ by the year it starts in (`2026` for 2026/27).
 
 ### Matches (sketch, not final)
 
-- `GET /live/v1/matches/live` - every match in play now, grouped by
-  competition in display order.
-- `GET /live/v1/matches?date=YYYY-MM-DD` - the matches of one day. How the
-  viewer's time zone picks "the day" is decided when this is built.
+- `GET /live/v1/matches?date=YYYY-MM-DD&tz=Europe/Paris` - **the opening
+  screen.** The matches of one day in the viewer's own time zone: in play,
+  finished and not started, grouped by competition in display order. `date`
+  is the viewer's local calendar date and `tz` their time zone name; without
+  them the server uses the current UTC day. The server works out which
+  matches fall inside that local day, so every client shows the same list.
+  `data` also carries `previousDate` and `nextDate` (`null` at the ends of
+  the allowed range) for the day switcher. While any listed match is in play,
+  `refreshAfterSeconds` is short; otherwise long.
+- `GET /live/v1/matches/live` - every match in play now, for clients that
+  only need to refresh scores.
 - `GET /live/v1/competitions/{key}/matches?season=` - fixtures and results of
   one competition, grouped by round.
 - `GET /live/v1/matches/{id}` - one match with its events.
@@ -218,3 +224,4 @@ the apps agree. Not designed yet.
 ## Change log
 
 - 2026-11-25: first draft. Nothing built.
+- 2026-11-25: the day view (`matches?date=&tz=`) is the opening screen.

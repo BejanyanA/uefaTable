@@ -60,7 +60,7 @@ settle them):
 - **Corners:** follow the radius the neighbouring panels use.
 - **Breakpoints already in the code:** 480 px is the common phone cut, with
   600, 768, 800 and 1100 px in the table styles. Reuse these; do not add a
-  new set.
+  new set. How layouts adapt between them is in `responsive.md`.
 
 ## 3. Match row
 
@@ -90,8 +90,11 @@ settle them):
   logo, competition name, and the round or date. Headers stick to the top
   while their group scrolls (`position: sticky`).
 - Order inside "today": live first, then upcoming by kick-off, then finished.
-- A date strip or simple previous / next day control if the tab shows more
-  than one day. Today is marked and one tap away.
+- The day switcher sits above the list: the selected day, the days around it,
+  previous and next arrows, Today always one tap away. Its full rules are in
+  `responsive.md`, section 4. Opening Live selects the viewer's current day.
+- A selected day lists its matches in play and its finished ones, and those
+  not started yet with their kick-off time.
 - Hairline between rows, a little more space between groups. No boxes inside
   boxes.
 

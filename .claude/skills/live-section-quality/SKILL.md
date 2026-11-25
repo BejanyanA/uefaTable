@@ -1,6 +1,6 @@
 ---
 name: live-section-quality
-description: The quality bar for the Live section of uefaresults.com (live scores, fixtures, results, standings) as it moves from the API-Sports widgets to our own API endpoints and our own front end. Use this whenever you plan, design, build, review or change anything in the Live section or its data - the All / Standings / Matches tabs, liveData.js, live-data.css, a Worker endpoint that calls API-Sports, caching or polling of scores, request limits, loading and error states, or how a match row, a table or a league picker looks and behaves. Also use it when the owner asks for the best usability, performance, modern design, accessibility or "reachability" of live data, even if the request names only one small part.
+description: The quality bar for the Live section of uefaresults.com (live scores, fixtures, results, standings) as it moves from the API-Sports widgets to our own API endpoints and our own front end. Use this whenever you plan, design, build, review or change anything in the Live section or its data - the All / Standings / Matches tabs, liveData.js, live-data.css, a Worker endpoint that calls API-Sports, caching or polling of scores, request limits, loading and error states, or how a match row, a table, the day switcher or a league picker looks and behaves on phones, tablets and desktop. Also use it when the owner asks for the best usability, performance, modern design, responsive layout for any device, accessibility or "reachability" of live data, even if the request names only one small part.
 ---
 
 # Live section: the quality bar
@@ -35,12 +35,19 @@ wrong or incomplete, change the plan and tell the owner what changed.
   the browser.
 - **Target:** our API Worker calls API-Sports, keeps the key as a secret,
   caches the answers and returns small JSON. Our own front end draws it. The
-  widget and the workaround code go away tab by tab. The Standings tab is the
-  first piece.
+  widget and the workaround code go away tab by tab. The order of the
+  pieces is in `docs/live-plan.md`; the day view comes first.
 - **Routes stay:** `live`, `live-standings`, `live-matches` (public, under
   `/{lang}/`). Do not rename them; Google and users have these addresses.
 - **Order of leagues stays:** Champions League first and selected by default,
   World Cup right before EURO. The owner asked for this.
+- **Opening Live shows the current day** (owner, 2026-11-25): the viewer's own
+  day, with a way to move to the days before and after, and the selected
+  day's matches listed: those in play and those that ended. Matches of that
+  day that have not started are listed too, with their kick-off time, since a
+  future day has nothing else.
+- **It must fit every device and every phone** (owner, 2026-11-25). See
+  section 5.
 
 ## 1. Start from the request budget
 
@@ -111,9 +118,12 @@ browser  ->  our API Worker  ->  cache (hit: answer now)
 
 The visitor came to see a score or a table. Everything else is in the way.
 
-- **The answer is on screen at once.** Open Live and today's matches are
-  there, live ones first. Open Standings and the default league's table is
-  there. No extra tap to see data.
+- **The answer is on screen at once.** Open Live and the current day's
+  matches are there, live ones first. Open Standings and the default league's
+  table is there. No extra tap to see data.
+- **Days are one tap apart.** A day switcher moves to the day before and the
+  day after, names Today clearly, and always offers a quick way back to it.
+  The selected day is in the address, so Back and shared links work.
 - **Remember the last choice** (league, tab) on this device and offer it next
   time. The default for a first visit stays Champions League.
 - **Every state is designed, not left over:** first load, loading a different
@@ -131,7 +141,8 @@ The visitor came to see a score or a table. Everything else is in the way.
 - **Updates never move things under the finger.** A refresh changes numbers in
   place. It does not rebuild the list, reset the scroll or close an open menu.
 - **Phones first.** Most visitors are on phones. Design at 360-430 px wide
-  first, then widen. The owner has already asked for these, so keep them:
+  first, then widen (section 5). The owner has already asked for these, so
+  keep them:
   long club names stay on one line (cut with "..." if needed), the rank never
   overlaps the club logo, numbers sit centred under their column headers.
 - **Words a fan uses.** "Played", "Goal difference", "Half-time". No provider
@@ -169,7 +180,30 @@ often we ask, how much we send and how we draw. Hold these:
   compare with the widget version: requests, bytes, time to data on screen.
   The `web-perf` skill covers the method.
 
-## 5. Design
+## 5. Every device, every phone
+
+This is an owner requirement, not a nice-to-have: every Live screen must fit
+any device, from a 320 px phone to a wide desktop, in both orientations, with
+touch or mouse. Read `references/responsive.md` before writing any Live markup
+or CSS. It has the screens to design for, how to build fluid layouts, the day
+switcher, long lists on weak phones, tables, and the sizes to check.
+
+The test, at every width from 320 px up:
+
+- the page never scrolls sideways;
+- nothing overlaps, is cut off or leaves the screen;
+- every control is reachable and at least 44 by 44 px on touch;
+- the same information is there at every size, rearranged if needed;
+- it survives 200% zoom and the long words of Armenian.
+
+Build the phone layout first and let it grow. Size each part by the space it
+is given (container queries), put layout in CSS and never in JavaScript that
+reads the screen width, and use `dvh` and the safe-area insets so phone
+browser bars and notches do not hide content. Emulation is not enough for
+release: ask the owner to try the dev site on a real iPhone and a real Android
+phone, and say so if that has not happened.
+
+## 6. Design
 
 Read `references/design.md` before drawing any Live screen. It covers the look
 (match rows, tables, league picker, live indicators, skeletons, motion), the
@@ -178,7 +212,7 @@ colours and sizes that fit the rest of the site, and what to avoid.
 In short: a calm dark screen where the score is the loudest thing, live matches
 are unmistakable, numbers line up, and every screen works with one thumb.
 
-## 6. Reachability
+## 7. Reachability
 
 Three meanings, all required.
 
@@ -199,8 +233,9 @@ Three meanings, all required.
 - Motion respects `prefers-reduced-motion`: no pulsing or flashing for people
   who turned motion off.
 
-**It works on any phone and any connection.**
-- Usable from 360 px wide up to desktop, in portrait and landscape.
+**It works on any device and any connection.**
+- Usable from 320 px wide up to desktop, in portrait and landscape
+  (section 5).
 - On a slow or dropped connection: show the last data with its age, keep the
   screen usable, retry quietly with growing pauses. Say "Offline" in words.
 
@@ -211,7 +246,7 @@ Three meanings, all required.
 - Do not propose server-rendered, indexable standings or fixtures pages. The
   owner said no to that on 2026-11-25.
 
-## 7. The other main things
+## 8. The other main things
 
 - **Three languages.** Every visible word goes through
   `public/js/shared/langMap.js` in English, French and Armenian. Team and
@@ -240,7 +275,9 @@ line you could not check, with the reason.
 2. **Data path:** no API-Sports key or call in the browser; unknown league ids
    are refused; a cached answer is served when the provider is down.
 3. **States:** loading, data, empty, old data and failure each look right.
-4. **Phones and desktop:** checked at 360, 390, 430, 768, 1100 and 1400 px.
+4. **Every device:** checked at 320, 360, 390, 430, 600, 768, 1024, 1280, 1440
+   and 1920 px, a phone in landscape, and 200% zoom; no sideways page scroll
+   at any of them. Whether the owner tried it on real phones.
 5. **Languages:** English, French and Armenian, including the empty and error
    texts and the day labels.
 6. **Keyboard and screen reader basics:** tabs and picker reachable, table
