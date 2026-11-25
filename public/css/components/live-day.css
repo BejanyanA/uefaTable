@@ -871,18 +871,11 @@
     line-height: 1.5rem;
   }
 
+  /* Also before kick-off, with no score: "Home - Away" (owner). */
   .lv-score-sep {
     display: inline;
     color: var(--lv-text-2);
     font-size: 1.125rem;
-  }
-
-  /* Before kick-off there is no score: no lonely dash either. */
-  .lv-match[data-phase="scheduled"] .lv-score-sep,
-  .lv-match[data-phase="postponed"] .lv-score-sep,
-  .lv-match[data-phase="cancelled"] .lv-score-sep,
-  .lv-match[data-phase="unknown"] .lv-score-sep {
-    visibility: hidden;
   }
 }
 
