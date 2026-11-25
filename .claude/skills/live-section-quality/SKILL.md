@@ -46,6 +46,10 @@ wrong or incomplete, change the plan and tell the owner what changed.
   day's matches listed: those in play and those that ended. Matches of that
   day that have not started are listed too, with their kick-off time, since a
   future day has nothing else.
+- **The day view lists every competition of the day, ours first** (owner,
+  2026-11-25): the competitions from our menus on top in the usual order,
+  then all the others grouped by country. Nothing the widget shows today
+  disappears.
 - **It must fit every device and every phone** (owner, 2026-11-25). See
   section 5.
 

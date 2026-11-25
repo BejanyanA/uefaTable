@@ -58,6 +58,9 @@ live, so nothing is missing for visitors in between.
   switch to the days before and after. The selected day lists its matches in
   play and its finished ones; matches of that day not started yet are listed
   too, with their kick-off time. (2026-11-25)
+- **The day view lists every competition of the day, ours first:** the
+  competitions from our menus on top in the usual order, then all the others
+  grouped by country. (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
 - The viewer's day is worked out on the server from their date and time zone;
@@ -72,9 +75,8 @@ live, so nothing is missing for visitors in between.
       blocks automated readers).
 - [ ] **Owner:** which technology for the mobile app (Flutter, native, other)?
       Not needed to start; it only matters at stage 8.
-- [ ] **Owner:** should the day view list every competition in the world (as
-      the widget does today, ours shown first) or only the competitions in our
-      menus?
+- [x] Which matches the day view lists: every competition, ours first (see
+      "Decisions").
 - [ ] Where the cached answers live (Cloudflare Cache, KV or D1). Decided at
       the start of stage 1 after reading Cloudflare's current limits.
 - [x] How "today" is chosen for a visitor's time zone: on the server, from
@@ -103,7 +105,10 @@ and after. This stage also lays the groundwork every later stage reuses.
 
 **Website (dev)**
 - [ ] New folder `public/js/live/`: `api.js`, `store.js`, `format.js`
-- [ ] Match row and competition group views
+- [ ] Match row and competition group views; our competitions first, then
+      the rest by country
+- [ ] A busy day (hundreds of matches) stays smooth on a cheap phone: small
+      answer from the API, off-screen groups not laid out until needed
 - [ ] Day switcher: Today named, previous and next, days around it, a way to
       jump further; the day is in the address
 - [ ] Refresh only while a match is in play and the screen is visible; score
@@ -206,3 +211,4 @@ and after. This stage also lays the groundwork every later stage reuses.
 - 2026-11-25: the day view becomes stage 1 and the opening screen (owner).
   Standings moves to stage 2, the Matches tab to stage 3. "Every device" added
   to the decisions and the checks.
+- 2026-11-25: the day view lists every competition, ours first (owner).

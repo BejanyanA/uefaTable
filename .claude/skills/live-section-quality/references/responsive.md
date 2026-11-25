@@ -118,8 +118,9 @@ and later days. This control is used constantly, so it gets the most care.
 
 A busy day can have hundreds of matches. A cheap phone must stay smooth.
 
-- Group by competition; show the competitions the site features first, in the
-  owner's order, then the rest.
+- Group by competition. The owner decided the order: the competitions from
+  our menus first, in their usual order, then every other competition grouped
+  by country.
 - Do not make the browser lay out what is far off-screen: give each
   competition group `content-visibility: auto` with a size hint
   (`contain-intrinsic-size`), or add groups as the visitor scrolls.

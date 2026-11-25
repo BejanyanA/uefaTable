@@ -203,7 +203,9 @@ by the year it starts in (`2026` for 2026/27).
 
 - `GET /live/v1/matches?date=YYYY-MM-DD&tz=Europe/Paris` - **the opening
   screen.** The matches of one day in the viewer's own time zone: in play,
-  finished and not started, grouped by competition in display order. `date`
+  finished and not started, for every competition played that day, grouped
+  by competition in display order: the competitions from our menus first
+  (`featured: true`), then the others by country. `date`
   is the viewer's local calendar date and `tz` their time zone name; without
   them the server uses the current UTC day. The server works out which
   matches fall inside that local day, so every client shows the same list.
@@ -224,4 +226,5 @@ the apps agree. Not designed yet.
 ## Change log
 
 - 2026-11-25: first draft. Nothing built.
-- 2026-11-25: the day view (`matches?date=&tz=`) is the opening screen.
+- 2026-11-25: the day view (`matches?date=&tz=`) is the opening screen. It
+  lists every competition of the day, ours first.
