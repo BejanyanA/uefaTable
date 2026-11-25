@@ -209,6 +209,9 @@ phone, and say so if that has not happened.
 
 ## 6. Design
 
+On phones the design is iOS, exactly: read the `ios-mobile-style` skill
+first; it overrides anything below for the mobile layout.
+
 Read `references/design.md` before drawing any Live screen. It covers the look
 (match rows, tables, league picker, live indicators, skeletons, motion), the
 colours and sizes that fit the rest of the site, and what to avoid.

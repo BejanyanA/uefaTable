@@ -12,11 +12,18 @@
   --lv-line: rgba(255, 255, 255, 0.1);
   --lv-live: #ff5a67;
   --lv-accent: #4da3ff;
-  --lv-page: rgb(1, 10, 20);
+  /* iOS dark mode: the page is pure black (systemBackground) and each match
+     sits on it as a grouped cell (secondarySystemGroupedBackground). */
+  --lv-page: #000;
   --lv-radius: 0.75rem;
   --lv-bar-h: 3.5rem;
-  /* Background of a match row (phones give each match its own block). */
-  --lv-row-bg: transparent;
+  /* Each match is a block of its own, in iOS's grouped cell colour. */
+  --lv-row-bg: #1c1c1e;
+  /* Corner radius of a match block. iOS 26 rounds grouped list sections far
+     more than iOS 13-18 did (10pt). Apple publishes no number for it; this
+     value is an estimate to be checked against an iPhone screenshot (see the
+     ios-mobile-style skill). Change it here only. */
+  --lv-row-radius: 26px;
 
   container-type: inline-size;
   container-name: lv;
@@ -552,14 +559,72 @@
   }
 }
 
+/* ---------------------------------------------------------------- match blocks */
+
+/* On every screen size: the competition name is a small heading on the page,
+   and each match is a block of its own under it (as iOS Settings shows its
+   rows on a black page). */
+.lv-group {
+  margin-bottom: 1rem;
+  background: none;
+  border-radius: 0;
+}
+
+.lv .lv-group-head {
+  min-height: 0;
+  padding: 0.25rem 0.25rem 0.5rem;
+  border-bottom: 0;
+}
+
+.lv .lv-matches {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.lv .lv-match,
+.lv .lv-match:last-child {
+  border-bottom: 0;
+  border-radius: var(--lv-row-radius);
+  background: var(--lv-row-bg);
+}
+
+.lv-skeleton {
+  background: none;
+}
+
+.lv-skel-head {
+  height: 1.75rem;
+  border-bottom: 0;
+}
+
+.lv-skel-row,
+.lv-skel-row:last-child {
+  margin-bottom: 0.375rem;
+  border-bottom: 0;
+  border-radius: var(--lv-row-radius);
+  background-color: var(--lv-row-bg);
+}
+
+.lv-message {
+  border-radius: var(--lv-row-radius);
+  background: var(--lv-row-bg);
+}
+
 /* ---------------------------------------------------------------- phones */
 
 /* Phones (768px and less), in the iOS way: the competition name is a small
    heading, and each match is a block of its own in iOS's dark "grouped" cell
    colour. The Live toggle is a compact pill and the row is tighter. */
+/* Phones (768px and less) follow iOS exactly (the ios-mobile-style skill):
+   the system font, iOS's dark text and red colours, a compact Live pill. */
 @media (max-width: 768px) {
   .lv {
-    --lv-row-bg: #1c1c1e;
+    --lv-text: #fff;
+    /* secondaryLabel */
+    --lv-text-2: rgba(235, 235, 245, 0.6);
+    /* systemRed, dark */
+    --lv-live: #ff453a;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   }
 
   .lv-bar {
@@ -573,6 +638,12 @@
     padding: 0 0.75rem;
     border-width: 1px;
     font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Pressed: white with iOS red (systemRed on a light surface). */
+  .lv .lv-filter[aria-pressed="true"] {
+    color: #ff3b30;
   }
 
   /* The pill is small, the place a finger can tap is not. */
@@ -586,46 +657,5 @@
     padding-inline: 0.25rem;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
     mask-image: linear-gradient(to right, transparent, #000 0.625rem, #000 calc(100% - 0.625rem), transparent);
-  }
-
-  .lv-group {
-    margin-bottom: 1rem;
-    background: none;
-    border-radius: 0;
-  }
-
-  .lv .lv-group-head {
-    min-height: 0;
-    padding: 0.25rem 0.25rem 0.5rem;
-    border-bottom: 0;
-  }
-
-  .lv .lv-matches {
-    display: grid;
-    gap: 0.375rem;
-  }
-
-  .lv .lv-match,
-  .lv .lv-match:last-child {
-    border-bottom: 0;
-    border-radius: 0.75rem;
-    background: var(--lv-row-bg);
-  }
-
-  .lv-skeleton {
-    background: none;
-  }
-
-  .lv-skel-head {
-    height: 1.75rem;
-    border-bottom: 0;
-  }
-
-  .lv-skel-row,
-  .lv-skel-row:last-child {
-    margin-bottom: 0.375rem;
-    border-bottom: 0;
-    border-radius: 0.75rem;
-    background-color: var(--lv-row-bg);
   }
 }

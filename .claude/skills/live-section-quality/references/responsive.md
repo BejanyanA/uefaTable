@@ -113,10 +113,13 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   selected day has light text and an underline (no outline); the others are
   a little grey. On desktop there are previous and next arrows and a
   calendar button as well; on phones the strip is scrolled with a finger.
-- **Phones (768 px and less):** each match is a block of its own in iOS's
-  dark grouped cell colour (`--lv-row-bg`, #1c1c1e) under a small
-  competition heading; the Live toggle is a compact pill (30 px tall, with a
-  larger invisible tap area).
+- **Every size:** the Live screen sits on a black page, and each match is a
+  block of its own in iOS's grouped cell colour (`--lv-row-bg`, #1c1c1e) with
+  `--lv-row-radius` corners, under a small competition heading.
+- **Phones (768 px and less) follow iOS exactly** (`ios-mobile-style`): the
+  system font, iOS text and red colours, a round glass Back button, the Live
+  toggle as a compact pill (30 px tall, with a larger invisible tap area).
+  The tabs sit in the middle of the screen, over the content.
 - **The width never jumps when a scrollbar appears.** While Live is open the
   body keeps room for its scrollbar (`body.live-open { scrollbar-gutter:
   stable }`), because toggling Live can turn a long page into a short one.

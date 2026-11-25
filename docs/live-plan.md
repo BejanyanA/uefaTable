@@ -85,9 +85,13 @@ live, so nothing is missing for visitors in between.
   page you came from comes back where you left it. (2026-11-26)
 - **"Updated ... ago" shows only when the API says the data is old**, not
   after a fixed number of minutes. (2026-11-26)
-- **Phones: each match is a block of its own** in iOS's dark grouped cell
-  colour (#1c1c1e), under its competition's name; the Live toggle is a
-  compact pill with little space around it. (2026-11-26)
+- **Each match is a block of its own, on desktop and phones,** in iOS's dark
+  grouped cell colour (#1c1c1e) on a black page, like iPhone Settings, under
+  its competition's name. (2026-11-26)
+- **Phones match iOS exactly** (skill `ios-mobile-style`): system font, iOS
+  colours, round glass Back button, compact Live pill, tabs centred over the
+  content. The corner radius (26px) is an estimate to check on an iPhone.
+  (2026-11-26)
 - **Desktop: the content keeps its width** whether the page needs a
   scrollbar or not (room for it is kept while Live is open). (2026-11-26)
 - **The Live block has no outline.** (2026-11-25)
@@ -272,6 +276,8 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: black page and iOS blocks on all sizes; phones follow iOS
+  exactly (new skill); tabs centred on phones (owner).
 - 2026-11-26: phones get a block per match and a compact Live pill; desktop
   keeps its width when the scrollbar comes and goes (owner).
 - 2026-11-26: one Live toggle (All by default), underlined day, row

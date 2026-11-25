@@ -109,6 +109,11 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
   const centre = () => {
     const rect = (content || page).getBoundingClientRect();
     if (rect.width > 0) header.style.setProperty("--live-center", `${Math.round(rect.left + rect.width / 2)}px`);
+    // The room the page's scrollbar takes at the right (0 where scrollbars
+    // float over the page, as on phones). It does not change when a phone
+    // turns, unlike the centre.
+    const gutter = Math.max(0, window.innerWidth - document.body.clientWidth);
+    header.style.setProperty("--live-gutter", `${gutter}px`);
   };
   const sizes = new ResizeObserver(centre);
   sizes.observe(content || page);

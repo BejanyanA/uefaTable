@@ -69,6 +69,9 @@ at.
 | Scores and standings writes | Totals are updated by adding to the old value | New columns need `DEFAULT 0` or `COALESCE`; never leave a NULL where a number is added |
 | The Live widget code in `liveData.js` | Fragile workarounds around a third-party widget (column removal, re-translation timers) | All three Live tabs in three languages after any edit there |
 
+Anything a phone visitor sees must match iOS exactly: follow
+`ios-mobile-style` for every mobile change, on any page.
+
 When the change is in the Live section, also follow `live-section-quality`
 and `live-architecture`. Once a Live endpoint is released, its JSON is a
 promise to old app versions: add fields, never remove or rename them

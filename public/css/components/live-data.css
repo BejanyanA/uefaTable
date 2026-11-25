@@ -3,6 +3,13 @@
    (for example when the Live toggle is released). Set by liveData.js. */
 body.live-open {
   scrollbar-gutter: stable;
+  /* The Live screen sits on pure black, as iOS does in dark mode. */
+  background-color: #000;
+}
+
+/* The site paints its navy page colour on a layer of its own (style.css). */
+body.live-open::before {
+  background: #000;
 }
 
 .liveDataPage {
@@ -958,18 +965,33 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     margin-top: 0;
   }
 
+  /* Three columns: the Back arrow, the tabs, and an empty one as wide as the
+     first. The tabs therefore sit in the middle of the screen, over the
+     content. Only when there is not enough room do they move right, so they
+     never cover the arrow. */
   .liveHeaderTabs {
     container-type: inline-size;
     top: 100%;
     left: 0;
-    right: 0;
+    /* Ends where the page's scrollbar begins (its width is measured by
+       headerTabs.js; 0 on phones), so the middle column sits over the content
+       and not over content plus scrollbar. */
+    right: var(--live-gutter, 0px);
     transform: none;
     height: 44px;
     padding: 4px 8px;
     box-sizing: border-box;
-    background: rgb(1, 10, 20);
+    background: #000;
+    grid-template-columns: 1fr minmax(0, auto) 1fr;
+    gap: 6px;
   }
 
+  .liveHeaderTabs.is-shown {
+    display: grid;
+  }
+
+  /* The iOS 26 back button: a round glass button with a chevron, no hard
+     outline, only a fine light rim. */
   .liveHeaderBack {
     flex: none;
     display: grid;
@@ -977,23 +999,34 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     width: 36px;
     height: 36px;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    border: 0;
+    border-radius: 50%;
+    background: rgba(120, 120, 128, 0.24);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.28);
     color: #fff;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
+  .liveHeaderBack:active {
+    background: rgba(120, 120, 128, 0.36);
+  }
+
   .liveHeaderBack svg {
     width: 18px;
     height: 18px;
+    margin-left: -2px;
   }
 
   /* The tabs take only the room their words need, in the middle of what is
      left beside the arrow. */
+  .liveHeaderBack {
+    justify-self: start;
+  }
+
   .liveHeaderTabs-inner {
-    margin-inline: auto;
     max-width: 100%;
     min-width: 0;
   }
