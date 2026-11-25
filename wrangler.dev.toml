@@ -23,6 +23,9 @@ enabled = true
 [vars]
 EXTRA_ALLOWED_ORIGINS = "https://dev.uefatable.pages.dev"
 EXTRA_ALLOWED_ORIGIN_SUFFIX = ".uefatable.pages.dev"
+# Which live data provider the /live endpoints use. Its key is a secret:
+#   npx wrangler@4.168.0 secret put LIVE_PROVIDER_KEY --config wrangler.dev.toml
+LIVE_PROVIDER = "api-sports"
 
 [[d1_databases]]
 binding = "core_data"

@@ -1,0 +1,422 @@
+[
+ {
+  "fixture": {
+   "id": 1635718,
+   "referee": "Nick Walsh",
+   "timezone": "UTC",
+   "date": "2026-11-25T17:45:00+00:00",
+   "timestamp": 1795628700,
+   "periods": {
+    "first": null,
+    "second": null
+   },
+   "venue": {
+    "id": null,
+    "name": "Baku Olympic Stadium",
+    "city": "Baku"
+   },
+   "status": {
+    "long": "First Half",
+    "short": "1H",
+    "elapsed": 31,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 2,
+   "name": "UEFA Champions League",
+   "country": "World",
+   "logo": "https://media.api-sports.io/football/leagues/2.png",
+   "flag": null,
+   "season": 2026,
+   "round": "League Stage - 5",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 13976,
+    "name": "Sabah FA",
+    "logo": "https://media.api-sports.io/football/teams/13976.png",
+    "winner": false
+   },
+   "away": {
+    "id": 529,
+    "name": "Barcelona",
+    "logo": "https://media.api-sports.io/football/teams/529.png",
+    "winner": true
+   }
+  },
+  "goals": {
+   "home": 0,
+   "away": 1
+  },
+  "score": {
+   "halftime": {
+    "home": 0,
+    "away": 1
+   },
+   "fulltime": {
+    "home": null,
+    "away": null
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  }
+ },
+ {
+  "fixture": {
+   "id": 1649153,
+   "referee": null,
+   "timezone": "UTC",
+   "date": "2026-11-25T00:30:00+00:00",
+   "timestamp": 1795566600,
+   "periods": {
+    "first": 1795566600,
+    "second": 1795570200
+   },
+   "venue": {
+    "id": null,
+    "name": null,
+    "city": null
+   },
+   "status": {
+    "long": "Match Finished",
+    "short": "FT",
+    "elapsed": 90,
+    "extra": 9
+   }
+  },
+  "league": {
+   "id": 617,
+   "name": "Copa do Brasil U20",
+   "country": "Brazil",
+   "logo": "https://media.api-sports.io/football/leagues/617.png",
+   "flag": "https://media.api-sports.io/flags/br.svg",
+   "season": 2026,
+   "round": "Semi-finals",
+   "standings": false
+  },
+  "teams": {
+   "home": {
+    "id": 12973,
+    "name": "São Paulo U20",
+    "logo": "https://media.api-sports.io/football/teams/12973.png",
+    "winner": false
+   },
+   "away": {
+    "id": 12952,
+    "name": "Atlético Mineiro U20",
+    "logo": "https://media.api-sports.io/football/teams/12952.png",
+    "winner": true
+   }
+  },
+  "goals": {
+   "home": 1,
+   "away": 2
+  },
+  "score": {
+   "halftime": {
+    "home": 1,
+    "away": 0
+   },
+   "fulltime": {
+    "home": 1,
+    "away": 2
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  }
+ },
+ {
+  "fixture": {
+   "id": 1611803,
+   "referee": null,
+   "timezone": "UTC",
+   "date": "2026-11-25T09:00:00+00:00",
+   "timestamp": 1795597200,
+   "periods": {
+    "first": null,
+    "second": null
+   },
+   "venue": {
+    "id": 20120,
+    "name": "Kolos Stadium",
+    "city": "Kovalivka"
+   },
+   "status": {
+    "long": "Not Started",
+    "short": "NS",
+    "elapsed": null,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 1065,
+   "name": "U19 League",
+   "country": "Ukraine",
+   "logo": "https://media.api-sports.io/football/leagues/1065.png",
+   "flag": "https://media.api-sports.io/flags/ua.svg",
+   "season": 2026,
+   "round": "Regular Season - 15",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 23075,
+    "name": "Kolos Kovalivka U19",
+    "logo": "https://media.api-sports.io/football/teams/23075.png",
+    "winner": null
+   },
+   "away": {
+    "id": 20240,
+    "name": "Rukh Vynnyky U19",
+    "logo": "https://media.api-sports.io/football/teams/20240.png",
+    "winner": null
+   }
+  },
+  "goals": {
+   "home": null,
+   "away": null
+  },
+  "score": {
+   "halftime": {
+    "home": null,
+    "away": null
+   },
+   "fulltime": {
+    "home": null,
+    "away": null
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  }
+ },
+ {
+  "fixture": {
+   "id": 1649631,
+   "referee": null,
+   "timezone": "UTC",
+   "date": "2026-11-25T10:00:00+00:00",
+   "timestamp": 1795600800,
+   "periods": {
+    "first": null,
+    "second": null
+   },
+   "venue": {
+    "id": null,
+    "name": null,
+    "city": null
+   },
+   "status": {
+    "long": "Match Postponed",
+    "short": "PST",
+    "elapsed": null,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 1075,
+   "name": "Pro League A",
+   "country": "Uzbekistan",
+   "logo": "https://media.api-sports.io/football/leagues/1075.png",
+   "flag": "https://media.api-sports.io/flags/uz.svg",
+   "season": 2026,
+   "round": "Semi-finals",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 4214,
+    "name": "Metalourg",
+    "logo": "https://media.api-sports.io/football/teams/4214.png",
+    "winner": null
+   },
+   "away": {
+    "id": 25763,
+    "name": "FarDu",
+    "logo": "https://media.api-sports.io/football/teams/25763.png",
+    "winner": null
+   }
+  },
+  "goals": {
+   "home": null,
+   "away": null
+  },
+  "score": {
+   "halftime": {
+    "home": null,
+    "away": null
+   },
+   "fulltime": {
+    "home": null,
+    "away": null
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  }
+ },
+ {
+  "fixture": {
+   "id": 1650137,
+   "referee": null,
+   "timezone": "UTC",
+   "date": "2026-11-25T15:00:00+00:00",
+   "timestamp": 1795618800,
+   "periods": {
+    "first": 1795618800,
+    "second": 1795622400
+   },
+   "venue": {
+    "id": null,
+    "name": "Carlo Speroni",
+    "city": "Busto Arsizio"
+   },
+   "status": {
+    "long": "Match Finished",
+    "short": "PEN",
+    "elapsed": 120,
+    "extra": null
+   }
+  },
+  "league": {
+   "id": 892,
+   "name": "Coppa Italia Serie D",
+   "country": "Italy",
+   "logo": "https://media.api-sports.io/football/leagues/892.png",
+   "flag": "https://media.api-sports.io/flags/it.svg",
+   "season": 2026,
+   "round": "Round of 16",
+   "standings": false
+  },
+  "teams": {
+   "home": {
+    "id": 1706,
+    "name": "Pro Patria",
+    "logo": "https://media.api-sports.io/football/teams/1706.png",
+    "winner": true
+   },
+   "away": {
+    "id": 9439,
+    "name": "Sanremese",
+    "logo": "https://media.api-sports.io/football/teams/9439.png",
+    "winner": false
+   }
+  },
+  "goals": {
+   "home": 2,
+   "away": 2
+  },
+  "score": {
+   "halftime": {
+    "home": 2,
+    "away": 1
+   },
+   "fulltime": {
+    "home": 2,
+    "away": 2
+   },
+   "extratime": {
+    "home": 0,
+    "away": 0
+   },
+   "penalty": {
+    "home": 4,
+    "away": 3
+   }
+  }
+ },
+ {
+  "fixture": {
+   "id": 1630407,
+   "referee": "Koki Nagamine",
+   "timezone": "UTC",
+   "date": "2026-11-25T07:45:00+00:00",
+   "timestamp": 1795592700,
+   "periods": {
+    "first": 1795592700,
+    "second": 1795596300
+   },
+   "venue": {
+    "id": null,
+    "name": "GMHBA Stadium",
+    "city": "Geelong"
+   },
+   "status": {
+    "long": "Match Finished",
+    "short": "FT",
+    "elapsed": 90,
+    "extra": 5
+   }
+  },
+  "league": {
+   "id": 18,
+   "name": "AFC Champions League Two",
+   "country": "World",
+   "logo": "https://media.api-sports.io/football/leagues/18.png",
+   "flag": null,
+   "season": 2026,
+   "round": "Group Stage - 5",
+   "standings": true
+  },
+  "teams": {
+   "home": {
+    "id": 944,
+    "name": "Melbourne Victory",
+    "logo": "https://media.api-sports.io/football/teams/944.png",
+    "winner": null
+   },
+   "away": {
+    "id": 3681,
+    "name": "Viettel",
+    "logo": "https://media.api-sports.io/football/teams/3681.png",
+    "winner": null
+   }
+  },
+  "goals": {
+   "home": 0,
+   "away": 0
+  },
+  "score": {
+   "halftime": {
+    "home": 0,
+    "away": 0
+   },
+   "fulltime": {
+    "home": 0,
+    "away": 0
+   },
+   "extratime": {
+    "home": null,
+    "away": null
+   },
+   "penalty": {
+    "home": null,
+    "away": null
+   }
+  }
+ }
+]

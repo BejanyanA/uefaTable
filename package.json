@@ -7,7 +7,7 @@
   "version": "1.0.0",
   "main": "worker.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --no-warnings --test tests/",
     "preloads": "node tools/update-preloads.mjs",
     "preloads:check": "node tools/update-preloads.mjs --check",
     "dev:site": "node tools/dev-site.mjs",

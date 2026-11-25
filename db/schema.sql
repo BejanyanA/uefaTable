@@ -230,3 +230,11 @@ CREATE INDEX idx_users_email_lower ON users(LOWER(email));
 CREATE INDEX idx_messages_conversation_created ON messages(conversation_id, created_at, id);
 
 CREATE INDEX idx_messages_conversation_unread ON messages(conversation_id, is_read, sender_id);
+
+-- Added by db/migrations/002_live_cache.sql
+CREATE TABLE live_cache (
+  key TEXT PRIMARY KEY,
+  body TEXT NOT NULL DEFAULT '',
+  fetched_at INTEGER NOT NULL DEFAULT 0,
+  refreshing_until INTEGER NOT NULL DEFAULT 0
+);

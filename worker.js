@@ -1,5 +1,6 @@
 import { handleCorsHeaders, jsonResponse, isAllowedOrigin, configureAllowedOrigins } from './utils/helper.js';
 import { verifyToken } from './utils/jwt.js';
+import { handleLive, isLivePath } from './routes_endpoints/live/routes.js';
 import { handleRegister } from './routes_endpoints/register.js';
 import { handleLogin } from './routes_endpoints/login.js';
 import { handleMe, handleCustomLeagues } from './routes_endpoints/me.js';
@@ -126,7 +127,7 @@ const routeRegistry = {
 };
 
 export async function onRequest(context) {
-  const { request, env } = context;
+  const { request, env, ctx } = context;
   const url = new URL(request.url);
   const method = request.method;
   const path = url.pathname;
@@ -156,7 +157,10 @@ export async function onRequest(context) {
   const route = routeRegistry[path];
   let response;
 
-  if (route) {
+  if (isLivePath(path)) {
+    // Live football data has its own versioned addresses (docs/live-api.md).
+    response = await handleLive(request, env, ctx);
+  } else if (route) {
     const handler = route[method];
     if (handler) {
       try {
