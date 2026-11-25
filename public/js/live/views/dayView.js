@@ -297,6 +297,9 @@ function drawDayBar(self, state, bar) {
     const isToday = day === data.today;
     const button = el("button", "lv-day");
     button.type = "button";
+    // One stop for the whole strip when moving with Tab; the arrow keys move
+    // between days (see the keydown handler below).
+    button.tabIndex = day === data.date ? 0 : -1;
     if (day === data.date) { button.setAttribute("aria-current", "date"); current = button; }
     if (isToday) button.classList.add("is-today");
     if (isToday && liveMode) {
@@ -346,11 +349,30 @@ function drawDayBar(self, state, bar) {
 
   bar.replaceChildren(prev, strip, next, jump, settingsBox);
 
+  // Left and right arrows: the day before or after; Home: today.
+  strip.addEventListener("keydown", (e) => {
+    const target = e.key === "ArrowLeft" ? data.previousDate
+      : e.key === "ArrowRight" ? data.nextDate
+      : e.key === "Home" ? data.today : undefined;
+    if (target === undefined) return;
+    e.preventDefault();
+    if (!target || target === data.date) return;
+    // Give the focus back once the new day is drawn (the bar is redrawn
+    // once before that, still showing the old day).
+    self.refocusDay = target;
+    pick(target);
+  });
+
   // Bring the selected day to the middle of the strip (the strip only, never
   // the page). Done after layout, when the sizes are known.
   if (current) {
     requestAnimationFrame(() => {
       strip.scrollLeft = current.offsetLeft - (strip.clientWidth - current.offsetWidth) / 2;
+      // A day chosen with the arrow keys keeps the keyboard focus.
+      if (self.refocusDay && self.refocusDay === data.date) {
+        self.refocusDay = null;
+        current.focus({ preventScroll: true });
+      }
     });
   }
 }

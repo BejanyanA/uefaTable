@@ -117,7 +117,9 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
       if (active) copy.setAttribute("aria-current", "page");
       else copy.removeAttribute("aria-current");
     }
-    const menuLabel = (langMap[currentLang] && langMap[currentLang].live_menu) || langMap.en.live_menu || "Menu";
+    const words = langMap[currentLang] || langMap.en;
+    nav.setAttribute("aria-label", words.live_sections || langMap.en.live_sections);
+    const menuLabel = words.live_menu || langMap.en.live_menu || "Menu";
     menuButton.setAttribute("aria-label", menuLabel);
     menuButton.title = menuLabel;
     if (backCopy) {
