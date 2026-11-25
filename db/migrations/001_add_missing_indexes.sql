@@ -6,9 +6,10 @@
 --   users(LOWER(...))             friend search, sign-up checks
 --   messages(...)                 chat list: last message and unread counts
 --
--- Safe to run more than once. Applied to: dev (2026-11-25). Not yet: production.
+-- Safe to run more than once. Applied to: dev (2026-11-25), production (2026-11-25).
 --
---   dev:  npx wrangler@4.168.0 d1 execute core-db-dev --remote --config wrangler.dev.toml --file db/migrations/001_add_missing_indexes.sql
+--   dev:         npx wrangler@4.168.0 d1 execute core-db-dev --remote --config wrangler.dev.toml --file db/migrations/001_add_missing_indexes.sql
+--   production:  npx wrangler@4.168.0 d1 execute core-db --remote --file db/migrations/001_add_missing_indexes.sql
 
 CREATE INDEX IF NOT EXISTS idx_league_instances_league_id ON league_instances(league_id);
 CREATE INDEX IF NOT EXISTS idx_rk_team1_user ON round_knockouts(team1_user_id);
