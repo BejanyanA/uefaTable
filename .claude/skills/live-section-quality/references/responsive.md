@@ -102,14 +102,21 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   is only as wide as its word; no line under the bar. The original tab and
   Back buttons stay in the page, hidden, as the source of the words and the
   actions.
-- **One row stays in view under them** in the day view: first the Live and
-  All buttons (round, no count), then the days.
+- **One row sits right under them from the moment Live opens** and stays
+  there while scrolling: the Live toggle first, then the days. On wide
+  screens the Back button is on the same line, at its left.
+- **The Live toggle** is one round button: released, every match of the day
+  is shown; pressed (white, red text), only the matches in play.
 - **The days are all fifteen** (a week each way) in a strip that scrolls
   sideways on its own, with the selected day brought to the middle. Only
   today is named ("Today"); every other day shows its weekday and date. The
-  selected day has a full outline. On desktop there are previous and next
-  arrows and a calendar button as well; on phones the strip is scrolled with
-  a finger and those give their room to more days.
+  selected day has light text and an underline (no outline); the others are
+  a little grey. On desktop there are previous and next arrows and a
+  calendar button as well; on phones the strip is scrolled with a finger.
+- **Live keeps its own scroll position.** The whole site scrolls on the body,
+  so `liveData.js` opens Live at its top and puts the page you came from back
+  where it was (`enterLiveScroll` / `leaveLiveScroll`). Check it: scroll the
+  home page, open Live, scroll, go back.
 - The selected day is in the address (`?date=`), so Back, reload and a shared
   link all return to it. Without a date the address means "today".
 - **Anything that stays in view stops below what is fixed above it:** use

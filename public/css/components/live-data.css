@@ -879,11 +879,23 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   }
 }
 
-/* Wide screens: the day view starts right under the header, and keeps clear
-   of the floating Back button at its left. */
+/* Wide screens: the day view's top row sits against the header from the
+   start, with the Back button on the same line at its left. The list keeps
+   clear of the button. */
 @media (min-width: 769px) {
   .liveDataPage[data-live-tab="allGames"] {
-    padding-top: calc(var(--live-top) + 12px);
+    padding-top: var(--live-top);
+  }
+
+  .liveDataPage[data-live-tab="allGames"] .liveHeader {
+    margin-top: 0;
+  }
+
+  /* Centred on the row (3.5rem tall); the button itself is 38px tall. */
+  .liveDataPage[data-live-tab="allGames"] .liveBackBtn {
+    top: calc(var(--live-top) + (3.5rem - 38px) / 2);
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .liveDataPage[data-live-tab="allGames"] .liveWidgetCard {
@@ -923,6 +935,11 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   .liveWidgetCard {
     margin-top: 0;
     padding-top: 0;
+  }
+
+  /* The day view's top row sits against the tab bar from the start. */
+  .liveDataPage[data-live-tab="allGames"] {
+    padding-top: calc(var(--live-top) + var(--live-tabs-h));
   }
 
   /* Its place is taken by the arrow in the bar. */

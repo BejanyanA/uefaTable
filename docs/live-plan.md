@@ -71,12 +71,20 @@ live, so nothing is missing for visitors in between.
 - **The site header is frosted (blurred) on every screen size,** on all
   pages. (2026-11-25)
 - **The day view's list is 54rem wide at most** (was 46rem). (2026-11-25)
-- **One row stays in view under them: Live and All first, then the days.**
-  Live and All are round buttons with no count. The days are all fifteen (a
-  week each way) in a strip that scrolls sideways; only today is named
-  "Today", the others show their weekday; the selected day has a full outline.
-  Live is the filter selected when the screen opens; a day with nothing in
-  play opens on All. (2026-11-25)
+- **One row sits against the header (on phones against the tab bar) from the
+  moment Live opens and stays there:** the Live toggle first, then the days.
+  On desktop the Back button is on the same line, at its left. (2026-11-26)
+- **Only a Live toggle, no All.** All matches of the day are shown by default;
+  pressing Live shows only those in play (the button turns white with red
+  text); pressing it again shows all. (2026-11-26)
+- **Days:** all fifteen (a week each way) in a strip that scrolls sideways;
+  only today is named "Today", the others show their weekday. The selected
+  day has light text and an underline, no outline; the others are a little
+  grey. (2026-11-26)
+- **Live has its own scroll position:** it always opens at its top, and the
+  page you came from comes back where you left it. (2026-11-26)
+- **"Updated ... ago" shows only when the API says the data is old**, not
+  after a fixed number of minutes. (2026-11-26)
 - **The Live block has no outline.** (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
@@ -139,7 +147,8 @@ and after. This stage also laid the groundwork every later stage reuses.
       changes update in place with a short highlight
 - [x] "Live" and "All" filter with the number of matches in play
 - [x] Tabs always at the top (header on desktop, own bar on phones); one
-      fixed row with Live / All and the scrollable days; no outline
+      row with the Live toggle and the days, attached from the start; Live
+      keeps its own scroll position
 - [x] Styles in their own file, colours and sizes named once
 - [x] All states: loading, data, no matches that day, old data, failure with
       Retry
@@ -258,6 +267,8 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: one Live toggle (All by default), underlined day, row
+  attached at open with Back on its line, own scroll for Live (owner).
 - 2026-11-25: fixed a second scrollbar on the page (a hidden helper element
   of the day view was placed against the whole page). Back stays on desktop,
   Back arrow in the bar on phones, frosted header, wider list (owner).

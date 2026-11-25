@@ -273,7 +273,11 @@ export async function getDay(env, ctx, { date, tz, now }) {
 
   let matches = days.flatMap((d) => matchesInWindow(d.value.matches, window));
   const competitions = Object.assign({}, ...days.map((d) => d.value.competitions));
-  let fetchedAt = Math.min(...days.map((d) => d.fetchedAt));
+  // How old the answer is: the oldest copy that could still change. A date
+  // whose matches are all over is as good as new however long ago it was
+  // fetched, so it does not make the answer look old.
+  const changing = days.filter((d) => !(d.value.matches.length > 0 && d.value.matches.every(isOver)));
+  const fetchedAt = Math.min(...(changing.length > 0 ? changing : days).map((d) => d.fetchedAt));
   let stale = days.some((d) => d.stale);
 
   // While something is on, lay the live list over the day: the stored day may

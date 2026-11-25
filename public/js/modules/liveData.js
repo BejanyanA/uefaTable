@@ -80,10 +80,45 @@ function hideDayView() {
    if (dayViewModule) dayViewModule.hideDay();
 }
 
+// The whole site scrolls on one element (the body), so without care Live
+// would open where the home page was scrolled to, and the home page would
+// come back where Live was. Live starts at its own top, and leaving it puts
+// the page you came from back where it was.
+const currentScrollY = () => document.body.scrollTop || document.documentElement.scrollTop || window.scrollY || 0;
+function scrollToY(y) {
+   document.body.scrollTo({ top: y, behavior: "instant" });
+   window.scrollTo({ top: y, behavior: "instant" });
+}
+// Where the last page outside Live was scrolled to. Kept up to date while
+// that page is on screen, because by the time Live opens the page has
+// already been swapped out.
+let liveIsOpen = false;
+let outside = { path: location.pathname, y: 0 };
+let comeBackTo = null;
+document.addEventListener("scroll", () => {
+   if (!liveIsOpen) outside = { path: location.pathname, y: currentScrollY() };
+}, { passive: true, capture: true });
+
+function enterLiveScroll() {
+   if (comeBackTo) return; // only moving between Live tabs
+   comeBackTo = outside;
+   scrollToY(0);
+}
+
+function leaveLiveScroll() {
+   // Wait for the next page to be on screen. Moving to another Live tab
+   // opens Live again before then, and nothing is restored.
+   requestAnimationFrame(() => {
+      if (liveIsOpen || !comeBackTo) return;
+      const back = comeBackTo;
+      comeBackTo = null;
+      scrollToY(back.path === location.pathname ? back.y : 0);
+   });
+}
+
 // The tabs mirrored in the site header once the page is scrolled
 // (public/js/live/headerTabs.js). Loaded with Live, not with the home page.
 let headerTabs = null;
-let liveIsOpen = false;
 
 async function enableHeaderTabs() {
    liveIsOpen = true;
@@ -113,6 +148,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
    // The styles lay the page out a little differently for our own day view.
    const livePage = document.getElementById("liveDataPage");
    if (livePage) livePage.dataset.liveTab = tab;
+   enterLiveScroll();
    enableHeaderTabs();
 
    if (tab === "allGames") {
@@ -145,6 +181,7 @@ export async function openLiveData(tab = "allGames", { date = null } = {}) {
 export function closeLiveData() {
    setLiveDataVisible(false);
    disableHeaderTabs();
+   leaveLiveScroll();
    hideDayView();
    resetLiveWidgets(); // so next open -> widget recreated -> request sent again
 }

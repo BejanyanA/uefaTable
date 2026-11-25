@@ -80,12 +80,9 @@ function createView(container, onPickDate) {
 
   const self = {
     container, root, onPickDate,
-    // "live" | "all". Live is the default (the owner's choice); a day with
-    // nothing in play opens on All instead of an empty screen. Once the
-    // visitor picks one themselves, their choice is kept.
-    filter: "live",
-    filterChosen: false,
-    filterDay: null,
+    // "all" | "live". Every match of the day is shown; the Live button
+    // narrows it to the matches in play and a second tap widens it again.
+    filter: "all",
     rows: new Map(),     // match id -> { node, parts }
     drawnKey: "",        // what the list currently shows, to know when to rebuild
     store: null,
@@ -125,16 +122,6 @@ function draw(self, state, change, parts) {
   const { bar, note, filters, list, announcer } = parts;
   self.root.dataset.status = state.status;
   self.root.classList.toggle("is-switching", Boolean(state.switching));
-
-  if (state.status === "ready" && !self.filterChosen) {
-    const inPlay = state.data.live?.count || 0;
-    if (self.filterDay !== state.data.date) {
-      self.filterDay = state.data.date;
-      self.filter = inPlay > 0 ? "live" : "all";
-    } else if (self.filter === "live" && inPlay === 0) {
-      self.filter = "all";
-    }
-  }
 
   drawDayBar(self, state, bar);
   drawFilters(self, state, filters, parts);
@@ -257,26 +244,24 @@ function drawFilters(self, state, filters, parts) {
   filters.dataset.key = key;
   if (state.status !== "ready") { filters.replaceChildren(); return; }
 
-  const make = (name, label) => {
-    const button = el("button", "lv-filter", label);
-    button.type = "button";
-    button.setAttribute("aria-pressed", String(self.filter === name));
-    button.addEventListener("click", () => {
-      if (self.filter === name) return;
-      self.filter = name;
-      self.filterChosen = true;
-      draw(self, self.store.state, {}, parts);
-    });
-    return button;
-  };
-  // The owner asked for Live first, then All.
-  filters.replaceChildren(make("live", t("live_filter_live")), make("all", t("live_filter_all")));
+  // One toggle: pressed shows only the matches in play, released shows all.
+  const live = el("button", "lv-filter", t("live_filter_live"));
+  live.type = "button";
+  live.setAttribute("aria-pressed", String(self.filter === "live"));
+  live.addEventListener("click", () => {
+    self.filter = self.filter === "live" ? "all" : "live";
+    draw(self, self.store.state, {}, parts);
+  });
+  filters.replaceChildren(live);
 }
 
 function drawNote(state, note) {
   if (state.status !== "ready" || !state.meta?.updatedAt) { note.textContent = ""; note.className = "lv-note"; return; }
   const ago = updatedAgo(state.meta.updatedAt, Date.now());
-  const old = Boolean(state.meta.stale) || (ago.n || 0) >= 20;
+  // The API knows how long each kind of data stays fresh (matches not yet
+  // started much longer than scores in play) and says when what it sent is
+  // older than it should be. Only then is the age worth showing.
+  const old = Boolean(state.meta.stale);
   note.className = old ? "lv-note is-old" : "lv-note";
   // Only say something when it matters: data that is old, or a failed refresh.
   note.textContent = old || state.error ? t(ago.key, { n: ago.n }) : "";
