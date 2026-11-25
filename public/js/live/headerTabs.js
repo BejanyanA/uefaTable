@@ -1,13 +1,14 @@
-// The Live tabs "reflected" in the site header.
+// The Live tabs, always at the top of the screen while Live is open.
 //
-// While a Live tab is open and the page is scrolled far enough that the tabs
-// (Live, Standings, Matches) are out of sight, a compact copy of them appears
-// in the site header, between the home icon and the login buttons or the user
-// name. The copy only mirrors the real tabs: their words, which one is
-// active, and a tap on it is a tap on the real one.
+// The three tabs (Live, Standings, Matches) are drawn by this file: inside
+// the site header on desktop, between the home icon and the login buttons or
+// the user name, and in a bar of their own right under the header on phones
+// (the styles decide which, see live-data.css). They mirror the original tab
+// buttons, which stay in the page, hidden: their words, which one is active,
+// and a tap here is a tap on the original.
 //
-// The same scroll watching tells the page it is scrolled (`is-scrolled`), so
-// the floating Back button can step aside for the parts that stay in view.
+// The same file tells the page when it is scrolled (`is-scrolled`), so the
+// floating Back button can step aside for the row that stays in view.
 
 const SCROLLED_AFTER_PX = 24;
 
@@ -33,7 +34,6 @@ export function mountHeaderTabs({ page, tabs }) {
 
   const nav = document.createElement("nav");
   nav.className = "liveHeaderTabs";
-  nav.setAttribute("aria-hidden", "true");
   const inner = document.createElement("div");
   inner.className = "liveHeaderTabs-inner";
   nav.append(inner);
@@ -44,7 +44,6 @@ export function mountHeaderTabs({ page, tabs }) {
     const copy = document.createElement("button");
     copy.type = "button";
     copy.className = "liveHeaderTab";
-    copy.tabIndex = -1;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("fill", "none");
@@ -73,7 +72,10 @@ export function mountHeaderTabs({ page, tabs }) {
       const text = real.textContent.trim();
       if (label.textContent !== text) label.textContent = text;
       copy.title = text;
-      copy.classList.toggle("active", real.classList.contains("active"));
+      const active = real.classList.contains("active");
+      copy.classList.toggle("active", active);
+      if (active) copy.setAttribute("aria-current", "page");
+      else copy.removeAttribute("aria-current");
     }
   };
   const watcher = new MutationObserver(mirror);
@@ -81,27 +83,16 @@ export function mountHeaderTabs({ page, tabs }) {
   mirror();
 
   let enabled = false;
-  let shown = false;
   let frame = 0;
 
-  const setShown = (next) => {
-    if (shown === next) return;
-    shown = next;
+  const setShown = (shown) => {
     nav.classList.toggle("is-shown", shown);
-    header.classList.toggle("has-live-tabs", shown);
-    nav.setAttribute("aria-hidden", String(!shown));
-    for (const { copy } of copies.values()) copy.tabIndex = shown ? 0 : -1;
   };
 
   const measure = () => {
     frame = 0;
     if (!enabled) return;
-    const headerBottom = header.getBoundingClientRect().bottom;
-    const rect = tabs.getBoundingClientRect();
-    // rect.height is 0 while the page is hidden: then nothing is "scrolled".
-    const tabsGone = rect.height > 0 && rect.bottom <= headerBottom;
-    const scrolled = rect.height > 0 && (document.body.scrollTop || window.scrollY || 0) > SCROLLED_AFTER_PX;
-    setShown(tabsGone);
+    const scrolled = (document.body.scrollTop || window.scrollY || 0) > SCROLLED_AFTER_PX;
     page.classList.toggle("is-scrolled", scrolled);
   };
   const onScroll = () => { if (!frame) frame = requestAnimationFrame(measure); };
@@ -115,12 +106,9 @@ export function mountHeaderTabs({ page, tabs }) {
     // Live was opened or closed.
     setEnabled(next) {
       enabled = next;
-      if (!enabled) {
-        setShown(false);
-        page.classList.remove("is-scrolled");
-      } else {
-        onScroll();
-      }
+      setShown(enabled);
+      if (!enabled) page.classList.remove("is-scrolled");
+      else onScroll();
     },
   };
   return instance;

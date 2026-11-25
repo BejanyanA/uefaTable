@@ -89,42 +89,34 @@ width", not a list of devices.
   goes wrong on rotation, resize and split-screen. If two layouts need
   different markup, render one structure that CSS can rearrange.
 
-## 4. The day switcher
+## 4. The top of a Live screen
 
-Opening Live shows the viewer's current day; the visitor can move to earlier
-and later days. This control is used constantly, so it gets the most care.
+The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
 
-- A strip with the selected day in the middle, a previous and a next arrow,
-  and neighbouring days visible when there is room: three days on small
-  phones, five on phones, seven or more on tablets and desktop. The same
-  component, showing more days as its container widens.
-- Today is always named ("Today") and one tap away from any other day.
-  Yesterday and Tomorrow are named too; other days show weekday and date in
-  the current language.
-- Arrows are real buttons, at least 44 px, at the edges where thumbs rest.
-  Swiping the list sideways may also change the day on touch screens, but
-  never as the only way.
-- A way to jump further (a date field or a small calendar) without tapping an
-  arrow twenty times.
-- Changing the day keeps the tab, the scroll resets to the top, and the old
-  list stays dimmed until the new one arrives.
+- **The three tabs (Live, Standings, Matches) are always at the top** while
+  Live is open, drawn by `public/js/live/headerTabs.js`: inside the site
+  header on desktop, between the home icon and the login buttons or user
+  name; on phones (480 px and less) in a bar of their own right under the
+  header, as wide as the screen. The original tab buttons stay in the page,
+  hidden, as the source of the words and the switching.
+- **One row stays in view under them** in the day view: first the Live and
+  All buttons (round, no count), then the days.
+- **The days are all fifteen** (a week each way) in a strip that scrolls
+  sideways on its own, with the selected day brought to the middle. Only
+  today is named ("Today"); every other day shows its weekday and date. The
+  selected day has a full outline. On desktop there are previous and next
+  arrows and a calendar button as well; on phones the strip is scrolled with
+  a finger and those give their room to more days.
 - The selected day is in the address (`?date=`), so Back, reload and a shared
   link all return to it. Without a date the address means "today".
-- With the keyboard: left and right arrows move a day when the strip has
-  focus.
-- The strip stays reachable while scrolling (sticky), but thin.
-- **What stays in view when scrolled** (the owner's design, 2026-11-25):
-  the site header is fixed (60px, 50px on phones); the three Live tabs are
-  mirrored inside it once the real ones scroll out of sight
-  (`public/js/live/headerTabs.js`); the day switcher sticks right under the
-  header and the Live / All filter right under that. The floating Back button
-  fades out while scrolled, because it would sit on the day switcher.
-- Anything sticky inside a Live tab stops below the header: use
-  `top: var(--lv-sticky-top)` (set on `.liveDataPage` in `live-data.css`),
-  never `top: 0`, or it slides under the header. Check by scrolling, not only
-  by looking at the top of the page.
-- A phone on its side is the exception: with so little height the day
-  switcher and the filter scroll away with the page.
+- **Anything that stays in view stops below what is fixed above it:** use
+  `top: var(--lv-sticky-top)` (set on `.liveDataPage` in `live-data.css`: the
+  header height, plus the tab bar's on phones), never `top: 0`, or it slides
+  under the header. Check by scrolling, not only by looking at the top.
+- The floating Back button fades out while the page is scrolled, because it
+  would sit on that row.
+- A phone on its side is the exception: with so little height the row scrolls
+  away with the page.
 
 ## 5. Long lists on small phones
 

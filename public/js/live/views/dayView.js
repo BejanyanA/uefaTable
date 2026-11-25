@@ -8,12 +8,11 @@
 import { langMap, currentLang } from "../../modules/LanguageManager.js";
 import * as api from "../api.js";
 import {
-  dateParts, daysAround, isInPlay, kickoffTime, matchStatus, redCards,
-  relativeDayKey, scoreText, updatedAgo,
+  dateParts, daysInRange, isInPlay, kickoffTime, matchStatus, redCards,
+  scoreText, updatedAgo,
 } from "../format.js";
 import { createDayStore } from "../store.js";
 
-const DAYS_IN_STRIP = 7;
 const SKELETON_ROWS = 9;
 const FLASH_MS = 2200;
 
@@ -67,13 +66,16 @@ export function hideDay() {
 
 function createView(container, onPickDate) {
   const root = el("div", "lv");
-  const bar = el("div", "lv-daybar");
-  const note = el("div", "lv-note");
+  // One row that stays in view: Live and All first, then the days.
+  const top = el("div", "lv-bar");
   const filters = el("div", "lv-filters");
+  const bar = el("div", "lv-daynav");
+  top.append(filters, bar);
+  const note = el("div", "lv-note");
   const list = el("div", "lv-list");
   const announcer = el("div", "lv-sr");
   announcer.setAttribute("aria-live", "polite");
-  root.append(bar, filters, note, list, announcer);
+  root.append(top, note, list, announcer);
   container.replaceChildren(root);
 
   const self = {
@@ -203,23 +205,22 @@ function drawDayBar(self, state, bar) {
   next.disabled = !data.nextDate;
   next.addEventListener("click", () => data.nextDate && pick(data.nextDate));
 
+  // Every day the visitor may open, in one strip that scrolls sideways.
+  // Only today is named; the others show their weekday.
   const strip = el("div", "lv-days");
-  const days = daysAround(data.date, data.range, DAYS_IN_STRIP);
-  const middle = days.indexOf(data.date);
-  days.forEach((day, i) => {
+  let current = null;
+  for (const day of daysInRange(data.range)) {
     const parts = dateParts(day, currentLang);
-    const relative = relativeDayKey(day, data.today);
+    const isToday = day === data.today;
     const button = el("button", "lv-day");
     button.type = "button";
-    // How far this day is from the selected one: narrow screens hide the far ones.
-    button.dataset.distance = String(Math.abs(i - middle));
-    if (day === data.date) button.setAttribute("aria-current", "date");
-    if (day === data.today) button.classList.add("is-today");
-    button.setAttribute("aria-label", relative ? `${t(relative)}, ${parts.full}` : parts.full);
-    button.append(el("span", "lv-day-name", relative ? t(relative) : parts.weekday), el("span", "lv-day-date", parts.dayMonth));
+    if (day === data.date) { button.setAttribute("aria-current", "date"); current = button; }
+    if (isToday) button.classList.add("is-today");
+    button.setAttribute("aria-label", isToday ? `${t("live_today")}, ${parts.full}` : parts.full);
+    button.append(el("span", "lv-day-name", isToday ? t("live_today") : parts.weekday), el("span", "lv-day-date", parts.dayMonth));
     button.addEventListener("click", () => day !== data.date && pick(day));
     strip.append(button);
-  });
+  }
 
   // Jump further than the strip shows, with the device's own date picker.
   const jump = el("label", "lv-day-jump");
@@ -240,21 +241,26 @@ function drawDayBar(self, state, bar) {
   jump.addEventListener("click", () => { try { input.showPicker(); } catch { /* not supported: the input still works */ } });
 
   bar.replaceChildren(prev, strip, next, jump);
+
+  // Bring the selected day to the middle of the strip (the strip only, never
+  // the page). Done after layout, when the sizes are known.
+  if (current) {
+    requestAnimationFrame(() => {
+      strip.scrollLeft = current.offsetLeft - (strip.clientWidth - current.offsetWidth) / 2;
+    });
+  }
 }
 
 function drawFilters(self, state, filters, parts) {
-  const count = state.data?.live?.count || 0;
-  const key = `${self.filter}|${count}|${currentLang}|${state.status}`;
+  const key = `${self.filter}|${currentLang}|${state.status}`;
   if (filters.dataset.key === key) return;
   filters.dataset.key = key;
   if (state.status !== "ready") { filters.replaceChildren(); return; }
 
-  const make = (name, label, extra) => {
-    const button = el("button", "lv-filter");
+  const make = (name, label) => {
+    const button = el("button", "lv-filter", label);
     button.type = "button";
     button.setAttribute("aria-pressed", String(self.filter === name));
-    button.append(el("span", null, label));
-    if (extra) button.append(extra);
     button.addEventListener("click", () => {
       if (self.filter === name) return;
       self.filter = name;
@@ -263,10 +269,8 @@ function drawFilters(self, state, filters, parts) {
     });
     return button;
   };
-  const badge = el("span", "lv-filter-count", String(count));
-  if (count > 0) badge.classList.add("is-live");
   // The owner asked for Live first, then All.
-  filters.replaceChildren(make("live", t("live_filter_live"), badge), make("all", t("live_filter_all")));
+  filters.replaceChildren(make("live", t("live_filter_live")), make("all", t("live_filter_all")));
 }
 
 function drawNote(state, note) {

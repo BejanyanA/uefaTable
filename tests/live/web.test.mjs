@@ -1,7 +1,7 @@
 // The website's pure Live helpers: the same rules a mobile app will follow.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { addDays, daysAround, daysBetween, kickoffTime, matchStatus, relativeDayKey, scoreText, updatedAgo } from "../../public/js/live/format.js";
+import { addDays, daysBetween, daysInRange, kickoffTime, matchStatus, scoreText, updatedAgo } from "../../public/js/live/format.js";
 import { changedScores, countInPlay, createDayStore, mergeLive } from "../../public/js/live/store.js";
 
 const side = (score, penalties = null) => ({ team: { id: "t", name: "T", logo: null }, score, penalties, winner: null });
@@ -11,18 +11,12 @@ const day = (matches, extra = {}) => ({ date: "2026-11-25", today: "2026-11-25",
 test("day arithmetic and the day strip", () => {
   assert.equal(addDays("2026-11-30", 1), "2026-12-01");
   assert.equal(daysBetween("2026-11-25", "2026-11-28"), 3);
-  const range = { from: "2026-11-18", to: "2026-12-02" };
-  assert.deepEqual(daysAround("2026-11-25", range, 7), ["2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27", "2026-11-28"]);
-  assert.equal(daysAround("2026-11-18", range, 7)[0], "2026-11-18", "never before the first allowed day");
-  assert.equal(daysAround("2026-12-02", range, 7).at(-1), "2026-12-02", "never after the last allowed day");
-  assert.equal(daysAround("2026-12-02", range, 7).length, 7);
-});
-
-test("today, yesterday and tomorrow are named", () => {
-  assert.equal(relativeDayKey("2026-11-25", "2026-11-25"), "live_today");
-  assert.equal(relativeDayKey("2026-11-24", "2026-11-25"), "live_yesterday");
-  assert.equal(relativeDayKey("2026-11-26", "2026-11-25"), "live_tomorrow");
-  assert.equal(relativeDayKey("2026-11-27", "2026-11-25"), null);
+  const days = daysInRange({ from: "2026-11-18", to: "2026-12-02" });
+  assert.equal(days.length, 15, "a week back, today, a week ahead");
+  assert.equal(days[0], "2026-11-18");
+  assert.equal(days.at(-1), "2026-12-02");
+  assert.equal(days[7], "2026-11-25");
+  assert.deepEqual(daysInRange({ from: "2026-11-25", to: "2026-11-25" }), ["2026-11-25"]);
 });
 
 test("what the status column says", () => {

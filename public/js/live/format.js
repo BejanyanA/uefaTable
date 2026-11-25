@@ -20,29 +20,11 @@ export function daysBetween(from, to) {
   return Math.round((ms(to) - ms(from)) / 86400000);
 }
 
-// The days shown in the day switcher: the selected day in the middle where
-// the allowed range lets it be.
-export function daysAround(selected, range, count) {
-  const half = Math.floor(count / 2);
-  let first = addDays(selected, -half);
-  if (daysBetween(range.from, first) < 0) first = range.from;
-  if (daysBetween(addDays(first, count - 1), range.to) < 0) first = addDays(range.to, -(count - 1));
-  if (daysBetween(range.from, first) < 0) first = range.from;
+// Every day from the first to the last one a viewer may open.
+export function daysInRange(range) {
   const days = [];
-  for (let i = 0; i < count; i++) {
-    const day = addDays(first, i);
-    if (daysBetween(day, range.to) >= 0) days.push(day);
-  }
+  for (let day = range.from; daysBetween(day, range.to) >= 0; day = addDays(day, 1)) days.push(day);
   return days;
-}
-
-// "Today", "Yesterday", "Tomorrow" as translation keys, or null for other days.
-export function relativeDayKey(date, today) {
-  const diff = daysBetween(today, date);
-  if (diff === 0) return "live_today";
-  if (diff === -1) return "live_yesterday";
-  if (diff === 1) return "live_tomorrow";
-  return null;
 }
 
 // Some browsers have no Armenian date names and would quietly answer in

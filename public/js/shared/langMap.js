@@ -161,8 +161,6 @@ export const langMap = {
     live_standings: "Standings",
     // Live day view (public/js/live)
     live_today: "Today",
-    live_yesterday: "Yesterday",
-    live_tomorrow: "Tomorrow",
     live_prev_day: "Previous day",
     live_next_day: "Next day",
     live_pick_date: "Choose a date",
@@ -393,8 +391,6 @@ export const langMap = {
     live_standings: "Աղյուսակներ",
     // Live day view (public/js/live)
     live_today: "Այսօր",
-    live_yesterday: "Երեկ",
-    live_tomorrow: "Վաղը",
     live_prev_day: "Նախորդ օրը",
     live_next_day: "Հաջորդ օրը",
     live_pick_date: "Ընտրել ամսաթիվը",
@@ -624,13 +620,11 @@ export const langMap = {
     live_standings: "Classements",
     // Live day view (public/js/live)
     live_today: "Aujourd'hui",
-    live_yesterday: "Hier",
-    live_tomorrow: "Demain",
     live_prev_day: "Jour précédent",
     live_next_day: "Jour suivant",
     live_pick_date: "Choisir une date",
     live_filter_all: "Tous",
-    live_filter_live: "En direct",
+    live_filter_live: "Direct",
     live_no_matches: "Aucun match ce jour-là",
     live_no_live_matches: "Aucun match en direct pour le moment",
     live_error: "Impossible de charger les matchs",

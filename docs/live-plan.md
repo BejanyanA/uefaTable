@@ -61,21 +61,19 @@ live, so nothing is missing for visitors in between.
 - **The day view lists every competition of the day, ours first:** the
   competitions from our menus on top in the usual order, then all the others
   grouped by country. (2026-11-25)
-- **When the page is scrolled, the three tabs appear inside the site header,**
-  between the home icon and the login buttons or the user name: icons on
-  phones, icons with words where there is room. Unscrolled, the tabs and the
-  Back button look as they always did. (2026-11-25)
-- **When scrolled, the day switcher and the Live / All filter stay fixed**
-  under the header. The floating Back button steps aside while scrolled.
-  (2026-11-25)
-- **The Live block has no outline.** (2026-11-25)
-- **In the day view the "Live" filter comes before "All", and Live is the one
-  selected when the screen opens.** A day with nothing in play opens on All
-  instead of an empty screen; once the visitor picks a filter, their choice is
-  kept. (2026-11-25)
-- **The day switcher keeps the look it had in the first version** (sizes of
-  names, dates and arrows); only phones about 320 px wide get a tighter one.
-  (2026-11-25)
+- **The three tabs are always at the top of the screen while Live is open,**
+  and are not shown separately in the page: inside the site header on
+  desktop (between the home icon and the login buttons or user name), and in
+  a bar of their own right under the header, as wide as the screen, on
+  phones. (2026-11-25)
+- **One row stays in view under them: Live and All first, then the days.**
+  Live and All are round buttons with no count. The days are all fifteen (a
+  week each way) in a strip that scrolls sideways; only today is named
+  "Today", the others show their weekday; the selected day has a full outline.
+  Live is the filter selected when the screen opens; a day with nothing in
+  play opens on All. (2026-11-25)
+- **Back button as before** (floating, top left); it steps aside while the
+  page is scrolled. **The Live block has no outline.** (2026-11-25)
 - **Every screen fits any device and any phone**, from 320 px wide to a wide
   desktop, portrait and landscape. (2026-11-25)
 - The viewer's day is worked out on the server from their date and time zone;
@@ -136,8 +134,8 @@ and after. This stage also laid the groundwork every later stage reuses.
 - [x] Refresh only while a match is in play and the screen is visible; score
       changes update in place with a short highlight
 - [x] "Live" and "All" filter with the number of matches in play
-- [x] Scrolled: tabs mirrored in the site header, day switcher and Live / All
-      fixed under it, Back button hidden; no outline around the block
+- [x] Tabs always at the top (header on desktop, own bar on phones); one
+      fixed row with Live / All and the scrollable days; no outline
 - [x] Styles in their own file, colours and sizes named once
 - [x] All states: loading, data, no matches that day, old data, failure with
       Retry
@@ -254,6 +252,8 @@ and after. This stage also laid the groundwork every later stage reuses.
 - 2026-11-25: sticky bar with Back and the tabs; Live filter before All (owner).
 - 2026-11-25: Live is the default filter; the day switcher back to its
   first look (owner).
+- 2026-11-25: tabs always at the top, one row with Live / All and fifteen
+  days, round buttons, no count, only Today named (owner).
 - 2026-11-25: the sticky bar is gone again. Tabs go into the site header
   when scrolled, day switcher and filters stay fixed, Back as before, no
   outline (owner).

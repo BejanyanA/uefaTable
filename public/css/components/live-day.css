@@ -59,28 +59,64 @@
   white-space: nowrap;
 }
 
-/* ---------------------------------------------------------------- day switcher */
+/* ---------------------------------------------------------------- top row */
 
-.lv-daybar {
+/* One row that stays in view while the list scrolls: Live and All first,
+   then the days. */
+.lv-bar {
   position: sticky;
-  /* Below whatever is already stuck above it (the site header sets
-     --lv-sticky-top); at the very top when used on its own. */
+  /* Below whatever is already fixed above it (the site header and, on phones,
+     the tab bar set --lv-sticky-top); at the very top when used on its own. */
   top: var(--lv-sticky-top, 0px);
   z-index: 20;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
   height: var(--lv-bar-h);
-  padding: 0.25rem 0;
   background: var(--lv-page);
+}
+
+.lv-filters {
+  flex: none;
+  display: flex;
+  gap: 0.375rem;
+}
+
+/* Live and All: full circles (a longer word stretches its circle a little). */
+.lv .lv-filter {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  color: var(--lv-text-2);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lv .lv-filter[aria-pressed="true"] {
+  border-color: var(--lv-text);
+  background: var(--lv-text);
+  color: var(--lv-page);
+}
+
+.lv-daynav {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
 }
 
 .lv-day-step,
 .lv-day-jump {
+  flex: none;
   display: grid;
   place-items: center;
-  width: 2.75rem;
+  width: 2.5rem;
   height: 2.75rem;
   border-radius: 50%;
   font-size: 1.5rem;
@@ -93,42 +129,57 @@
   cursor: default;
 }
 
+/* Every day of the range, in a strip that scrolls sideways on its own. */
 .lv-days {
-  display: flex;
-  gap: 0.125rem;
+  position: relative;
+  flex: 1 1 0;
   min-width: 0;
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  /* Days fade at the edges, a hint that there are more. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 1rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 1rem), transparent);
+  padding-inline: 0.5rem;
+}
+
+.lv-days::-webkit-scrollbar {
+  display: none;
 }
 
 .lv .lv-day {
+  flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.125rem;
-  /* Each day takes the room its name needs, then they share what is left. */
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 2.75rem;
-  padding: 0.25rem 0.25rem;
-  border-radius: 0.625rem;
+  gap: 0.0625rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 0.5rem;
+  /* The selected day gets a full outline, all the way round. */
+  border: 1.5px solid transparent;
+  border-radius: 999px;
   color: var(--lv-text-2);
+  scroll-snap-align: center;
 }
 
 .lv-day-name,
 .lv-day-date {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .lv-day-name {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
 .lv-day-date {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
 }
 
 .lv .lv-day.is-today .lv-day-name {
@@ -136,9 +187,9 @@
 }
 
 .lv .lv-day[aria-current="date"] {
+  border-color: var(--lv-accent);
   background: var(--lv-surface-2);
   color: var(--lv-text);
-  box-shadow: inset 0 -2px 0 var(--lv-accent);
 }
 
 /* The calendar button: the device's own date picker sits invisibly on top. */
@@ -165,75 +216,22 @@
   font-size: 1rem; /* stops phones zooming in on focus */
 }
 
-/* Fewer days when there is less room: 7, then 5, then 3. */
+/* Phones: the strip is scrolled with a finger, so the arrows and the calendar
+   give their room to more days. */
 @container lv (max-width: 35rem) {
-  .lv-day[data-distance="3"] { display: none; }
-}
+  .lv-day-step,
+  .lv-day-jump {
+    display: none;
+  }
 
-@container lv (max-width: 23rem) {
-  .lv-day[data-distance="2"] { display: none; }
-  .lv-day-step, .lv-day-jump { width: 2.5rem; }
-}
+  /* Tighter days, so more of them are in view at once. */
+  .lv-days {
+    gap: 0.125rem;
+  }
 
-/* Only the very smallest phones (about 320 px wide): slimmer arrows and
-   slightly smaller words, so three days fit even with long names. */
-@container lv (max-width: 19rem) {
-  .lv-day-step, .lv-day-jump { width: 2.25rem; }
-  .lv .lv-day { padding-inline: 0.125rem; }
-  .lv-day-name { font-size: 0.75rem; }
-  .lv-day-date { font-size: 0.6875rem; }
-}
-
-/* ---------------------------------------------------------------- filters and note */
-
-.lv-filters {
-  /* Stays in view too, right under the day bar. */
-  position: sticky;
-  top: calc(var(--lv-sticky-top, 0px) + var(--lv-bar-h));
-  z-index: 19;
-  display: flex;
-  gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0.25rem 0 0.5rem;
-  background: var(--lv-page);
-}
-
-.lv-filters:empty {
-  position: static;
-}
-
-.lv .lv-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 2.75rem;
-  padding: 0.25rem 1rem;
-  border-radius: 999px;
-  background: var(--lv-surface);
-  color: var(--lv-text-2);
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
-.lv .lv-filter[aria-pressed="true"] {
-  background: var(--lv-text);
-  color: var(--lv-page);
-}
-
-.lv-filter-count {
-  min-width: 1.25rem;
-  padding: 0 0.3125rem;
-  border-radius: 999px;
-  background: var(--lv-surface-2);
-  font-size: 0.75rem;
-  line-height: 1.25rem;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.lv-filter-count.is-live {
-  background: var(--lv-live);
-  color: #fff;
+  .lv .lv-day {
+    padding: 0 0.25rem;
+  }
 }
 
 .lv-note {
@@ -242,11 +240,15 @@
 }
 
 .lv-note:not(:empty) {
-  padding: 0 0 0.5rem;
+  padding: 0.25rem 0 0.5rem;
 }
 
 .lv-note.is-old {
   color: #ffc35a;
+}
+
+.lv-list {
+  padding-top: 0.25rem;
 }
 
 /* ---------------------------------------------------------------- competitions */
@@ -496,14 +498,13 @@
   }
 
   .lv .lv-filter[aria-pressed="false"]:hover {
-    background: var(--lv-surface-2);
+    background: var(--lv-surface);
   }
 }
 
-/* A phone on its side has very little height: let the day bar scroll away. */
+/* A phone on its side has very little height: let the top row scroll away. */
 @media (max-height: 30rem) {
-  .lv-daybar,
-  .lv-filters {
+  .lv-bar {
     position: static;
   }
 }
