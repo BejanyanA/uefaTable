@@ -82,8 +82,8 @@ live, so nothing is missing for visitors in between.
 - **Days:** all fifteen (a week each way) in a strip that scrolls sideways;
   only today is named "Today", the others show their weekday. The selected
   day has light text and an underline, no outline; the others are a little
-  grey. While another day
-  is selected, "Today" is light green. (2026-11-26)
+  grey. While another day is selected, "Today" and its date are light
+  green. (2026-11-26)
 - **Live has its own scroll position:** it always opens at its top, and the
   page you came from comes back where you left it. (2026-11-26)
 - **"Updated ... ago" shows only when the API says the data is old**, not

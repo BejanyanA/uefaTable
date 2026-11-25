@@ -42,13 +42,15 @@
    position: absolute;
    top: 100%;
    left: 0;
-   background-color: rgba(43, 42, 42, 0.4);
+   /* The same near-black glass as on phones (owner, 2026-11-26). */
+   background-color: rgba(0, 0, 0, 0.9);
    border-radius: 6px;
    padding: 6px 0px;
    flex-direction: column;
    min-width: 120px;
    z-index: 9000;
-   backdrop-filter: blur(8px);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
    animation: fadeOut 0.25s ease forwards;
    display: none;
 }

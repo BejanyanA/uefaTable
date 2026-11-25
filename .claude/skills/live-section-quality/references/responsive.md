@@ -112,8 +112,8 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   sideways on its own, with the selected day brought to the middle. Only
   today is named ("Today"); every other day shows its weekday and date. The
   selected day has light text and an underline (no outline); the others are
-  a little grey; while another day is selected, "Today" is light green (iOS
-  systemGreen, #30d158). On desktop there are previous and next arrows and a
+  a little grey; while another day is selected, "Today" and its date are light green
+  (iOS systemGreen, #30d158). On desktop there are previous and next arrows and a
   calendar button as well; on phones the strip is scrolled with a finger.
 - **Every size:** the Live screen sits on a black page, and each match is a
   block of its own in iOS's grouped cell colour (`--lv-row-bg`, #1c1c1e) with
