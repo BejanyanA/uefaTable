@@ -289,6 +289,7 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: added time as 90'+9, the +9 smaller and red (owner).
 - 2026-11-26: matches still running from before midnight stay in today; the
   Today button reads "Live" while the Live button is pressed (owner).
 - 2026-11-26: "Today" in light green while another day is selected (owner).

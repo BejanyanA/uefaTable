@@ -80,8 +80,12 @@ export function matchStatus(match) {
     case "live":
       if (match.period === "penalties") return { key: "live_st_penalties", live: true };
       if (Number.isInteger(match.minute)) {
-        const added = Number.isInteger(match.addedTime) && match.addedTime > 0 ? `+${match.addedTime}` : "";
-        return { text: `${match.minute}${added}'`, live: true };
+        // Added time comes as its own part ("+2"), so it can be drawn smaller.
+        if (Number.isInteger(match.addedTime) && match.addedTime > 0) {
+          const added = `+${match.addedTime}`;
+          return { text: `${match.minute}${added}'`, minute: `${match.minute}'`, added, live: true };
+        }
+        return { text: `${match.minute}'`, live: true };
       }
       return { key: "live_st_live", live: true };
     case "break":

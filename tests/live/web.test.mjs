@@ -22,7 +22,7 @@ test("day arithmetic and the day strip", () => {
 test("what the status column says", () => {
   assert.deepEqual(matchStatus(match("m", "scheduled")), { kickoff: true, live: false });
   assert.deepEqual(matchStatus(match("m", "live", 1, 0, { minute: 67 })), { text: "67'", live: true });
-  assert.deepEqual(matchStatus(match("m", "live", 1, 0, { minute: 45, addedTime: 2 })), { text: "45+2'", live: true });
+  assert.deepEqual(matchStatus(match("m", "live", 1, 0, { minute: 45, addedTime: 2 })), { text: "45+2'", minute: "45'", added: "+2", live: true });
   assert.deepEqual(matchStatus(match("m", "live", 1, 1, { period: "penalties", minute: 120 })), { key: "live_st_penalties", live: true });
   assert.deepEqual(matchStatus(match("m", "break", 0, 0, { period: "half_time" })), { key: "live_st_half_time", live: true });
   assert.deepEqual(matchStatus(match("m", "finished", 2, 1, { decidedBy: "regular" })), { key: "live_st_full_time", live: false });

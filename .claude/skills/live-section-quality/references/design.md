@@ -143,7 +143,8 @@ settle them):
 
 - A live match shows its minute in strong white text and a red bar at the
   left edge of its block, with a faint red glow behind it (the owner's
-  choice, 2026-11-26). Nothing blinks.
+  choice, 2026-11-26). Nothing blinks. Added time is written after the
+  minute, smaller and in the same red: 90'+9.
 - When a score changes, highlight that score cell for about two seconds
   (a soft background fade), then return to normal. No sound, no popup, no
   shifting of rows.

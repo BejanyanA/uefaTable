@@ -381,6 +381,15 @@
 
 /* The ":last-child" form is needed: the block rules below style a group's
    last row separately and would otherwise win for the last (or only) match. */
+/* Added time ("+9"): smaller, in the red of the bar the block starts with. */
+.lv-when-added {
+  margin-left: 0.125rem;
+  color: var(--lv-live);
+  font-size: 0.75em;
+  font-weight: 700;
+  vertical-align: 0.1em;
+}
+
 .lv .lv-match.is-live,
 .lv .lv-match.is-live:last-child {
   position: relative;
