@@ -34,17 +34,21 @@ Existing screens must keep working while Live is rebuilt. Use the
 
 ## 1. Start from the request budget
 
-API-Sports allows a fixed number of calls per day, depending on the plan. The
-whole design hangs on that number, so settle it before writing code.
+API-Sports allows a fixed number of calls per day. The site is on the Pro plan:
+7,500 requests a day and 300 a minute (read on 2026-11-25). The whole design
+hangs on that number.
 
-- If the plan and daily limit are not written down in this project yet, ask
-  the owner. This question was asked on 2026-11-25 and not answered.
-- Write a small budget: for each kind of data, how often we refresh it and how
-  many calls a day that costs with every league in the menu. It must fit the
-  limit with room to spare (aim to use at most about 70%).
+Read `references/request-budget.md` before adding or re-timing any call. It
+holds the budget table (about half the daily limit at its ceiling), the guard
+that slows refreshing when the day's calls run high, and what to do with the
+key once the widgets are gone.
+
+- Every new kind of data gets a line in that budget before it is built.
 - The number of visitors must not change the number of calls to API-Sports.
   One visitor or ten thousand, the Worker makes the same calls. If a design
   needs "one upstream call per visitor", it is the wrong design.
+- Calls made per match are the dangerous kind. Fetch match detail only when a
+  visitor opens that match.
 
 ## 2. How data travels
 
@@ -58,16 +62,18 @@ browser  ->  our API Worker  ->  cache (hit: answer now)
 - **Trim on the server.** Send the browser only the fields the screen shows.
   API-Sports answers are large; a standings table needs rank, team id, name,
   logo, played, won, drawn, lost, goals and points, nothing else.
-- **Cache by how fast the data changes.** A starting point to adjust to the
-  budget:
+- **Cache by how fast the data changes:**
 
   | Data | Fresh for | Notes |
   | --- | --- | --- |
-  | Live scores (a match is on) | 15-30 s | Only while at least one match is live |
-  | Today's fixtures, nothing live | 5-10 min | |
-  | Standings | 15-60 min | Shorter on match days if the budget allows |
+  | Live scores (a match is on) | 15 s | Only while at least one match is live |
+  | Today's matches, nothing live | 10 min | |
+  | Fixtures and results of a league | 60 min | |
+  | Standings | 30 min | |
   | Finished matches, past rounds | 24 h or more | They do not change |
   | League list, seasons | days | Or keep them in our own code |
+
+  These are the times in the budget; change both places together.
 
 - **Serve stale while refreshing.** If the cached copy is old, answer with it
   at once and refresh in the background (`ctx.waitUntil`). Nobody should wait
@@ -215,7 +221,8 @@ Three meanings, all required.
 Go through this for every Live piece before saying it is finished. Report each
 line you could not check, with the reason.
 
-1. **Budget:** the calls per day are written down and fit the plan's limit.
+1. **Budget:** every call this piece makes has a line in
+   `references/request-budget.md`, and the total still fits the daily limit.
 2. **Data path:** no API-Sports key or call in the browser; unknown league ids
    are refused; a cached answer is served when the provider is down.
 3. **States:** loading, data, empty, old data and failure each look right.
