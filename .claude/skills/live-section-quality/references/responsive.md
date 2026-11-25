@@ -107,7 +107,12 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   screens the Back button is on the same line, at its left.
 - **The Live toggle** is one round button: pressed (white, red text), only
   the matches in play; released, every match of the day. It is pressed when
-  the screen opens, unless the day has nothing in play.
+  the screen opens, unless the day has nothing in play. While it is pressed,
+  today's button in the day row reads "Live" without a date; pressing it on
+  another day goes to today, and picking a day releases it.
+- **Matches do not vanish at midnight.** A match that kicked off before the
+  viewer's midnight and is still on belongs to today as well (the API adds
+  it, `stillRunningFromBefore` in `arrange.js`).
 - **The days are all fifteen** (a week each way) in a strip that scrolls
   sideways on its own, with the selected day brought to the middle. Only
   today is named ("Today"); every other day shows its weekday and date. The

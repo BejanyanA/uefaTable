@@ -23,6 +23,18 @@ export function kickoffMs(match) {
   return Date.parse(match.kickoff);
 }
 
+// Matches that kicked off before the viewer's day began but are still being
+// played (or ended minutes ago) belong to the start of today too: at 00:10 a
+// match that kicked off at 23:30 is still the match people are watching.
+// Only for "today", and only for as long as a match can last.
+export function stillRunningFromBefore(liveMatches, { start }, now) {
+  if (now - start > LONGEST_MATCH_MS) return [];
+  return liveMatches.filter((m) => {
+    const t = kickoffMs(m);
+    return t < start && t >= start - LONGEST_MATCH_MS;
+  });
+}
+
 export function matchesInWindow(matches, { start, end }) {
   return matches.filter((m) => {
     const t = kickoffMs(m);

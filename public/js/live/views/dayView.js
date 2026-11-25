@@ -245,12 +245,20 @@ function visibleGroups(data, filter) {
 
 function drawDayBar(self, state, bar) {
   const data = state.data;
-  const key = data ? `${data.date}|${data.today}|${data.range.from}|${data.range.to}|${currentLang}` : `none|${currentLang}`;
+  // While the Live button is pressed (only ever on today), today's button
+  // reads "Live" without a date.
+  const liveMode = Boolean(data) && self.filter === "live" && data.date === data.today;
+  const key = data ? `${data.date}|${data.today}|${data.range.from}|${data.range.to}|${currentLang}|${liveMode}` : `none|${currentLang}`;
   if (bar.dataset.key === key) return;
   bar.dataset.key = key;
   if (!data) { bar.replaceChildren(); return; }
 
-  const pick = (date) => self.onPickDate(date === data.today ? null : date);
+  // Picking a day shows all of its matches: live matches only exist now.
+  const pick = (date) => {
+    self.filter = "all";
+    self.filterChosen = true;
+    self.onPickDate(date === data.today ? null : date);
+  };
 
   const prev = el("button", "lv-day-step", "‹");
   prev.type = "button";
@@ -275,8 +283,14 @@ function drawDayBar(self, state, bar) {
     button.type = "button";
     if (day === data.date) { button.setAttribute("aria-current", "date"); current = button; }
     if (isToday) button.classList.add("is-today");
-    button.setAttribute("aria-label", isToday ? `${t("live_today")}, ${parts.full}` : parts.full);
-    button.append(el("span", "lv-day-name", isToday ? t("live_today") : parts.weekday), el("span", "lv-day-date", parts.dayMonth));
+    if (isToday && liveMode) {
+      button.classList.add("is-live-mode");
+      button.setAttribute("aria-label", t("live_filter_live"));
+      button.append(el("span", "lv-day-name", t("live_filter_live")));
+    } else {
+      button.setAttribute("aria-label", isToday ? `${t("live_today")}, ${parts.full}` : parts.full);
+      button.append(el("span", "lv-day-name", isToday ? t("live_today") : parts.weekday), el("span", "lv-day-date", parts.dayMonth));
+    }
     button.addEventListener("click", () => day !== data.date && pick(day));
     strip.append(button);
   }
@@ -323,6 +337,11 @@ function drawFilters(self, state, filters, parts) {
   live.addEventListener("click", () => {
     self.filter = self.filter === "live" ? "all" : "live";
     self.filterChosen = true;
+    // Matches in play are today's: pressing Live on another day goes to today.
+    if (self.filter === "live" && state.data.date !== state.data.today) {
+      self.onPickDate(null);
+      return;
+    }
     draw(self, self.store.state, {}, parts);
   });
   filters.replaceChildren(live);

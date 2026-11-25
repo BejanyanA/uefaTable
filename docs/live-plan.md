@@ -76,9 +76,11 @@ live, so nothing is missing for visitors in between.
   On desktop the Back button is on the same line, at its left. (2026-11-26)
 - **Only a Live toggle, no All.** Live is pressed when the screen opens, so
   only the matches in play show (white button, red text); a day with nothing
-  in play opens with all its matches. Tapping the button switches between
-  live and all, and that choice is kept while moving between days.
-  (2026-11-26)
+  in play opens with all its matches. While Live is pressed, today's button
+  in the day row reads "Live" with no date and the list shows every match in
+  play, including ones that kicked off before midnight. Released, it reads
+  "Today" with its date and lists all of today's matches. Pressing Live on
+  another day goes to today; picking a day releases Live. (2026-11-26)
 - **Days:** all fifteen (a week each way) in a strip that scrolls sideways;
   only today is named "Today", the others show their weekday. The selected
   day has light text and an underline, no outline; the others are a little
@@ -287,6 +289,8 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: matches still running from before midnight stay in today; the
+  Today button reads "Live" while the Live button is pressed (owner).
 - 2026-11-26: "Today" in light green while another day is selected (owner).
 - 2026-11-26: football pitch picture for empty days; the header's language
   menu opens over the Back button (owner).

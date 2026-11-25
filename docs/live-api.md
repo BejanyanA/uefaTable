@@ -191,7 +191,10 @@ Query:
   today in that time zone. Must be inside `range` (see below).
 
 The server works out which matches fall inside that local day, so every
-client shows the same list.
+client shows the same list. For **today**, the list also holds matches that
+kicked off before the viewer's midnight and are still being played (or ended
+in the last minutes), for up to four hours after midnight: at 00:10 a match
+that kicked off at 23:30 is still on, so it is part of today.
 
 ```json
 {
@@ -302,6 +305,9 @@ by the year it starts in (`2026` for 2026/27).
   so the website and the apps agree.
 
 ## Change log
+
+- 2026-11-26: today's list also holds matches still running from before
+  midnight.
 
 - 2026-11-25: first draft.
 - 2026-11-25: the day view is the opening screen and lists every competition

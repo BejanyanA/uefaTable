@@ -8,7 +8,7 @@
 import * as cache from "./cache.js";
 import {
   LIVE_REFRESH_SECONDS, dayRefreshSeconds, forList, groupByCompetition,
-  matchesInWindow, mayBeInPlay, overlay,
+  matchesInWindow, mayBeInPlay, overlay, stillRunningFromBefore,
 } from "./arrange.js";
 import { FEATURED } from "./competitions.js";
 import { addDays, daysBetween, localDateOf, localDayWindow, utcDateOf, utcDatesOf } from "./day.js";
@@ -283,7 +283,10 @@ export async function getDay(env, ctx, { date, tz, now }) {
   // While something is on, lay the live list over the day: the stored day may
   // be minutes old, the live list seconds.
   let live = null;
-  if (matches.some((m) => mayBeInPlay(m, now))) {
+  // In the first hours of today, matches from before midnight may still be on.
+  const isToday = day === today;
+  const earlyToday = isToday && now - window.start < 4 * HOUR;
+  if (earlyToday || matches.some((m) => mayBeInPlay(m, now))) {
     try {
       const fresh = await loadLive(env, ctx, now, quota);
       const fresher = new Map();
@@ -291,6 +294,17 @@ export async function getDay(env, ctx, { date, tz, now }) {
       for (const m of fresh.value.matches) fresher.set(m.id, m);
       matches = overlay(matches, fresher);
       Object.assign(competitions, fresh.value.competitions);
+
+      // Still on from before midnight (or just finished): add them to today.
+      if (isToday) {
+        const listed = new Set(matches.map((m) => m.id));
+        const running = [...fresh.value.matches, ...fresh.value.ended.map((e) => e.match)];
+        matches = matches.concat(
+          stillRunningFromBefore(running, window, now)
+            .filter((m) => !listed.has(m.id))
+            .map((m) => ({ ...m, events: undefined }))
+        );
+      }
 
       // Stored as in play but missing from a current live list: it ended while
       // nobody was watching. Find out how, once (the stored day is corrected).

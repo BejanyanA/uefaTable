@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { dayRefreshSeconds, forList, groupByCompetition, matchesInWindow, mayBeInPlay, overlay } from "../../routes_endpoints/live/arrange.js";
+import { dayRefreshSeconds, forList, groupByCompetition, matchesInWindow, mayBeInPlay, overlay, stillRunningFromBefore } from "../../routes_endpoints/live/arrange.js";
 import { FEATURED } from "../../routes_endpoints/live/competitions.js";
 import { makeCompetition, makeMatch, makeSide, makeTeam, PHASE } from "../../routes_endpoints/live/model.js";
 
@@ -87,4 +87,17 @@ test("when to ask for the day again", () => {
   // Kick-off in 7 minutes: ask again 5 minutes before it, that is in 2 minutes.
   assert.equal(dayRefreshSeconds([match("m_1", "c_1", "2026-11-25T12:07:00Z")], now), 120);
   assert.equal(dayRefreshSeconds([match("m_1", "c_1", "2026-11-25T12:05:10Z")], now), 30, "never sooner than 30 seconds");
+});
+
+test("matches still on from before midnight belong to the start of today", () => {
+  const window = { start: Date.parse("2026-11-26T00:00:00Z"), end: Date.parse("2026-11-27T00:00:00Z") };
+  const live = [
+    match("m_1", "c_1", "2026-11-25T23:30:00Z", PHASE.LIVE),     // kicked off 30 min before midnight
+    match("m_2", "c_1", "2026-11-25T19:00:00Z", PHASE.LIVE),     // more than 4 hours before: not ours
+    match("m_3", "c_1", "2026-11-26T00:10:00Z", PHASE.LIVE),     // already inside today
+    match("m_4", "c_1", "2026-11-25T22:45:00Z", PHASE.FINISHED), // just ended
+  ];
+  const at = (iso) => stillRunningFromBefore(live, window, Date.parse(iso)).map((m) => m.id);
+  assert.deepEqual(at("2026-11-26T00:20:00Z"), ["m_1", "m_4"]);
+  assert.deepEqual(at("2026-11-26T05:00:00Z"), [], "late in the day nothing from yesterday is added");
 });
