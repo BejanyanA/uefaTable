@@ -15,15 +15,15 @@
   /* iOS dark mode: the page is pure black (systemBackground) and each match
      sits on it as a grouped cell (secondarySystemGroupedBackground). */
   --lv-page: #000;
-  --lv-radius: 0.75rem;
+  /* The site's one corner radius (the corner-radius skill): the same as the
+     Live / Standings / Matches tab bar. Everything rounded uses it, except
+     shapes the owner chose to be round (the Live pill, round buttons). */
+  --lv-radius: 12px;
   --lv-bar-h: 3.5rem;
   /* Each match is a block of its own, in iOS's grouped cell colour. */
   --lv-row-bg: #1c1c1e;
-  /* Corner radius of a match block. iOS 26 rounds grouped list sections far
-     more than iOS 13-18 did (10pt). Apple publishes no number for it; this
-     value is an estimate to be checked against an iPhone screenshot (see the
-     ios-mobile-style skill). Change it here only. */
-  --lv-row-radius: 26px;
+  /* Corner radius of a match block: the site's radius. */
+  --lv-row-radius: var(--lv-radius);
 
   container-type: inline-size;
   container-name: lv;
@@ -178,7 +178,7 @@
   min-width: 2.75rem;
   height: 2.75rem;
   padding: 0 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: var(--lv-radius);
   /* Days not selected are a little grey; the selected one is light. */
   color: var(--lv-text-2);
   scroll-snap-align: center;
@@ -503,7 +503,7 @@
 .lv .lv-button {
   min-height: 2.75rem;
   padding: 0.5rem 1.5rem;
-  border-radius: 999px;
+  border-radius: var(--lv-radius);
   background: var(--lv-text);
   color: var(--lv-page);
   font-weight: 700;
@@ -634,10 +634,10 @@
   .lv .lv-filter {
     position: relative;
     min-width: 0;
-    height: 1.875rem;
-    padding: 0 0.75rem;
+    height: 2.25rem;
+    padding: 0 0.875rem;
     border-width: 1px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
   }
 
@@ -650,7 +650,7 @@
   .lv .lv-filter::before {
     content: "";
     position: absolute;
-    inset: -0.4375rem -0.25rem;
+    inset: -0.25rem -0.25rem;
   }
 
   .lv-days {

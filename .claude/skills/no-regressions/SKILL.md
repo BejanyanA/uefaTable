@@ -70,7 +70,8 @@ at.
 | The Live widget code in `liveData.js` | Fragile workarounds around a third-party widget (column removal, re-translation timers) | All three Live tabs in three languages after any edit there |
 
 Anything a phone visitor sees must match iOS exactly: follow
-`ios-mobile-style` for every mobile change, on any page.
+`ios-mobile-style` for every mobile change, on any page. Every corner
+radius follows `corner-radius` (12px, like the Live tab bar).
 
 When the change is in the Live section, also follow `live-section-quality`
 and `live-architecture`. Once a Live endpoint is released, its JSON is a

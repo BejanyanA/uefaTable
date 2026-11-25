@@ -880,6 +880,12 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
   color: #fff;
 }
 
+/* The live mark of the Live tab turns red while that tab is selected
+   (iOS systemRed). */
+.liveHeaderTab.active[data-tab="allGames"] svg {
+  color: #ff453a;
+}
+
 .liveHeaderTab:focus-visible,
 .liveHeaderBack:focus-visible {
   outline: 2px solid #4da3ff;

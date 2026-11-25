@@ -115,10 +115,12 @@ The owner designed this on 2026-11-25. Keep it unless they ask otherwise.
   calendar button as well; on phones the strip is scrolled with a finger.
 - **Every size:** the Live screen sits on a black page, and each match is a
   block of its own in iOS's grouped cell colour (`--lv-row-bg`, #1c1c1e) with
-  `--lv-row-radius` corners, under a small competition heading.
+  12px corners like the tab bar (`--lv-row-radius`, see `corner-radius`),
+  under a small competition heading.
 - **Phones (768 px and less) follow iOS exactly** (`ios-mobile-style`): the
   system font, iOS text and red colours, a round glass Back button, the Live
-  toggle as a compact pill (30 px tall, with a larger invisible tap area).
+  toggle as a pill (36 px tall, 14 px text, with a larger invisible tap
+  area). The selected Live tab's live mark is red.
   The tabs sit in the middle of the screen, over the content.
 - **The width never jumps when a scrollbar appears.** While Live is open the
   body keeps room for its scrollbar (`body.live-open { scrollbar-gutter:

@@ -90,8 +90,10 @@ live, so nothing is missing for visitors in between.
   its competition's name. (2026-11-26)
 - **Phones match iOS exactly** (skill `ios-mobile-style`): system font, iOS
   colours, round glass Back button, compact Live pill, tabs centred over the
-  content. The corner radius (26px) is an estimate to check on an iPhone.
-  (2026-11-26)
+  content. (2026-11-26)
+- **One corner radius for the whole site: 12px, like the tab bar** (skill
+  `corner-radius`); match blocks use it. The Live pill on phones has 14px
+  text and is 36px tall; the selected Live tab's icon is red. (2026-11-26)
 - **Desktop: the content keeps its width** whether the page needs a
   scrollbar or not (room for it is kept while Live is open). (2026-11-26)
 - **The Live block has no outline.** (2026-11-25)
@@ -276,6 +278,8 @@ and after. This stage also laid the groundwork every later stage reuses.
   first look (owner).
 - 2026-11-25: tabs always at the top, one row with Live / All and fifteen
   days, round buttons, no count, only Today named (owner).
+- 2026-11-26: 12px corners like the tab bar (new skill), bigger Live pill on
+  phones, red icon on the selected Live tab (owner).
 - 2026-11-26: black page and iOS blocks on all sizes; phones follow iOS
   exactly (new skill); tabs centred on phones (owner).
 - 2026-11-26: phones get a block per match and a compact Live pill; desktop

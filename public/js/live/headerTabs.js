@@ -68,6 +68,7 @@ export function mountHeaderTabs({ page, tabs, back, content }) {
     const copy = document.createElement("button");
     copy.type = "button";
     copy.className = "liveHeaderTab";
+    copy.dataset.tab = real.dataset.tab;
     const label = document.createElement("span");
     copy.append(icon(real.dataset.tab), label);
     copy.addEventListener("click", () => {
