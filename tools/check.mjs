@@ -72,7 +72,7 @@ else ok(`translations: ${allKeys.size} keys in ${langs.join(", ")}`);
 // 4. No long dashes in lines added since main (project rule: write "-").
 try {
   const diff = execFileSync("git", ["diff", "main", "--unified=0", "--", ".", ":(exclude)package-lock.json"], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  const bad = diff.split("\n").filter((l) => l.startsWith("+") && !l.startsWith("+++") && /[–—]/.test(l));
+  const bad = diff.split("\n").filter((l) => l.startsWith("+") && !l.startsWith("+++") && /[\u2013\u2014]/.test(l));
   check("no long dashes in lines added since main", bad.length === 0, `${bad.length} line(s), e.g. ${bad[0]?.slice(0, 80)}`);
 } catch { warn("no long dashes in lines added since main", "could not compare with main"); }
 
