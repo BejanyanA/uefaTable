@@ -19,7 +19,7 @@ Free web app for running football tournaments with friends, with live football s
 - **Frontend:** plain HTML, CSS and JavaScript modules in `public/`, hosted on Cloudflare Pages
 - **API:** a Cloudflare Worker (`worker.js`) with a D1 database
 - **Real time:** Durable Objects for chat, notifications and presence
-- **Live data API (planned):** the contract for the website and future mobile apps is in `docs/live-api.md`; the plan and its progress are in `docs/live-plan.md`
+- **Live data API (on dev):** the contract for the website and future mobile apps is in `docs/live-api.md`; the plan and its progress are in `docs/live-plan.md`
 
 ## Environments
 
@@ -50,6 +50,7 @@ Commands:
 | Command | What it does |
 | --- | --- |
 | `npm run check` | Check that nothing is broken: code checks plus the dev site and dev API. Add `-- https://uefaresults.com` to check production, `-- --local` for code only |
+| `npm test` | Tests for the Live code: provider mapping, day arithmetic, ordering, the website's Live store |
 | `npm run deploy:api:dev` | Deploy the API to the dev Worker |
 | `npm run logs:api:dev` | Follow the dev Worker's logs |
 | `npm run dev:site` | Run the site on this machine (http://localhost:8788), talking to the dev API |

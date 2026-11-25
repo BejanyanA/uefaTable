@@ -74,6 +74,38 @@ The provider also returns the remaining count in its response headers
 (`x-ratelimit-requests-remaining`). Trust that over our own count when they
 disagree.
 
+## The provider refuses some calls from Cloudflare
+
+Found on 2026-11-25. The provider's API is itself behind Cloudflare, so every
+call from any Cloudflare Worker reaches it from one shared address. It answers
+a share of ours (about four in ten, in bursts) with "too many requests per
+minute", although our own count is far below 300 a minute and the same calls
+from another network all pass.
+
+What the code does about it (keep these when changing it):
+
+- a refused call is asked again a few times within about 2.5 seconds
+  (`providers/api-sports/client.js`);
+- a visitor is never kept waiting for that: they are answered from the stored
+  copy within about a second, and the refresh carries on in the background;
+- after a failed refresh the next request may try again 3 seconds later;
+- the days next to the one being viewed are fetched ahead, so switching day
+  does not depend on the provider answering at that moment.
+
+Measured afterwards: every request answered in under 1.6 s, live data at most
+18 s old, switching day about a quarter of a second.
+
+Only the owner can ask the provider's support whether calls from Cloudflare
+Workers can be counted per key instead of per address. The first-ever request
+for a day nobody has opened can still fail and shows "Try again".
+
+## Other calls the Worker makes
+
+- When a match leaves the live list, one call asks how it ended (up to 20
+  matches per call). A few dozen calls on a busy day.
+- The same call corrects a stored day that still shows a match as live after
+  it ended while nobody was watching.
+
 ## Adding something new
 
 A new kind of data (match events, line-ups, statistics, top scorers, a new

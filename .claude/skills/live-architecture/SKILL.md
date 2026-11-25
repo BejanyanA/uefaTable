@@ -93,15 +93,21 @@ core rules:
 ```
 routes_endpoints/live/
   routes.js          HTTP in, JSON out. Checks parameters. No provider words.
-  service.js         What to fetch, cache times, budget guard, comparing answers
-  model.js           Our shapes: builders and checks for match, standing, event
-  competitions.js    Our competition keys, names, order, and each provider's reference
+  service.js         What to fetch, cache times, budget guard, correcting old copies
+  arrange.js         Pure: which matches, which groups, which order, when to ask again
+  day.js             Pure: the viewer's day from a date and a time zone
+  model.js           Our shapes: builders and checks for match, team, event, competition
+  competitions.js    The competitions we feature: our keys, names, order
+  cache.js           Stored copies in D1, one refresher at a time
   providers/
     index.js         Picks the provider named in env.LIVE_PROVIDER
     api-sports/
-      client.js      Host, key header, reading the rate-limit headers
+      index.js       The functions every provider exports
+      client.js      Host, key header, rate-limit headers, retries
       map.js         Provider JSON -> our model. The status table lives here
+      competitions.js  Our competition keys -> this provider's ids
       samples/       Saved provider answers used by tests
+tests/live/          node --test: mapping, day arithmetic, ordering, the web store
 ```
 
 Every provider folder exports the same few functions and each returns **our
@@ -109,11 +115,11 @@ model**, for example:
 
 ```js
 // providers/<name>/index.js
-export async function getStandings(env, { competition, season }) { /* -> Standings */ }
-export async function getLiveMatches(env) { /* -> Match[] */ }
-export async function getMatchesByDate(env, { date }) { /* -> Match[] */ }
-export async function getCompetitionMatches(env, { competition, season }) { /* -> Match[] */ }
-export async function getQuota(env) { /* -> { limitPerDay, remainingToday } */ }
+export async function getMatchesByDate(env, { date }) { /* every match of one UTC date */ }
+export async function getLiveMatches(env) { /* every match in play, with goals and cards */ }
+export async function getMatchesByIds(env, { ids }) { /* the current state of a few matches */ }
+export const MAX_IDS_PER_CALL = 20;
+// each resolves to { matches, competitions, quota: { limitPerDay, remainingToday } | null }
 ```
 
 Keep that list short. Add a function only when a screen needs it.
@@ -122,7 +128,7 @@ Keep that list short. Add a function only when a screen needs it.
 work should be exactly this and nothing else:
 
 1. A new folder under `providers/` with the same functions.
-2. The new provider's references added in `competitions.js`.
+2. In that folder, its own references for our competition keys.
 3. A new secret for its key and `LIVE_PROVIDER` switched (dev first).
 4. The cache times and budget table reviewed for the new plan.
 

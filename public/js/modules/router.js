@@ -567,9 +567,9 @@ const routes = {
 
     live: {
         id: "liveDataPage",
-        onEnter: () => {
+        onEnter: ({ query } = {}) => {
             sessionStorage.setItem("actionForLive", "openLive");
-            openLiveData("allGames");
+            openLiveData("allGames", { date: query ? query.get("date") : null });
         },
         onLeave: () => {
             sessionStorage.removeItem("actionForLive");

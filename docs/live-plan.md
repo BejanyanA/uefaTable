@@ -16,7 +16,7 @@ each needs your yes.
 | Stage | What | State |
 | --- | --- | --- |
 | 0 | Preparation | Done |
-| 1 | Day view: the opening screen (current day, switch days, live and finished matches) | **Next** |
+| 1 | Day view: the opening screen (current day, switch days, live and finished matches) | **On dev, waiting for you** |
 | 2 | Standings tab | Not started |
 | 3 | Matches tab (fixtures and results per league) | Not started |
 | 4 | Match details (goals, cards, line-ups) | Not started |
@@ -77,63 +77,84 @@ live, so nothing is missing for visitors in between.
       Not needed to start; it only matters at stage 8.
 - [x] Which matches the day view lists: every competition, ours first (see
       "Decisions").
-- [ ] Where the cached answers live (Cloudflare Cache, KV or D1). Decided at
-      the start of stage 1 after reading Cloudflare's current limits.
+- [x] Where the cached answers live: in the database (D1). Cloudflare's own
+      cache is separate in every location, so it would not stop provider calls
+      from growing with the audience.
+- [ ] **Owner:** ask API-Sports support whether calls from Cloudflare Workers
+      can be counted per key. They refuse a share of them today (see the
+      request budget).
 - [x] How "today" is chosen for a visitor's time zone: on the server, from
       the viewer's date and time zone (see "Decisions").
 
-## Stage 1: day view, the opening screen (next)
+## Stage 1: day view, the opening screen (on dev, waiting for you)
 
 Opening Live shows the current day; the visitor can move to the days before
-and after. This stage also lays the groundwork every later stage reuses.
+and after. This stage also laid the groundwork every later stage reuses.
 
 **API (dev)**
-- [ ] Provider key stored as a secret on the dev API
-- [ ] Our competition list: our keys, names, order, provider references
-- [ ] Provider folder: fetch the matches of a date and the matches in play,
+- [x] Provider key stored as a secret on the dev API
+- [x] Our competition list: our keys, names, order; the provider's references
+      in its own folder
+- [x] Provider folder: fetch the matches of a date and the matches in play,
       turn them into our shape (states, scores, goals and cards)
-- [ ] Saved sample answers and tests for that mapping (`npm test`)
-- [ ] Cache per calendar date with "serve the old copy while refreshing"
-- [ ] The viewer's day cut out on the server from date and time zone
-- [ ] Day range limited (a week back, a week ahead)
-- [ ] Daily request counter and the budget guard
-- [ ] `GET /live/v1/competitions`
-- [ ] `GET /live/v1/matches?date=&tz=` and `GET /live/v1/matches/live`
-- [ ] Bad dates and time zones are refused
-- [ ] `docs/live-api.md` updated with real example answers
-- [ ] Deployed to the dev API
+- [x] Saved sample answers and tests for that mapping (`npm test`, 30 tests)
+- [x] Cache per calendar date with "serve the old copy while refreshing"
+      (stored in the database, table `live_cache`, dev only so far)
+- [x] The viewer's day cut out on the server from date and time zone
+- [x] Day range limited (a week back, a week ahead)
+- [x] Request count read from the provider and the budget guard
+- [x] `GET /live/v1/competitions`
+- [x] `GET /live/v1/matches?date=&tz=` and `GET /live/v1/matches/live`
+- [x] Bad dates and time zones are refused
+- [x] `docs/live-api.md` updated with real example answers
+- [x] Deployed to the dev API
+- [x] Extra, found on the way: the provider refuses some calls coming from
+      Cloudflare; the API retries and never keeps a visitor waiting for it
 
 **Website (dev)**
-- [ ] New folder `public/js/live/`: `api.js`, `store.js`, `format.js`
-- [ ] Match row and competition group views; our competitions first, then
+- [x] New folder `public/js/live/`: `api.js`, `store.js`, `format.js`
+- [x] Match row and competition group views; our competitions first, then
       the rest by country
-- [ ] A busy day (hundreds of matches) stays smooth on a cheap phone: small
-      answer from the API, off-screen groups not laid out until needed
-- [ ] Day switcher: Today named, previous and next, days around it, a way to
-      jump further; the day is in the address
-- [ ] Refresh only while a match is in play and the screen is visible; score
+- [x] A busy day stays light: 15 KB answer, off-screen groups not laid out
+- [x] Day switcher: Today named, previous and next, days around it, a
+      calendar button to jump further; the day is in the address
+- [x] Refresh only while a match is in play and the screen is visible; score
       changes update in place with a short highlight
-- [ ] Styles in their own file, colours and sizes named once
-- [ ] All states: loading, data, no matches that day, old data, failure with
+- [x] "All" and "Live" filter with the number of matches in play
+- [x] Styles in their own file, colours and sizes named once
+- [x] All states: loading, data, no matches that day, old data, failure with
       Retry
-- [ ] Texts in three languages (`live_` keys), day names included
-- [ ] The first Live tab uses the new code; its widget code is deleted
-- [ ] `npm run preloads` after the module changes
+- [x] Texts in three languages (`live_` keys), day names included
+- [x] The first Live tab uses the new code; its widget code is deleted
+- [x] The Live code loads only when Live is opened (home page unchanged)
 
 **Checks**
-- [ ] Every device: 320 to 1920 px, a phone in landscape, 200% zoom, no
-      sideways page scroll (`live-section-quality`, section 5)
-- [ ] The rest of the `live-section-quality` checklist, three languages
-- [ ] `live-architecture` checklist, including "no provider words outside its
-      folder"
-- [ ] `no-regressions` checks: `npm run check`, custom-league tables still
-      right, the other two Live tabs still work
-- [ ] Requests, size and time to data compared with the widget version; the
-      day's request count looked at
+- [x] Sizes checked in the browser: 320, 360, 375, 390 px, a phone in
+      landscape (740 by 360) and 1440 px; no sideways page scroll
+- [ ] Sizes not yet checked: 430, 600, 768, 1024, 1280, 1920 px and 200% zoom
+- [x] English, French and Armenian looked at
+- [x] No provider words outside the provider folder (`npm run check`)
+- [x] `npm run check` passes; Standings and Matches tabs still work; leaving
+      Live stops all refreshing; home banners still there
+- [x] One request for the day (15 KB), then small score requests (about 2 KB
+      compressed) every 15 s; rows are updated in place
+- [ ] Keyboard and screen reader pass
+- [ ] Comparison with the widget version in numbers
+- [ ] Custom-league tables looked at while signed in (no shared styles were
+      touched, so no change is expected)
+
+**Known gaps in this stage**
+- Tapping a match does nothing yet. The widget opened a match pop-up from
+  this tab; that returns with stage 4. The Matches tab still has it.
+- The Armenian texts need your eye.
+- Processing time on the API for a full day is 9-16 ms; fine on a paid
+  Workers plan, tight on the free one. To be watched.
 
 **Release**
 - [ ] **Owner:** try the day view on the dev site, on a real iPhone and a real
       Android phone
+- [ ] **Owner says yes:** create the `live_cache` table on production
+      (`db/migrations/002_live_cache.sql`)
 - [ ] **Owner says yes:** provider key as a secret on the production API
 - [ ] **Owner says yes:** deploy the production API
 - [ ] **Owner says yes:** merge to `main` (production site)
@@ -212,3 +233,4 @@ and after. This stage also lays the groundwork every later stage reuses.
   Standings moves to stage 2, the Matches tab to stage 3. "Every device" added
   to the decisions and the checks.
 - 2026-11-25: the day view lists every competition, ours first (owner).
+- 2026-11-25: stage 1 built on dev (API and website). Not on production.

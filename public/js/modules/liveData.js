@@ -58,9 +58,42 @@ export async function loadLeagueLogos() {
 }
 
 // ---------- public API ----------
-export async function openLiveData(tab = "allGames") {
+// The day view: our own screen for the first tab. Loaded only when Live is
+// opened, so the home page does not carry it.
+let dayViewModule = null;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+async function showDayView(date) {
+   const container = document.getElementById("leaguesWidgetContainer");
+   if (!container) return;
+   dayViewModule = dayViewModule || await import("../live/views/dayView.js");
+   // The visitor may have moved to another tab while the module loaded.
+   if (currentTab !== "allGames") return;
+   dayViewModule.showDay(container, {
+      date: DATE_RE.test(date || "") ? date : null,
+      // The chosen day goes into the address, so Back and shared links work.
+      onPickDate: (day) => navigateTo(day ? `live?date=${day}` : "live"),
+   });
+}
+
+function hideDayView() {
+   if (dayViewModule) dayViewModule.hideDay();
+}
+
+export async function openLiveData(tab = "allGames", { date = null } = {}) {
    setLiveDataVisible(true);
 
+   if (tab === "allGames") {
+      initLiveTabsOnce();
+      currentTab = tab;
+      document.querySelectorAll(".liveTabBtn").forEach((btn) => {
+         btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      await showDayView(date);
+      return;
+   }
+
+   hideDayView();
    await loadApiSportsWidgetsOnce();
 
    initLiveTabsOnce();
@@ -79,6 +112,7 @@ export async function openLiveData(tab = "allGames") {
 
 export function closeLiveData() {
    setLiveDataVisible(false);
+   hideDayView();
    resetLiveWidgets(); // so next open -> widget recreated -> request sent again
 }
 
@@ -218,26 +252,7 @@ function renderTab(tab) {
    if (!container) return;
 
    if (tab === "allGames") {
-      container.innerHTML = `
-      <api-sports-widget
-        data-type="games"
-        data-target-game="modal"
-        data-games-style="2"
-        data-refresh="15"
-        data-show-toolbar="true"
-        data-tab="live"
-      ></api-sports-widget>
-
-      <api-sports-widget
-        data-type="config"
-        data-key="${API_KEY}"
-        data-sport="football"
-        data-lang="en"
-        data-theme="dark"
-        data-show-logos="true"
-        data-favorite="false"
-      ></api-sports-widget>
-    `;
+      // The day view is our own screen (public/js/live); openLiveData mounts it.
       return;
    }
 

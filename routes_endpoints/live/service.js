@@ -314,6 +314,8 @@ export async function getDay(env, ctx, { date, tz, now }) {
       today,
       previousDate: distance > -DAYS_BACK ? addDays(day, -1) : null,
       nextDate: distance < DAYS_AHEAD ? addDays(day, 1) : null,
+      // The days a viewer may ask for, so no client has to know the rule.
+      range: { from: addDays(today, -DAYS_BACK), to: addDays(today, DAYS_AHEAD) },
       live,
       groups: groupByCompetition(matches, competitions),
     },

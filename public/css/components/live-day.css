@@ -1,0 +1,516 @@
+/* The Live day view (public/js/live/views/dayView.js).
+ *
+ * Everything is scoped under .lv and sized by the space .lv is given, not by
+ * the screen, so it fits a phone, a tablet column or a desktop page alike.
+ * Colours and sizes are named once here; nothing outside Live uses them. */
+
+.lv {
+  --lv-text: rgb(250, 249, 249);
+  --lv-text-2: rgba(255, 255, 255, 0.62);
+  --lv-surface: rgba(255, 255, 255, 0.05);
+  --lv-surface-2: rgba(255, 255, 255, 0.1);
+  --lv-line: rgba(255, 255, 255, 0.1);
+  --lv-live: #ff5a67;
+  --lv-accent: #4da3ff;
+  --lv-page: rgb(1, 10, 20);
+  --lv-radius: 0.75rem;
+  --lv-bar-h: 3.5rem;
+
+  container-type: inline-size;
+  container-name: lv;
+  color: var(--lv-text);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-align: left;
+  max-width: 46rem;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.lv *,
+.lv *::before,
+.lv *::after {
+  box-sizing: border-box;
+}
+
+.lv button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lv button:focus-visible,
+.lv-day-jump:focus-within {
+  outline: 2px solid var(--lv-accent);
+  outline-offset: 2px;
+}
+
+.lv-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- day switcher */
+
+.lv-daybar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: var(--lv-bar-h);
+  padding: 0.25rem 0;
+  background: var(--lv-page);
+}
+
+.lv-day-step,
+.lv-day-jump {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--lv-text);
+}
+
+.lv-day-step:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.lv-days {
+  display: flex;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.lv .lv-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  /* Each day takes the room its name needs, then they share what is left. */
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.25rem;
+  border-radius: 0.625rem;
+  color: var(--lv-text-2);
+}
+
+.lv-day-name,
+.lv-day-date {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lv-day-name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.lv-day-date {
+  font-size: 0.75rem;
+}
+
+.lv .lv-day.is-today .lv-day-name {
+  color: var(--lv-accent);
+}
+
+.lv .lv-day[aria-current="date"] {
+  background: var(--lv-surface-2);
+  color: var(--lv-text);
+  box-shadow: inset 0 -2px 0 var(--lv-accent);
+}
+
+/* The calendar button: the device's own date picker sits invisibly on top. */
+.lv-day-jump {
+  position: relative;
+  cursor: pointer;
+}
+
+.lv-day-jump-icon {
+  width: 1.25rem;
+  height: 1.125rem;
+  border: 2px solid var(--lv-text);
+  border-top-width: 5px;
+  border-radius: 0.25rem;
+}
+
+.lv-day-jump input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 1rem; /* stops phones zooming in on focus */
+}
+
+/* Fewer days when there is less room: 7, then 5, then 3. */
+@container lv (max-width: 35rem) {
+  .lv-day[data-distance="3"] { display: none; }
+}
+
+@container lv (max-width: 23rem) {
+  .lv-day[data-distance="2"] { display: none; }
+  .lv-day-step, .lv-day-jump { width: 2.5rem; }
+}
+
+/* ---------------------------------------------------------------- filters and note */
+
+.lv-filters {
+  display: flex;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0 0.5rem;
+}
+
+.lv .lv-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 1rem;
+  border-radius: 999px;
+  background: var(--lv-surface);
+  color: var(--lv-text-2);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.lv .lv-filter[aria-pressed="true"] {
+  background: var(--lv-text);
+  color: var(--lv-page);
+}
+
+.lv-filter-count {
+  min-width: 1.25rem;
+  padding: 0 0.3125rem;
+  border-radius: 999px;
+  background: var(--lv-surface-2);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.lv-filter-count.is-live {
+  background: var(--lv-live);
+  color: #fff;
+}
+
+.lv-note {
+  font-size: 0.75rem;
+  color: var(--lv-text-2);
+}
+
+.lv-note:not(:empty) {
+  padding: 0 0 0.5rem;
+}
+
+.lv-note.is-old {
+  color: #ffc35a;
+}
+
+/* ---------------------------------------------------------------- competitions */
+
+.lv-list {
+  transition: opacity 0.15s ease-out;
+}
+
+.lv.is-switching .lv-list {
+  opacity: 0.45;
+}
+
+.lv-group {
+  margin: 0 0 0.75rem;
+  border-radius: var(--lv-radius);
+  background: var(--lv-surface);
+  /* Groups far off-screen are not laid out until they are needed. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 14rem;
+}
+
+.lv .lv-group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  margin: 0;
+  padding: 0.375rem 0.75rem;
+  border-bottom: 1px solid var(--lv-line);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--lv-text);
+}
+
+.lv-group-logo,
+.lv-team-logo {
+  flex: none;
+  object-fit: contain;
+}
+
+.lv-group-logo.is-missing,
+.lv-team-logo.is-missing {
+  visibility: hidden;
+}
+
+.lv-group-names {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.lv-group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lv-group-country {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--lv-text-2);
+}
+
+.lv .lv-matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------- match row */
+
+.lv .lv-match {
+  display: grid;
+  grid-template-columns: 3.75rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  min-height: 3.5rem;
+  margin: 0;
+  padding: 0.375rem 0.75rem;
+  border-bottom: 1px solid var(--lv-line);
+}
+
+.lv .lv-match:last-child {
+  border-bottom: 0;
+}
+
+.lv-when {
+  font-size: 0.8125rem;
+  color: var(--lv-text-2);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.lv-match.is-live .lv-when {
+  color: var(--lv-live);
+  font-weight: 700;
+}
+
+.lv-match.is-live .lv-when::before {
+  content: "";
+  display: inline-block;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-right: 0.3125rem;
+  border-radius: 50%;
+  background: var(--lv-live);
+  vertical-align: 0.0625rem;
+  animation: lv-pulse 1.6s ease-in-out infinite;
+}
+
+.lv-teams {
+  display: grid;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.lv-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.lv-team-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+}
+
+.lv-team.is-loser .lv-team-name,
+.lv-score.is-loser {
+  color: var(--lv-text-2);
+}
+
+.lv-team-cards.has-red {
+  flex: none;
+  min-width: 0.5625rem;
+  height: 0.8125rem;
+  padding: 0 0.125rem;
+  border-radius: 0.125rem;
+  background: #e5303f;
+  color: #fff;
+  font-size: 0.625rem;
+  line-height: 0.8125rem;
+  text-align: center;
+}
+
+.lv-scores {
+  display: grid;
+  gap: 0.375rem;
+  justify-items: end;
+  min-width: 1.5rem;
+}
+
+.lv-score {
+  min-height: 1.25rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lv-match.is-flash {
+  animation: lv-flash 2.2s ease-out;
+}
+
+@keyframes lv-flash {
+  from { background: rgba(77, 163, 255, 0.28); }
+  to { background: transparent; }
+}
+
+@keyframes lv-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---------------------------------------------------------------- loading, empty, failure */
+
+.lv-skeleton {
+  border-radius: var(--lv-radius);
+  background: var(--lv-surface);
+}
+
+.lv-skel-head {
+  height: 2.5rem;
+  border-bottom: 1px solid var(--lv-line);
+}
+
+.lv-skel-row {
+  height: 3.5rem;
+  border-bottom: 1px solid var(--lv-line);
+  background:
+    linear-gradient(var(--lv-surface-2), var(--lv-surface-2)) 0.75rem 1.1rem / 2.5rem 0.625rem no-repeat,
+    linear-gradient(var(--lv-surface-2), var(--lv-surface-2)) 4.5rem 0.75rem / 45% 0.75rem no-repeat,
+    linear-gradient(var(--lv-surface-2), var(--lv-surface-2)) 4.5rem 2rem / 35% 0.75rem no-repeat;
+  animation: lv-skel 1.4s ease-in-out infinite;
+}
+
+.lv-skel-row:last-child {
+  border-bottom: 0;
+}
+
+@keyframes lv-skel {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.lv-message {
+  padding: 2.5rem 1rem;
+  border-radius: var(--lv-radius);
+  background: var(--lv-surface);
+  text-align: center;
+  color: var(--lv-text-2);
+}
+
+.lv-message p {
+  margin: 0 0 1rem;
+  color: inherit;
+}
+
+.lv-message p:last-child {
+  margin-bottom: 0;
+}
+
+.lv .lv-button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  background: var(--lv-text);
+  color: var(--lv-page);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- devices */
+
+/* Hover only where there is a real pointer. */
+@media (hover: hover) {
+  .lv .lv-day:hover,
+  .lv-day-step:not(:disabled):hover,
+  .lv-day-jump:hover {
+    background: var(--lv-surface);
+  }
+
+  .lv .lv-filter[aria-pressed="false"]:hover {
+    background: var(--lv-surface-2);
+  }
+}
+
+/* A phone on its side has very little height: let the day bar scroll away. */
+@media (max-height: 30rem) {
+  .lv-daybar {
+    position: static;
+  }
+}
+
+/* More air where there is room. */
+@container lv (min-width: 36rem) {
+  .lv .lv-match {
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    padding-inline: 1rem;
+  }
+
+  .lv .lv-group-head {
+    padding-inline: 1rem;
+  }
+
+  .lv-team-name {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lv-match.is-live .lv-when::before,
+  .lv-skel-row,
+  .lv-match.is-flash {
+    animation: none;
+  }
+
+  .lv-list {
+    transition: none;
+  }
+}
