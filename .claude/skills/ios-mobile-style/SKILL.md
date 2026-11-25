@@ -97,6 +97,13 @@ Shapes and sizes:
   (`rgba(0, 0, 0, 0.329)` with `blur(6px)`), never solid black. The header
   draws its own blur on `header::before`, so frosted things inside it (the
   phone tab bar) can blur the page too; keep it that way.
+- **Bars stacked at the top share one frosted band.** Two blurs that meet
+  show a sharp line where they touch. On Live the header, the phone tab bar
+  and the day row are transparent and one fixed band behind them
+  (`.liveDataPage::before`) does the blurring, as tall as all of them.
+- **A toggle button in a bar looks like the Back button when it is off**
+  (the glass fill above on phones; on desktop the Back button's thin light
+  outline and dark fill), so buttons in one bar match.
 - **Sticky bars must not sit inside a container-query element.** Safari can
   stop them from sticking. On Live the top row and the list are each their
   own `lv` container instead of the whole view.

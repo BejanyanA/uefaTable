@@ -95,10 +95,10 @@
   align-items: center;
   gap: 0.5rem;
   height: var(--lv-bar-h);
-  /* Frosted like the site header. */
-  background: rgba(0, 0, 0, 0.329);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  /* See-through: on the Live screen one frosted band behind the header, the
+     tab bar and this row does the blurring (live-data.css), so no line shows
+     where they meet. */
+  background: transparent;
 }
 
 .lv-filters {
@@ -116,8 +116,10 @@
   height: 2.75rem;
   padding: 0 0.625rem;
   border-radius: 999px;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  color: var(--lv-text-2);
+  /* Not pressed: the same outline and fill as the Back button next to it. */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
   font-size: 0.8125rem;
   font-weight: 700;
   white-space: nowrap;
@@ -580,7 +582,7 @@
   }
 
   .lv .lv-filter[aria-pressed="false"]:hover {
-    background: var(--lv-surface);
+    background: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -764,6 +766,16 @@
     font-weight: 600;
     /* The word sits in the exact middle, whatever the font's own spacing. */
     line-height: 1;
+  }
+
+  /* Not pressed: the same round glass as the Back arrow in the tab bar. */
+  .lv .lv-filter[aria-pressed="false"] {
+    border: 0;
+    background: rgba(120, 120, 128, 0.24);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.28);
+    color: #fff;
   }
 
   /* Pressed: white with iOS red (systemRed on a light surface). */

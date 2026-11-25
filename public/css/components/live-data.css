@@ -12,6 +12,44 @@ body.live-open::before {
   background: #000;
 }
 
+/* One frosted band for the whole top of the Live screen: the site header,
+   the phone tab bar and the day row. Separate frosted layers each blur only
+   what is behind their own box and leave a sharp line where they meet, so
+   while Live is open they are see-through and this band does the blurring.
+   It sits above the list and below the bars' buttons. */
+.liveDataPage::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--lv-sticky-top);
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.329);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+/* With the day view, the band reaches down to the bottom of the day row
+   (3.5rem tall, see live-day.css). */
+.liveDataPage[data-live-tab="allGames"]::before {
+  height: calc(var(--lv-sticky-top) + 3.5rem);
+}
+
+/* A phone on its side lets the day row scroll away: the band stops above it. */
+@media (max-height: 30rem) {
+  .liveDataPage[data-live-tab="allGames"]::before {
+    height: var(--lv-sticky-top);
+  }
+}
+
+body.live-open header::before {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 .liveDataPage {
   /* Height of the site's fixed header (css/layout/header.css): 60px, and 50px
      on phones (see the 480px rule at the end of this file). Sticky parts of a
@@ -990,10 +1028,9 @@ api-sports-widget .standings-table tbody tr:nth-child(2) td:first-child::after {
     height: 44px;
     padding: 4px 8px;
     box-sizing: border-box;
-    /* Frosted like the site header above it. */
-    background: rgba(0, 0, 0, 0.329);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+    /* See-through: the frosted band of the Live screen (.liveDataPage::before)
+       is behind it, together with the header. */
+    background: transparent;
     grid-template-columns: 1fr minmax(0, auto) 1fr;
     gap: 6px;
   }

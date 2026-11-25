@@ -328,6 +328,9 @@ and after. This stage also laid the groundwork every later stage reuses.
 - 2026-11-26: tab bar and day row frosted like the header; day row moved
   out of the container element so it sticks on iPhone; smaller Live button
   on phones (owner's phone test).
+- 2026-11-26: one frosted band behind the header, tab bar and day row (no
+  sharp lines between them); Live button off looks like the Back button;
+  smaller, centred Live button on phones (owner's phone test).
 - 2026-11-26: menus drawn on the page (real blur, never cut); time zone
   panel under Settings on desktop; words on all phone tabs; bigger desktop
   list (owner).
