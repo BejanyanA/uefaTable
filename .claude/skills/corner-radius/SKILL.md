@@ -20,7 +20,7 @@ This rule wins over the radius notes in `ios-mobile-style` and
 | --- | --- | --- |
 | Any block, card, row, panel, input, button, menu, image | **12px** | match blocks, the tab bar, Retry button, a day button's highlight |
 | Something inside a 12px shape with padding around it | **12px minus that padding** (concentric) | a tab inside the bar: 12px - 2px padding = 10px |
-| Round on purpose (the owner chose these) | `50%` or `999px` | the Live pill, the round Back button and arrows, the live dot |
+| Round on purpose (the owner chose these) | `50%` or `999px` | the round Back button and arrows, the live dot (the Live toggle is 12px since 2026-11-26) |
 | Thin lines and tiny drawn marks | as the drawing needs | the 2px underline, the red card mark, the calendar icon |
 
 A new shape is never "round on purpose" unless the owner asked for it. When
