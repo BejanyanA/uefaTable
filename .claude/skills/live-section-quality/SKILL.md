@@ -16,6 +16,15 @@ Existing screens must keep working while Live is rebuilt, and Live must be
 built once for the website and future mobile apps. Use the `no-regressions`
 and `live-architecture` skills together with this one.
 
+## The plan
+
+`docs/live-plan.md` lists every stage of the rebuild with what is done and
+what is left. Read it before starting Live work so you pick up at the right
+step. When a step is finished and checked, tick it in the same change, and
+update the "Where we are" table, the date and the change log. Do not tick a
+step that was only written and not checked. If the work shows the plan is
+wrong or incomplete, change the plan and tell the owner what changed.
+
 ## Where things stand
 
 - **Today:** the three Live tabs (All, Standings, Matches) are drawn by

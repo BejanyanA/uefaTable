@@ -21,6 +21,9 @@ Three ideas carry all of it:
 Use this together with `live-section-quality` (how good it must be) and
 `no-regressions` (do not break what exists).
 
+Progress is tracked in `docs/live-plan.md`: read it before starting, and tick
+a step in the same change that finishes and checks it.
+
 ## What gets reused by a mobile app
 
 Be honest about this when planning: a native or Flutter app cannot run the
