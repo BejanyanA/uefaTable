@@ -19,6 +19,7 @@ Free web app for running football tournaments with friends, with live football s
 - **Frontend:** plain HTML, CSS and JavaScript modules in `public/`, hosted on Cloudflare Pages
 - **API:** a Cloudflare Worker (`worker.js`) with a D1 database
 - **Real time:** Durable Objects for chat, notifications and presence
+- **Live data API (planned):** the contract for the website and future mobile apps is in `docs/live-api.md`
 
 ## Environments
 

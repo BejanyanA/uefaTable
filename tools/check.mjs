@@ -10,8 +10,8 @@
 // phone and desktop widths, logged in and logged out.
 
 import { execFileSync } from "node:child_process";
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -81,6 +81,24 @@ const { LANGS, STATIC_SLUGS } = await import(pathToFileURL(join(root, "public/js
 const locs = (readFileSync(join(root, "public/sitemap.xml"), "utf8").match(/<loc>/g) || []).length;
 const expectedLocs = LANGS.length * (STATIC_SLUGS.length + 1);
 check(`sitemap has ${expectedLocs} addresses`, locs === expectedLocs, `found ${locs}`);
+
+// 6. Live code speaks our own words: the data provider's name stays inside
+//    its own folder, so the provider can be replaced without touching the rest.
+{
+  const providerName = /api[-_ ]?sports|api[-_ ]?football/i;
+  const liveFiles = [
+    ...(existsSync(join(root, "public/js/live")) ? walk(join(root, "public/js/live")) : []),
+    ...(existsSync(join(root, "routes_endpoints/live")) ? walk(join(root, "routes_endpoints/live")) : []),
+    ...(existsSync(join(root, "docs/live-api.md")) ? [join(root, "docs/live-api.md")] : []),
+  ].filter((f) => !f.includes(`${sep}providers${sep}`));
+  const leaks = [];
+  for (const file of liveFiles) {
+    readFileSync(file, "utf8").split("\n").forEach((line, i) => {
+      if (providerName.test(line)) leaks.push(`${file.slice(root.length + 1)}:${i + 1}`);
+    });
+  }
+  check(`provider name stays in its folder (${liveFiles.length} Live file(s) read)`, leaks.length === 0, leaks.slice(0, 6).join(", "));
+}
 
 // ---------------------------------------------------------------- site checks
 if (!localOnly) {

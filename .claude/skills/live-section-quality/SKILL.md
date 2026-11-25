@@ -12,8 +12,9 @@ turns that into things you can check. Read it before you design or write
 anything for Live, and go through "Definition of done" before you say a piece
 is finished.
 
-Existing screens must keep working while Live is rebuilt. Use the
-`no-regressions` skill together with this one.
+Existing screens must keep working while Live is rebuilt, and Live must be
+built once for the website and future mobile apps. Use the `no-regressions`
+and `live-architecture` skills together with this one.
 
 ## Where things stand
 
@@ -51,6 +52,10 @@ key once the widgets are gone.
   visitor opens that match.
 
 ## 2. How data travels
+
+Where each piece of code goes, the shape of the JSON and how the provider is
+kept replaceable are in the `live-architecture` skill. Read it before creating
+any Live file. This section is about freshness and safety.
 
 ```
 browser  ->  our API Worker  ->  cache (hit: answer now)
