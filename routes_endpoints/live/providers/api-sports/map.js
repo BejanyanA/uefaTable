@@ -241,10 +241,13 @@ function mapFixture(item) {
   const { fixture, league, teams, goals, score, events } = item;
   const { phase, period, decidedBy } = mapStatus(fixture.status?.short);
   const competition = mapCompetition(league);
+  // They fill the shoot-out score with 0 for some matches that had none
+  // (seen on a suspended match): only a shoot-out has one.
+  const shootout = fixture.status?.short === "P" || fixture.status?.short === "PEN";
   const side = (which) => makeSide({
     team: makeTeam({ id: `t_${teams[which].id}`, name: teams[which].name, logo: teams[which].logo }),
     score: goals?.[which],
-    penalties: score?.penalty?.[which],
+    penalties: shootout ? score?.penalty?.[which] : null,
     winner: teams[which].winner,
   });
   const match = makeMatch({

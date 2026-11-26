@@ -384,7 +384,12 @@
   font-size: 0.8125rem;
   color: var(--lv-text-2);
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  /* Always one line: words come shortened ("Susp."), and anything longer
+     still ends in "..." instead of breaking. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* A live match: its minute in strong text and a red bar at its left edge,
@@ -981,5 +986,19 @@
 @media (prefers-reduced-motion: reduce) {
   .lv .lv-match {
     transition: none;
+  }
+}
+
+/* A status word instead of a time ("Susp.", "Postp."): a little smaller than
+   the minutes, on every screen size, so every language fits on one line. */
+.lv .lv-when.is-word {
+  font-size: 0.75rem;
+}
+
+/* The narrowest phones (320px): a little smaller still, so the longest word
+   in any language keeps some room. */
+@container lv (max-width: 20rem) {
+  .lv .lv-when.is-word {
+    font-size: 0.6875rem;
   }
 }

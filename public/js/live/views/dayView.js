@@ -512,16 +512,26 @@ function updateRow(row, match, scoreChanged, announcer, timeZone) {
   };
 
   const status = matchStatus(match);
-  const whenText = status.kickoff ? kickoffTime(match.kickoff, currentLang, timeZone) : (status.text || t(status.key));
+  // Words ("Suspended") are shortened to fit the narrow column ("Susp."); the
+  // full word is kept for screen readers and as a tooltip.
+  const fullText = status.kickoff ? kickoffTime(match.kickoff, currentLang, timeZone) : (status.text || t(status.key));
+  const shortKey = status.key ? `${status.key}_short` : null;
+  const whenText = shortKey && t(shortKey) !== shortKey ? t(shortKey) : fullText;
   if (last.when !== whenText) {
     last.when = whenText;
-    if (status.added) {
+    parts.when.classList.toggle("is-word", Boolean(status.key));
+    if (whenText !== fullText) {
+      parts.when.textContent = whenText;
+      parts.when.setAttribute("aria-label", fullText);
+      parts.when.title = fullText;
+    } else if (status.added) {
       // "90'" with a smaller "+9" in the live red after it.
       parts.when.replaceChildren(document.createTextNode(status.minute), el("span", "lv-when-added", status.added));
       parts.when.setAttribute("aria-label", whenText);
     } else {
       parts.when.textContent = whenText;
       parts.when.removeAttribute("aria-label");
+      parts.when.removeAttribute("title");
     }
   }
   if (last.phase !== match.phase || last.live !== status.live) {

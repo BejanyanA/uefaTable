@@ -119,3 +119,13 @@ test("one unreadable item does not lose the rest", () => {
   const items = [...sample("date"), { broken: true }, null];
   assert.equal(mapFixtures(items).matches.length, 6);
 });
+
+test("a shoot-out score only when there was a shoot-out", () => {
+  const base = sample("date")[0];
+  const withStatus = (short) => ({ ...base, fixture: { ...base.fixture, status: { ...base.fixture.status, short } }, score: { ...base.score, penalty: { home: 0, away: 0 } } });
+  const suspended = mapFixtures([withStatus("SUSP")]).matches[0];
+  assert.equal(suspended.home.penalties, null);
+  assert.equal(suspended.away.penalties, null);
+  const shootout = mapFixtures([withStatus("PEN")]).matches[0];
+  assert.equal(shootout.home.penalties, 0);
+});
