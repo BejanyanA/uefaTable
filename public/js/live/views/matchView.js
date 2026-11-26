@@ -60,10 +60,12 @@ let view = null;
 
 // Show match `id` inside `container`, over the day view (which stays there,
 // hidden, with its scroll and state).
-export function showMatch(container, { id }) {
+// `preview` ({ match, competition }, optional) is what the list already
+// knows: the score card shows it at once while the details load.
+export function showMatch(container, { id, preview = null }) {
   if (view && view.id === id && container.contains(view.root)) return;
   hideMatch();
-  view = createView(container, id);
+  view = createView(container, id, preview);
 }
 
 export function hideMatch() {
@@ -76,7 +78,7 @@ export function isMatchOpen() {
   return Boolean(view);
 }
 
-function createView(container, id) {
+function createView(container, id, preview) {
   const root = el("div", "lv lvd");
   root.setAttribute("aria-label", t("live_match_details"));
   const bar = el("div", "lvd-bar");
@@ -97,7 +99,7 @@ function createView(container, id) {
   container.classList.add("lv-has-match");
 
   const self = {
-    id, root, seg, head, note, panel, announcer,
+    id, root, seg, head, note, panel, announcer, preview,
     tab: "summary",
     tz: activeTimeZone(),
     drawn: { head: "", panel: "" },
@@ -180,10 +182,20 @@ function draw(self, state) {
   self.root.dataset.status = state.status;
   drawNote(self, state);
 
-  if (state.status === "loading" && !state.data) {
-    self.drawn = { head: "", panel: "" };
-    self.head.replaceChildren(skeletonHead());
-    self.panel.replaceChildren(skeletonRows());
+  // Still loading, or the first try failed (it is tried again on its own in
+  // a few seconds): the list's own copy of the score, or a placeholder.
+  const waiting = state.status === "loading" || (state.status === "error" && state.failures <= 1);
+  if (waiting && !state.data) {
+    const preview = self.preview && self.preview.match ? { ...self.preview, halfTime: null } : null;
+    const headKey = preview ? JSON.stringify(["preview", currentLang, self.tz, preview.match]) : "skeleton";
+    if (headKey !== self.drawn.head) {
+      self.drawn.head = headKey;
+      self.head.replaceChildren(...(preview ? drawHead(self, preview) : [skeletonHead()]));
+    }
+    if (self.drawn.panel !== "skeleton") {
+      self.drawn.panel = "skeleton";
+      self.panel.replaceChildren(skeletonRows());
+    }
     return;
   }
   if (state.status === "missing") {
@@ -193,8 +205,12 @@ function draw(self, state) {
     return;
   }
   if (!state.data) {
-    self.drawn = { head: "", panel: "" };
-    self.head.replaceChildren();
+    // Keep the score card from the list if there is one; say what failed below.
+    if (!self.preview) {
+      self.drawn.head = "";
+      self.head.replaceChildren();
+    }
+    self.drawn.panel = "error";
     self.panel.replaceChildren(message(t("live_error"), t("live_retry"), () => self.store.retry()));
     return;
   }

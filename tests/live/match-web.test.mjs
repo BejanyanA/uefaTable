@@ -58,9 +58,9 @@ test("an unknown match is final; a failure is tried again with growing pauses", 
   failing.start();
   await flush();
   assert.equal(failing.state.status, "error");
-  assert.deepEqual(retry.waits(), [5000]);
+  assert.deepEqual(retry.waits(), [3000]);
   await retry.fire();
-  assert.deepEqual(retry.waits(), [15000]);
+  assert.deepEqual(retry.waits(), [10000]);
   failing.stop();
 });
 
@@ -93,4 +93,20 @@ test("kick-off date and time in the viewer's own time zone", () => {
   assert.equal(localDate("2026-11-25T23:30:00Z", "Asia/Yerevan"), "2026-11-26");
   assert.equal(localDate("2026-11-25T23:30:00Z", "UTC"), "2026-11-25");
   assert.match(kickoffDateTime("2026-11-25T20:00:00Z", "en", "UTC"), /25 November, 20:00$/);
+});
+
+test("the store says how many tries in a row failed", async () => {
+  const timers = fakeTimers();
+  let fail = true;
+  const store = createMatchStore({ api: { fetchMatch: async () => (fail ? { ok: false, error: "unavailable" } : answer(15)) }, id: "m_1", onChange: () => {}, timers });
+  store.start();
+  await flush();
+  assert.equal(store.state.failures, 1, "a first failure: the view keeps waiting");
+  await timers.fire();
+  assert.equal(store.state.failures, 2, "a second one: the view says so");
+  fail = false;
+  await timers.fire();
+  assert.equal(store.state.status, "ready");
+  assert.equal(store.state.failures, 0);
+  store.stop();
 });

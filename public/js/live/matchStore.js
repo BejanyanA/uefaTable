@@ -6,7 +6,9 @@
 // (meta.refreshAfterSeconds; null when the match is over) and the store
 // obeys it. While the screen is hidden nothing is requested.
 
-const RETRY_SECONDS = [5, 15, 30, 60];
+// The first retry matches the server, which lets anyone try again 3 s after a
+// failed fetch.
+const RETRY_SECONDS = [3, 10, 30, 60];
 // An answer marked as old means the server is fetching a newer one right
 // now: ask again shortly, a couple of times.
 const STALE_RECHECK_SECONDS = 4;
@@ -18,6 +20,7 @@ export function createMatchStore({ api, id, onChange, timers = globalThis }) {
     data: null,         // the API's match details answer
     meta: null,
     error: null,
+    failures: 0,        // tries in a row that failed
   };
 
   let timer = null;
@@ -54,6 +57,7 @@ export function createMatchStore({ api, id, onChange, timers = globalThis }) {
 
     if (result.ok) {
       failures = 0;
+      state.failures = 0;
       state.status = "ready";
       state.data = result.data;
       state.meta = result.meta;
@@ -64,6 +68,7 @@ export function createMatchStore({ api, id, onChange, timers = globalThis }) {
     }
 
     state.error = result.error;
+    state.failures = failures + 1;
     if (result.error === "not_found") {
       state.status = "missing";
       emit();

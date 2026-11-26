@@ -66,7 +66,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MATCH_RE = /^[A-Za-z0-9_-]{1,40}$/;
 
 // The match open on top of the day view, from the address (?match=).
-let openMatch = null; // { id, date, fromList }
+let openMatch = null; // { id, date, fromList, preview }
 // Where the day's list was scrolled to when a match was opened from it.
 let listScrollY = 0;
 
@@ -90,9 +90,10 @@ async function showDayView(date, matchId = null) {
       // The chosen day goes into the address, so Back and shared links work.
       onPickDate: (pick) => navigateTo(liveAddress({ date: pick })),
       // So does an opened match; Back closes it again.
-      onOpenMatch: (id, onDate) => {
+      matchLink: (id, onDate) => `/${currentLang}/${liveAddress({ date: onDate, match: id })}`,
+      onOpenMatch: (id, onDate, preview) => {
          listScrollY = currentScrollY();
-         openMatch = { id, date: onDate, fromList: true };
+         openMatch = { id, date: onDate, fromList: true, preview };
          navigateTo(liveAddress({ date: onDate, match: id }));
       },
    });
@@ -115,7 +116,7 @@ async function showMatchView(container, matchId, date) {
    if (!openMatch || openMatch.id !== matchId) openMatch = { id: matchId, date, fromList: false };
    matchViewModule = matchViewModule || await import("../live/views/matchView.js");
    if (currentTab !== "allGames" || !openMatch || openMatch.id !== matchId) return;
-   matchViewModule.showMatch(container, { id: matchId });
+   matchViewModule.showMatch(container, { id: matchId, preview: openMatch.preview || null });
    scrollToY(0);
 }
 

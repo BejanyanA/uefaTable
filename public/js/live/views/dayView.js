@@ -29,16 +29,19 @@ const t = (key, vars) => {
 let view = null;
 
 // Show the day view inside `container`, for `date` ("2026-11-25") or today.
-// `onOpenMatch(id, date | null)` is called when the visitor opens a match.
+// `onOpenMatch(id, date | null, preview)` is called when the visitor opens a
+// match, with what the list knows about it ({ match, competition });
+// `matchLink(id, date | null)` gives that match's address for its link.
 // `onPickDate(date | null)` is called when the visitor chooses another day;
 // the caller puts it in the address and calls showDay again.
-export function showDay(container, { date = null, onPickDate, onOpenMatch }) {
+export function showDay(container, { date = null, onPickDate, onOpenMatch, matchLink }) {
   if (!view || view.container !== container || !container.contains(view.root)) {
     hideDay();
     view = createView(container, onPickDate);
   }
   view.onPickDate = onPickDate;
   view.onOpenMatch = onOpenMatch;
+  view.matchLink = matchLink;
   view.store.show(date);
 }
 
@@ -439,7 +442,7 @@ function drawGroup(self, group) {
   matches.id = `lv-group-${key}`;
   button.setAttribute("aria-controls", matches.id);
   for (const match of group.matches) {
-    const row = drawRow(self, match);
+    const row = drawRow(self, match, competition);
     self.rows.set(match.id, row);
     matches.append(row.node);
   }
@@ -458,7 +461,7 @@ function drawSide(parts, which) {
   return line;
 }
 
-function drawRow(self, match) {
+function drawRow(self, match, competition) {
   const node = el("li", "lv-match");
   const parts = {};
   const when = el("div", "lv-when");
@@ -476,18 +479,24 @@ function drawRow(self, match) {
   scores.append(parts.homeScore, sep, parts.awayScore);
 
   node.append(when, teams, scores);
-  // The whole row opens the match. A row is a list item, not a link, so
-  // its columns keep their layout; keyboard users reach it with Tab.
-  node.tabIndex = 0;
-  node.setAttribute("role", "link");
-  const open = () => {
-    const data = self.store.state.data;
-    self.onOpenMatch?.(match.id, data && data.date !== data.today ? data.date : null);
-  };
-  node.addEventListener("click", open);
-  node.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+
+  // The whole row opens the match through a real link laid over it: every
+  // browser (iPhone Safari included) treats a tap on a link as a tap, and a
+  // long press or a middle click can open the match in a new tab.
+  const data = self.store.state.data;
+  const date = data && data.date !== data.today ? data.date : null;
+  const link = el("a", "lv-match-link");
+  link.href = self.matchLink ? self.matchLink(match.id, date) : "#";
+  link.setAttribute("aria-label", `${match.home.team.name} - ${match.away.team.name}`);
+  link.addEventListener("click", (e) => {
+    // New tab or window: leave it to the browser.
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    // What the list knows now, so the match screen has its score at once.
+    const current = self.store.state.data?.groups?.flatMap((g) => g.matches).find((m) => m.id === match.id) || match;
+    self.onOpenMatch?.(match.id, date, { match: current, competition });
   });
+  node.append(link);
   const row = { node, parts, last: {} };
   updateRow(row, match, false, null, self.tz);
   return row;

@@ -944,12 +944,23 @@
 
 /* ---------------------------------------------------------------- opening a match */
 
-/* A whole match block opens its details: lighter under the pointer, and
-   while pressed, as an iOS cell does. */
+/* A whole match block opens its details, through a link laid over it
+   (dayView.js): lighter under the pointer, and while pressed, as an iOS cell
+   does. */
 .lv .lv-match {
+  position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s ease-out;
+}
+
+.lv .lv-match-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: default;
 }
 
 @media (hover: hover) {
@@ -962,7 +973,7 @@
   background: #3a3a3c;
 }
 
-.lv .lv-match:focus-visible {
+.lv .lv-match-link:focus-visible {
   outline: 2px solid var(--lv-accent);
   outline-offset: 2px;
 }
