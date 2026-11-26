@@ -319,9 +319,8 @@ and after. This stage also laid the groundwork every later stage reuses.
 - [ ] **Owner says yes:** merge `dev` into `main`. Until then production does
       not have: the dev environment setup, the analytics guard, the skills,
       `npm run check`. (The database indexes are already on production.)
-- [x] "Request indexing" in Search Console for the two Armenian pages
-      (`/am/champions-league-tournament/`, `/am/tournament-bracket-maker/`),
-      done 2026-11-26
+- [x] The five new bracket pages are on Google (checked 2026-11-26 in
+      Search Console; the two Armenian ones after an indexing request)
 - [ ] **Owner, optional:** fix the Villarreal row in the production standings
       (goals against and goal difference are empty)
 - [ ] **Owner:** post the listings, read the Armenian texts, fill the GitHub
